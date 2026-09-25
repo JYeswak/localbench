@@ -1,0 +1,646 @@
+{
+  "kind": "aa",
+  "runs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "2bdcdfc",
+        "created": "20260923T212051Z",
+        "tiers": [
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "aa1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "e2e.tool_read.first_wall_s": {
+          "value": 5.6044,
+          "better": "lower",
+          "spread": [
+            5.6044,
+            5.6044
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 4.196,
+          "better": "lower",
+          "spread": [
+            4.196,
+            4.196
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 2.1727,
+          "better": "lower",
+          "spread": [
+            2.1727,
+            2.1727
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 0.893,
+          "better": "lower",
+          "spread": [
+            0.893,
+            0.893
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 4.9152,
+          "better": "lower",
+          "spread": [
+            4.9152,
+            4.9152
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 3.652,
+          "better": "lower",
+          "spread": [
+            3.652,
+            3.652
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 1.3061,
+          "better": "lower",
+          "spread": [
+            1.3061,
+            1.3061
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.133,
+          "better": "lower",
+          "spread": [
+            0.133,
+            0.133
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260923T212051Z__aa1__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 0.6,
+            "llm_s": 4.196,
+            "aux_s": 0.685,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.685,
+                "aborted": 0,
+                "completion_tokens": 66
+              }
+            }
+          },
+          "input": 19009,
+          "output": 103,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {},
+        "e2e.ok": {
+          "answer_ok": true,
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 0.588,
+            "llm_s": 3.652,
+            "aux_s": 0.611,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.611,
+                "aborted": 0,
+                "completion_tokens": 64
+              }
+            }
+          },
+          "input": 9439,
+          "output": 15,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {}
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 2.3,
+              "max": 2.34,
+              "min": 2.2
+            },
+            "gpu_device_pct": {
+              "mean": 1.5,
+              "max": 6,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.6,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 1.4,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ]
+          },
+          "cpu_busy_pct": 6.9,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.8
+        },
+        "during": {
+          "samples": 13,
+          "load1": {
+            "mean": 2.2,
+            "max": 2.34,
+            "min": 2.12
+          },
+          "gpu_device_pct": {
+            "mean": 90.5,
+            "max": 99,
+            "min": 54
+          },
+          "free_pct": {
+            "mean": 93.5,
+            "max": 98,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 63566,
+              "name": "ollama",
+              "pct": 28.3,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 64511",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 1.0,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 7,
+          "busy_pct": {
+            "mean": 9.0,
+            "max": 12.5,
+            "min": 5.4
+          }
+        },
+        "before_live": {
+          "t": 1790198452.359766,
+          "load1": 2.2,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1253474304,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "2bdcdfc",
+        "created": "20260923T212114Z",
+        "tiers": [
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "aa2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "e2e.tool_read.first_wall_s": {
+          "value": 5.5161,
+          "better": "lower",
+          "spread": [
+            5.5161,
+            5.5161
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 4.129,
+          "better": "lower",
+          "spread": [
+            4.129,
+            4.129
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 2.0362,
+          "better": "lower",
+          "spread": [
+            2.0362,
+            2.0362
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 0.77,
+          "better": "lower",
+          "spread": [
+            0.77,
+            0.77
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 4.8043,
+          "better": "lower",
+          "spread": [
+            4.8043,
+            4.8043
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 3.528,
+          "better": "lower",
+          "spread": [
+            3.528,
+            3.528
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 1.4164,
+          "better": "lower",
+          "spread": [
+            1.4164,
+            1.4164
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.287,
+          "better": "lower",
+          "spread": [
+            0.287,
+            0.287
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260923T212114Z__aa2__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 0.61,
+            "llm_s": 4.129,
+            "aux_s": 0.679,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.679,
+                "aborted": 0,
+                "completion_tokens": 66
+              }
+            }
+          },
+          "input": 19009,
+          "output": 92,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {},
+        "e2e.ok": {
+          "answer_ok": true,
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 0.595,
+            "llm_s": 3.528,
+            "aux_s": 0.612,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.612,
+                "aborted": 0,
+                "completion_tokens": 64
+              }
+            }
+          },
+          "input": 9439,
+          "output": 22,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {}
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 2.1,
+              "max": 2.11,
+              "min": 2.11
+            },
+            "gpu_device_pct": {
+              "mean": 2.2,
+              "max": 7,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 1.5,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.5,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 5.6,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.9
+        },
+        "during": {
+          "samples": 13,
+          "load1": {
+            "mean": 2.3,
+            "max": 2.42,
+            "min": 2.2
+          },
+          "gpu_device_pct": {
+            "mean": 90.5,
+            "max": 99,
+            "min": 53
+          },
+          "free_pct": {
+            "mean": 93.5,
+            "max": 98,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 64043,
+              "name": "ollama",
+              "pct": 28.5,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 64719",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 1.1,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 7,
+          "busy_pct": {
+            "mean": 9.2,
+            "max": 14.4,
+            "min": 5.7
+          }
+        },
+        "before_live": {
+          "t": 1790198475.056719,
+          "load1": 2.11,
+          "free_pct": 94,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 24807587840,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ],
+  "problems": []
+}

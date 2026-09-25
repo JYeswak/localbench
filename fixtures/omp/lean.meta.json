@@ -1,0 +1,30 @@
+{
+  "omp_version": "18.2.11",
+  "omp_sha": "ce797fb3ed92e768",
+  "omp_path": "~/.bun/bin/omp",
+  "prompt_tokens": 11433,
+  "recorded_at": "20260923T065948Z",
+  "omp_calls": 1,
+  "profile": "default",
+  "omp_flags": [
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "--tools=read,bash,edit,write,grep,glob,todo"
+  ],
+  "child_config": {
+    "path": "fixtures/omp/child-config.yml",
+    "sha16": "62eed267e219ddde"
+  },
+  "provider_path": "localbench provider (openai-completions) -> localbench proxy -> backend",
+  "messages": 2,
+  "tools": 7,
+  "backend_pins": {
+    "backend": "ollama",
+    "backend_version": "0.32.15",
+    "backend_sha": "eee609f0a6da58b9",
+    "model": "qwen3.6:35b-mlx",
+    "model_digest": "e92a3e94bbca"
+  }
+}

@@ -1,0 +1,169 @@
+#!/bin/sh
+# Pre-commit honesty gate (installed by scripts/init.sh).
+# Pattern: franken_whisper .githooks/pre-commit (exit 2 blocks invalid rows);
+#          franken_markdown check-claim-discipline.sh self-test ("the gate
+#          proves its own teeth"); frankensympy tools/validate_planning.py
+#          --self-test (negative fixtures must be rejected).
+#
+# --no-verify: git's --no-verify flag bypasses this hook entirely and
+# silently, by git's design — no hook can prevent that. The backstop is CI:
+# .github/workflows/kit-gates.yml (installed by init.sh) re-runs every gate
+# where --no-verify cannot reach. A locally bypassed gate is a process
+# violation, not a silent pass. (CHECKLIST.md B5 names this escape hatch.)
+#
+# Kept pure shell with no builds: a hook that builds the workspace is a hook
+# that gets bypassed with --no-verify on its second use (frankensim).
+# POSIX sh only. A missing or unrunnable guard fails CLOSED: a gate that
+# degrades to a warning when its checker disappears is decoration.
+set -u
+
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+fail=0
+
+TMPD="${TMPDIR:-/tmp}/kit-hook-$$"
+rm -rf "$TMPD"
+if ! mkdir -p "$TMPD"; then
+  echo "pre-commit: cannot create temp dir; blocking commit." >&2
+  exit 2
+fi
+trap 'rm -rf "$TMPD"' EXIT
+
+CHECKER="$ROOT/scripts/check-claim-discipline.sh"
+READINESS="$ROOT/scripts/check-readiness.sh"
+
+# 0. The gate must exist and be runnable, or nothing below means anything.
+if [ ! -x "$CHECKER" ]; then
+  echo "pre-commit: BLOCKED — $CHECKER is missing or not executable." >&2
+  echo "pre-commit: the honesty gate cannot verify itself; repair the checker" >&2
+  echo "pre-commit: or remove this hook deliberately. Refusing to fail open." >&2
+  exit 2
+fi
+
+# 1. Canary self-test: the claim gate MUST fail a deliberately overclaimed
+#    fixture. If it passes, the gate has no teeth and this commit is blocked.
+TAB=$(printf '\t')
+printf 'label%sreadme_pattern%scapability_key%sexpected_substr%sproof_path%senforce%snotes\n' \
+  "$TAB" "$TAB" "$TAB" "$TAB" "$TAB" "$TAB" > "$TMPD/claims.tsv"
+# Deliberately overclaimed row: the README makes the claim, the proof is missing.
+printf '%s\n' "canary${TAB}CANARY_OVERCLAIM_XYZ${TAB}${TAB}${TAB}${TMPD}/canary-proof-missing.md${TAB}yes${TAB}canary fixture" >> "$TMPD/claims.tsv"
+printf '# canary fixture\nCANARY_OVERCLAIM_XYZ\n' > "$TMPD/README.md"
+# The canary must fail for the RIGHT reason (its proof is missing). localbench, 2026-09-22: on macOS
+# /bin/sh the kit's checker failed to parse any row and rejected the canary only through its
+# zero-enforced-rows rule — a pass for the wrong reason (docs/evidence/break-tests.md, lb-10).
+canary_out=$(sh "$CHECKER" "$TMPD/claims.tsv" "$TMPD/README.md" 2>&1)
+canary_rc=$?
+if [ "$canary_rc" -eq 0 ]; then
+  echo "pre-commit: CANARY FAILED — the claim gate passed a deliberate overclaim." >&2
+  echo "pre-commit: the gate has no teeth; blocking commit until it is repaired." >&2
+  fail=1
+elif ! printf '%s\n' "$canary_out" | grep -q '^FAIL  canary: proof artifact missing'; then
+  echo "pre-commit: CANARY FAILED — the gate rejected the canary for the wrong reason:" >&2
+  printf '%s\n' "$canary_out" >&2
+  fail=1
+else
+  echo "pre-commit: canary self-test ok (gate rejects overclaims for a missing proof)." >&2
+fi
+
+# 2. Claim discipline on the real registry.
+#    Checker output is captured: on failure the whole report prints; on
+#    success, WARNING lines still surface — an enforce=yes row whose
+#    readme_pattern misses the README prose is registered but UNVERIFIED,
+#    and that must be visible, not buried in a passing run.
+if [ -f "$ROOT/registries/claims.tsv" ]; then
+  if out=$(sh "$CHECKER" "$ROOT/registries/claims.tsv" "$ROOT/README.md" 2>&1); then
+    printf '%s\n' "$out" | grep '^WARNING' >&2 || true
+  else
+    printf '%s\n' "$out" >&2
+    echo "pre-commit: claim discipline FAILED — fix the claims or the proofs before committing." >&2
+    fail=1
+  fi
+fi
+
+# 3. Negative-evidence ledger lint. EVERY row in the staged ledger file is
+#    linted whenever the file is staged — not just added headings. Linting
+#    only added headings let a body-only edit weaken a committed row's retry
+#    predicate to "later" with no warning (cold-test L1). Each row is
+#    validated against its FULL content read from the staged file, so editing
+#    a row's heading can never false-block, and weasel predicates
+#    ("later", "TBD", "n/a", ...) fail.
+if git rev-parse --git-dir >/dev/null 2>&1; then
+  if git diff --cached --name-only | grep -q 'docs/evidence/NEGATIVE_EVIDENCE.md'; then
+    if git -C "$ROOT" show ":docs/evidence/NEGATIVE_EVIDENCE.md" > "$TMPD/ledger.md" 2>/dev/null; then
+      # Lint every row in the staged file. (Earlier versions linted only rows
+      # whose headings were added lines in the diff — a body-only edit to an
+      # existing row then evaded the check entirely.)
+      bad_rows=$(awk -v ledger="$TMPD/ledger.md" '
+          BEGIN {
+            nl = 0
+            while ((getline line < ledger) > 0) l[++nl] = line
+          }
+          END {
+            for (s = 1; s <= nl; s++) {
+              if (l[s] !~ /^## /) continue
+              e = nl
+              for (i = s + 1; i <= nl; i++) if (l[i] ~ /^## /) { e = i - 1; break }
+              pred = ""
+              for (i = s; i <= e; i++) {
+                if (l[i] ~ /[Rr]etry [Pp]redicate:/) {
+                  v = l[i]
+                  sub(/.*[Rr]etry [Pp]redicate:[ \t]*/, "", v)
+                  sub(/^\*\*[ \t]*/, "", v)
+                  sub(/^[ \t]+|[ \t]+$/, "", v)
+                  pred = v
+                }
+              }
+              wl = pred
+              # Weasel test: the WHOLE value must be a weasel word (after
+              # trimming whitespace), or contain "later" as a standalone word.
+              # Substantive values like "n/a — shipped; ..." pass because they
+              # carry real content beyond the weasel word.
+              gsub(/^[ \t]+|[ \t]+$/, "", wl)
+              wll = tolower(wl)
+              weasel = (wl == "" || wll == "later" || wll == "tbd" || wll == "t.b.d." || \
+                        wll == "todo" || wll == "n/a" || wll == "n.a." || wll == "na" || \
+                        wll == "none" || wll == "unknown" || wll == "pending" || \
+                        wll == "to be determined" || wll == "?")
+              if (!weasel && wll ~ /(^|[^[:alnum:]])later([^[:alnum:]]|$)/) weasel = 1
+              if (weasel) print "BAD: " l[s]
+            }
+          }' < /dev/null)
+      if [ -n "$bad_rows" ]; then
+        echo "pre-commit: staged NEGATIVE_EVIDENCE.md row(s) with missing or weasel retry predicates:" >&2
+        printf '%s\n' "$bad_rows" >&2
+        echo "pre-commit: every row needs a real, testable retry predicate — never 'later', 'TBD', 'n/a'." >&2
+        fail=1
+      fi
+    fi
+  fi
+fi
+
+# 4. Advisory only: if the planning packet is staged, report readiness.
+#    This never blocks — drafting a packet takes many commits — but the
+#    reminder is cheap. The blocking enforcement lives in CI (kit-gates.yml).
+if git diff --cached --name-only 2>/dev/null | grep -q 'docs/planning/packet.md'; then
+  if [ -x "$READINESS" ]; then
+    if ! sh "$READINESS" "$ROOT/docs/planning/packet.md" >/dev/null 2>&1; then
+      echo "pre-commit: note — docs/planning/packet.md is staged but NOT READY (advisory; blocking gate is in CI)." >&2
+    fi
+  fi
+fi
+
+# 5. Regression suite (tests/, stdlib unittest): the code that judges runs — golden generation binding and merge,
+#    the proxy's side-call labels, CLI refusals, output projections — must keep failing on the bugs it was written
+#    against (each test is mutation-checked; 2026-09-23 merge() tier drop, 0b6832e, reached review untested).
+#    Pure logic, about a second; runs when code, tests or fixtures are staged. It tests the working tree, not the
+#    staged snapshot. Fails CLOSED without uv: a suite that silently does not run is decoration.
+if git diff --cached --name-only 2>/dev/null | grep -qE '^(localbench|tests|fixtures)/'; then
+  if ! command -v uv >/dev/null 2>&1; then
+    echo "pre-commit: BLOCKED — uv not found, so the regression suite (tests/) cannot run." >&2
+    fail=1
+  elif ! suite_out=$(cd "$ROOT" && uv run --quiet python -m unittest discover -s tests -t . 2>&1); then
+    printf '%s\n' "$suite_out" | grep -v '^INFO' | tail -40 >&2
+    echo "pre-commit: regression suite FAILED — fix the code or the test; never weaken a test to land a change." >&2
+    fail=1
+  else
+    echo "pre-commit: regression suite ok ($(printf '%s\n' "$suite_out" | grep -E '^Ran [0-9]+ tests' | head -1))." >&2
+  fi
+fi
+
+exit $fail

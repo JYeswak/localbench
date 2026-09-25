@@ -1,0 +1,1007 @@
+{
+  "kind": "ab",
+  "a": "ollama:localbench-parked:5642e97495e1",
+  "b": "ollama:qwen3.6:35b-mlx",
+  "order": [
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [],
+  "table": {
+    "micro.decode.decode_tps": {
+      "a1": 64.3183,
+      "a2": 65.8438,
+      "b": 150.5284,
+      "better": "higher",
+      "aa_rel_spread": 0.0234,
+      "band": 0.0703,
+      "b_over_a": 2.313,
+      "verdict": "B-BETTER"
+    },
+    "micro.decode.ttft_s": {
+      "a1": 0.2537,
+      "a2": 0.2584,
+      "b": 0.0897,
+      "better": "lower",
+      "aa_rel_spread": 0.0184,
+      "band": 0.1,
+      "b_over_a": 0.35,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_1k.prefill_tps": {
+      "a1": 416.9191,
+      "a2": 415.5757,
+      "b": 2666.6909,
+      "better": "higher",
+      "aa_rel_spread": 0.0032,
+      "band": 0.05,
+      "b_over_a": 6.407,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_1k.ttft_s": {
+      "a1": 2.6345,
+      "a2": 2.6493,
+      "b": 0.4129,
+      "better": "lower",
+      "aa_rel_spread": 0.0056,
+      "band": 0.1,
+      "b_over_a": 0.156,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_8k.prefill_tps": {
+      "a1": 419.0269,
+      "a2": 413.2111,
+      "b": 2734.5603,
+      "better": "higher",
+      "aa_rel_spread": 0.014,
+      "band": 0.05,
+      "b_over_a": 6.572,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_8k.ttft_s": {
+      "a1": 20.7791,
+      "a2": 21.0837,
+      "b": 3.1848,
+      "better": "lower",
+      "aa_rel_spread": 0.0146,
+      "band": 0.1,
+      "b_over_a": 0.152,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_32k.prefill_tps": {
+      "a1": 374.1277,
+      "a2": 347.6245,
+      "b": 2073.6758,
+      "better": "higher",
+      "aa_rel_spread": 0.0734,
+      "band": 0.2203,
+      "b_over_a": 5.746,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_32k.ttft_s": {
+      "a1": 93.5991,
+      "a2": 100.7323,
+      "b": 16.8864,
+      "better": "lower",
+      "aa_rel_spread": 0.0734,
+      "band": 0.2202,
+      "b_over_a": 0.174,
+      "verdict": "B-BETTER"
+    },
+    "micro.cache_hit_8k.warm_ttft_s": {
+      "a1": 0.1817,
+      "a2": 0.13,
+      "b": 0.0468,
+      "better": "lower",
+      "aa_rel_spread": 0.3317,
+      "band": 0.9952,
+      "b_over_a": 0.3,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.cache_hit_8k.speedup_x": {
+      "a1": 116.6065,
+      "a2": 178.1827,
+      "b": 68.0425,
+      "better": "higher",
+      "aa_rel_spread": 0.4178,
+      "band": 1.2533,
+      "b_over_a": 0.462,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.eviction_probe_8k.a_again_ttft_s": {
+      "a1": 0.183,
+      "a2": 23.1266,
+      "b": 0.0501,
+      "better": "lower",
+      "aa_rel_spread": 1.9686,
+      "band": 5.9058,
+      "b_over_a": 0.004,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.full.cold_ttft_s": {
+      "a1": null,
+      "a2": null,
+      "b": null,
+      "verdict": "VOID",
+      "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+    },
+    "replay.full.warm_ttft_s": {
+      "a1": null,
+      "a2": null,
+      "b": null,
+      "verdict": "VOID",
+      "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+    },
+    "replay.full.turn2_ttft_s": {
+      "a1": null,
+      "a2": null,
+      "b": null,
+      "verdict": "VOID",
+      "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+    },
+    "replay.lean.cold_ttft_s": {
+      "a1": null,
+      "a2": null,
+      "b": null,
+      "verdict": "VOID",
+      "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+    },
+    "replay.lean.warm_ttft_s": {
+      "a1": null,
+      "a2": null,
+      "b": null,
+      "verdict": "VOID",
+      "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+    },
+    "replay.lean.turn2_ttft_s": {
+      "a1": null,
+      "a2": null,
+      "b": null,
+      "verdict": "VOID",
+      "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "d7a4ea2-dirty",
+        "created": "20260923T054806Z",
+        "tiers": [
+          "micro",
+          "replay"
+        ],
+        "repeats": 3,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 64.3183,
+          "better": "higher",
+          "spread": [
+            62.1592,
+            69.787
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.2537,
+          "better": "lower",
+          "spread": [
+            0.2524,
+            0.268
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 416.9191,
+          "better": "higher",
+          "spread": [
+            416.3946,
+            418.8298
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 2.6345,
+          "better": "lower",
+          "spread": [
+            2.6288,
+            2.6432
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 419.0269,
+          "better": "higher",
+          "spread": [
+            418.2588,
+            419.1083
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 20.7791,
+          "better": "lower",
+          "spread": [
+            20.7751,
+            20.8268
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 374.1277,
+          "better": "higher",
+          "spread": [
+            370.0908,
+            374.6448
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 93.5991,
+          "better": "lower",
+          "spread": [
+            93.4645,
+            94.62
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.1817,
+          "better": "lower",
+          "spread": [
+            0.1817,
+            0.1817
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 116.6065,
+          "better": "higher",
+          "spread": [
+            116.6065,
+            116.6065
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.183,
+          "better": "lower",
+          "spread": [
+            0.183,
+            0.183
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.full.warm_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        }
+      },
+      "conformance": {},
+      "run_dir": "runs/20260923T054806Z__ab_a1__ollama__localbench-parked_5642e97495e1",
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 5,
+            "load1": {
+              "mean": 4.6,
+              "max": 4.58,
+              "min": 4.58
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0
+          },
+          "cpu_busy_pct": 8.2,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.7
+        },
+        "during": {
+          "samples": 334,
+          "load1": {
+            "mean": 3.8,
+            "max": 4.57,
+            "min": 2.38
+          },
+          "gpu_device_pct": {
+            "mean": 99.5,
+            "max": 100,
+            "min": 88
+          },
+          "free_pct": {
+            "mean": 93.6,
+            "max": 94,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 183,
+          "busy_pct": {
+            "mean": 10.0,
+            "max": 27.5,
+            "min": 4.1
+          }
+        },
+        "before_live": {
+          "t": 1790142486.8366778,
+          "load1": 4.58,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 2525446144,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1"
+            ],
+            "mlx-serve": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "d7a4ea2-dirty",
+        "created": "20260923T055522Z",
+        "tiers": [
+          "micro",
+          "replay"
+        ],
+        "repeats": 3,
+        "label": "ab_b"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 150.5284,
+          "better": "higher",
+          "spread": [
+            148.5789,
+            158.2687
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.0897,
+          "better": "lower",
+          "spread": [
+            0.0828,
+            0.0995
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2666.6909,
+          "better": "higher",
+          "spread": [
+            2617.649,
+            2681.2801
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.4129,
+          "better": "lower",
+          "spread": [
+            0.4114,
+            0.421
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2734.5603,
+          "better": "higher",
+          "spread": [
+            2731.8904,
+            2749.2416
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 3.1848,
+          "better": "lower",
+          "spread": [
+            3.1681,
+            3.1872
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 2073.6758,
+          "better": "higher",
+          "spread": [
+            2073.6007,
+            2078.3265
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 16.8864,
+          "better": "lower",
+          "spread": [
+            16.8496,
+            16.8866
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.0468,
+          "better": "lower",
+          "spread": [
+            0.0468,
+            0.0468
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 68.0425,
+          "better": "higher",
+          "spread": [
+            68.0425,
+            68.0425
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.0501,
+          "better": "lower",
+          "spread": [
+            0.0501,
+            0.0501
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.full.warm_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        }
+      },
+      "conformance": {},
+      "run_dir": "runs/20260923T055522Z__ab_b__ollama__qwen3.6_35b-mlx",
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 2.9,
+              "max": 2.93,
+              "min": 2.93
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.5,
+              "max": 98,
+              "min": 95
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0
+          },
+          "cpu_busy_pct": 8.1,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.7
+        },
+        "during": {
+          "samples": 61,
+          "load1": {
+            "mean": 2.8,
+            "max": 3.19,
+            "min": 2.54
+          },
+          "gpu_device_pct": {
+            "mean": 97.8,
+            "max": 99,
+            "min": 72
+          },
+          "free_pct": {
+            "mean": 92.7,
+            "max": 93,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 33,
+          "busy_pct": {
+            "mean": 5.9,
+            "max": 14.4,
+            "min": 4.1
+          }
+        },
+        "before_live": {
+          "t": 1790142922.99027,
+          "load1": 2.93,
+          "free_pct": 95,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 19607552000,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1"
+            ],
+            "mlx-serve": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "d7a4ea2-dirty",
+        "created": "20260923T055707Z",
+        "tiers": [
+          "micro",
+          "replay"
+        ],
+        "repeats": 3,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 65.8438,
+          "better": "higher",
+          "spread": [
+            63.1127,
+            69.6496
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.2584,
+          "better": "lower",
+          "spread": [
+            0.2571,
+            0.2633
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 415.5757,
+          "better": "higher",
+          "spread": [
+            409.8215,
+            417.8327
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 2.6493,
+          "better": "lower",
+          "spread": [
+            2.6326,
+            2.6914
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 413.2111,
+          "better": "higher",
+          "spread": [
+            412.3762,
+            415.3221
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 21.0837,
+          "better": "lower",
+          "spread": [
+            20.9741,
+            21.1215
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 347.6245,
+          "better": "higher",
+          "spread": [
+            336.6615,
+            359.3689
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 100.7323,
+          "better": "lower",
+          "spread": [
+            97.4375,
+            104.0095
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.13,
+          "better": "lower",
+          "spread": [
+            0.13,
+            0.13
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 178.1827,
+          "better": "higher",
+          "spread": [
+            178.1827,
+            178.1827
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 23.1266,
+          "better": "lower",
+          "spread": [
+            23.1266,
+            23.1266
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.full.warm_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": null,
+          "better": "lower",
+          "void": "GENERATION-MISMATCH: fixture omp 18.2.10 sha acf06c76a4969558 vs running 18.2.11 sha ce797fb3ed92e768"
+        }
+      },
+      "conformance": {},
+      "run_dir": "runs/20260923T055707Z__ab_a2__ollama__localbench-parked_5642e97495e1",
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 3.1,
+              "max": 3.19,
+              "min": 3.01
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 94.8,
+              "max": 98,
+              "min": 93
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0
+          },
+          "cpu_busy_pct": 7.5,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.7
+        },
+        "during": {
+          "samples": 374,
+          "load1": {
+            "mean": 2.8,
+            "max": 3.77,
+            "min": 1.88
+          },
+          "gpu_device_pct": {
+            "mean": 99.6,
+            "max": 100,
+            "min": 90
+          },
+          "free_pct": {
+            "mean": 93.8,
+            "max": 94,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 206,
+          "busy_pct": {
+            "mean": 6.1,
+            "max": 10.3,
+            "min": 3.9
+          }
+        },
+        "before_live": {
+          "t": 1790143028.160842,
+          "load1": 3.19,
+          "free_pct": 93,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 26584645632,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

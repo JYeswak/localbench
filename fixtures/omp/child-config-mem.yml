@@ -1,0 +1,13 @@
+# Overlay for the `mem` tier's omp children (`omp -p ... --config`): memory ON, stated explicitly instead of inherited
+# from the default profile, so a profile edit cannot change what the tier measures. Recall before each turn, retention
+# when the process exits, the memory LLM on the smol role — which child_flags points at the model under test (one model
+# on the machine).
+# Consumer: workloads.mem. Pinned per run as omp_mem_config; mem goldens bind to it. Variants (memory LLM on the CPU
+# tiny model, no memory LLM, FTS-only recall) are separate overlays passed with --mem-config / ab's --b-mem-config.
+# Delete when: the mem tier is retired.
+memory:
+  backend: mnemopi
+mnemopi:
+  autoRecall: true
+  autoRetain: true
+  llmMode: smol

@@ -1,0 +1,2163 @@
+{
+  "kind": "ab",
+  "a": "mlx-serve:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit",
+  "b": "omlx:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit",
+  "order": [
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [],
+  "table": {
+    "micro.decode.decode_tps": {
+      "b": 42.5992,
+      "a1": 28.9623,
+      "a2": 79.1804,
+      "b_legs": [
+        42.5992
+      ],
+      "a_legs": [
+        28.9623,
+        79.1804
+      ],
+      "a_median": 54.07135,
+      "b_median": 42.5992,
+      "better": "higher",
+      "aa_rel_spread": 0.9287,
+      "bb_rel_spread": 0.0,
+      "band": 2.7862,
+      "b_over_a": 0.788,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.decode.ttft_s": {
+      "b": 0.2478,
+      "a1": 0.2974,
+      "a2": 0.1019,
+      "b_legs": [
+        0.2478
+      ],
+      "a_legs": [
+        0.2974,
+        0.1019
+      ],
+      "a_median": 0.19965,
+      "b_median": 0.2478,
+      "better": "lower",
+      "aa_rel_spread": 0.9792,
+      "bb_rel_spread": 0.0,
+      "band": 2.9376,
+      "b_over_a": 1.241,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_1k.prefill_tps": {
+      "b": 2277.1219,
+      "a1": 1182.0011,
+      "a2": 2561.7782,
+      "b_legs": [
+        2277.1219
+      ],
+      "a_legs": [
+        1182.0011,
+        2561.7782
+      ],
+      "a_median": 1871.88965,
+      "b_median": 2277.1219,
+      "better": "higher",
+      "aa_rel_spread": 0.7371,
+      "bb_rel_spread": 0.0,
+      "band": 2.2113,
+      "b_over_a": 1.216,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_1k.ttft_s": {
+      "b": 0.4835,
+      "a1": 0.9323,
+      "a2": 0.4302,
+      "b_legs": [
+        0.4835
+      ],
+      "a_legs": [
+        0.9323,
+        0.4302
+      ],
+      "a_median": 0.68125,
+      "b_median": 0.4835,
+      "better": "lower",
+      "aa_rel_spread": 0.737,
+      "bb_rel_spread": 0.0,
+      "band": 2.2111,
+      "b_over_a": 0.71,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_8k.prefill_tps": {
+      "b": 2953.8688,
+      "a1": 2528.1531,
+      "a2": 2909.5582,
+      "b_legs": [
+        2953.8688
+      ],
+      "a_legs": [
+        2528.1531,
+        2909.5582
+      ],
+      "a_median": 2718.85565,
+      "b_median": 2953.8688,
+      "better": "higher",
+      "aa_rel_spread": 0.1403,
+      "bb_rel_spread": 0.0,
+      "band": 0.4208,
+      "b_over_a": 1.086,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_8k.ttft_s": {
+      "b": 2.9466,
+      "a1": 3.4456,
+      "a2": 2.9929,
+      "b_legs": [
+        2.9466
+      ],
+      "a_legs": [
+        3.4456,
+        2.9929
+      ],
+      "a_median": 3.21925,
+      "b_median": 2.9466,
+      "better": "lower",
+      "aa_rel_spread": 0.1406,
+      "bb_rel_spread": 0.0,
+      "band": 0.4219,
+      "b_over_a": 0.915,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_32k.prefill_tps": {
+      "b": 2281.3362,
+      "a1": 1887.3307,
+      "a2": 2162.1509,
+      "b_legs": [
+        2281.3362
+      ],
+      "a_legs": [
+        1887.3307,
+        2162.1509
+      ],
+      "a_median": 2024.7408,
+      "b_median": 2281.3362,
+      "better": "higher",
+      "aa_rel_spread": 0.1357,
+      "bb_rel_spread": 0.0,
+      "band": 0.4072,
+      "b_over_a": 1.127,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_32k.ttft_s": {
+      "b": 15.3493,
+      "a1": 18.5532,
+      "a2": 16.1964,
+      "b_legs": [
+        15.3493
+      ],
+      "a_legs": [
+        18.5532,
+        16.1964
+      ],
+      "a_median": 17.3748,
+      "b_median": 15.3493,
+      "better": "lower",
+      "aa_rel_spread": 0.1356,
+      "bb_rel_spread": 0.0,
+      "band": 0.4069,
+      "b_over_a": 0.883,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.cache_hit_8k.warm_ttft_s": {
+      "b": 0.3417,
+      "a1": 0.2415,
+      "a2": 0.0938,
+      "b_legs": [
+        0.3417
+      ],
+      "a_legs": [
+        0.2415,
+        0.0938
+      ],
+      "a_median": 0.16765,
+      "b_median": 0.3417,
+      "better": "lower",
+      "aa_rel_spread": 0.881,
+      "bb_rel_spread": 0.0,
+      "band": 2.643,
+      "b_over_a": 2.038,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.cache_hit_8k.speedup_x": {
+      "b": 9.1486,
+      "a1": 14.077,
+      "a2": 31.6638,
+      "b_legs": [
+        9.1486
+      ],
+      "a_legs": [
+        14.077,
+        31.6638
+      ],
+      "a_median": 22.8704,
+      "b_median": 9.1486,
+      "better": "higher",
+      "aa_rel_spread": 0.769,
+      "bb_rel_spread": 0.0,
+      "band": 2.3069,
+      "b_over_a": 0.4,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.eviction_probe_8k.a_again_ttft_s": {
+      "b": 0.2209,
+      "a1": 0.2285,
+      "a2": 0.0265,
+      "b_legs": [
+        0.2209
+      ],
+      "a_legs": [
+        0.2285,
+        0.0265
+      ],
+      "a_median": 0.1275,
+      "b_median": 0.2209,
+      "better": "lower",
+      "aa_rel_spread": 1.5843,
+      "bb_rel_spread": 0.0,
+      "band": 4.7529,
+      "b_over_a": 1.733,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.full.cold_ttft_s": {
+      "b": 42.7207,
+      "a1": 49.3021,
+      "a2": 47.8956,
+      "b_legs": [
+        42.7207
+      ],
+      "a_legs": [
+        49.3021,
+        47.8956
+      ],
+      "a_median": 48.59885,
+      "b_median": 42.7207,
+      "better": "lower",
+      "aa_rel_spread": 0.0289,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 0.879,
+      "verdict": "B-BETTER"
+    },
+    "replay.full.warm_ttft_s": {
+      "b": 1.1116,
+      "a1": 0.7204,
+      "a2": 0.3553,
+      "b_legs": [
+        1.1116
+      ],
+      "a_legs": [
+        0.7204,
+        0.3553
+      ],
+      "a_median": 0.53785,
+      "b_median": 1.1116,
+      "better": "lower",
+      "aa_rel_spread": 0.6788,
+      "bb_rel_spread": 0.0,
+      "band": 2.0364,
+      "b_over_a": 2.067,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.full.turn2_ttft_s": {
+      "b": 1.1453,
+      "a1": 1.1096,
+      "a2": 0.7418,
+      "b_legs": [
+        1.1453
+      ],
+      "a_legs": [
+        1.1096,
+        0.7418
+      ],
+      "a_median": 0.9257,
+      "b_median": 1.1453,
+      "better": "lower",
+      "aa_rel_spread": 0.3973,
+      "bb_rel_spread": 0.0,
+      "band": 1.192,
+      "b_over_a": 1.237,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.lean.cold_ttft_s": {
+      "b": 3.6168,
+      "a1": 5.4608,
+      "a2": 3.8447,
+      "b_legs": [
+        3.6168
+      ],
+      "a_legs": [
+        5.4608,
+        3.8447
+      ],
+      "a_median": 4.65275,
+      "b_median": 3.6168,
+      "better": "lower",
+      "aa_rel_spread": 0.3473,
+      "bb_rel_spread": 0.0,
+      "band": 1.042,
+      "b_over_a": 0.777,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.lean.warm_ttft_s": {
+      "b": 0.4135,
+      "a1": 0.4323,
+      "a2": 0.1085,
+      "b_legs": [
+        0.4135
+      ],
+      "a_legs": [
+        0.4323,
+        0.1085
+      ],
+      "a_median": 0.27040000000000003,
+      "b_median": 0.4135,
+      "better": "lower",
+      "aa_rel_spread": 1.1975,
+      "bb_rel_spread": 0.0,
+      "band": 3.5925,
+      "b_over_a": 1.529,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.lean.turn2_ttft_s": {
+      "b": 0.2998,
+      "a1": 0.4864,
+      "a2": 0.1899,
+      "b_legs": [
+        0.2998
+      ],
+      "a_legs": [
+        0.4864,
+        0.1899
+      ],
+      "a_median": 0.33815,
+      "b_median": 0.2998,
+      "better": "lower",
+      "aa_rel_spread": 0.8768,
+      "bb_rel_spread": 0.0,
+      "band": 2.6305,
+      "b_over_a": 0.887,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.first_wall_s": {
+      "b": 4.804,
+      "a1": 13.9824,
+      "a2": 5.0455,
+      "b_legs": [
+        4.804
+      ],
+      "a_legs": [
+        13.9824,
+        5.0455
+      ],
+      "a_median": 9.51395,
+      "b_median": 4.804,
+      "better": "lower",
+      "aa_rel_spread": 0.9393,
+      "bb_rel_spread": 0.0,
+      "band": 2.818,
+      "b_over_a": 0.505,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.first_llm_s": {
+      "b": 2.989,
+      "a1": 7.046,
+      "a2": 3.199,
+      "b_legs": [
+        2.989
+      ],
+      "a_legs": [
+        7.046,
+        3.199
+      ],
+      "a_median": 5.1225000000000005,
+      "b_median": 2.989,
+      "better": "lower",
+      "aa_rel_spread": 0.751,
+      "bb_rel_spread": 0.0,
+      "band": 2.253,
+      "b_over_a": 0.584,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.repeat_wall_s": {
+      "b": 4.1863,
+      "a1": 8.9164,
+      "a2": 3.1174,
+      "b_legs": [
+        4.1863
+      ],
+      "a_legs": [
+        8.9164,
+        3.1174
+      ],
+      "a_median": 6.0169,
+      "b_median": 4.1863,
+      "better": "lower",
+      "aa_rel_spread": 0.9638,
+      "bb_rel_spread": 0.0,
+      "band": 2.8914,
+      "b_over_a": 0.696,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.repeat_llm_s": {
+      "b": 2.265,
+      "a1": 4.051,
+      "a2": 1.434,
+      "b_legs": [
+        2.265
+      ],
+      "a_legs": [
+        4.051,
+        1.434
+      ],
+      "a_median": 2.7425,
+      "b_median": 2.265,
+      "better": "lower",
+      "aa_rel_spread": 0.9542,
+      "bb_rel_spread": 0.0,
+      "band": 2.8627,
+      "b_over_a": 0.826,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.first_wall_s": {
+      "b": 3.6654,
+      "a1": 7.3882,
+      "a2": 3.5546,
+      "b_legs": [
+        3.6654
+      ],
+      "a_legs": [
+        7.3882,
+        3.5546
+      ],
+      "a_median": 5.4714,
+      "b_median": 3.6654,
+      "better": "lower",
+      "aa_rel_spread": 0.7007,
+      "bb_rel_spread": 0.0,
+      "band": 2.102,
+      "b_over_a": 0.67,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.first_llm_s": {
+      "b": 2.038,
+      "a1": 3.13,
+      "a2": 1.883,
+      "b_legs": [
+        2.038
+      ],
+      "a_legs": [
+        3.13,
+        1.883
+      ],
+      "a_median": 2.5065,
+      "b_median": 2.038,
+      "better": "lower",
+      "aa_rel_spread": 0.4975,
+      "bb_rel_spread": 0.0,
+      "band": 1.4925,
+      "b_over_a": 0.813,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.repeat_wall_s": {
+      "b": 3.484,
+      "a1": 5.9209,
+      "a2": 1.7361,
+      "b_legs": [
+        3.484
+      ],
+      "a_legs": [
+        5.9209,
+        1.7361
+      ],
+      "a_median": 3.8285,
+      "b_median": 3.484,
+      "better": "lower",
+      "aa_rel_spread": 1.0931,
+      "bb_rel_spread": 0.0,
+      "band": 3.2792,
+      "b_over_a": 0.91,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.repeat_llm_s": {
+      "b": 0.911,
+      "a1": 0.351,
+      "a2": 0.265,
+      "b_legs": [
+        0.911
+      ],
+      "a_legs": [
+        0.351,
+        0.265
+      ],
+      "a_median": 0.308,
+      "b_median": 0.911,
+      "better": "lower",
+      "aa_rel_spread": 0.2792,
+      "bb_rel_spread": 0.0,
+      "band": 0.8377,
+      "b_over_a": 2.958,
+      "verdict": "B-WORSE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.3.1",
+          "omp_sha": "46cb390bb7e6def5",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "4-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "df38ea7",
+        "created": "20260925T055143Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 28.9623,
+          "better": "higher",
+          "spread": [
+            15.8532,
+            29.2036
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.2974,
+          "better": "lower",
+          "spread": [
+            0.1863,
+            0.4689
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 1182.0011,
+          "better": "higher",
+          "spread": [
+            1126.7171,
+            1400.0119
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.9323,
+          "better": "lower",
+          "spread": [
+            0.7879,
+            0.979
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2528.1531,
+          "better": "higher",
+          "spread": [
+            2486.6719,
+            2737.6831
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 3.4456,
+          "better": "lower",
+          "spread": [
+            3.1804,
+            3.5035
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 1887.3307,
+          "better": "higher",
+          "spread": [
+            1862.4688,
+            2028.1826
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 18.5532,
+          "better": "lower",
+          "spread": [
+            17.2662,
+            18.8019
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.2415,
+          "better": "lower",
+          "spread": [
+            0.2415,
+            0.2415
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 14.077,
+          "better": "higher",
+          "spread": [
+            14.077,
+            14.077
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.2285,
+          "better": "lower",
+          "spread": [
+            0.2285,
+            0.2285
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 49.3021,
+          "better": "lower",
+          "spread": [
+            49.3021,
+            49.3021
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.7204,
+          "better": "lower",
+          "spread": [
+            0.7204,
+            0.7204
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 1.1096,
+          "better": "lower",
+          "spread": [
+            1.1096,
+            1.1096
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 5.4608,
+          "better": "lower",
+          "spread": [
+            5.4608,
+            5.4608
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.4323,
+          "better": "lower",
+          "spread": [
+            0.4323,
+            0.4323
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.4864,
+          "better": "lower",
+          "spread": [
+            0.4864,
+            0.4864
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 13.9824,
+          "better": "lower",
+          "spread": [
+            13.9824,
+            13.9824
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 7.046,
+          "better": "lower",
+          "spread": [
+            7.046,
+            7.046
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 8.9164,
+          "better": "lower",
+          "spread": [
+            8.9164,
+            8.9164
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 4.051,
+          "better": "lower",
+          "spread": [
+            4.051,
+            4.051
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 7.3882,
+          "better": "lower",
+          "spread": [
+            7.3882,
+            7.3882
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 3.13,
+          "better": "lower",
+          "spread": [
+            3.13,
+            3.13
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 5.9209,
+          "better": "lower",
+          "spread": [
+            5.9209,
+            5.9209
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.351,
+          "better": "lower",
+          "spread": [
+            0.351,
+            0.351
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260925T055143Z__ab_a1__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 5.403,
+            "llm_s": 7.046,
+            "aux_s": 0.834,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.834,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 133,
+          "output": 96,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817",
+            "4817"
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 3.163,
+            "llm_s": 3.13,
+            "aux_s": 0.715,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.715,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 31,
+          "output": 3,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 8,
+            "load1": {
+              "mean": 38.5,
+              "max": 39.34,
+              "min": 38.03
+            },
+            "gpu_device_pct": {
+              "mean": 0.8,
+              "max": 6,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 97.0,
+              "max": 97,
+              "min": 97
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 8,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 7.7,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.7,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 8,
+              "app_gpu_mean_pct": 11.0,
+              "app_gpu_p95_pct": 13.8,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 31.8,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 9.4
+        },
+        "during": {
+          "samples": 185,
+          "load1": {
+            "mean": 47.5,
+            "max": 65.45,
+            "min": 34.41
+          },
+          "gpu_device_pct": {
+            "mean": 73.1,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.2,
+            "max": 98,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 185,
+          "gpu_by_process": [
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 10.5,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 4.4,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 185,
+            "app_gpu_mean_pct": 15.3,
+            "app_gpu_p95_pct": 28.1,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 86,
+          "busy_pct": {
+            "mean": 37.2,
+            "max": 60.6,
+            "min": 29.7
+          }
+        },
+        "before_live": {
+          "t": 1790315504.637169,
+          "load1": 39.34,
+          "free_pct": 97,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 5402230784,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            ],
+            "splash": null,
+            "omlx": []
+          },
+          "user_idle_s": 1406.9
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "omlx",
+          "backend_version": "0.7.0rc1",
+          "backend_sha": "0765dade2ba118f5",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.3.1",
+          "omp_sha": "cacaf5726609a21b",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "omlx",
+          "backend_version": "0.7.0rc1",
+          "backend_sha": "0765dade2ba118f5",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe_text",
+          "quantization": "4-bit",
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "df38ea7",
+        "created": "20260925T055726Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "ab_b"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 42.5992,
+          "better": "higher",
+          "spread": [
+            17.4635,
+            44.8667
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.2478,
+          "better": "lower",
+          "spread": [
+            0.1813,
+            0.2694
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2277.1219,
+          "better": "higher",
+          "spread": [
+            2061.1748,
+            2437.126
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.4835,
+          "better": "lower",
+          "spread": [
+            0.4518,
+            0.5351
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2953.8688,
+          "better": "higher",
+          "spread": [
+            2944.8149,
+            3002.2987
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 2.9466,
+          "better": "lower",
+          "spread": [
+            2.9001,
+            2.9574
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 2281.3362,
+          "better": "higher",
+          "spread": [
+            2243.938,
+            2315.3928
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 15.3493,
+          "better": "lower",
+          "spread": [
+            15.1244,
+            15.6056
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.3417,
+          "better": "lower",
+          "spread": [
+            0.3417,
+            0.3417
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 9.1486,
+          "better": "higher",
+          "spread": [
+            9.1486,
+            9.1486
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.2209,
+          "better": "lower",
+          "spread": [
+            0.2209,
+            0.2209
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 42.7207,
+          "better": "lower",
+          "spread": [
+            42.7207,
+            42.7207
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 1.1116,
+          "better": "lower",
+          "spread": [
+            1.1116,
+            1.1116
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 1.1453,
+          "better": "lower",
+          "spread": [
+            1.1453,
+            1.1453
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 3.6168,
+          "better": "lower",
+          "spread": [
+            3.6168,
+            3.6168
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.4135,
+          "better": "lower",
+          "spread": [
+            0.4135,
+            0.4135
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.2998,
+          "better": "lower",
+          "spread": [
+            0.2998,
+            0.2998
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 4.804,
+          "better": "lower",
+          "spread": [
+            4.804,
+            4.804
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 2.989,
+          "better": "lower",
+          "spread": [
+            2.989,
+            2.989
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 4.1863,
+          "better": "lower",
+          "spread": [
+            4.1863,
+            4.1863
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 2.265,
+          "better": "lower",
+          "spread": [
+            2.265,
+            2.265
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 3.6654,
+          "better": "lower",
+          "spread": [
+            3.6654,
+            3.6654
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 2.038,
+          "better": "lower",
+          "spread": [
+            2.038,
+            2.038
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 3.484,
+          "better": "lower",
+          "spread": [
+            3.484,
+            3.484
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.911,
+          "better": "lower",
+          "spread": [
+            0.911,
+            0.911
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260925T055726Z__ab_b__omlx__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "\n\n4817",
+            "\n\n4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 1,
+            "first_call_cached_tokens": 0,
+            "startup_s": 1.427,
+            "llm_s": 2.989,
+            "aux_s": 0.237,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.237,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 113,
+          "output": 99,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "\n\n4817",
+            "\n\n4817"
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "\n\nOK",
+            "\n\nOK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 1,
+            "first_call_cached_tokens": 0,
+            "startup_s": 1.251,
+            "llm_s": 2.038,
+            "aux_s": 0.241,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.241,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 5,
+          "output": 14,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "\n\nOK",
+            "\n\nOK"
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 7,
+            "load1": {
+              "mean": 66.2,
+              "max": 67.09,
+              "min": 63.8
+            },
+            "gpu_device_pct": {
+              "mean": 1.6,
+              "max": 6,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 97.6,
+              "max": 98,
+              "min": 97
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 7,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 7.2,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.7,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 7,
+              "app_gpu_mean_pct": 10.1,
+              "app_gpu_p95_pct": 12.6,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 59.4,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 57.6
+        },
+        "during": {
+          "samples": 200,
+          "load1": {
+            "mean": 42.8,
+            "max": 79.42,
+            "min": 21.01
+          },
+          "gpu_device_pct": {
+            "mean": 74.9,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.7,
+            "max": 98,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 200,
+          "gpu_by_process": [
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 11.4,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 3.0,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 2.0,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ],
+          "load": {
+            "samples": 200,
+            "app_gpu_mean_pct": 17.1,
+            "app_gpu_p95_pct": 31.9,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 97,
+          "busy_pct": {
+            "mean": 44.7,
+            "max": 62.2,
+            "min": 33.9
+          }
+        },
+        "before_live": {
+          "t": 1790315849.534187,
+          "load1": 73.43,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1623506944,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [],
+            "splash": null,
+            "omlx": []
+          },
+          "user_idle_s": 1751.9
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.3.1",
+          "omp_sha": "cacaf5726609a21b",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "4-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "df38ea7",
+        "created": "20260925T060352Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 79.1804,
+          "better": "higher",
+          "spread": [
+            76.6584,
+            84.9355
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.1019,
+          "better": "lower",
+          "spread": [
+            0.0937,
+            0.1049
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2561.7782,
+          "better": "higher",
+          "spread": [
+            2522.251,
+            2579.3432
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.4302,
+          "better": "lower",
+          "spread": [
+            0.4272,
+            0.4373
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2909.5582,
+          "better": "higher",
+          "spread": [
+            2904.8358,
+            2925.9629
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 2.9929,
+          "better": "lower",
+          "spread": [
+            2.9768,
+            2.9984
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 2162.1509,
+          "better": "higher",
+          "spread": [
+            2161.1298,
+            2170.6117
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 16.1964,
+          "better": "lower",
+          "spread": [
+            16.1337,
+            16.2036
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.0938,
+          "better": "lower",
+          "spread": [
+            0.0938,
+            0.0938
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 31.6638,
+          "better": "higher",
+          "spread": [
+            31.6638,
+            31.6638
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.0265,
+          "better": "lower",
+          "spread": [
+            0.0265,
+            0.0265
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 47.8956,
+          "better": "lower",
+          "spread": [
+            47.8956,
+            47.8956
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.3553,
+          "better": "lower",
+          "spread": [
+            0.3553,
+            0.3553
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.7418,
+          "better": "lower",
+          "spread": [
+            0.7418,
+            0.7418
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 3.8447,
+          "better": "lower",
+          "spread": [
+            3.8447,
+            3.8447
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1085,
+          "better": "lower",
+          "spread": [
+            0.1085,
+            0.1085
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.1899,
+          "better": "lower",
+          "spread": [
+            0.1899,
+            0.1899
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 5.0455,
+          "better": "lower",
+          "spread": [
+            5.0455,
+            5.0455
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 3.199,
+          "better": "lower",
+          "spread": [
+            3.199,
+            3.199
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 3.1174,
+          "better": "lower",
+          "spread": [
+            3.1174,
+            3.1174
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.434,
+          "better": "lower",
+          "spread": [
+            1.434,
+            1.434
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 3.5546,
+          "better": "lower",
+          "spread": [
+            3.5546,
+            3.5546
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 1.883,
+          "better": "lower",
+          "spread": [
+            1.883,
+            1.883
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 1.7361,
+          "better": "lower",
+          "spread": [
+            1.7361,
+            1.7361
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.265,
+          "better": "lower",
+          "spread": [
+            0.265,
+            0.265
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260925T060352Z__ab_a2__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 1.479,
+            "llm_s": 3.199,
+            "aux_s": 0.218,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.218,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 134,
+          "output": 89,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817",
+            "4817"
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 1.393,
+            "llm_s": 1.883,
+            "aux_s": 0.198,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.198,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 31,
+          "output": 15,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 7,
+            "load1": {
+              "mean": 28.4,
+              "max": 28.71,
+              "min": 26.6
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 97.9,
+              "max": 98,
+              "min": 97
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 7,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 8.4,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.9,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 7,
+              "app_gpu_mean_pct": 11.4,
+              "app_gpu_p95_pct": 12.3,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 48.2,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 6.1
+        },
+        "during": {
+          "samples": 161,
+          "load1": {
+            "mean": 22.2,
+            "max": 33.57,
+            "min": 14.46
+          },
+          "gpu_device_pct": {
+            "mean": 93.1,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.0,
+            "max": 98,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 161,
+          "gpu_by_process": [
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 16.9,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 5.5,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 3.4,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 55544,
+              "name": "mlx-serve",
+              "pct": 1.0,
+              "cmd": "mlx-serve --model ~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit --serve --host 127.0.0.1 --port 11234 --metrics",
+              "model": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            }
+          ],
+          "load": {
+            "samples": 161,
+            "app_gpu_mean_pct": 26.0,
+            "app_gpu_p95_pct": 40.2,
+            "app_spike_seconds": 19,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 80,
+          "busy_pct": {
+            "mean": 40.4,
+            "max": 51.7,
+            "min": 32.2
+          }
+        },
+        "before_live": {
+          "t": 1790316232.97853,
+          "load1": 26.6,
+          "free_pct": 94,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 22385016832,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            ],
+            "splash": null,
+            "omlx": []
+          },
+          "user_idle_s": 2135.1
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

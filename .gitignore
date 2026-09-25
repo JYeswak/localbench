@@ -1,0 +1,5 @@
+runs/
+fixtures/omp/.capture/
+*.actual
+__pycache__/
+.venv/

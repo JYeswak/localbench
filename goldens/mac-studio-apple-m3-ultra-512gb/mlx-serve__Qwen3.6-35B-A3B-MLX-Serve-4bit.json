@@ -1,0 +1,387 @@
+{
+  "aa_receipt": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T212141Z.json",
+  "conformance": {
+    "conf.greedy_deterministic": {
+      "level": "SHOULD",
+      "verdict": "PASS"
+    },
+    "conf.no_truncation_64k": {
+      "level": "MUST",
+      "verdict": "PASS"
+    },
+    "conf.streams_incrementally": {
+      "level": "MUST",
+      "verdict": "PASS"
+    },
+    "conf.tool_call": {
+      "level": "MUST",
+      "shape": {
+        "arg_keys": [
+          "path"
+        ],
+        "name": "read_file"
+      },
+      "verdict": "PASS"
+    },
+    "conf.usage_reported": {
+      "level": "MUST",
+      "verdict": "PASS"
+    },
+    "e2e.ok.correct": {
+      "level": "MUST",
+      "verdict": "PASS"
+    },
+    "e2e.tool_read.correct": {
+      "level": "MUST",
+      "verdict": "PASS"
+    },
+    "replay.full.prompt_tokens": {
+      "level": "SHOULD",
+      "verdict": "PASS"
+    },
+    "replay.lean.prompt_tokens": {
+      "level": "SHOULD",
+      "verdict": "FAIL"
+    }
+  },
+  "metrics": {
+    "e2e.ok.first_llm_s": {
+      "aa_rel_spread": 0.0022,
+      "better": "lower",
+      "spread": [
+        3.172,
+        3.179
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T212141Z.json",
+      "value": 3.1755
+    },
+    "e2e.ok.first_wall_s": {
+      "aa_rel_spread": 0.0056,
+      "better": "lower",
+      "spread": [
+        4.0207,
+        4.0432
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T212141Z.json",
+      "value": 4.032
+    },
+    "e2e.ok.repeat_llm_s": {
+      "aa_rel_spread": 0.0048,
+      "better": "lower",
+      "spread": [
+        0.21,
+        0.211
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T212141Z.json",
+      "value": 0.2105
+    },
+    "e2e.ok.repeat_wall_s": {
+      "aa_rel_spread": 0.0273,
+      "better": "lower",
+      "spread": [
+        0.9171,
+        0.9425
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T212141Z.json",
+      "value": 0.9298
+    },
+    "e2e.tool_read.first_llm_s": {
+      "aa_rel_spread": 0.0013,
+      "better": "lower",
+      "spread": [
+        3.96,
+        3.965
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T212141Z.json",
+      "value": 3.9625
+    },
+    "e2e.tool_read.first_wall_s": {
+      "aa_rel_spread": 0.0009,
+      "better": "lower",
+      "spread": [
+        4.8674,
+        4.8718
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T212141Z.json",
+      "value": 4.8696
+    },
+    "e2e.tool_read.repeat_llm_s": {
+      "aa_rel_spread": 0.0607,
+      "better": "lower",
+      "spread": [
+        1.15,
+        1.222
+      ],
+      "tol": 0.1821,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T212141Z.json",
+      "value": 1.186
+    },
+    "e2e.tool_read.repeat_wall_s": {
+      "aa_rel_spread": 0.0334,
+      "better": "lower",
+      "spread": [
+        1.9017,
+        1.9663
+      ],
+      "tol": 0.1002,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T212141Z.json",
+      "value": 1.934
+    },
+    "micro.cache_hit_8k.speedup_x": {
+      "aa_rel_spread": 0.0309,
+      "better": "higher",
+      "spread": [
+        32.7838,
+        33.8138
+      ],
+      "tol": 0.0928,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json",
+      "value": 33.2988
+    },
+    "micro.cache_hit_8k.warm_ttft_s": {
+      "aa_rel_spread": 0.0055,
+      "better": "lower",
+      "spread": [
+        0.0905,
+        0.091
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json",
+      "value": 0.0907
+    },
+    "micro.decode.decode_tps": {
+      "aa_rel_spread": 0.0071,
+      "better": "higher",
+      "spread": [
+        161.431,
+        163.2931
+      ],
+      "tol": 0.05,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json",
+      "value": 162.416
+    },
+    "micro.decode.ttft_s": {
+      "aa_rel_spread": 0.0013,
+      "better": "lower",
+      "spread": [
+        0.0757,
+        0.0777
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json",
+      "value": 0.0774
+    },
+    "micro.eviction_probe_8k.a_again_ttft_s": {
+      "aa_rel_spread": 0.0082,
+      "better": "lower",
+      "spread": [
+        0.0243,
+        0.0245
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json",
+      "value": 0.0244
+    },
+    "micro.prefill_1k.prefill_tps": {
+      "aa_rel_spread": 0.0029,
+      "better": "higher",
+      "spread": [
+        2627.4559,
+        2649.9777
+      ],
+      "tol": 0.05,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json",
+      "value": 2645.5154
+    },
+    "micro.prefill_1k.ttft_s": {
+      "aa_rel_spread": 0.0036,
+      "better": "lower",
+      "spread": [
+        0.4156,
+        0.4206
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json",
+      "value": 0.4167
+    },
+    "micro.prefill_32k.prefill_tps": {
+      "aa_rel_spread": 0.0181,
+      "better": "higher",
+      "spread": [
+        2097.1002,
+        2140.6265
+      ],
+      "tol": 0.0542,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json",
+      "value": 2120.2791
+    },
+    "micro.prefill_32k.ttft_s": {
+      "aa_rel_spread": 0.0182,
+      "better": "lower",
+      "spread": [
+        16.3602,
+        16.6973
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json",
+      "value": 16.5183
+    },
+    "micro.prefill_8k.prefill_tps": {
+      "aa_rel_spread": 0.0373,
+      "better": "higher",
+      "spread": [
+        2756.0702,
+        2901.7199
+      ],
+      "tol": 0.1118,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json",
+      "value": 2843.6158
+    },
+    "micro.prefill_8k.ttft_s": {
+      "aa_rel_spread": 0.0374,
+      "better": "lower",
+      "spread": [
+        2.9993,
+        3.1607
+      ],
+      "tol": 0.1122,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json",
+      "value": 3.0639
+    },
+    "replay.full.cold_ttft_s": {
+      "aa_rel_spread": 0.0011,
+      "better": "lower",
+      "spread": [
+        44.6197,
+        44.6678
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T160735Z.json",
+      "value": 44.6437
+    },
+    "replay.full.turn2_ttft_s": {
+      "aa_rel_spread": 0.0013,
+      "better": "lower",
+      "spread": [
+        0.7061,
+        0.707
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T160735Z.json",
+      "value": 0.7066
+    },
+    "replay.full.warm_ttft_s": {
+      "aa_rel_spread": 0.0018,
+      "better": "lower",
+      "spread": [
+        0.3417,
+        0.3423
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T160735Z.json",
+      "value": 0.342
+    },
+    "replay.lean.cold_ttft_s": {
+      "aa_rel_spread": 0.0025,
+      "better": "lower",
+      "spread": [
+        3.7891,
+        3.7987
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T160735Z.json",
+      "value": 3.7939
+    },
+    "replay.lean.turn2_ttft_s": {
+      "aa_rel_spread": 0.0113,
+      "better": "lower",
+      "spread": [
+        0.1583,
+        0.1601
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T160735Z.json",
+      "value": 0.1592
+    },
+    "replay.lean.warm_ttft_s": {
+      "aa_rel_spread": 0.0123,
+      "better": "lower",
+      "spread": [
+        0.0969,
+        0.0981
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T160735Z.json",
+      "value": 0.0975
+    }
+  },
+  "pins": {
+    "backend": "mlx-serve",
+    "backend_args": "",
+    "backend_sha": "4d09a3beb8d4c9be",
+    "backend_version": "26.9.2",
+    "fixtures_sha": "41ff309f03a98aa5",
+    "host_id": "mac-studio-apple-m3-ultra-512gb",
+    "macos_build": "25F84",
+    "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+    "model_digest": "files:68dedceb5da0",
+    "omp_agent_config": "38b87e2b63396937",
+    "omp_child_config": "62eed267e219ddde",
+    "omp_mem_config": "019eef862b65ed03",
+    "omp_sha": "ce797fb3ed92e768",
+    "omp_version": "18.2.11"
+  },
+  "tier_pins": {
+    "conf": {
+      "backend": "mlx-serve",
+      "backend_args": "",
+      "backend_sha": "4d09a3beb8d4c9be",
+      "backend_version": "26.9.2",
+      "host_id": "mac-studio-apple-m3-ultra-512gb",
+      "macos_build": "25F84",
+      "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "model_digest": "files:68dedceb5da0"
+    },
+    "e2e": {
+      "backend": "mlx-serve",
+      "backend_args": "",
+      "backend_sha": "4d09a3beb8d4c9be",
+      "backend_version": "26.9.2",
+      "host_id": "mac-studio-apple-m3-ultra-512gb",
+      "macos_build": "25F84",
+      "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "model_digest": "files:68dedceb5da0",
+      "omp_agent_config": "38b87e2b63396937",
+      "omp_child_config": "62eed267e219ddde",
+      "omp_sha": "ce797fb3ed92e768",
+      "omp_version": "18.2.11"
+    },
+    "micro": {
+      "backend": "mlx-serve",
+      "backend_args": "",
+      "backend_sha": "4d09a3beb8d4c9be",
+      "backend_version": "26.9.2",
+      "host_id": "mac-studio-apple-m3-ultra-512gb",
+      "macos_build": "25F84",
+      "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "model_digest": "files:68dedceb5da0"
+    },
+    "replay": {
+      "backend": "mlx-serve",
+      "backend_args": "",
+      "backend_sha": "4d09a3beb8d4c9be",
+      "backend_version": "26.9.2",
+      "fixtures_sha": "41ff309f03a98aa5",
+      "host_id": "mac-studio-apple-m3-ultra-512gb",
+      "macos_build": "25F84",
+      "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "model_digest": "files:68dedceb5da0"
+    }
+  }
+}

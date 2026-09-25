@@ -1,0 +1,2185 @@
+{
+  "kind": "ab",
+  "a": "ollama:qwen3.6:35b-mlx",
+  "b": "ollama:qwen3.6:35b-mlx",
+  "order": [
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [],
+  "table": {
+    "sess.turn.wall_s": {
+      "a1": 1.2441,
+      "a2": 1.1766,
+      "b": 1.3342,
+      "better": "lower",
+      "aa_rel_spread": 0.0558,
+      "band": 0.1673,
+      "b_over_a": 1.102,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.post_retain_wall_s": {
+      "a1": 8.3803,
+      "a2": 8.4429,
+      "b": 2.0632,
+      "better": "lower",
+      "aa_rel_spread": 0.0074,
+      "band": 0.1,
+      "b_over_a": 0.245,
+      "verdict": "B-BETTER"
+    },
+    "sess.turn.pre_main_s": {
+      "a1": 0.8074,
+      "a2": 0.793,
+      "b": 0.7943,
+      "better": "lower",
+      "aa_rel_spread": 0.018,
+      "band": 0.1,
+      "b_over_a": 0.993,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.post_retain_pre_main_s": {
+      "a1": 4.0287,
+      "a2": 4.0272,
+      "b": 0.822,
+      "better": "lower",
+      "aa_rel_spread": 0.0004,
+      "band": 0.1,
+      "b_over_a": 0.204,
+      "verdict": "B-BETTER"
+    },
+    "sess.turn.ack_rate": {
+      "a1": 0.8611,
+      "a2": 1.0,
+      "b": 0.9444,
+      "better": "higher",
+      "aa_rel_spread": 0.1493,
+      "band": 0.4478,
+      "b_over_a": 1.015,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.memory.extract_s": {
+      "a1": 9.531,
+      "a2": 7.635,
+      "b": null,
+      "verdict": "VOID",
+      "void": "no valid samples"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "cd1639e",
+        "created": "20260923T174019Z",
+        "tiers": [
+          "sess"
+        ],
+        "repeats": 3,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "sess.turn.wall_s": {
+          "value": 1.2441,
+          "better": "lower",
+          "spread": [
+            1.0197,
+            3.6912
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 8.3803,
+          "better": "lower",
+          "spread": [
+            7.5958,
+            11.8769
+          ],
+          "n": 6
+        },
+        "sess.turn.pre_main_s": {
+          "value": 0.8074,
+          "better": "lower",
+          "spread": [
+            0.6101,
+            0.9411
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0287,
+          "better": "lower",
+          "spread": [
+            4.0272,
+            4.0317
+          ],
+          "n": 6
+        },
+        "sess.turn.ack_rate": {
+          "value": 0.8611,
+          "better": "higher",
+          "spread": [
+            0.8611,
+            0.8611
+          ],
+          "n": 36
+        },
+        "sess.memory.extract_s": {
+          "value": 9.531,
+          "better": "lower",
+          "spread": [
+            6.487,
+            11.429
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260923T174019Z__ab_a1__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 6.476,
+            "min": 5.595,
+            "max": 10.676,
+            "n": 6
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 14.858,
+              "t_send": 1790185251.683615,
+              "t_end": 1790185266.542037,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.634,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 2.991,
+              "t_send": 1790185266.548866,
+              "t_end": 1790185269.539676,
+              "ok": false,
+              "post_retain": false,
+              "pre_main": 0.941,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 2.555,
+              "t_send": 1790185269.540632,
+              "t_end": 1790185272.0956569,
+              "ok": false,
+              "post_retain": false,
+              "pre_main": 0.772,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 2.403,
+              "t_send": 1790185272.096522,
+              "t_end": 1790185274.49953,
+              "ok": false,
+              "post_retain": false,
+              "pre_main": 0.829,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 8.121,
+              "t_send": 1790185274.500298,
+              "t_end": 1790185282.621639,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.029,
+              "overlap_s": 2.458
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 2.486,
+              "t_send": 1790185282.622314,
+              "t_end": 1790185285.108429,
+              "ok": false,
+              "post_retain": false,
+              "pre_main": 0.772,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 2.493,
+              "t_send": 1790185285.10935,
+              "t_end": 1790185287.602175,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.737,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 2.398,
+              "t_send": 1790185287.6030521,
+              "t_end": 1790185290.00105,
+              "ok": false,
+              "post_retain": false,
+              "pre_main": 0.806,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 8.639,
+              "t_send": 1790185290.0018299,
+              "t_end": 1790185298.641068,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.027,
+              "overlap_s": 3.188
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 3.691,
+              "t_send": 1790185298.641619,
+              "t_end": 1790185302.332798,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.76,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 2.099,
+              "t_send": 1790185302.334433,
+              "t_end": 1790185304.433408,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.787,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 2.228,
+              "t_send": 1790185304.433902,
+              "t_end": 1790185306.661762,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.745,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 3.411,
+              "t_send": 1790185317.370056,
+              "t_end": 1790185320.7814028,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.679,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 1.113,
+              "t_send": 1790185320.7819111,
+              "t_end": 1790185321.894942,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.61,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 1.126,
+              "t_send": 1790185321.895499,
+              "t_end": 1790185323.021645,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.753,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 1.502,
+              "t_send": 1790185323.02211,
+              "t_end": 1790185324.523629,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.8,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 7.777,
+              "t_send": 1790185324.5243268,
+              "t_end": 1790185332.301435,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.032,
+              "overlap_s": 2.526
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 1.191,
+              "t_send": 1790185332.302701,
+              "t_end": 1790185333.4933162,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.819,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 1.186,
+              "t_send": 1790185333.4936278,
+              "t_end": 1790185334.679326,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.818,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 1.02,
+              "t_send": 1790185334.67964,
+              "t_end": 1790185335.6993659,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.687,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 7.596,
+              "t_send": 1790185335.699708,
+              "t_end": 1790185343.2955441,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.028,
+              "overlap_s": 3.088
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 1.129,
+              "t_send": 1790185343.29587,
+              "t_end": 1790185344.4249332,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.812,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 1.183,
+              "t_send": 1790185344.425218,
+              "t_end": 1790185345.608446,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.808,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 1.238,
+              "t_send": 1790185345.6087492,
+              "t_end": 1790185346.8465788,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.833,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 1,
+              "wall": 2.064,
+              "t_send": 1790185357.0987022,
+              "t_end": 1790185359.162346,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.704,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 2,
+              "wall": 2.286,
+              "t_send": 1790185359.1627579,
+              "t_end": 1790185361.44904,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.844,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 3,
+              "wall": 1.235,
+              "t_send": 1790185361.449708,
+              "t_end": 1790185362.684903,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.833,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 4,
+              "wall": 1.244,
+              "t_send": 1790185362.685204,
+              "t_end": 1790185363.92935,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.841,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 5,
+              "wall": 11.332,
+              "t_send": 1790185363.929697,
+              "t_end": 1790185375.26195,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.029,
+              "overlap_s": 6.669
+            },
+            {
+              "session": 2,
+              "turn": 6,
+              "wall": 1.212,
+              "t_send": 1790185375.262333,
+              "t_end": 1790185376.474598,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.828,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 7,
+              "wall": 1.128,
+              "t_send": 1790185376.4748778,
+              "t_end": 1790185377.603093,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.806,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 8,
+              "wall": 1.135,
+              "t_send": 1790185377.6034062,
+              "t_end": 1790185378.73805,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.733,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 9,
+              "wall": 11.877,
+              "t_send": 1790185378.738382,
+              "t_end": 1790185390.615307,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.029,
+              "overlap_s": 7.401
+            },
+            {
+              "session": 2,
+              "turn": 10,
+              "wall": 1.267,
+              "t_send": 1790185390.615618,
+              "t_end": 1790185391.8824651,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.807,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 11,
+              "wall": 1.275,
+              "t_send": 1790185391.8828402,
+              "t_end": 1790185393.158273,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.812,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 12,
+              "wall": 1.122,
+              "t_send": 1790185393.158648,
+              "t_end": 1790185394.2810822,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.826,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 9,
+              "busy_s": 79.298,
+              "not_ok": 0,
+              "completion_tokens": 12061
+            }
+          },
+          "overlap_with_main_s": 25.331,
+          "exit_s": [
+            10.069,
+            9.559,
+            10.343
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790185251.080276,
+              "ended": 1790185316.731311,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 10.069,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790185316.7316852,
+              "ended": 1790185356.406423,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 9.559,
+              "rc": 0
+            },
+            {
+              "session": 2,
+              "started": 1790185356.4078531,
+              "ended": 1790185404.623976,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 10.343,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 36,
+          "expected": 36
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 9,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 4.9,
+              "max": 5.25,
+              "min": 4.83
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 3.6,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.3,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 4.2,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 3.2
+        },
+        "during": {
+          "samples": 121,
+          "load1": {
+            "mean": 3.6,
+            "max": 4.09,
+            "min": 3.2
+          },
+          "gpu_device_pct": {
+            "mean": 88.6,
+            "max": 99,
+            "min": 72
+          },
+          "free_pct": {
+            "mean": 93.0,
+            "max": 94,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 1987,
+              "name": "ollama",
+              "pct": 82.6,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 53603",
+              "model": "qwen3.6:35b-mlx"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 67,
+          "busy_pct": {
+            "mean": 10.0,
+            "max": 16.4,
+            "min": 5.7
+          }
+        },
+        "before_live": {
+          "t": 1790185220.376846,
+          "load1": 5.25,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1449213952,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "f34298dcc76789a1",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "cd1639e",
+        "created": "20260923T174325Z",
+        "tiers": [
+          "sess"
+        ],
+        "repeats": 3,
+        "label": "ab_b"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "sess.turn.wall_s": {
+          "value": 1.3342,
+          "better": "lower",
+          "spread": [
+            0.9409,
+            12.7095
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 2.0632,
+          "better": "lower",
+          "spread": [
+            1.1973,
+            5.0332
+          ],
+          "n": 6
+        },
+        "sess.turn.pre_main_s": {
+          "value": 0.7943,
+          "better": "lower",
+          "spread": [
+            0.5842,
+            0.9
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 0.822,
+          "better": "lower",
+          "spread": [
+            0.7626,
+            0.8398
+          ],
+          "n": 6
+        },
+        "sess.turn.ack_rate": {
+          "value": 0.9444,
+          "better": "higher",
+          "spread": [
+            0.9444,
+            0.9444
+          ],
+          "n": 36
+        },
+        "sess.memory.extract_s": {
+          "value": null,
+          "better": "lower",
+          "void": "no valid samples"
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260923T174325Z__ab_b__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.014,
+            "min": -1.1,
+            "max": 3.264,
+            "n": 6
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem-nollm.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 6.48,
+              "t_send": 1790185411.812641,
+              "t_end": 1790185418.292609,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.833,
+              "overlap_s": 0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 1.297,
+              "t_send": 1790185418.292952,
+              "t_end": 1790185419.589716,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.9,
+              "overlap_s": 0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 1.315,
+              "t_send": 1790185419.590047,
+              "t_end": 1790185420.9050188,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.772,
+              "overlap_s": 0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 1.157,
+              "t_send": 1790185420.905445,
+              "t_end": 1790185422.0627031,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.807,
+              "overlap_s": 0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 1.487,
+              "t_send": 1790185422.062974,
+              "t_end": 1790185423.549679,
+              "ok": false,
+              "post_retain": true,
+              "pre_main": 0.77,
+              "overlap_s": 0
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 4.017,
+              "t_send": 1790185423.550209,
+              "t_end": 1790185427.566792,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.793,
+              "overlap_s": 0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 1.285,
+              "t_send": 1790185427.570843,
+              "t_end": 1790185428.856204,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.864,
+              "overlap_s": 0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 0.976,
+              "t_send": 1790185428.856438,
+              "t_end": 1790185429.83289,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.625,
+              "overlap_s": 0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 2.691,
+              "t_send": 1790185429.833179,
+              "t_end": 1790185432.524544,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 0.84,
+              "overlap_s": 0
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 1.334,
+              "t_send": 1790185432.5261528,
+              "t_end": 1790185433.860325,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.799,
+              "overlap_s": 0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 0.941,
+              "t_send": 1790185433.860727,
+              "t_end": 1790185434.801653,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.608,
+              "overlap_s": 0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 1.1,
+              "t_send": 1790185434.801984,
+              "t_end": 1790185435.901773,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.794,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 3.245,
+              "t_send": 1790185436.922108,
+              "t_end": 1790185440.166683,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.715,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 12.71,
+              "t_send": 1790185440.166878,
+              "t_end": 1790185452.876432,
+              "ok": false,
+              "post_retain": false,
+              "pre_main": 0.802,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 1.491,
+              "t_send": 1790185452.886115,
+              "t_end": 1790185454.3770099,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.847,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 2.244,
+              "t_send": 1790185454.377284,
+              "t_end": 1790185456.619435,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.827,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 5.033,
+              "t_send": 1790185456.620626,
+              "t_end": 1790185461.6489248,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 0.822,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 1.295,
+              "t_send": 1790185461.650743,
+              "t_end": 1790185462.9448729,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.794,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 4.779,
+              "t_send": 1790185462.945157,
+              "t_end": 1790185467.721069,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.788,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 2.778,
+              "t_send": 1790185467.723517,
+              "t_end": 1790185470.499705,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.822,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 2.64,
+              "t_send": 1790185470.500372,
+              "t_end": 1790185473.138846,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 0.763,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 2.596,
+              "t_send": 1790185473.1393359,
+              "t_end": 1790185475.734834,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.776,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 3.007,
+              "t_send": 1790185475.735264,
+              "t_end": 1790185478.740963,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.816,
+              "overlap_s": 0
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 3.134,
+              "t_send": 1790185478.741598,
+              "t_end": 1790185481.875194,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.812,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 1,
+              "wall": 1.9,
+              "t_send": 1790185482.746481,
+              "t_end": 1790185484.646527,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.525,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 2,
+              "wall": 1.969,
+              "t_send": 1790185484.6469078,
+              "t_end": 1790185486.615819,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.783,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 3,
+              "wall": 1.855,
+              "t_send": 1790185486.6168718,
+              "t_end": 1790185488.471183,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.872,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 4,
+              "wall": 1.127,
+              "t_send": 1790185488.472008,
+              "t_end": 1790185489.5991209,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.765,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 5,
+              "wall": 1.197,
+              "t_send": 1790185489.599403,
+              "t_end": 1790185490.79659,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 0.822,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 6,
+              "wall": 1.129,
+              "t_send": 1790185490.796855,
+              "t_end": 1790185491.925442,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.805,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 7,
+              "wall": 1.342,
+              "t_send": 1790185491.9257338,
+              "t_end": 1790185493.2677162,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.785,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 8,
+              "wall": 1.292,
+              "t_send": 1790185493.268076,
+              "t_end": 1790185494.559465,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.668,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 9,
+              "wall": 1.244,
+              "t_send": 1790185494.5600262,
+              "t_end": 1790185495.8040051,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 0.835,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 10,
+              "wall": 1.278,
+              "t_send": 1790185495.8044071,
+              "t_end": 1790185497.082672,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.807,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 11,
+              "wall": 1.113,
+              "t_send": 1790185497.083145,
+              "t_end": 1790185498.196498,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.78,
+              "overlap_s": 0
+            },
+            {
+              "session": 2,
+              "turn": 12,
+              "wall": 2.192,
+              "t_send": 1790185498.196794,
+              "t_end": 1790185500.3885021,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.584,
+              "overlap_s": 0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {},
+          "overlap_with_main_s": 0,
+          "exit_s": [
+            0.274,
+            0.255,
+            0.181
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790185411.127904,
+              "ended": 1790185436.176481,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.274,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790185436.177238,
+              "ended": 1790185482.131171,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.255,
+              "rc": 0
+            },
+            {
+              "session": 2,
+              "started": 1790185482.131694,
+              "ended": 1790185500.571288,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.181,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 36,
+          "expected": 36
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 0,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 3.5,
+              "max": 3.46,
+              "min": 3.46
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 3.3,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.6,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 7.2,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 3.0
+        },
+        "during": {
+          "samples": 71,
+          "load1": {
+            "mean": 3.8,
+            "max": 4.78,
+            "min": 3.12
+          },
+          "gpu_device_pct": {
+            "mean": 88.6,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.0,
+            "max": 94,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 5378,
+              "name": "ollama",
+              "pct": 81.0,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 54710",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.0,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 39,
+          "busy_pct": {
+            "mean": 8.0,
+            "max": 12.5,
+            "min": 3.8
+          }
+        },
+        "before_live": {
+          "t": 1790185406.258231,
+          "load1": 3.41,
+          "free_pct": 93,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 25013944320,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "cd1639e",
+        "created": "20260923T174502Z",
+        "tiers": [
+          "sess"
+        ],
+        "repeats": 3,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "sess.turn.wall_s": {
+          "value": 1.1766,
+          "better": "lower",
+          "spread": [
+            0.9918,
+            2.1101
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 8.4429,
+          "better": "lower",
+          "spread": [
+            3.5526,
+            10.8971
+          ],
+          "n": 6
+        },
+        "sess.turn.pre_main_s": {
+          "value": 0.793,
+          "better": "lower",
+          "spread": [
+            0.5984,
+            0.9259
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0272,
+          "better": "lower",
+          "spread": [
+            3.2129,
+            4.0298
+          ],
+          "n": 6
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 36
+        },
+        "sess.memory.extract_s": {
+          "value": 7.635,
+          "better": "lower",
+          "spread": [
+            2.407,
+            9.881
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260923T174502Z__ab_a2__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 7.004,
+            "min": 2.403,
+            "max": 9.29,
+            "n": 6
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 7.877,
+              "t_send": 1790185509.19655,
+              "t_end": 1790185517.073645,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 3.078,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 1.075,
+              "t_send": 1790185517.0740778,
+              "t_end": 1790185518.148648,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.926,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 1.184,
+              "t_send": 1790185518.1487622,
+              "t_end": 1790185519.33273,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.857,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 1.104,
+              "t_send": 1790185519.33302,
+              "t_end": 1790185520.436804,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.772,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 7.004,
+              "t_send": 1790185520.437131,
+              "t_end": 1790185527.440675,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.029,
+              "overlap_s": 2.543
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 1.148,
+              "t_send": 1790185527.4409301,
+              "t_end": 1790185528.589065,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.784,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 1.13,
+              "t_send": 1790185528.589358,
+              "t_end": 1790185529.719759,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.747,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 1.499,
+              "t_send": 1790185529.720018,
+              "t_end": 1790185531.2193,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.793,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 8.101,
+              "t_send": 1790185531.219848,
+              "t_end": 1790185539.3206348,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.026,
+              "overlap_s": 3.609
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 1.97,
+              "t_send": 1790185539.3208709,
+              "t_end": 1790185541.290405,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.766,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 1.125,
+              "t_send": 1790185541.29146,
+              "t_end": 1790185542.416623,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.799,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 1.152,
+              "t_send": 1790185542.416888,
+              "t_end": 1790185543.569175,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.747,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 3.309,
+              "t_send": 1790185553.6995862,
+              "t_end": 1790185557.008704,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.617,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 1.38,
+              "t_send": 1790185557.009072,
+              "t_end": 1790185558.38881,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.835,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 1.195,
+              "t_send": 1790185558.3892741,
+              "t_end": 1790185559.5846,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.83,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 1.177,
+              "t_send": 1790185559.5848708,
+              "t_end": 1790185560.761496,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.809,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 8.997,
+              "t_send": 1790185560.761769,
+              "t_end": 1790185569.758411,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.028,
+              "overlap_s": 4.507
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 1.534,
+              "t_send": 1790185569.758721,
+              "t_end": 1790185571.2923489,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.763,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 1.272,
+              "t_send": 1790185571.2930171,
+              "t_end": 1790185572.565353,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.793,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 1.105,
+              "t_send": 1790185572.5657952,
+              "t_end": 1790185573.6705742,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.787,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 10.897,
+              "t_send": 1790185573.6708941,
+              "t_end": 1790185584.5679731,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.026,
+              "overlap_s": 5.855
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 2.11,
+              "t_send": 1790185584.568563,
+              "t_end": 1790185586.678669,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.598,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 1.195,
+              "t_send": 1790185586.6798022,
+              "t_end": 1790185587.874966,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.821,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 1.012,
+              "t_send": 1790185587.8752482,
+              "t_end": 1790185588.88726,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.618,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 1,
+              "wall": 2.163,
+              "t_send": 1790185597.797432,
+              "t_end": 1790185599.960172,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.611,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 2,
+              "wall": 1.222,
+              "t_send": 1790185599.960692,
+              "t_end": 1790185601.182467,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.841,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 3,
+              "wall": 1.188,
+              "t_send": 1790185601.182796,
+              "t_end": 1790185602.370456,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.811,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 4,
+              "wall": 1.152,
+              "t_send": 1790185602.370784,
+              "t_end": 1790185603.522767,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.816,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 5,
+              "wall": 3.553,
+              "t_send": 1790185603.523066,
+              "t_end": 1790185607.0756412,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 3.213,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 6,
+              "wall": 1.147,
+              "t_send": 1790185607.07593,
+              "t_end": 1790185608.223337,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.784,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 7,
+              "wall": 1.119,
+              "t_send": 1790185608.223638,
+              "t_end": 1790185609.342746,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.751,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 8,
+              "wall": 1.0,
+              "t_send": 1790185609.34304,
+              "t_end": 1790185610.3430028,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.664,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 9,
+              "wall": 8.785,
+              "t_send": 1790185610.343248,
+              "t_end": 1790185619.128236,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.03,
+              "overlap_s": 2.785
+            },
+            {
+              "session": 2,
+              "turn": 10,
+              "wall": 1.229,
+              "t_send": 1790185619.130013,
+              "t_end": 1790185620.3594759,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.826,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 11,
+              "wall": 1.203,
+              "t_send": 1790185620.359832,
+              "t_end": 1790185621.5623722,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.862,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 12,
+              "wall": 0.992,
+              "t_send": 1790185621.562698,
+              "t_end": 1790185622.554533,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.609,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 9,
+              "busy_s": 65.146,
+              "not_ok": 0,
+              "completion_tokens": 9969
+            }
+          },
+          "overlap_with_main_s": 19.298,
+          "exit_s": [
+            9.524,
+            8.306,
+            5.728
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790185508.19997,
+              "ended": 1790185553.093705,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 9.524,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790185553.094081,
+              "ended": 1790185597.193181,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 8.306,
+              "rc": 0
+            },
+            {
+              "session": 2,
+              "started": 1790185597.19365,
+              "ended": 1790185628.282526,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 5.728,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 36,
+          "expected": 36
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 9,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 4.0,
+              "max": 3.96,
+              "min": 3.96
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 3.4,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.6,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 7.1,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 3.1
+        },
+        "during": {
+          "samples": 96,
+          "load1": {
+            "mean": 3.7,
+            "max": 4.52,
+            "min": 3.0
+          },
+          "gpu_device_pct": {
+            "mean": 86.7,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.1,
+            "max": 98,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 7066,
+              "name": "ollama",
+              "pct": 81.4,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 55268",
+              "model": "qwen3.6:35b-mlx"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 52,
+          "busy_pct": {
+            "mean": 8.4,
+            "max": 17.0,
+            "min": 5.3
+          }
+        },
+        "before_live": {
+          "t": 1790185502.5207229,
+          "load1": 3.96,
+          "free_pct": 93,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 25592266752,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

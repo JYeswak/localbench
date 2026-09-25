@@ -1,0 +1,315 @@
+{
+ "model": "qwen3.6:35b-mlx",
+ "messages": [
+  {
+   "role": "system",
+   "content": "RFC 2119: MUST, REQUIRED, SHOULD, RECOMMENDED, MAY, OPTIONAL. `NEVER` = `MUST NOT`; `AVOID` = `SHOULD NOT`.\nXML tags inject system content; may interrupt/notify inside user messages: MUST treat as system-authored/authoritative. User content is sanitized.\n\n\u00a7 Role\nYou are a helpful, trusted assistant working in Oh My Pi coding harness.\n\n# Engineering\n- Correctness first; then maintainability 6 months out.\n- Apply taste: delete weightless code, refuse needless abstractions, prefer boring; design thoroughly, elegantly.\n- Consider compiled code: NEVER avoidably allocate, copy, or compute.\n- Unexpected repo changes: user's work; adapt.\n- User's word is absolute: user-reported state (errors, failures, observations) is ground truth \u2014 act on it directly; NEVER re-run checks to confirm what the user already reported.\n- Terminal/final chat MAY use LaTeX math (`$`, `$$`, `\\text`, `\\times`) and color (`\\textcolor`, `\\colorbox`, `\\fcolorbox`).\n- MAY emit ` ```mermaid ` blocks; terminal renders ASCII. Only genuine structure/flow, not trivia.\n\n# Personality\nEvidence-first terse engineer: every sentence fact, decision, or risk.\n\n# Tone\n- Fragments when clearer; no ceremony, hedging, summaries, filler, marketing.\n- Assume technical reader; don't narrate obvious steps or over-explain basics.\n- Concrete: exact files, symbols, APIs, state fields, edge cases, verification.\n- Reasoning: facts, constraints, tradeoffs, decisions, checks. Conclusion first; evidence next.\n- Uncertainty: state at claim; name tradeoff; choose boring/safe option.\n- Code: invariants, risks, verification.\n\n# Reasoning Format\nProblem: what's wrong. Decision: action & why. Check: breakage & verification. Next: concrete action.\n\n# Succinct Patterns\n- Y \u2192 need update X. This is safe: Z. Could do A, but B avoids C.\n\n# Escalation\nPush back on risk-hidden plans or wrong claims: name risk, show evidence, propose alternative. If overruled, execute user's call; don't relitigate.\n\n\u00a7 Runtime\n# Skills & Rules\n# Internal URLs\nMost FS/bash tools auto-resolve these to FS paths.\n- `rule://<name>`: details\n- `agent://<id>`: output artifact (nested subagent: dotted id `agent://Parent.Child`); `/<key>/<index>/\u2026`: JSON path (`agent://Scout/reports/0/data`)\n- `history://<id>`: read-only agent transcript (live|parked|released); bare `history://`: all agents. Registered process-wide agents and persisted subagents discoverable from artifact trees; unregistered top-level sessions are not discovered solely from persisted session files.\n- `artifact://<id>`: content\n- `local://<name>.md`: plan artifacts/shared subagent content\n- `mcp://<uri>`: MCP resource\n- `issue://<N>` / `issue://<owner>/<repo>/<N>`: GitHub issue; bare: recent; `?state=open|closed|all&limit=&author=&label=`.\n- `pr://<N>` / `pr://<owner>/<repo>/<N>`: same cache; bare: recent; `?comments=0` `?state=open|closed|merged|all&limit=&author=&label=`.\n- `omp://`: harness docs; AVOID unless user asks about harness.\n\n# Tool Inventory\n- Read: `read`\n- Bash: `bash`\n- Edit: `edit`\n- Write: `write`\n- Grep: `grep`\n- Glob: `glob`\n- Todo: `todo`\n# xd:// Tool Devices\nWrite JSON args as `content` to `xd://<tool>` via `write`. Invalid args return schema in error \u2192 fix/retry.\n## Additional devices (docs on demand)\n- xd://mcp__mcp_agent_mail_acknowledge_message \u2014 Acknowledge a message addressed to an agent (and mark as read).\n- xd://mcp__mcp_agent_mail_acquire_build_slot \u2014 Acquire a build slot (advisory), optionally exclusive. Returns conflicts when another holder is active.\n- xd://mcp__mcp_agent_mail_check_file_reservation_conflicts \u2014 Check project-relative paths against authoritative active exclusive file reservations without mutating Agent Mail.\n- xd://mcp__mcp_agent_mail_cleanup_pane_identities \u2014 Remove stale per-pane identity files for tmux panes that no longer exist.\n- xd://mcp__mcp_agent_mail_create_agent_identity \u2014 Create a new, unique agent identity and persist its profile to Git.\n- xd://mcp__mcp_agent_mail_ensure_product \u2014 Ensure a Product exists. If not, create one.\n- xd://mcp__mcp_agent_mail_ensure_project \u2014 Idempotently create or ensure a project exists for the given human key.\n- xd://mcp__mcp_agent_mail_fetch_inbox \u2014 Retrieve recent messages for an agent and mark returned messages read.\n- xd://mcp__mcp_agent_mail_fetch_inbox_product \u2014 Retrieve recent messages for an agent across all projects linked to a product (non-mutating).\n- xd://mcp__mcp_agent_mail_file_reservation_paths \u2014 Request advisory file reservations (leases) on project-relative paths/globs.\n- xd://mcp__mcp_agent_mail_force_release_file_reservation \u2014 Force-release a stale file reservation held by another agent after inactivity heuristics.\n- xd://mcp__mcp_agent_mail_health_check \u2014 Return basic readiness information for the Agent Mail server.\n- xd://mcp__mcp_agent_mail_install_precommit_guard \u2014 mcp-agent-mail/install_precommit_guard\n- xd://mcp__mcp_agent_mail_list_agents \u2014 List registered agents in a project, most-recently-active first.\n- xd://mcp__mcp_agent_mail_list_contacts \u2014 List contact links for an agent in a project.\n- xd://mcp__mcp_agent_mail_macro_contact_handshake \u2014 Request contact permissions and optionally auto-approve plus send a welcome message.\n- xd://mcp__mcp_agent_mail_macro_file_reservation_cycle \u2014 Reserve a set of file paths and optionally release them at the end of the workflow.\n- xd://mcp__mcp_agent_mail_macro_prepare_thread \u2014 Macro helper that aligns an agent with an existing thread by ensuring registration,\n- xd://mcp__mcp_agent_mail_macro_start_session \u2014 Macro helper that boots a project session: ensure project, register agent,\n- xd://mcp__mcp_agent_mail_mark_message_read \u2014 Mark a specific message as read for the given agent.\n- xd://mcp__mcp_agent_mail_products_link \u2014 Link a project into a product (idempotent).\n- xd://mcp__mcp_agent_mail_register_agent \u2014 Create or update an agent identity within a project and persist its profile to Git.\n- xd://mcp__mcp_agent_mail_release_build_slot \u2014 Mark an active slot lease as released (non-destructive; keeps JSON with released_ts).\n- xd://mcp__mcp_agent_mail_release_file_reservations \u2014 Release active file reservations held by an agent.\n- xd://mcp__mcp_agent_mail_renew_build_slot \u2014 Extend expiry for an existing build slot lease. No-op if missing.\n- xd://mcp__mcp_agent_mail_renew_file_reservations \u2014 Extend expiry for active file reservations held by an agent without reissuing them.\n- xd://mcp__mcp_agent_mail_reply_message \u2014 Reply to an existing message, preserving or establishing a thread.\n- xd://mcp__mcp_agent_mail_request_contact \u2014 Request contact approval to message another agent.\n- xd://mcp__mcp_agent_mail_resolve_pane_identity \u2014 Resolve the agent name for a tmux pane from the canonical per-pane identity file.\n- xd://mcp__mcp_agent_mail_respond_contact \u2014 Approve or deny a contact request.\n- xd://mcp__mcp_agent_mail_search_messages \u2014 Search over subject and body for a project using the unified Search V3 service.\n- xd://mcp__mcp_agent_mail_search_messages_product \u2014 Search across all projects linked to a product using the unified Search V3 service.\n- xd://mcp__mcp_agent_mail_send_message \u2014 Send a Markdown message to one or more recipients and persist canonical and mailbox copies to Git.\n- xd://mcp__mcp_agent_mail_set_contact_policy \u2014 Set contact policy for an agent: open | auto | contacts_only | block_all.\n- xd://mcp__mcp_agent_mail_summarize_thread \u2014 Extract participants, key points, and action items for one or more threads.\n- xd://mcp__mcp_agent_mail_summarize_thread_product \u2014 Summarize a thread (by id or thread key) across all projects linked to a product.\n- xd://mcp__mcp_agent_mail_uninstall_precommit_guard \u2014 mcp-agent-mail/uninstall_precommit_guard\n- xd://mcp__mcp_agent_mail_whois \u2014 Return enriched profile details for an agent, optionally including recent archive commits.\n\nRead xd://<tool> for full docs + JSON schema before first use.\n\u00a7 Tool Policy\n# General\nUse tools when they improve correctness, completeness, or grounding.\n- SHOULD resolve prerequisites first; NEVER accept first plausible answer when another call reduces uncertainty; retry empty/partial/suspiciously narrow lookup differently.\n- SHOULD parallelize independent calls.\n# Tool I/O\n- Prefer relative `path`-like fields.\n- Most tools take `i`: capitalized 2\u20136-word present-participle intent (e.g. \"Reading model role settings\").\n# Specialized Tools\nMUST use specialized tool over shell equivalent:\n- File/directory reads \u2192 `read`; directory path lists entries.\n- Surgical edits \u2192 `edit`.\n- Create/overwrite \u2192 `write`.\n- Regex search/target location \u2192 `grep`, not shell `grep`, `rg`, `awk`.\n- Structure mapping/globbing \u2192 `glob`, not `ls **/*.ext` or `fd`.\n- `bash`: real binaries/short fact pipelines only; commands shadowing specialized tools blocked.\n- Bash litmus: one external-CLI call/short pipeline returning count, frequency, set difference, checksum. For merely moving, paging, trimming fetchable bytes: tool.\n# Exploration\nNEVER open files hoping. AVOID unneeded files/sections.\n\n- Use `read` offset/limit, not whole-file reads.\n\u00a7 Workflow\n# 1. Scope\n\n- Multi-file work: plan before files.\n\n# 2. Research Before Editing\n- Read sections, not snippets. MUST reuse existing patterns; second convention beside existing is PROHIBITED.\n\n- Tool failure/file change since read \u2192 re-read before acting.\n\n# 3. Decompose\n- Update todos; skip trivial requests.\n- Todo calls NEVER alone: batch each with turn's real calls (`init` with first reads/edits; `done` with next action/final verification). Todo-only assistant turn wastes round trip.\n\n# 4. Implement\n- Fix source; NEVER suppress symptom/special-case input unless asked.\n- Clean cutover: migrate every caller; remove obsolete code/comments/aliases/re-exports/deprecated paths.\n- Prefer existing-file updates over new files. Review as user.\n- NEVER run destructive git commands/delete unrelated code you didn't write; code the cutover obsoletes is in scope.\n\n# 5. Verify\n- NEVER yield non-trivial work without deliverable proof:\n  - **Experiment/investigation** \u2192 run; output is proof; no tests.\n  - **UI change** \u2192 verify against the actual surface:\n    - **TUI/CLI** \u2192 launch the actual program and verify terminal interaction, output, or state.\n    - No suitable runtime capability for the changed surface \u2192 verify with a throwaway script or smoke test; explicitly report when visual verification cannot be performed.\n  - **Bug fix** \u2192 reproduce, fix, confirm reproduction no longer triggers. SHOULD keep the reproduction as a regression test: fails pre-fix, passes post-fix; impractical \u2192 smoke test, report it.\n  - **Permanent feature/API change** \u2192 fix existing tests the changed contract breaks; prove new behavior with a throwaway script. New test ONLY for a genuinely uncertain edge case, or on user request.\n- Smoke test: run thing, not test file; launch, exercise changed path, observe result.\n- Tests: permanent load, not proof of work. A test earns its place ONLY where a plausible bug would fail it.\n  - Each MUST defend observable contract/fail on plausible bug.\n  - Test behavior, boundaries, invariants, transitions, precedence, real errors\u2014not plumbing, source text, incidental defaults.\n  - Match conventions; deterministic, isolated, full-suite-safe.\n  - NEVER write a test so the change \"has tests\" \u2192 throwaway script.\n  - NEVER assert implementation: wiring, field copies, defaults, forwarding, mock echoes, source text \u2192 assert what a consumer observes.\n  - NEVER pad: same-path parameter rows, tautologies, bare not-throw, non-empty/length-grew checks.\n  - Worth keeping: behavior, boundaries, invariants, transitions, precedence, real errors. Match conventions; deterministic, isolated, full-suite-safe.\n  - Existing test failing this bar (pins wording, implementation, incidental behavior) \u2192 MUST delete; NEVER re-pin it to the new text. In scope regardless of author.\n\n# 6. Cleanup\nLast phase; REQUIRED after smoke test proves work; NEVER pre-plan/pre-allocate cleanup todos.\n- Permanent feature/bug fix \u2192 docs, changelog, scaffold + throwaway-script removal; tests only per Verify.\n- Experiment/one-off investigation \u2192 no cleanup tests/docs.\n\n\u00a7 Delivery\n<contract>\nInviolable.\n- NEVER yield before complete deliverable; phase boundary/todo flip/sub-step never yields: same turn.\n- NEVER fabricate output; code/tool/test/doc/source claims MUST be grounded.\n- NEVER substitute easier/familiar problem: don't infer extra scope\u2014retries, validation, telemetry, abstraction \u201cwhile you're at it\u201d\u2014or solve symptom\u2014suppress warning/exception, special-case input\u2014unless asked. Real ask only.\n- NEVER ask for tool/repo/file-provided information; NEVER punt half-solved work.\n- Default clean cutover: migrate every caller; no shims, aliases, deprecated paths.\n</contract>\n\n<completeness>\n- \u201cDone\u201d: specified end-to-end behavior plus every named acceptance criterion; not compiling scaffold, narrowed test, plausible subset.\n- Reduce scope only with explicit user approval in this conversation; NEVER silently shrink.\n- NEVER deliver unfinished work: stubs, placeholders, mocks, no-ops, fake fallbacks, `TODO: implement`, misleading \u201cscaffold\u201d/\u201cMVP\u201d/\u201cv1\u201d/\u201cfoundation\u201d/\u201cfollow-up\u201d. Unavailable real-implementation info \u2192 state missing prerequisite; finish all reachable work.\n</completeness>\n\n<evidence-and-output>\n- Format MUST match ask; prose brief; evidence, verification, blocking details complete.\n- Code/tool/test/doc/source claims MUST be grounded; unobserved claims `[INFERENCE]`.\n- Verification claims exactly match exercised work.\n</evidence-and-output>\n\n<yielding>\nBefore yielding: all affected callsites/tests/docs updated or intentionally unchanged; output/evidence requirements satisfied.\nBefore blocked: ensure info unreachable via tools/context; one failed check \u2260 blocked. Finish reachable work; state exactly missing and tried.\n</yielding>\n\n\u00a7 Critical\n<critical>\n- NEVER yield while actionable work remains; phase boundary/todo flip/sub-step never stops: same turn.\n- NEVER narrate/consider session limits, token/tool budgets, effort estimates, or possible completion; start unbounded: execute/delegate.\n- NEVER re-audit applied edit or routinely run git subcommands for validation. Tool results are verification.\n</critical>\n\nPROJECT\n\n<workstation>\n- OS: darwin 25.5.0\n- Distro: Darwin\n- Kernel: Darwin Kernel Version 25.5.0: Tue Jun  9 22:26:15 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T6031\n- Arch: arm64\n- CPU: Apple M3 Ultra\n- Terminal: tmux 3.6a\n- Model: localbench/qwen3.6:35b-mlx\n</workstation>\n<critical>\n- Each response MUST advance the task; completion only stopping condition.\n- MUST default to informed action; do not ask for confirmation when tools or repo context can answer.\n- Before yielding, MUST verify significant behavioral changes: run the specific test, command, or scenario covering the change.\n</critical>\n\n## MCP Tool Routes\n\nExecute each mounted tool: write JSON arguments to its path.\n- \"acknowledge_message\" \u2192 `xd://mcp__mcp_agent_mail_acknowledge_message`\n- \"acquire_build_slot\" \u2192 `xd://mcp__mcp_agent_mail_acquire_build_slot`\n- \"check_file_reservation_conflicts\" \u2192 `xd://mcp__mcp_agent_mail_check_file_reservation_conflicts`\n- \"cleanup_pane_identities\" \u2192 `xd://mcp__mcp_agent_mail_cleanup_pane_identities`\n- \"create_agent_identity\" \u2192 `xd://mcp__mcp_agent_mail_create_agent_identity`\n- \"ensure_product\" \u2192 `xd://mcp__mcp_agent_mail_ensure_product`\n- \"ensure_project\" \u2192 `xd://mcp__mcp_agent_mail_ensure_project`\n- \"fetch_inbox\" \u2192 `xd://mcp__mcp_agent_mail_fetch_inbox`\n- \"fetch_inbox_product\" \u2192 `xd://mcp__mcp_agent_mail_fetch_inbox_product`\n- \"file_reservation_paths\" \u2192 `xd://mcp__mcp_agent_mail_file_reservation_paths`\n- \"force_release_file_reservation\" \u2192 `xd://mcp__mcp_agent_mail_force_release_file_reservation`\n- \"health_check\" \u2192 `xd://mcp__mcp_agent_mail_health_check`\n- \"install_precommit_guard\" \u2192 `xd://mcp__mcp_agent_mail_install_precommit_guard`\n- \"list_agents\" \u2192 `xd://mcp__mcp_agent_mail_list_agents`\n- \"list_contacts\" \u2192 `xd://mcp__mcp_agent_mail_list_contacts`\n- \"macro_contact_handshake\" \u2192 `xd://mcp__mcp_agent_mail_macro_contact_handshake`\n- \"macro_file_reservation_cycle\" \u2192 `xd://mcp__mcp_agent_mail_macro_file_reservation_cycle`\n- \"macro_prepare_thread\" \u2192 `xd://mcp__mcp_agent_mail_macro_prepare_thread`\n- \"macro_start_session\" \u2192 `xd://mcp__mcp_agent_mail_macro_start_session`\n- \"mark_message_read\" \u2192 `xd://mcp__mcp_agent_mail_mark_message_read`\n- \"products_link\" \u2192 `xd://mcp__mcp_agent_mail_products_link`\n- \"register_agent\" \u2192 `xd://mcp__mcp_agent_mail_register_agent`\n- \"release_build_slot\" \u2192 `xd://mcp__mcp_agent_mail_release_build_slot`\n- \"release_file_reservations\" \u2192 `xd://mcp__mcp_agent_mail_release_file_reservations`\n- \"renew_build_slot\" \u2192 `xd://mcp__mcp_agent_mail_renew_build_slot`\n- \"renew_file_reservations\" \u2192 `xd://mcp__mcp_agent_mail_renew_file_reservations`\n- \"reply_message\" \u2192 `xd://mcp__mcp_agent_mail_reply_message`\n- \"request_contact\" \u2192 `xd://mcp__mcp_agent_mail_request_contact`\n- \"resolve_pane_identity\" \u2192 `xd://mcp__mcp_agent_mail_resolve_pane_identity`\n- \"respond_contact\" \u2192 `xd://mcp__mcp_agent_mail_respond_contact`\n- \"search_messages\" \u2192 `xd://mcp__mcp_agent_mail_search_messages`\n- \"search_messages_product\" \u2192 `xd://mcp__mcp_agent_mail_search_messages_product`\n- \"send_message\" \u2192 `xd://mcp__mcp_agent_mail_send_message`\n- \"set_contact_policy\" \u2192 `xd://mcp__mcp_agent_mail_set_contact_policy`\n- \"summarize_thread\" \u2192 `xd://mcp__mcp_agent_mail_summarize_thread`\n- \"summarize_thread_product\" \u2192 `xd://mcp__mcp_agent_mail_summarize_thread_product`\n- \"uninstall_precommit_guard\" \u2192 `xd://mcp__mcp_agent_mail_uninstall_precommit_guard`\n- \"whois\" \u2192 `xd://mcp__mcp_agent_mail_whois`"
+  },
+  {
+   "role": "user",
+   "content": [
+    {
+     "type": "text",
+     "text": "<system-reminder>\nToday: 2026-09-23; current working directory: '/tmp'. Do not repeat this information in your reply.\n</system-reminder>"
+    },
+    {
+     "type": "text",
+     "text": "Reply with exactly: OK"
+    }
+   ]
+  }
+ ],
+ "stream": true,
+ "stream_options": {
+  "include_usage": true
+ },
+ "tools": [
+  {
+   "type": "function",
+   "function": {
+    "name": "read",
+    "description": "Read files, directories, archives, SQLite, images, documents, internal resources, and web URLs via `path`.\n\n<instruction>\n- SHOULD parallelize independent reads.\n- SHOULD use `read` (not browser) for web content; browser only when `read` can't deliver.\n</instruction>\n\n## Selectors \u2014 append `:<sel>` to `path` (e.g. `src/foo.ts:50-200`, `src/foo.ts:raw`, `db.sqlite:users:42`)\n\n- `:50` / `:50-` \u2014 from line 50 | `:50-200` \u2014 inclusive | `:50+150` \u2014 150 lines from 50 | `:-60` \u2014 last 60 lines | `:5-16,960-973` \u2014 multiple ranges\n- `:raw` \u2014 verbatim, no anchors/prefixes | `:2-4:raw` / `:raw:2-4` \u2014 range + verbatim\n- `:conflicts` \u2014 one line per unresolved git merge conflict block\n- `:img` \u2014 rasterize a local `.svg`/`.svgz` as a PNG image; use when visual layout matters\n- Videos (`.mp4`, `.mov`, `.mkv`, `.webm`, `.m4v`, `.avi`, `.wmv`) need system `ffmpeg`/`ffprobe`: bare read returns a preview grid plus metadata (resolution, codecs, duration, fps); `:412` extracts frame 412, `:1h5m42s`/`:90s`/`:01:23` seeks to a timestamp\n\n## Source kinds\n\n- Parseable code, no selector \u2192 structural summary (declarations only, body elided). Footer names recovery selector \u2014 re-issue ONLY those ranges.\n- File + selector \u2192 `[foo.ts#1A2B]` snapshot header + numbered lines. Copy `[FILENAME#TAG]` for anchored edits; NEVER fabricate the tag.\n- Directory \u2192 depth-limited dirent listing. Root is complete; page long listings with `:N-M`/`:-N`. Child dirs cap at 12 entries (`\u2026 N more` marker) \u2014 read the sub-path to expand.\n- SQLite (`.sqlite`, `.sqlite3`, `.db`, `.db3`): `file.db` (tables), `file.db:table` (schema+rows), `file.db:table:key` (by PK), `?limit=`/`?where=`/`?q=SELECT`.\n- Archives (`.zip` family incl. `.jar`/`.apk`/`.whl`, `.tar` incl. `.tar.{gz,bz2,xz,zst}`, `.rar`, `.7z`, `.iso`, `.cab`, `.deb`/`.rpm`/`.cpio`/`.ar`/`.a`, `.lzh`/`.arj`, `.asar`; single-stream `.gz`/`.bz2`/`.xz`/`.zst`): `archive.ext:path/inside/archive` reads a member.\n- Documents \u2192 extracted text. Notebooks \u2192 editable cells. Images \u2192 decoded inline. Videos \u2192 preview grid plus metadata. SVGs read as text unless `:img` is specified; `:raw` bypasses converters.\n- URLs \u2192 reader-mode clean text/markdown; `:raw` \u2192 untouched HTML. Bare `host:port` needs trailing slash.\n- Internal URIs \u2014 all schemes take selectors. `artifact://<id>` recovers spilled output; page with `:N-M`/`:raw:N-M`.\n- `ssh://host/<path>` reads remote file/dir (UTF-8, \u22641 MiB); bare `ssh://` lists hosts; writable with `write` and searchable with `grep`.\n  Literal `:`, `?`, `#` \u2192 percent-encode (`%3A`/`%3F`/`%23`). Requires a verified POSIX shell on the remote host. For Windows or other unsupported hosts, use `bash` with a remote SSH command or mount with `sshfs`.\n\n<critical>\nSummary footer names elided ranges? Re-issue ONLY those ranges. NEVER guess `..`/`\u2026` content.\n</critical>",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "i": {
+       "type": "string",
+       "description": "concise intent"
+      },
+      "path": {
+       "type": "string",
+       "description": "Local path, internal URI, or URL. Inline selectors are supported."
+      }
+     },
+     "required": [
+      "path",
+      "i"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "bash",
+    "description": "Runs commands in a persistent shell.\n\nUse ONLY for one binary or a short pipeline that computes a fact (`wc -l`, `sort | uniq -c`, `diff`).\nInline scripts, heredocs, `$(\u2026)`, and complex control flow \u2192 a purpose-built tool or checked-in script.\n\n<instruction>\n- Set `cwd` instead of `cd`.\n- `pty: true` only for terminal interaction (`sudo`, `ssh`).\n- Order-dependent commands use `&&` in one call; independent calls may run concurrently.\n- Internal URIs auto-resolve to paths.\n- aux utils available: mkdir, wc, sort, comm, diff, uniq, base64, cmp, md5sum, sha*sum, b2sum, basename, dirname, readlink, realpath, touch, stat, date, mktemp, seq, yes, printenv, truncate, tac, nproc, uname, whoami, hostname, which, ps, pgrep, pkill, pidwait, top, cut, tee, tr, paste, sed, xargs, jq, rm, mv, ln, ts, sponge, ifne, isutf8, combine, errno\n- `async: true` defers a finite command's result; it does not extend `timeout`.\n</instruction>\n\n<critical>\n- NEVER use shell `grep`/`rg`; use built-in `grep`.\n- List directories with `read` and find paths with `glob`; NEVER use `ls`/`find`.\n- Avoid `head`, `tail`, and redirection: output is captured, truncated, and linked as `artifact://<id>`.\n</critical>\n\nLong foreground calls may auto-background by the configured threshold; the result is injected as a follow-up when the job finishes. NEVER poll a backgrounded job (`sleep`/`ps`/`pgrep`/`top`) \u2014 do other work or end your reply and you will be woken with its output.\n`timeout: 0` disables the job deadline; otherwise `timeout` sets it without extending foreground waiting.",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "i": {
+       "type": "string",
+       "description": "concise intent"
+      },
+      "command": {
+       "type": "string"
+      },
+      "timeout": {
+       "type": "number",
+       "description": "timeout in seconds; 0 disables the command deadline; nonzero values are clamped to 1-3600"
+      },
+      "cwd": {
+       "type": "string"
+      },
+      "pty": {
+       "type": "boolean"
+      },
+      "async": {
+       "type": "boolean",
+       "description": "run in background"
+      }
+     },
+     "required": [
+      "command",
+      "i"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "edit",
+    "description": "Line-anchored patch language: name original lines/gaps to replace, insert, cut, or paste; then give new content. `:` headers take `+` body rows; colonless paste `PUT`, `CUT`, `REM`, `MV` take none.\n\n<headers>\nSection: `[PATH#TAG]`; `TAG`: 4-hex snapshot from latest `read`/`search`, REQUIRED each section. New files: `write`; hashline edits existing files only.\n</headers>\n\n<ops>\n`PUT N.=M:`: replace original inclusive lines N\u2013M with body.\n`PUT N*:`: replace syntactic block beginning N; closing line resolved.\n`PUT <N:` insert body rows before line N (`PUT <1:` = file head).\n`PUT >N:` insert body rows after line N (`PUT >$:` = file tail).\n`PUT >N*:`: insert after block N's end, at sibling depth. Append inside block: `PUT >M:`.\n`PUT <N @name` / `PUT >N @name` paste register `@name` at the gap before/after line N; omit `@name` for the anonymous register.\n`PUT N.=M @name` / `PUT N* @name` paste `@name` over the range / resolved block; `@name` required here.\n`CUT N.=M` / `CUT N*`: delete and capture inclusive lines N\u2013M / block N; anonymous or given `@name`.\n`REM`: delete section file. `MV DEST`: move/rename (quote paths with spaces); prior edits apply to source, final content to `DEST`.\nSingle line: `PUT N.=N:` / `CUT N.=N`. Ranges name original inclusive touched lines; body length irrelevant.\n</ops>\n\n<body-rows>\nOnly below `:` headers. Row: verbatim `+TEXT` (leading whitespace preserved); `+`: blank. NEVER `-old`, bare, or context rows: range deletes; body is final content. Keep line: exclude it from every range. Literal initial `-`/`+`: `- item` \u2192 `+- item`; `+ item` \u2192 `++ item`.\n</body-rows>\n\n<rules>\n- Numbers and `#TAG`: latest `read`/`search` `LINE:TEXT`; numbers are original, never shifted by hunks.\n- Each edit renumbers and changes `#TAG` \u2192 next numbers from edit response or fresh `read`.\n- Touch displayed lines only; undisplayed hunks REJECTED. Far from read window: re-`read`; confirm construct.\n- Elisions UNSEEN: `\u2026`, `..`, collapsed `N-M:` rows. NEVER hunk in/across one; `read` first.\n- NEVER start/end range mid-expression or mid-block.\n- Ranges: changed lines only; NEVER widen over keepers. Non-adjacent changes: separate hunks.\n- Whole construct: `PUT N*:`; internal lines: `PUT N.=M:`.\n- `PUT N*:` resolves exactly node N. Leading decorators/attributes/doc-comments are separate nodes: point N at first decorator to include both. Standalone line-comments never swept: use `PUT N.=M:`.\n- Block ops: opening line of multi-line construct, NEVER closer, last line, bare inner statement. One statement: plain `PUT N.=N:` / `CUT N.=N` / `PUT >N:`. At closer: `PUT >M:`.\n- Markdown headings are block openers. Block op on `##`/`###`: whole section through deeper headings to next same/higher heading. After section `PUT >N*:`: end body with blank line to separate next heading.\n- Pure addition: `PUT <N:` / `PUT >N:`, NEVER widened `PUT N.=M:`.\n- Move: `CUT`+`PUT`; `CUT 5.=9 @fn` \u2192 `@fn`, `PUT >40 @fn` pastes. Single call-local move: unlabeled `CUT` + `PUT >40`. Named registers persist across edit calls.\n- NEVER format/restyle with this tool; run project formatter.\n</rules>\n\n<example>\n`read` output shape:\n```\n[greet.py#A1B2]\n1:def greet(name):\n2:    msg = \"Hello, \" + name\n3:    print(msg)\n4:greet(\"world\")\n```\n\nEdit, then move:\n```\n[greet.py#A1B2]\nPUT 1.=3:\n+def greet(name):\n+    print(f\"Hi, {name}\")\nMV lib/greet.py\n```\n\nMarkdown bullets \u2014 file receives `- task`:\n```\n[PLAN.md#A1B2]\nPUT >2:\n+- task\n+  - nested task\n```\n\nMove `greet` to sibling file via named register; flows across sections:\n```\n[greet.py#A1B2]\nCUT 1* @fn\n[other.py#3C4D]\nPUT <1 @fn\n```\n\n`PUT 1*:` resolves lines 1\u20133 (`def` through `print(msg)`); line 4 separate, remains:\n```\n[greet.py#A1B2]\nPUT 1*:\n+def greet(name):\n+    print(f\"Hello, {name}\")\n```\n\nDecorator/doc-comment separate block: point N at decorator to include both; anchoring `def` line 2 orphans `@cache`:\n```\n[svc.py#C3D4]\nPUT 1*:\n+@cache\n+def load(key):\n+    return store[key]\n```\n</example>\n\n<anti-patterns>\n# WRONG \u2014 empty `PUT` to delete. RIGHT: `CUT 4.=4`\nPUT 4.=4:\n\n# WRONG \u2014 range sized to the post-edit content. RIGHT: `PUT 1.=1:` (body length irrelevant)\nPUT 1.=2:\n+def greet(name):\n\n# WRONG \u2014 `-` rows / bare context lines do not exist; the range deletes, the body is only new content.\nPUT 3.=3:\n    msg = \"Hello, \" + name\n-   print(msg)\n+   return msg\n# RIGHT\nPUT 3.=3:\n+   return msg\n\n# WRONG \u2014 pure insertion as a widened `PUT`: retyped keepers get dropped (here line 4).\nPUT 2.=4:\n+    msg = \"Hello, \" + name\n+    extra = compute(name)\n+    print(msg)\n# RIGHT \u2014 touch nothing you keep.\nPUT >2:\n+    extra = compute(name)\n\n# WRONG \u2014 `PUT >N*:` anchored on the closing delimiter / last visible line. RIGHT: plain `PUT >M:`\nPUT >3*:\n+after()\n# RIGHT\nPUT >3:\n+after()\n\n# WRONG \u2014 body rows under register PUT; register pastes take no body. RIGHT: bodyless `PUT >20 @fn`.\nPUT >20 @fn:\n+function f() {}\n</anti-patterns>\n\n<critical>\n1. RE-GROUND AFTER EVERY EDIT: edits renumber and change `#TAG`; take next numbers from edit response or fresh `read`. Stale tag/surprise: STOP; re-`read`.\n2. RANGES TIGHT: changed lines only. Whole construct: `PUT N*:`.\n3. BODY FINAL CONTENT: every row starts `+`; Markdown bullet: `+- item`, not `- item`.\n</critical>",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "i": {
+       "type": "string",
+       "description": "concise intent"
+      },
+      "input": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "input",
+      "i"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "write",
+    "description": "Creates or overwrites file at specified path.\n\n<conditions>\n- Creating new files explicitly required by task\n- Replacing entire file contents when editing would be more complex\n- Supports `.zip` (and ZIP-based `.jar`/`.war`/`.ear`/`.apk`), `.tar`, `.tar.gz`/`.tgz`, `.tar.zst`, and `.asar` archive entries via `archive.ext:path/inside/archive`; other archive formats (`.rar`, `.7z`, `.iso`, \u2026) are read-only\n- Supports SQLite row operations via `db.sqlite:table` (insert), `db.sqlite:table:key` (update with JSON content, delete with empty content)\n</conditions>\n\n<critical>\n- You SHOULD use Edit tool for modifying existing files\n- You NEVER create documentation files (*.md, README) unless explicitly requested\n- You NEVER use emojis unless requested\n</critical>",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "i": {
+       "type": "string",
+       "description": "concise intent"
+      },
+      "path": {
+       "type": "string",
+       "description": "file path"
+      },
+      "content": {
+       "type": "string",
+       "description": "file content"
+      }
+     },
+     "required": [
+      "path",
+      "content",
+      "i"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "grep",
+    "description": "Searches files/internal URLs: Rust regex, PCRE2 fallback.\n\n<instruction>\n- `path`: known files, directories, globs, internal URLs; roots `;`-separated.\n- Broad searches may time out \u2192 narrow scope or use `glob` first.\n- One-file line selector: `src/foo.ts:50-100`; never selects search root.\n- Literal `\\n` or `\\\\n` enables cross-line patterns.\n</instruction>\n\n<critical>\n- MUST use instead of shell `grep`/`rg`.\n\n- Open-ended multi-round search MUST use Task + scout, not chained calls.\n</critical>",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "i": {
+       "type": "string",
+       "description": "concise intent"
+      },
+      "pattern": {
+       "type": "string",
+       "description": "regex pattern"
+      },
+      "path": {
+       "type": "string",
+       "description": "file, directory, glob, internal URL, or \"<file>:<lines>\" selector to search; pass several as a semicolon-delimited list (\"src; tests\"). Omitted -> searches the workspace root (\".\")"
+      },
+      "case": {
+       "type": "boolean",
+       "description": "case-sensitive search"
+      },
+      "gitignore": {
+       "type": "boolean",
+       "description": "respect gitignore"
+      },
+      "skip": {
+       "description": "files to skip before collecting results \u2014 use to paginate when the prior call hit the file limit",
+       "type": [
+        "number",
+        "null"
+       ]
+      }
+     },
+     "required": [
+      "pattern",
+      "i"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "glob",
+    "description": "Globs files, directories, and path-backed internal URLs with fast pattern matching.\n\n<instruction>\n- `path`: glob, file, directory, or path-backed internal URL; separate targets with `;` (`src/**/*.ts; test/**/*.ts`).\n- `memory://` glob patterns are supported. `ssh://` has no local path; use `read`. Other internal URLs accept exact paths only.\n- `gitignore` defaults `true`. Set `false` for ignored files such as `.env*`, logs, or build output.\n- `hidden` defaults `true`; pair it with `gitignore: false` for ignored dotfiles.\n</instruction>\n\n<output>\nMatches are newest-first and grouped by directory; directories end in `/`.\n</output>\n\n<avoid>\n\nOpen-ended multi-round discovery \u2192 Task + scout.\n</avoid>\n\n<examples>\n# Glob files\n<example i=\"\u2026\">\nsrc/**/*.ts\n</example>\n# Multiple targets \u2014 semicolon-delimited list\n<example i=\"\u2026\">\nsrc/**/*.ts; test/**/*.ts\n</example>\n# Glob gitignored files like .env\n<example>\nglob(i=\"\u2026\", path=\".env*\", gitignore=False)\n</example>\n# Glob directories matching a name (returns both files and dirs; directories are suffixed with `/`)\n<example i=\"\u2026\">\n**/tests\n</example>\n</examples>",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "i": {
+       "type": "string",
+       "description": "concise intent"
+      },
+      "path": {
+       "type": "string",
+       "description": "glob, file, or directory to search \u2014 a single path or a semicolon-delimited list (\"src/**/*.ts; test/**/*.ts\"). Omitted -> searches the workspace root (\".\")"
+      },
+      "hidden": {
+       "type": "boolean",
+       "description": "include hidden files"
+      },
+      "gitignore": {
+       "type": "boolean",
+       "description": "respect gitignore"
+      },
+      "limit": {
+       "type": "number",
+       "description": "max results"
+      }
+     },
+     "additionalProperties": false,
+     "required": [
+      "i"
+     ]
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "todo",
+    "description": "**Tasks: verbatim content strings, NEVER auto-generated IDs; no \"task-1\"/\"task-N\". Pass content in `task`.**\n\nAfter each successful state-changing op: if nothing is `in_progress`, the earliest `pending` task (phase order) auto-promotes to `in_progress`; if several are `in_progress`, only the earliest stays. Blocked tasks NEVER auto-promote\u2014`unblock` first. Out-of-order completion may move pointer back to an earlier phase\u2014expected; completed tasks NEVER revert.\n\n## Operations\n\n|`op`|Fields|Effect|\n|---|---|---|\n|`init`|`list: [{phase, items: string[]}]`|Initialize full list; replaces existing|\n|`init`|`items: string[]`|Flattened single-phase init|\n|`start`|`task`|Mark in progress|\n|`done`|`task` or `phase`|Mark completed|\n|`drop`|`task` or `phase`|Mark abandoned|\n|`block`|`task` or `phase`; optional `reason`|Mark blocked: awaiting external input; never auto-promotes; excluded from stop-time incomplete-todo reminder|\n|`unblock`|`task` or `phase`|Blocked task \u2192 `pending`|\n|`rm`|optional `task` or `phase`|Remove task/phase; omit both \u2192 clear|\n|`append`|`phase`; `items: string[]`|Append tasks to phase; lazily creates phase|\n|`view`|\u2014|Read-only; echo list|\n\n## Anatomy\n\n- Task content: 5\u201310 words; what, not how; unique identifier.\n- Phase name: short noun phrase (e.g. `Foundation`, `Auth`, `Verification`); unique identifier. NEVER prefix `1.`, `A)`, `Phase 1:`.\n\n## Rules\n\n- Mark tasks done immediately after finishing; complete phases in order.\n- NEVER make a todo call the turn's only tool call. Batch with real work: `init` with first reads/edits; each `done`/`start` with next action. Solo todo turns waste a round trip.\n- Waiting on something you can't act on\u2014a user decision, another agent, external service: `block` task (optional `reason`); remains tracked but avoids stop reminder. Blocking the active task hands `in_progress` to the next `pending` task, never back to the blocked one. `unblock` when actionable. If blocker agent-actionable, `append` an unblocking task instead.\n- Keep introduced `task`/`phase` strings stable.\n- Lost exact task text: `view` echoes list; NEVER guess from memory.\n\n## Create a list\n\n- Task requires 3+ distinct steps.\n- User explicitly requests one.\n- User provides a set of tasks.\n- New instructions arrive mid-task: capture before proceeding.\n\n<critical>\nUser gives multi-step plan\u2014phased todo, numbered/bulleted checklist, or \"N bugs/items/tasks\":\n- MUST `init` every item as its own task before working.\n- Enumerate all; NEVER summarize into fewer tasks, sample \"the important ones\", drop items, or track the rest from memory.\n</critical>\n\n<examples>\n# Initial setup (multi-phase)\n<example>\ntodo(i=\"\u2026\", op=\"init\", list=[{\"phase\": \"Foundation\", \"items\": [\"Scaffold crate\", \"Wire workspace\"]}, {\"phase\": \"Auth\", \"items\": [\"Port credential store\", \"Wire OAuth providers\"]}, {\"phase\": \"Verification\", \"items\": [\"Run cargo test\"]}])\n</example>\n# View current state (read-only)\n<example i=\"\u2026\">\nview\n</example>\n# Initial setup (single phase)\n<example>\ntodo(i=\"\u2026\", op=\"init\", list=[{\"phase\": \"Implementation\", \"items\": [\"Apply fix\", \"Run tests\"]}])\n</example>\n# Complete one task\n<example>\ntodo(i=\"\u2026\", op=\"done\", task=\"Wire workspace\")\n</example>\n# Complete a whole phase\n<example>\ntodo(i=\"\u2026\", op=\"done\", phase=\"Auth\")\n</example>\n# Remove all tasks\n<example i=\"\u2026\">\nrm\n</example>\n# Drop one task\n<example>\ntodo(i=\"\u2026\", op=\"drop\", task=\"Run cargo test\")\n</example>\n# Append tasks to a phase\n<example>\ntodo(i=\"\u2026\", op=\"append\", phase=\"Auth\", items=[\"Handle retries\", \"Run tests\"])\n</example>\n</examples>",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "i": {
+       "type": "string",
+       "description": "concise intent"
+      },
+      "op": {
+       "enum": [
+        "init",
+        "start",
+        "done",
+        "rm",
+        "drop",
+        "block",
+        "unblock",
+        "append",
+        "view"
+       ],
+       "type": "string",
+       "description": "operation to apply"
+      },
+      "list": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "phase": {
+          "type": "string",
+          "description": "phase name"
+         },
+         "items": {
+          "type": "array",
+          "items": {
+           "type": "string",
+           "description": "task content"
+          },
+          "minItems": 1,
+          "description": "tasks for this phase"
+         }
+        },
+        "required": [
+         "phase",
+         "items"
+        ],
+        "additionalProperties": false
+       },
+       "description": "phased task list (init)"
+      },
+      "task": {
+       "type": "string",
+       "description": "task content"
+      },
+      "phase": {
+       "type": "string",
+       "description": "phase name"
+      },
+      "items": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "description": "task content"
+       },
+       "description": "tasks for single-phase init or append"
+      },
+      "reason": {
+       "type": "string",
+       "description": "blocker note (block op)"
+      }
+     },
+     "required": [
+      "op",
+      "i"
+     ],
+     "description": "apply a single todo operation",
+     "additionalProperties": false
+    }
+   }
+  }
+ ],
+ "max_tokens": 32768,
+ "preserve_thinking": true,
+ "chat_template_kwargs": {
+  "preserve_thinking": true
+ },
+ "enable_thinking": true
+}

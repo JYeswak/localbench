@@ -1,0 +1,1206 @@
+{
+  "kind": "aa",
+  "runs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.34.4",
+          "backend_sha": "bba8b79eac84ab09",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "omp_version": "18.3.1",
+          "omp_sha": "cacaf5726609a21b",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.34.4",
+          "backend_sha": "bba8b79eac84ab09",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "aa9e3b4",
+        "created": "20260925T134733Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "aa1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 59.1051,
+          "better": "higher",
+          "spread": [
+            58.6795,
+            60.2179
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.3292,
+          "better": "lower",
+          "spread": [
+            0.3185,
+            0.3423
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 319.7167,
+          "better": "higher",
+          "spread": [
+            298.7105,
+            324.9142
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 3.4249,
+          "better": "lower",
+          "spread": [
+            3.3763,
+            3.6725
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 321.4433,
+          "better": "higher",
+          "spread": [
+            316.301,
+            323.7056
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 27.0623,
+          "better": "lower",
+          "spread": [
+            26.8824,
+            27.5149
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 273.4367,
+          "better": "higher",
+          "spread": [
+            271.0662,
+            273.6106
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 128.0552,
+          "better": "lower",
+          "spread": [
+            127.9629,
+            129.164
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.1359,
+          "better": "lower",
+          "spread": [
+            0.1359,
+            0.1359
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 204.821,
+          "better": "higher",
+          "spread": [
+            204.821,
+            204.821
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.1424,
+          "better": "lower",
+          "spread": [
+            0.1424,
+            0.1424
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 319.6019,
+          "better": "lower",
+          "spread": [
+            319.6019,
+            319.6019
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.2176,
+          "better": "lower",
+          "spread": [
+            0.2176,
+            0.2176
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.5988,
+          "better": "lower",
+          "spread": [
+            0.5988,
+            0.5988
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 37.3127,
+          "better": "lower",
+          "spread": [
+            37.3127,
+            37.3127
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.2031,
+          "better": "lower",
+          "spread": [
+            0.2031,
+            0.2031
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.2198,
+          "better": "lower",
+          "spread": [
+            0.2198,
+            0.2198
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 18.3024,
+          "better": "lower",
+          "spread": [
+            18.3024,
+            18.3024
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 14.722,
+          "better": "lower",
+          "spread": [
+            14.722,
+            14.722
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 3.7666,
+          "better": "lower",
+          "spread": [
+            3.7666,
+            3.7666
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.295,
+          "better": "lower",
+          "spread": [
+            1.295,
+            1.295
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_startup_s": {
+          "value": 1.371,
+          "better": "lower",
+          "spread": [
+            1.371,
+            1.371
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_startup_s": {
+          "value": 1.062,
+          "better": "lower",
+          "spread": [
+            1.062,
+            1.062
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 15.8283,
+          "better": "lower",
+          "spread": [
+            15.8283,
+            15.8283
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 12.443,
+          "better": "lower",
+          "spread": [
+            12.443,
+            12.443
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 3.4885,
+          "better": "lower",
+          "spread": [
+            3.4885,
+            3.4885
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.296,
+          "better": "lower",
+          "spread": [
+            0.296,
+            0.296
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_startup_s": {
+          "value": 1.473,
+          "better": "lower",
+          "spread": [
+            1.473,
+            1.473
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_startup_s": {
+          "value": 1.95,
+          "better": "lower",
+          "spread": [
+            1.95,
+            1.95
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260925T134733Z__aa1__ollama__localbench-parked_5642e97495e1",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817\n\n\nThe user wants me to read answer.txt and reply with only the number it contains. The file contains `4817`. I should reply with only that number.4817\n\n\n48\u2026[+2 chars]",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 1.371,
+            "llm_s": 14.722,
+            "aux_s": 2.084,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 2.084,
+                "aborted": 0,
+                "completion_tokens": 81
+              }
+            }
+          },
+          "input": 36,
+          "output": 90,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817\n\n\nThe user wants me to read answer.txt and reply with only the number it contains. The file contains `4817`. I should reply with only that number.4817\n\n\n48\u2026[+2 chars]",
+            "4817"
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 1.473,
+            "llm_s": 12.443,
+            "aux_s": 1.799,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 1.799,
+                "aborted": 0,
+                "completion_tokens": 65
+              }
+            }
+          },
+          "input": 5,
+          "output": 15,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 8,
+            "load1": {
+              "mean": 24.4,
+              "max": 25.07,
+              "min": 24.3
+            },
+            "gpu_device_pct": {
+              "mean": 27.2,
+              "max": 85,
+              "min": 12
+            },
+            "free_pct": {
+              "mean": 97.0,
+              "max": 97,
+              "min": 97
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 8,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 8.5,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 8.2,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 4.0,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 83619,
+                "name": "Google Chrome He",
+                "pct": 2.3,
+                "cmd": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.53/Helpers/Google Chrome Helper.app/Contents/MacOS/Goo"
+              }
+            ],
+            "load": {
+              "samples": 8,
+              "app_gpu_mean_pct": 23.0,
+              "app_gpu_p95_pct": 28.8,
+              "app_spike_seconds": 0,
+              "user_active_pct": 100.0
+            }
+          },
+          "cpu_busy_pct": 29.1,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 43.9
+        },
+        "during": {
+          "samples": 932,
+          "load1": {
+            "mean": 23.0,
+            "max": 47.92,
+            "min": 10.5
+          },
+          "gpu_device_pct": {
+            "mean": 97.6,
+            "max": 100,
+            "min": 8
+          },
+          "free_pct": {
+            "mean": 93.0,
+            "max": 97,
+            "min": 86
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 932,
+          "gpu_by_process": [
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 18.6,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 16.8,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 10.0,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 83619,
+              "name": "Google Chrome He",
+              "pct": 5.4,
+              "cmd": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.53/Helpers/Google Chrome Helper.app/Contents/MacOS/Goo"
+            }
+          ],
+          "load": {
+            "samples": 932,
+            "app_gpu_mean_pct": 51.9,
+            "app_gpu_p95_pct": 65.0,
+            "app_spike_seconds": 424,
+            "user_active_pct": 80.4
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 479,
+          "busy_pct": {
+            "mean": 27.4,
+            "max": 37.9,
+            "min": 13.9
+          }
+        },
+        "before_live": {
+          "t": 1790344054.893569,
+          "load1": 28.48,
+          "free_pct": 92,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 98,
+          "gpu_renderer_pct": 89,
+          "gpu_tiler_pct": 89,
+          "gpu_in_use_mem_bytes": 30456692736,
+          "resident": {
+            "ollama": [
+              "qwen3.8:27b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": null,
+            "omlx": []
+          },
+          "user_idle_s": 0.3
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.34.4",
+          "backend_sha": "bba8b79eac84ab09",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "omp_version": "18.3.1",
+          "omp_sha": "cacaf5726609a21b",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.34.4",
+          "backend_sha": "bba8b79eac84ab09",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "aa9e3b4",
+        "created": "20260925T141050Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "aa2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 56.6325,
+          "better": "higher",
+          "spread": [
+            53.0963,
+            59.4222
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.3361,
+          "better": "lower",
+          "spread": [
+            0.3271,
+            0.3524
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 318.7251,
+          "better": "higher",
+          "spread": [
+            289.108,
+            319.3996
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 3.4324,
+          "better": "lower",
+          "spread": [
+            3.4252,
+            3.791
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 306.6437,
+          "better": "higher",
+          "spread": [
+            297.9998,
+            312.1012
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 28.3782,
+          "better": "lower",
+          "spread": [
+            27.8884,
+            29.2047
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 257.8063,
+          "better": "higher",
+          "spread": [
+            253.9849,
+            262.9456
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 135.819,
+          "better": "lower",
+          "spread": [
+            133.1606,
+            137.8586
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.1406,
+          "better": "lower",
+          "spread": [
+            0.1406,
+            0.1406
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 208.4342,
+          "better": "higher",
+          "spread": [
+            208.4342,
+            208.4342
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.1401,
+          "better": "lower",
+          "spread": [
+            0.1401,
+            0.1401
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 336.9409,
+          "better": "lower",
+          "spread": [
+            336.9409,
+            336.9409
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.379,
+          "better": "lower",
+          "spread": [
+            0.379,
+            0.379
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.6147,
+          "better": "lower",
+          "spread": [
+            0.6147,
+            0.6147
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 38.5451,
+          "better": "lower",
+          "spread": [
+            38.5451,
+            38.5451
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1997,
+          "better": "lower",
+          "spread": [
+            0.1997,
+            0.1997
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.2224,
+          "better": "lower",
+          "spread": [
+            0.2224,
+            0.2224
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 19.0335,
+          "better": "lower",
+          "spread": [
+            19.0335,
+            19.0335
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 14.984,
+          "better": "lower",
+          "spread": [
+            14.984,
+            14.984
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 22.7139,
+          "better": "lower",
+          "spread": [
+            22.7139,
+            22.7139
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 19.532,
+          "better": "lower",
+          "spread": [
+            19.532,
+            19.532
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_startup_s": {
+          "value": 1.814,
+          "better": "lower",
+          "spread": [
+            1.814,
+            1.814
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_startup_s": {
+          "value": 1.706,
+          "better": "lower",
+          "spread": [
+            1.706,
+            1.706
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 17.2253,
+          "better": "lower",
+          "spread": [
+            17.2253,
+            17.2253
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 13.26,
+          "better": "lower",
+          "spread": [
+            13.26,
+            13.26
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 3.0612,
+          "better": "lower",
+          "spread": [
+            3.0612,
+            3.0612
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.316,
+          "better": "lower",
+          "spread": [
+            0.316,
+            0.316
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_startup_s": {
+          "value": 2.066,
+          "better": "lower",
+          "spread": [
+            2.066,
+            2.066
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_startup_s": {
+          "value": 1.579,
+          "better": "lower",
+          "spread": [
+            1.579,
+            1.579
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260925T141050Z__aa2__ollama__localbench-parked_5642e97495e1",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 1.814,
+            "llm_s": 14.984,
+            "aux_s": 2.095,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 2.095,
+                "aborted": 0,
+                "completion_tokens": 81
+              }
+            }
+          },
+          "input": 36,
+          "output": 1130,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817",
+            "4817"
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 2.066,
+            "llm_s": 13.26,
+            "aux_s": 1.811,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 1.811,
+                "aborted": 0,
+                "completion_tokens": 65
+              }
+            }
+          },
+          "input": 5,
+          "output": 21,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 8,
+            "load1": {
+              "mean": 12.7,
+              "max": 13.16,
+              "min": 12.66
+            },
+            "gpu_device_pct": {
+              "mean": 6.8,
+              "max": 17,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 97.0,
+              "max": 97,
+              "min": 97
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 8,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 8.3,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 3.5,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.9,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 8,
+              "app_gpu_mean_pct": 14.9,
+              "app_gpu_p95_pct": 20.8,
+              "app_spike_seconds": 0,
+              "user_active_pct": 100.0
+            }
+          },
+          "cpu_busy_pct": 24.3,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 7.0
+        },
+        "during": {
+          "samples": 1017,
+          "load1": {
+            "mean": 15.0,
+            "max": 25.49,
+            "min": 7.14
+          },
+          "gpu_device_pct": {
+            "mean": 98.0,
+            "max": 100,
+            "min": 13
+          },
+          "free_pct": {
+            "mean": 92.9,
+            "max": 97,
+            "min": 90
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 1017,
+          "gpu_by_process": [
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 19.4,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 15.4,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 10.4,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 83619,
+              "name": "Google Chrome He",
+              "pct": 4.1,
+              "cmd": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.53/Helpers/Google Chrome Helper.app/Contents/MacOS/Goo"
+            }
+          ],
+          "load": {
+            "samples": 1017,
+            "app_gpu_mean_pct": 50.1,
+            "app_gpu_p95_pct": 62.7,
+            "app_spike_seconds": 275,
+            "user_active_pct": 75.5
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 516,
+          "busy_pct": {
+            "mean": 26.5,
+            "max": 39.5,
+            "min": 14.7
+          }
+        },
+        "before_live": {
+          "t": 1790345451.518363,
+          "load1": 13.16,
+          "free_pct": 97,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 2933227520,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1"
+            ],
+            "mlx-serve": [],
+            "splash": null,
+            "omlx": []
+          },
+          "user_idle_s": 0.0
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ],
+  "problems": []
+}

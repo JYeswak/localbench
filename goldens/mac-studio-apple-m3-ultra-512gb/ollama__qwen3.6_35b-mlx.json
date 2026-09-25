@@ -1,0 +1,383 @@
+{
+  "aa_receipt": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+  "conformance": {
+    "conf.greedy_deterministic": {
+      "level": "SHOULD",
+      "verdict": "FAIL"
+    },
+    "conf.no_truncation_64k": {
+      "level": "MUST",
+      "verdict": "PASS"
+    },
+    "conf.streams_incrementally": {
+      "level": "MUST",
+      "verdict": "PASS"
+    },
+    "conf.tool_call": {
+      "level": "MUST",
+      "shape": {
+        "arg_keys": [
+          "path"
+        ],
+        "name": "read_file"
+      },
+      "verdict": "PASS"
+    },
+    "conf.usage_reported": {
+      "level": "MUST",
+      "verdict": "PASS"
+    },
+    "e2e.ok.correct": {
+      "level": "MUST",
+      "verdict": "PASS"
+    },
+    "e2e.tool_read.correct": {
+      "level": "MUST",
+      "verdict": "PASS"
+    },
+    "replay.full.prompt_tokens": {
+      "level": "SHOULD",
+      "verdict": "PASS"
+    },
+    "replay.lean.prompt_tokens": {
+      "level": "SHOULD",
+      "verdict": "PASS"
+    }
+  },
+  "metrics": {
+    "e2e.ok.first_llm_s": {
+      "aa_rel_spread": 0.0173,
+      "better": "lower",
+      "spread": [
+        1.892,
+        1.925
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 1.9085
+    },
+    "e2e.ok.first_wall_s": {
+      "aa_rel_spread": 0.0612,
+      "better": "lower",
+      "spread": [
+        6.4258,
+        6.8313
+      ],
+      "tol": 0.1835,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 6.6285
+    },
+    "e2e.ok.repeat_llm_s": {
+      "aa_rel_spread": 0.2517,
+      "better": "lower",
+      "spread": [
+        0.125,
+        0.161
+      ],
+      "tol": 0.7552,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 0.143
+    },
+    "e2e.ok.repeat_wall_s": {
+      "aa_rel_spread": 0.1473,
+      "better": "lower",
+      "spread": [
+        4.5244,
+        5.2438
+      ],
+      "tol": 0.4419,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 4.8841
+    },
+    "e2e.tool_read.first_llm_s": {
+      "aa_rel_spread": 0.316,
+      "better": "lower",
+      "spread": [
+        2.478,
+        3.408
+      ],
+      "tol": 0.948,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 2.943
+    },
+    "e2e.tool_read.first_wall_s": {
+      "aa_rel_spread": 0.0625,
+      "better": "lower",
+      "spread": [
+        8.2595,
+        8.7927
+      ],
+      "tol": 0.1876,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 8.5261
+    },
+    "e2e.tool_read.repeat_llm_s": {
+      "aa_rel_spread": 0.0939,
+      "better": "lower",
+      "spread": [
+        0.771,
+        0.847
+      ],
+      "tol": 0.2818,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 0.809
+    },
+    "e2e.tool_read.repeat_wall_s": {
+      "aa_rel_spread": 0.0908,
+      "better": "lower",
+      "spread": [
+        5.5107,
+        6.0347
+      ],
+      "tol": 0.2723,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 5.7727
+    },
+    "micro.cache_hit_8k.speedup_x": {
+      "aa_rel_spread": 0.0111,
+      "better": "higher",
+      "spread": [
+        49.3129,
+        49.8618
+      ],
+      "tol": 0.05,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 49.5874
+    },
+    "micro.cache_hit_8k.warm_ttft_s": {
+      "aa_rel_spread": 0.0076,
+      "better": "lower",
+      "spread": [
+        0.0655,
+        0.066
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 0.0658
+    },
+    "micro.decode.decode_tps": {
+      "aa_rel_spread": 0.0261,
+      "better": "higher",
+      "spread": [
+        137.8088,
+        147.8221
+      ],
+      "tol": 0.0782,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 145.416
+    },
+    "micro.decode.ttft_s": {
+      "aa_rel_spread": 0.0851,
+      "better": "lower",
+      "spread": [
+        0.0842,
+        0.1017
+      ],
+      "tol": 0.2553,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 0.0929
+    },
+    "micro.eviction_probe_8k.a_again_ttft_s": {
+      "aa_rel_spread": 0.3901,
+      "better": "lower",
+      "spread": [
+        0.0846,
+        0.1256
+      ],
+      "tol": 1.1703,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 0.1051
+    },
+    "micro.prefill_1k.prefill_tps": {
+      "aa_rel_spread": 0.0007,
+      "better": "higher",
+      "spread": [
+        2542.1456,
+        2634.6331
+      ],
+      "tol": 0.05,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 2625.5302
+    },
+    "micro.prefill_1k.ttft_s": {
+      "aa_rel_spread": 0.0002,
+      "better": "lower",
+      "spread": [
+        0.416,
+        0.4307
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 0.4173
+    },
+    "micro.prefill_32k.prefill_tps": {
+      "aa_rel_spread": 0.0082,
+      "better": "higher",
+      "spread": [
+        1942.4711,
+        1999.1678
+      ],
+      "tol": 0.05,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 1990.4242
+    },
+    "micro.prefill_32k.ttft_s": {
+      "aa_rel_spread": 0.0082,
+      "better": "lower",
+      "spread": [
+        17.5128,
+        18.0245
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 17.5918
+    },
+    "micro.prefill_8k.prefill_tps": {
+      "aa_rel_spread": 0.0021,
+      "better": "higher",
+      "spread": [
+        2682.5187,
+        2716.7208
+      ],
+      "tol": 0.05,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 2702.9573
+    },
+    "micro.prefill_8k.ttft_s": {
+      "aa_rel_spread": 0.0017,
+      "better": "lower",
+      "spread": [
+        3.2046,
+        3.2443
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 3.22
+    },
+    "replay.full.cold_ttft_s": {
+      "aa_rel_spread": 0.0534,
+      "better": "lower",
+      "spread": [
+        54.8759,
+        57.889
+      ],
+      "tol": 0.1603,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 56.3825
+    },
+    "replay.full.turn2_ttft_s": {
+      "aa_rel_spread": 0.0116,
+      "better": "lower",
+      "spread": [
+        0.3344,
+        0.3383
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 0.3363
+    },
+    "replay.full.warm_ttft_s": {
+      "aa_rel_spread": 0.0063,
+      "better": "lower",
+      "spread": [
+        0.2213,
+        0.2227
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 0.222
+    },
+    "replay.lean.cold_ttft_s": {
+      "aa_rel_spread": 0.0101,
+      "better": "lower",
+      "spread": [
+        4.3901,
+        4.4346
+      ],
+      "tol": 0.1,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 4.4123
+    },
+    "replay.lean.turn2_ttft_s": {
+      "aa_rel_spread": 0.3112,
+      "better": "lower",
+      "spread": [
+        0.092,
+        0.1259
+      ],
+      "tol": 0.9335,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 0.109
+    },
+    "replay.lean.warm_ttft_s": {
+      "aa_rel_spread": 0.4321,
+      "better": "lower",
+      "spread": [
+        0.0615,
+        0.0954
+      ],
+      "tol": 1.2964,
+      "tol_source": "docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260925T053350Z.json",
+      "value": 0.0784
+    }
+  },
+  "pins": {
+    "backend": "ollama",
+    "backend_args": "",
+    "backend_sha": "bba8b79eac84ab09",
+    "backend_version": "0.34.4",
+    "fixtures_sha": "41ff309f03a98aa5",
+    "host_id": "mac-studio-apple-m3-ultra-512gb",
+    "macos_build": "25F84",
+    "model": "qwen3.6:35b-mlx",
+    "model_digest": "e92a3e94bbca",
+    "omp_agent_config": "38b87e2b63396937",
+    "omp_child_config": "62eed267e219ddde",
+    "omp_mem_config": "019eef862b65ed03"
+  },
+  "tier_pins": {
+    "conf": {
+      "backend": "ollama",
+      "backend_args": "",
+      "backend_sha": "bba8b79eac84ab09",
+      "backend_version": "0.34.4",
+      "host_id": "mac-studio-apple-m3-ultra-512gb",
+      "macos_build": "25F84",
+      "model": "qwen3.6:35b-mlx",
+      "model_digest": "e92a3e94bbca"
+    },
+    "e2e": {
+      "backend": "ollama",
+      "backend_args": "",
+      "backend_sha": "bba8b79eac84ab09",
+      "backend_version": "0.34.4",
+      "host_id": "mac-studio-apple-m3-ultra-512gb",
+      "macos_build": "25F84",
+      "model": "qwen3.6:35b-mlx",
+      "model_digest": "e92a3e94bbca",
+      "omp_agent_config": "38b87e2b63396937",
+      "omp_child_config": "62eed267e219ddde"
+    },
+    "micro": {
+      "backend": "ollama",
+      "backend_args": "",
+      "backend_sha": "bba8b79eac84ab09",
+      "backend_version": "0.34.4",
+      "host_id": "mac-studio-apple-m3-ultra-512gb",
+      "macos_build": "25F84",
+      "model": "qwen3.6:35b-mlx",
+      "model_digest": "e92a3e94bbca"
+    },
+    "replay": {
+      "backend": "ollama",
+      "backend_args": "",
+      "backend_sha": "bba8b79eac84ab09",
+      "backend_version": "0.34.4",
+      "fixtures_sha": "41ff309f03a98aa5",
+      "host_id": "mac-studio-apple-m3-ultra-512gb",
+      "macos_build": "25F84",
+      "model": "qwen3.6:35b-mlx",
+      "model_digest": "e92a3e94bbca"
+    }
+  }
+}

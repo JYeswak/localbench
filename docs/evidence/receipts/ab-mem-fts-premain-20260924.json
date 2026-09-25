@@ -1,0 +1,2547 @@
+{
+  "kind": "ab",
+  "a": "ollama:qwen3.6:35b-mlx",
+  "b": "ollama:qwen3.6:35b-mlx",
+  "order": [
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [],
+  "table": {
+    "mem.recall.hit_rate": {
+      "a1": 0.9167,
+      "a2": 0.9167,
+      "b": 0.9444,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 1.03,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.pre_main_s": {
+      "a1": 5.8633,
+      "a2": 6.7105,
+      "b": 4.4646,
+      "better": "lower",
+      "aa_rel_spread": 0.1348,
+      "band": 0.4043,
+      "b_over_a": 0.71,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.wall_s": {
+      "a1": 8.3768,
+      "a2": 9.2459,
+      "b": 6.0536,
+      "better": "lower",
+      "aa_rel_spread": 0.0986,
+      "band": 0.2959,
+      "b_over_a": 0.687,
+      "verdict": "B-BETTER"
+    },
+    "mem.plant.wall_s": {
+      "a1": 6.3514,
+      "a2": 7.2449,
+      "b": 3.5708,
+      "better": "lower",
+      "aa_rel_spread": 0.1314,
+      "band": 0.3943,
+      "b_over_a": 0.525,
+      "verdict": "B-BETTER"
+    },
+    "mem.derail.ok_rate": {
+      "a1": 0.9722,
+      "a2": 0.8611,
+      "b": 0.8611,
+      "better": "higher",
+      "aa_rel_spread": 0.1212,
+      "band": 0.3636,
+      "b_over_a": 0.939,
+      "verdict": "WITHIN-NOISE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.3.0",
+          "omp_sha": "33cf63aab3a109b3",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "66b587f",
+        "created": "20260924T133221Z",
+        "tiers": [
+          "mem"
+        ],
+        "repeats": 3,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.recall.hit_rate": {
+          "value": 0.9167,
+          "better": "higher",
+          "spread": [
+            0.9167,
+            0.9167
+          ],
+          "n": 36
+        },
+        "mem.recall.pre_main_s": {
+          "value": 5.8633,
+          "better": "lower",
+          "spread": [
+            2.29,
+            9.0266
+          ],
+          "n": 36
+        },
+        "mem.recall.wall_s": {
+          "value": 8.3768,
+          "better": "lower",
+          "spread": [
+            2.9583,
+            37.2918
+          ],
+          "n": 36
+        },
+        "mem.plant.wall_s": {
+          "value": 6.3514,
+          "better": "lower",
+          "spread": [
+            2.4991,
+            10.6201
+          ],
+          "n": 36
+        },
+        "mem.derail.ok_rate": {
+          "value": 0.9722,
+          "better": "higher",
+          "spread": [
+            0.9722,
+            0.9722
+          ],
+          "n": 36
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260924T133221Z__ab_a1__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.recall": {
+          "hits": 33,
+          "attempts": 36,
+          "ci95": [
+            0.7817,
+            0.9713
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-8929",
+              "hit": true,
+              "recall_answer": "ZEBRA-8929",
+              "plant_answer": "NOTED",
+              "control_answer": "<memories>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "34734",
+              "hit": true,
+              "recall_answer": "34734",
+              "plant_answer": "NOTED",
+              "control_answer": "I need to look up information about project Falcon's staging database.",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "<tool_code>python code\nfrom tools import memopilot\nmemopilot.remember(\n    proje",
+              "control_answer": "```json\n[{\"name\": \"recall\", \"arguments\": {\"memory\": [\"Falcon on-call owner this ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-2272",
+              "hit": true,
+              "recall_answer": "ZEBRA-2272",
+              "plant_answer": "Noted \u2014 I've stored this as `FALCON_DEPLOY_CODE: ZEBRA-2272` for future referenc",
+              "control_answer": "<tool_code>\nrun_shell_command(i=\"Finding Falcon deploy code\", command=\"grep -rni",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "58550",
+              "hit": true,
+              "recall_answer": "58550",
+              "plant_answer": "```json\n{\"tool\": \"retain\", \"i\": \"Retaining Falcon staging database port informat",
+              "control_answer": "<recall>project Falcon staging database port</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Lindqvist",
+              "hit": true,
+              "recall_answer": "Lindqvist",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>project Falcon</recall><recall>on-call owner</recall><recall>Falcon proj",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-4575",
+              "hit": true,
+              "recall_answer": "ZEBRA-4575",
+              "plant_answer": "```json\n{\n  \"command\": \"retain\",\n  \"arguments\": {\n    \"facts\": [\n      \"The depl",
+              "control_answer": "```bash\nfind /tmp/localbench-mem-e7534ed1-control-code-2 -type f \\( -name \"*.py\"",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "51876",
+              "hit": true,
+              "recall_answer": "51876",
+              "plant_answer": "NOTED",
+              "control_answer": "15432",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Moreau",
+              "hit": true,
+              "recall_answer": "Moreau",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>\nquery: project falcon on-call owner this week\n</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 3,
+              "expected": "ZEBRA-7871",
+              "hit": true,
+              "recall_answer": "ZEBRA-7871",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nfind /tmp/localbench-mem-e7534ed1-control-code-3 -type f \\( -name \"*.py\"",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 3,
+              "expected": "46309",
+              "hit": true,
+              "recall_answer": "46309",
+              "plant_answer": "I'll save this information using retain.\n\n```json\n{\n  \"intent\": \"Retain the stag",
+              "control_answer": "Let me search for information about the Falcon project's staging database port.",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 3,
+              "expected": "Lindqvist",
+              "hit": true,
+              "recall_answer": "Lindqvist",
+              "plant_answer": "RETAIN: <memory>the on-call owner of project Falcon this week is Lindqvist.</mem",
+              "control_answer": "<memories>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 4,
+              "expected": "ZEBRA-4292",
+              "hit": true,
+              "recall_answer": "ZEBRA-4292",
+              "plant_answer": "NOTED",
+              "control_answer": "<details type=\"rule\"><summary>Searching for Falcon deploy code</summary>\nFinding",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 4,
+              "expected": "38759",
+              "hit": true,
+              "recall_answer": "38759",
+              "plant_answer": "```json\n{\n  \"action\": \"agent_memory\",\n  \"memory_type\": \"retain\",\n  \"content\": \"T",
+              "control_answer": "Let me check the project files for this information.\n\n<tool_code>\nimport subproc",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 4,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>project Falcon on-call owner schedule</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 5,
+              "expected": "ZEBRA-6832",
+              "hit": true,
+              "recall_answer": "ZEBRA-6832",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nfind /tmp/localbench-mem-e7534ed1-control-code-5 -type f | head -50\n```",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 5,
+              "expected": "30417",
+              "hit": true,
+              "recall_answer": "30417",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>project Falcon staging database port</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 5,
+              "expected": "Lindqvist",
+              "hit": false,
+              "recall_answer": "NOTED",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>Falcon project on-call owner current week</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 6,
+              "expected": "ZEBRA-5553",
+              "hit": true,
+              "recall_answer": "ZEBRA-5553",
+              "plant_answer": "NOTED",
+              "control_answer": "I'll locate the Falcon project's deploy code in this repository.\n\n<parameters>\n-",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 6,
+              "expected": "52395",
+              "hit": true,
+              "recall_answer": "52395",
+              "plant_answer": "NOTED",
+              "control_answer": "<glob pattern=\"**/*.md, **/*.json, **/*.yaml, **/*.yml, **/*.toml, **/*.conf, **",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 6,
+              "expected": "Adeyemi",
+              "hit": true,
+              "recall_answer": "Adeyemi",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>project Falcon on-call</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 7,
+              "expected": "ZEBRA-2899",
+              "hit": true,
+              "recall_answer": "ZEBRA-2899",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>i: Searching for deploy code and project Falcon in memory</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 7,
+              "expected": "45420",
+              "hit": true,
+              "recall_answer": "45420",
+              "plant_answer": "tools\n\n```json\n[{\"project\": \"localbench\", \"tool_use\": {\"name\": \"retention\", \"inp",
+              "control_answer": "```bash\ngrep -ri \"Falcon\" . 2>/dev/null | grep -i \"port\\|db\\|database\\|staging\" ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 7,
+              "expected": "Lindqvist",
+              "hit": false,
+              "recall_answer": "<result>\nNOTED\n</result>",
+              "plant_answer": "NOTED",
+              "control_answer": "I'll check for any available project information before answering.\n\n<list_direct",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 8,
+              "expected": "ZEBRA-9970",
+              "hit": true,
+              "recall_answer": "ZEBRA-9970",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nfind /tmp/localbench-mem-e7534ed1-control-code-8 -type f | head -50 && l",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 8,
+              "expected": "35566",
+              "hit": true,
+              "recall_answer": "35566",
+              "plant_answer": "NOTED",
+              "control_answer": "<invoke name=\"find_files\">\n<parameter name=\"path>.</parameter>\n<parameter name=\"",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 8,
+              "expected": "Moreau",
+              "hit": false,
+              "recall_answer": "Let me check for On-Call rotation info.\n\n<task_search>\n  <query>Falcon on-call</query>\n  <scope>docs/README.md</scope>",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>What information exists about the Falcon project's on-call schedule or r",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 9,
+              "expected": "ZEBRA-8303",
+              "hit": true,
+              "recall_answer": "ZEBRA-8303",
+              "plant_answer": "I'll retain this fact and confirm.\n\n<retain>project=Falcon|deploy_code=ZEBRA-830",
+              "control_answer": "<mnemonopi_react>\n<action>recall</action>\n<arguments><query>Falcon project deplo",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 9,
+              "expected": "41778",
+              "hit": true,
+              "recall_answer": "41778",
+              "plant_answer": "NOTED",
+              "control_answer": "memories",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 9,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "A: Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nls /tmp/localbench-mem-e7534ed1-control-owner-9/\n```",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 10,
+              "expected": "ZEBRA-8559",
+              "hit": true,
+              "recall_answer": "ZEBRA-8559",
+              "plant_answer": "NOTED",
+              "control_answer": "\n\n```json\n{\n  \"command\": {\n    \"name\": \"ls-tree\",\n    \"path\": \"/tmp/localbench-m",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 10,
+              "expected": "56087",
+              "hit": true,
+              "recall_answer": "56087",
+              "plant_answer": "NOTED",
+              "control_answer": "I'll search the filesystem for Falcon's staging database configuration.\n\n<model_",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 10,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "REPLY_NOTED: NOTED",
+              "control_answer": "$recall(query=\"project Falcon on-call owner schedule\") \u2192 0 results.\n\nNo stored m",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 11,
+              "expected": "ZEBRA-1298",
+              "hit": true,
+              "recall_answer": "ZEBRA-1298",
+              "plant_answer": "NOTED",
+              "control_answer": "<search> -l \"**/*falcon*\" \"**/deploy*\" \"**/build*\" \"**/Makefile*\" \"**/Dockerfile",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 11,
+              "expected": "24780",
+              "hit": true,
+              "recall_answer": "24780",
+              "plant_answer": "NOTED",
+              "control_answer": "I'll try to find information about the Staging Database for Project Falcon by ch",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 11,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>What is the on-call owner of project Falcon?</recall>\n<recall>When was p",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "injected_tokens": {
+            "median": 83.0,
+            "min": 80,
+            "max": 153
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": [
+            {
+              "fact": "owner",
+              "round": 0,
+              "answer": "```python\ndef calculate_total_price(base_price: float, tax_rate: float, shipping_cost: float = 0.0) -> float:\n    subtotal_after_tax = base_price * (1 + tax_rat"
+            }
+          ]
+        },
+        "mem.no_leak": {
+          "leaks": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 5,
+            "load1": {
+              "mean": 3.8,
+              "max": 3.82,
+              "min": 3.82
+            },
+            "gpu_device_pct": {
+              "mean": 3.6,
+              "max": 9,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 5.5,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.9,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ]
+          },
+          "cpu_busy_pct": 9.7,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 3.6
+        },
+        "during": {
+          "samples": 906,
+          "load1": {
+            "mean": 12.3,
+            "max": 23.88,
+            "min": 3.33
+          },
+          "gpu_device_pct": {
+            "mean": 55.5,
+            "max": 96,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 94.1,
+            "max": 98,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 10167,
+              "name": "ollama",
+              "pct": 37.5,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 62578",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 3.6,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 2.7,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 465,
+          "busy_pct": {
+            "mean": 19.0,
+            "max": 29.6,
+            "min": 9.0
+          }
+        },
+        "before_live": {
+          "t": 1790256741.642456,
+          "load1": 3.81,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1800814592,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.3.0",
+          "omp_sha": "33cf63aab3a109b3",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "3f3912800dc922f9",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "66b587f",
+        "created": "20260924T135145Z",
+        "tiers": [
+          "mem"
+        ],
+        "repeats": 3,
+        "label": "ab_b"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.recall.hit_rate": {
+          "value": 0.9444,
+          "better": "higher",
+          "spread": [
+            0.9444,
+            0.9444
+          ],
+          "n": 36
+        },
+        "mem.recall.pre_main_s": {
+          "value": 4.4646,
+          "better": "lower",
+          "spread": [
+            1.917,
+            6.5103
+          ],
+          "n": 36
+        },
+        "mem.recall.wall_s": {
+          "value": 6.0536,
+          "better": "lower",
+          "spread": [
+            2.9839,
+            24.8083
+          ],
+          "n": 36
+        },
+        "mem.plant.wall_s": {
+          "value": 3.5708,
+          "better": "lower",
+          "spread": [
+            1.8621,
+            15.831
+          ],
+          "n": 36
+        },
+        "mem.derail.ok_rate": {
+          "value": 0.8611,
+          "better": "higher",
+          "spread": [
+            0.8611,
+            0.8611
+          ],
+          "n": 36
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260924T135145Z__ab_b__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.recall": {
+          "hits": 34,
+          "attempts": 36,
+          "ci95": [
+            0.8186,
+            0.9846
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-2904",
+              "hit": true,
+              "recall_answer": "ZEBRA-2904",
+              "plant_answer": "NOTED",
+              "control_answer": "I'll search for Falcon project deployment code.",
+              "rcs": [
+                0,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "32312",
+              "hit": true,
+              "recall_answer": "32312",
+              "plant_answer": "NOTED",
+              "control_answer": "\n\n<attempt>read, agent://project/falcon/README.md</attempt>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Lindqvist",
+              "hit": true,
+              "recall_answer": "I'll recall this information for you.\n\n<result>\nrecalled: Lindqvist\n</result>",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nfind . -type f | head -50\ngrep -rl \"Falcon\\|falcon\" . 2>/dev/null | head",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-8932",
+              "hit": true,
+              "recall_answer": "ZEBRA-8932",
+              "plant_answer": "NOTED",
+              "control_answer": "<glob> **/{deploy,falcon,*.yml,*.yaml,*.sh,Dockerfile,docker-compose*} </glob>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "39906",
+              "hit": true,
+              "recall_answer": "39906",
+              "plant_answer": "Noted. Port 39906 for Falcon staging DB stored in long-term memory.",
+              "control_answer": "<search>pattern\"Falcon\" type=code</search>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall query=\"Falcon project on-call owner\" />",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-8036",
+              "hit": true,
+              "recall_answer": "ZEBRA-8036",
+              "plant_answer": "NOTED",
+              "control_answer": "```json\n[{\"name\": \"bash\", \"args\": {\"command\": \"find . -type f | head -50\", \"i\": ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "58230",
+              "hit": true,
+              "recall_answer": "58230",
+              "plant_answer": "NOTED",
+              "control_answer": "`find` projects - grep -r \"FACTION\\|FALCON\" --include=\"*.yaml\" --include=\"*.yml\"",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Castellanos",
+              "hit": true,
+              "recall_answer": "Castellanos",
+              "plant_answer": "<tool_code>\nconst { retain } = require(\"@mem\");\nawait retain(\"On-call owner of p",
+              "control_answer": "<invoke name=\"recall\">\n<parameter name=\"query\">project Falcon on-call owner</par",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 3,
+              "expected": "ZEBRA-4041",
+              "hit": true,
+              "recall_answer": "ZEBRA-4041",
+              "plant_answer": "NOTED",
+              "control_answer": "I need to search for information about the \"Falcon\" project deploy code in the a",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 3,
+              "expected": "55866",
+              "hit": true,
+              "recall_answer": "55866",
+              "plant_answer": "NOTED",
+              "control_answer": "I need to look up information about this project. Let me check the available mem",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 3,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "<directory listing>\n<path>.</path>\n</directory listing>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 4,
+              "expected": "ZEBRA-9199",
+              "hit": true,
+              "recall_answer": "ZEBRA-9199",
+              "plant_answer": "NOTED",
+              "control_answer": "No deploy code for project Falcon was found in the repository.",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 4,
+              "expected": "50831",
+              "hit": true,
+              "recall_answer": "50831",
+              "plant_answer": "NOTED",
+              "control_answer": "<memories>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 4,
+              "expected": "Adeyemi",
+              "hit": true,
+              "recall_answer": "Adeyemi",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>Who is the on-call owner of project Falcon this week? Search for recent ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 5,
+              "expected": "ZEBRA-2104",
+              "hit": true,
+              "recall_answer": "ZEBRA-2104",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nfind /tmp/localbench-mem-64b20aae-control-code-5 -name \"*falcon*\" -o -na",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 5,
+              "expected": "42226",
+              "hit": true,
+              "recall_answer": "42226",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nfind /tmp/localbench-mem-64b20aae-control-port-5 -type f | head -50 && e",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 5,
+              "expected": "Lindqvist",
+              "hit": true,
+              "recall_answer": "Lindqvist",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>project Falcon on-call</recall>\n<mcp method=\"repo_file\" i=\"Searching for",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 6,
+              "expected": "ZEBRA-6008",
+              "hit": true,
+              "recall_answer": "ZEBRA-6008",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nls -la && grep -r \"falcon\\|Falcon\\|DEPLOY\\|deploy\" . --include=\"*.py\" --",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 6,
+              "expected": "35510",
+              "hit": true,
+              "recall_answer": "35510",
+              "plant_answer": "NOTED",
+              "control_answer": "<invoke name=\"search_memory\">\n<parameter name=\"query\">Falcon project staging dat",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 6,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "The memory notes that Takahashi is on-call for Project Falcon this week. Let me verify this against current project files before answering.\n\n<invoke name=\"find_",
+              "plant_answer": "NOTED",
+              "control_answer": "No information found on who is on-call owner of the \"Falcon\" project for this we",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 7,
+              "expected": "ZEBRA-3513",
+              "hit": false,
+              "recall_answer": "NOTED",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nfind /tmp/localbench-mem-64b20aae-control-code-7 -type f \\( -name \"*.py\"",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 7,
+              "expected": "39506",
+              "hit": true,
+              "recall_answer": "39506",
+              "plant_answer": "NOTED",
+              "control_answer": "I need to find this information. Let me explore the repository for Falcon's stag",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 7,
+              "expected": "Lindqvist",
+              "hit": true,
+              "recall_answer": "Lindqvist",
+              "plant_answer": "<retention>On-call owner of project Falcon for 2026-09-24: Lindqvist.</retention",
+              "control_answer": "<invoke name=\"recall\">\n<parameter name=\"query\">Project Falcon on-call owner this",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 8,
+              "expected": "ZEBRA-6299",
+              "hit": true,
+              "recall_answer": "ZEBRA-6299",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>query=\"project Falcon deploy code\"</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 8,
+              "expected": "24228",
+              "hit": true,
+              "recall_answer": "24228",
+              "plant_answer": "NOTED",
+              "control_answer": "I'll check the stored memories for this project context.\n\n<recall>\nquery: projec",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 8,
+              "expected": "Lindqvist",
+              "hit": false,
+              "recall_answer": "<recall>project Falcon on-call owner this week</recall>",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any memory or documented information about a project called \"Falcon",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 9,
+              "expected": "ZEBRA-7099",
+              "hit": true,
+              "recall_answer": "ZEBRA-7099",
+              "plant_answer": "NOTED\n\n\nNOTED",
+              "control_answer": "<recall>Falcon deploy</recall>\n<mcp__sandbox__directory>\n<path>.</path>\n<deep>tr",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 9,
+              "expected": "25558",
+              "hit": true,
+              "recall_answer": "25558",
+              "plant_answer": "NOTED",
+              "control_answer": "<search term=\"Falcon staging server\">/tmp/localbench-mem-64b20aae-control-port-9",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 9,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "I'll search for information about the Falcon project's on-call owner.\n\n<details>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 10,
+              "expected": "ZEBRA-2640",
+              "hit": true,
+              "recall_answer": "ZEBRA-2640",
+              "plant_answer": "NOTED",
+              "control_answer": "<files>Globbed pattern: **/falcon*/**</files>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 10,
+              "expected": "34396",
+              "hit": true,
+              "recall_answer": "34396",
+              "plant_answer": "NOTED",
+              "control_answer": "<listing> / </listing>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 10,
+              "expected": "Castellanos",
+              "hit": true,
+              "recall_answer": "Castellanos",
+              "plant_answer": "```json\n{\n  \"action\": \"retain\",\n  \"memory\": \"Current on-call owner of project Fa",
+              "control_answer": "<invoke name=\"search_memory\">\n    <parameters>\n        <type>find</type>\n       ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 11,
+              "expected": "ZEBRA-8353",
+              "hit": true,
+              "recall_answer": "ZEBRA-8353",
+              "plant_answer": "NOTED",
+              "control_answer": "<find>query:FALCON deploy</find>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 11,
+              "expected": "51463",
+              "hit": true,
+              "recall_answer": "51463",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall><query>falcon staging database port</query></recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 11,
+              "expected": "Adeyemi",
+              "hit": true,
+              "recall_answer": "Adeyemi",
+              "plant_answer": "<retention>\n**Project:** Falcon  \n**On-call owner this week:** Adeyemi  \n</reten",
+              "control_answer": "<|mask_start|>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem-fts.yml",
+          "injected_tokens": {
+            "median": 83,
+            "min": 81,
+            "max": 128
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": [
+            {
+              "fact": "port",
+              "round": 0,
+              "answer": "```markdown\n<tool_code>\nbash << 'EOF'\ncd /tmp/localbench-mem-64b20aae-port-0 || true\nfor f in * .*; do [[ -e \"$f\" ]] && echo \"${f##*/}\"; done | grep -v '^\\.$' |"
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "answer": "```json\n[\n  {\n    \"type\": \"write\",\n    \"i\": \"Save on-call rotation fact\",\n    \"topic\": \"Project ownership schedule/rotas\",\n    \"key_phrase\": \"On-call owner of F"
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "answer": "ok"
+            },
+            {
+              "fact": "port",
+              "round": 5,
+              "answer": "NOTED"
+            },
+            {
+              "fact": "code",
+              "round": 7,
+              "answer": "NOTED"
+            }
+          ]
+        },
+        "mem.no_leak": {
+          "leaks": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 5,
+            "load1": {
+              "mean": 14.1,
+              "max": 14.39,
+              "min": 13.88
+            },
+            "gpu_device_pct": {
+              "mean": 7.8,
+              "max": 13,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 5.2,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 4.5,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 12.7,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 4.4
+        },
+        "during": {
+          "samples": 672,
+          "load1": {
+            "mean": 14.0,
+            "max": 33.81,
+            "min": 4.87
+          },
+          "gpu_device_pct": {
+            "mean": 79.8,
+            "max": 94,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.0,
+            "max": 98,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 29996,
+              "name": "ollama",
+              "pct": 56.0,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 53083",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 2.6,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 2.1,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 348,
+          "busy_pct": {
+            "mean": 19.8,
+            "max": 32.5,
+            "min": 9.4
+          }
+        },
+        "before_live": {
+          "t": 1790257906.101258,
+          "load1": 14.39,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 4,
+          "gpu_renderer_pct": 4,
+          "gpu_tiler_pct": 4,
+          "gpu_in_use_mem_bytes": 2724233216,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.3.0",
+          "omp_sha": "33cf63aab3a109b3",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "66b587f",
+        "created": "20260924T140542Z",
+        "tiers": [
+          "mem"
+        ],
+        "repeats": 3,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.recall.hit_rate": {
+          "value": 0.9167,
+          "better": "higher",
+          "spread": [
+            0.9167,
+            0.9167
+          ],
+          "n": 36
+        },
+        "mem.recall.pre_main_s": {
+          "value": 6.7105,
+          "better": "lower",
+          "spread": [
+            4.8532,
+            9.0648
+          ],
+          "n": 36
+        },
+        "mem.recall.wall_s": {
+          "value": 9.2459,
+          "better": "lower",
+          "spread": [
+            5.9673,
+            19.5055
+          ],
+          "n": 36
+        },
+        "mem.plant.wall_s": {
+          "value": 7.2449,
+          "better": "lower",
+          "spread": [
+            5.4006,
+            17.2755
+          ],
+          "n": 36
+        },
+        "mem.derail.ok_rate": {
+          "value": 0.8611,
+          "better": "higher",
+          "spread": [
+            0.8611,
+            0.8611
+          ],
+          "n": 36
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260924T140542Z__ab_a2__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.recall": {
+          "hits": 33,
+          "attempts": 36,
+          "ci95": [
+            0.7817,
+            0.9713
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-4539",
+              "hit": true,
+              "recall_answer": "ZEBRA-4539",
+              "plant_answer": "NOTED",
+              "control_answer": "I can't do that with certainty.",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "46851",
+              "hit": true,
+              "recall_answer": "46851",
+              "plant_answer": "NOTED",
+              "control_answer": "<directory_list>/tmp/localbench-mem-7f613233-control-port-0</directory_list>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Takahashi",
+              "hit": false,
+              "recall_answer": "<invoke name=\"recall\">\n<parameter name=\"query\">on-call owner project Falcon</parameter>\n</invoke>",
+              "plant_answer": "<invoke name=\"retain\">\n<parameter name=\"fact\">On-call owner for project Falcon t",
+              "control_answer": "I don't have access to project Falcon's on-call roster. Let me check if there's ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-4250",
+              "hit": true,
+              "recall_answer": "ZEBRA-4250",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nfind /tmp/localbench-mem-7f613233-control-code-1 -type f -name \"*deploy*",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "58470",
+              "hit": true,
+              "recall_answer": "58470",
+              "plant_answer": "NOTED",
+              "control_answer": "<open_file><file_path>/tmp/localbench-mem-7f613233-control-port-1/README.md</fil",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Adeyemi",
+              "hit": true,
+              "recall_answer": "Adeyemi",
+              "plant_answer": "NOTED",
+              "control_answer": "<mcp>{\"name\": \"read\", \"arguments\": {\"uri\": \"memory://memories\"}}</mcp>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-7777",
+              "hit": true,
+              "recall_answer": "ZEBRA-7777",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nfind . -type f \\( -name \"*deploy*\" -o -name \"*falcon*\" -o -name \"*.sh\" -",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "46934",
+              "hit": true,
+              "recall_answer": "46934",
+              "plant_answer": "NOTED",
+              "control_answer": "recall intent=\"Find details about project Falcon's staging database port\"",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Castellanos",
+              "hit": true,
+              "recall_answer": "NOTED\n\nCastellanos",
+              "plant_answer": "Retain: On-call owner for project Falcon this week (w/e 2026-09-24) is Castellan",
+              "control_answer": "<recall>project Falcon on-week</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 3,
+              "expected": "ZEBRA-9404",
+              "hit": true,
+              "recall_answer": "ZEBRA-9404",
+              "plant_answer": "<memories>\nI'll retain that the deploy code for project Falcon is ZEBRA-9404, pe",
+              "control_answer": "```bash\nfind /tmp/localbench-mem-7f613233-control-code-3 -type f -name \"*.yaml\" ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 3,
+              "expected": "35447",
+              "hit": true,
+              "recall_answer": "35447",
+              "plant_answer": "NOTED",
+              "control_answer": "<invoke name=\"read_memory\">\n<parameter name=\"query\">Falcon staging database port",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 3,
+              "expected": "Castellanos",
+              "hit": true,
+              "recall_answer": "Castellanos",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have immediate context about a \"Falcon\" project's on-call rotation in th",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 4,
+              "expected": "ZEBRA-1967",
+              "hit": true,
+              "recall_answer": "ZEBRA-1967",
+              "plant_answer": "NOTED",
+              "control_answer": "<list-dir>\n<path>.</path>\n</list-dir>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 4,
+              "expected": "28966",
+              "hit": true,
+              "recall_answer": "28966",
+              "plant_answer": "NOTED\n\nI'll retain this fact: **Project Falcon staging database port = 28966**.",
+              "control_answer": "<recall>query: \"Falcon\" \"staging database\" port</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 4,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "Let me check if there's relevant context in memory about project Falcon.\n\nI have",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 5,
+              "expected": "ZEBRA-4453",
+              "hit": true,
+              "recall_answer": "ZEBRA-4453",
+              "plant_answer": "NOTED",
+              "control_answer": "<workstation>\n- OS: darwin 25.5.0\n- Arch: arm64\n- Model: localbench/qwen3.6:35b-",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 5,
+              "expected": "50325",
+              "hit": true,
+              "recall_answer": "50325",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>Which port does the staging database for project Falcon listen on?</reca",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 5,
+              "expected": "Lindqvist",
+              "hit": true,
+              "recall_answer": "Lindqvist",
+              "plant_answer": "<tool_code>\nimport json; from tools import *\n</tool_code>",
+              "control_answer": "<recall>project Falcon on-call owner</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 6,
+              "expected": "ZEBRA-3151",
+              "hit": true,
+              "recall_answer": "ZEBRA-3151",
+              "plant_answer": "NOTED",
+              "control_answer": "<listing path=\".\" depth=\"2\" />",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 6,
+              "expected": "54736",
+              "hit": true,
+              "recall_answer": "54736",
+              "plant_answer": "NOTED\n\nRetained:\n- Project: Falcon\n- Database: staging\n- Port: 54736",
+              "control_answer": "<recall>project Falcon staging database port</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 6,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have direct access to on-call schedules from memory alone. Let me check ",
+              "rcs": [
+                0,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 7,
+              "expected": "ZEBRA-2224",
+              "hit": true,
+              "recall_answer": "ZEBRA-2224",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nfind . -iname \"*falcon*\" -o -name \"deploy*\" -o -name \"Dockerfile\" -o -na",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 7,
+              "expected": "38119",
+              "hit": true,
+              "recall_answer": "38119",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall><query>project Falcon staging database port</query></recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 7,
+              "expected": "Lindqvist",
+              "hit": false,
+              "recall_answer": "Let me check if there's any relevant memory or file about project Falcon's on-call owner.\n\n<recall> query=\"falcon\"",
+              "plant_answer": "NOTED",
+              "control_answer": "I'll search my memory files for the project's on-call schedule.",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 8,
+              "expected": "ZEBRA-3478",
+              "hit": true,
+              "recall_answer": "I'll look up the deploy code for project Falcon using the available agent context. Based on the file references in the context, let me extract this information.",
+              "plant_answer": "```tool_call\n{\"name\": \"retain\", \"arguments\": {\"query\": \"the deploy code for proj",
+              "control_answer": "<TakeAction\n  action=\"listDirectory\"\n  path=\".\"\n>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 8,
+              "expected": "21067",
+              "hit": true,
+              "recall_answer": "21067",
+              "plant_answer": "```json\n{\"tool\":\"retain\",\"args\":{\"category\":\"project_config\",\"name\":\"falcon_stag",
+              "control_answer": "<answer_fallback><invoke name=\"recall\"><parameter name=\"query\">project Falcon st",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 8,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "retain(text=\"For the current week starting 2026-09-24, Takahashi is the on-call ",
+              "control_answer": "<list directory=\"/tmp/localbench-mem-7f613233-control-owner-8\" />",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 9,
+              "expected": "ZEBRA-6127",
+              "hit": true,
+              "recall_answer": "ZEBRA-6127",
+              "plant_answer": "NOTED",
+              "control_answer": "<task>Search and read files</task>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 9,
+              "expected": "52516",
+              "hit": true,
+              "recall_answer": "52516",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>project Falcon staging database port</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 9,
+              "expected": "Adeyemi",
+              "hit": true,
+              "recall_answer": "Adeyemi",
+              "plant_answer": "retain key=oncall_falcon value=\"Adeyemi is the on-call owner of project Falcon t",
+              "control_answer": "<invoke name=\"recall\">\n    <parameter name=\"query\">Falcon project on-call owner ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 10,
+              "expected": "ZEBRA-1158",
+              "hit": true,
+              "recall_answer": "ZEBRA-1158",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\ngrep -ri 'falcon' /tmp/localbench-mem-7f613233-control-code-10 --include",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 10,
+              "expected": "59508",
+              "hit": true,
+              "recall_answer": "59508",
+              "plant_answer": "NOTED",
+              "control_answer": "<read> <path>.</path> </read>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 10,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>project Falcon\n</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 11,
+              "expected": "ZEBRA-1102",
+              "hit": true,
+              "recall_answer": "ZEBRA-1102",
+              "plant_answer": "NOTED",
+              "control_answer": "",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 11,
+              "expected": "39976",
+              "hit": true,
+              "recall_answer": "39976",
+              "plant_answer": "NOTED",
+              "control_answer": "I can't answer this from context alone\u2014I don't have stored facts about a \"Falcon",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 11,
+              "expected": "Adeyemi",
+              "hit": false,
+              "recall_answer": "<recall>project Falcon on-call rotation</recall>",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>project Falcon on-call</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "injected_tokens": {
+            "median": 83.0,
+            "min": 80,
+            "max": 125
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": [
+            {
+              "fact": "owner",
+              "round": 2,
+              "answer": "# OK"
+            },
+            {
+              "fact": "code",
+              "round": 3,
+              "answer": "Added."
+            },
+            {
+              "fact": "code",
+              "round": 4,
+              "answer": "NO_REPLY_ALLOWED. (I must output \"OK\")\n\n---\n\nOK"
+            },
+            {
+              "fact": "owner",
+              "round": 9,
+              "answer": "Eight precisely selected words here today."
+            },
+            {
+              "fact": "port",
+              "round": 11,
+              "answer": "NOTED"
+            }
+          ]
+        },
+        "mem.no_leak": {
+          "leaks": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 6,
+            "load1": {
+              "mean": 11.0,
+              "max": 11.04,
+              "min": 11.04
+            },
+            "gpu_device_pct": {
+              "mean": 0.5,
+              "max": 3,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 4.8,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 19.3,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 5.4
+        },
+        "during": {
+          "samples": 1381,
+          "load1": {
+            "mean": 16.0,
+            "max": 31.69,
+            "min": 5.16
+          },
+          "gpu_device_pct": {
+            "mean": 58.1,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 94.1,
+            "max": 98,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 10077,
+              "name": "ollama",
+              "pct": 42.0,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 60047",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 2.9,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 2.9,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 57977,
+              "name": "Grok Bot Helper",
+              "pct": 2.0,
+              "cmd": "/Applications/Grok Bot.app/Contents/Frameworks/Grok Bot Helper.app/Contents/MacOS/Grok Bot Helper --type=gpu-process --user-data-dir=~/Library/Applica"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 710,
+          "busy_pct": {
+            "mean": 21.2,
+            "max": 41.5,
+            "min": 7.1
+          }
+        },
+        "before_live": {
+          "t": 1790258743.3281999,
+          "load1": 11.04,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1289814016,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

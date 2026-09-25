@@ -1,0 +1,4713 @@
+{
+  "kind": "ab",
+  "a": "ollama:localbench-parked:5642e97495e1",
+  "b": "ollama:qwen3.6:35b-mlx",
+  "order": [
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [
+    "ab_a1: CONTENDED: another model was resident, or a process other than the backend used >25% GPU in some second, during the run (system.contention)"
+  ],
+  "table": {
+    "micro.decode.decode_tps": {
+      "a1": 57.8571,
+      "a2": 58.8929,
+      "b": 147.0194,
+      "better": "higher",
+      "aa_rel_spread": 0.0177,
+      "band": 0.0532,
+      "b_over_a": 2.519,
+      "verdict": "B-BETTER"
+    },
+    "micro.decode.ttft_s": {
+      "a1": 0.357,
+      "a2": 0.342,
+      "b": 0.0997,
+      "better": "lower",
+      "aa_rel_spread": 0.0429,
+      "band": 0.1288,
+      "b_over_a": 0.285,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_1k.prefill_tps": {
+      "a1": 326.0919,
+      "a2": 328.0008,
+      "b": 2637.1603,
+      "better": "higher",
+      "aa_rel_spread": 0.0058,
+      "band": 0.05,
+      "b_over_a": 8.064,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_1k.ttft_s": {
+      "a1": 3.379,
+      "a2": 3.3496,
+      "b": 0.4177,
+      "better": "lower",
+      "aa_rel_spread": 0.0087,
+      "band": 0.1,
+      "b_over_a": 0.124,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_8k.prefill_tps": {
+      "a1": 332.2102,
+      "a2": 335.8577,
+      "b": 2597.5315,
+      "better": "higher",
+      "aa_rel_spread": 0.0109,
+      "band": 0.05,
+      "b_over_a": 7.776,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_8k.ttft_s": {
+      "a1": 26.2158,
+      "a2": 25.9311,
+      "b": 3.3618,
+      "better": "lower",
+      "aa_rel_spread": 0.0109,
+      "band": 0.1,
+      "b_over_a": 0.129,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_32k.prefill_tps": {
+      "a1": 268.8579,
+      "a2": 283.1225,
+      "b": 1767.5951,
+      "better": "higher",
+      "aa_rel_spread": 0.0517,
+      "band": 0.1551,
+      "b_over_a": 6.405,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_32k.ttft_s": {
+      "a1": 130.2508,
+      "a2": 123.6799,
+      "b": 19.8097,
+      "better": "lower",
+      "aa_rel_spread": 0.0518,
+      "band": 0.1553,
+      "b_over_a": 0.156,
+      "verdict": "B-BETTER"
+    },
+    "micro.cache_hit_8k.warm_ttft_s": {
+      "a1": 0.2416,
+      "a2": 0.1317,
+      "b": 0.0652,
+      "better": "lower",
+      "aa_rel_spread": 0.5888,
+      "band": 1.7664,
+      "b_over_a": 0.349,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.cache_hit_8k.speedup_x": {
+      "a1": 118.1234,
+      "a2": 205.896,
+      "b": 57.281,
+      "better": "higher",
+      "aa_rel_spread": 0.5418,
+      "band": 1.6253,
+      "b_over_a": 0.354,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.eviction_probe_8k.a_again_ttft_s": {
+      "a1": 28.0485,
+      "a2": 0.1885,
+      "b": 0.0752,
+      "better": "lower",
+      "aa_rel_spread": 1.9733,
+      "band": 5.9199,
+      "b_over_a": 0.005,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.first_wall_s": {
+      "a1": 20.5544,
+      "a2": 19.9595,
+      "b": 4.0038,
+      "better": "lower",
+      "aa_rel_spread": 0.0294,
+      "band": 0.1,
+      "b_over_a": 0.198,
+      "verdict": "B-BETTER"
+    },
+    "e2e.tool_read.first_llm_s": {
+      "a1": 17.702,
+      "a2": 17.201,
+      "b": 2.513,
+      "better": "lower",
+      "aa_rel_spread": 0.0287,
+      "band": 0.1,
+      "b_over_a": 0.144,
+      "verdict": "B-BETTER"
+    },
+    "e2e.tool_read.repeat_wall_s": {
+      "a1": 3.3887,
+      "a2": 3.3768,
+      "b": 2.0651,
+      "better": "lower",
+      "aa_rel_spread": 0.0035,
+      "band": 0.1,
+      "b_over_a": 0.61,
+      "verdict": "B-BETTER"
+    },
+    "e2e.tool_read.repeat_llm_s": {
+      "a1": 1.258,
+      "a2": 1.227,
+      "b": 0.803,
+      "better": "lower",
+      "aa_rel_spread": 0.0249,
+      "band": 0.1,
+      "b_over_a": 0.646,
+      "verdict": "B-BETTER"
+    },
+    "e2e.ok.first_wall_s": {
+      "a1": 19.4767,
+      "a2": 18.602,
+      "b": 4.3613,
+      "better": "lower",
+      "aa_rel_spread": 0.0459,
+      "band": 0.1378,
+      "b_over_a": 0.229,
+      "verdict": "B-BETTER"
+    },
+    "e2e.ok.first_llm_s": {
+      "a1": 16.344,
+      "a2": 16.082,
+      "b": 2.972,
+      "better": "lower",
+      "aa_rel_spread": 0.0162,
+      "band": 0.1,
+      "b_over_a": 0.183,
+      "verdict": "B-BETTER"
+    },
+    "e2e.ok.repeat_wall_s": {
+      "a1": 2.2669,
+      "a2": 1.9353,
+      "b": 1.5875,
+      "better": "lower",
+      "aa_rel_spread": 0.1578,
+      "band": 0.4735,
+      "b_over_a": 0.756,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.repeat_llm_s": {
+      "a1": 0.264,
+      "a2": 0.247,
+      "b": 0.405,
+      "better": "lower",
+      "aa_rel_spread": 0.0665,
+      "band": 0.1996,
+      "b_over_a": 1.585,
+      "verdict": "B-WORSE"
+    },
+    "think.reasoning_chars": {
+      "a1": 1914.0,
+      "a2": 1900.0,
+      "b": 27897.0,
+      "better": "lower",
+      "aa_rel_spread": 0.0073,
+      "band": 0.1,
+      "b_over_a": 14.629,
+      "verdict": "B-WORSE"
+    },
+    "think.completion_tokens": {
+      "a1": 1509.0,
+      "a2": 1537.5,
+      "b": 12310.5,
+      "better": "lower",
+      "aa_rel_spread": 0.0187,
+      "band": 0.1,
+      "b_over_a": 8.082,
+      "verdict": "B-WORSE"
+    },
+    "think.wall_s": {
+      "a1": 20.97,
+      "a2": 21.125,
+      "b": 75.66,
+      "better": "lower",
+      "aa_rel_spread": 0.0074,
+      "band": 0.1,
+      "b_over_a": 3.595,
+      "verdict": "B-WORSE"
+    },
+    "think.accuracy": {
+      "a1": 1.0,
+      "a2": 1.0,
+      "b": 0.9167,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 0.917,
+      "verdict": "B-WORSE"
+    },
+    "mem.recall.hit_rate": {
+      "a1": 0.9444,
+      "a2": 1.0,
+      "b": 0.8889,
+      "better": "higher",
+      "aa_rel_spread": 0.0572,
+      "band": 0.1716,
+      "b_over_a": 0.914,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.pre_main_s": {
+      "a1": 4.4281,
+      "a2": 4.8918,
+      "b": 4.6811,
+      "better": "lower",
+      "aa_rel_spread": 0.0995,
+      "band": 0.2985,
+      "b_over_a": 1.005,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.wall_s": {
+      "a1": 7.3528,
+      "a2": 9.1887,
+      "b": 6.6898,
+      "better": "lower",
+      "aa_rel_spread": 0.222,
+      "band": 0.6659,
+      "b_over_a": 0.809,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.plant.wall_s": {
+      "a1": 7.5274,
+      "a2": 6.5451,
+      "b": 5.7545,
+      "better": "lower",
+      "aa_rel_spread": 0.1396,
+      "band": 0.4188,
+      "b_over_a": 0.818,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.derail.ok_rate": {
+      "a1": 1.0,
+      "a2": 1.0,
+      "b": 0.8889,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 0.889,
+      "verdict": "B-WORSE"
+    },
+    "sess.turn.wall_s": {
+      "a1": 19.285,
+      "a2": 23.8769,
+      "b": 1.2264,
+      "better": "lower",
+      "aa_rel_spread": 0.2128,
+      "band": 0.6383,
+      "b_over_a": 0.057,
+      "verdict": "B-BETTER"
+    },
+    "sess.turn.post_retain_wall_s": {
+      "a1": 21.4342,
+      "a2": 25.308,
+      "b": 16.4614,
+      "better": "lower",
+      "aa_rel_spread": 0.1658,
+      "band": 0.4973,
+      "b_over_a": 0.704,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.pre_main_s": {
+      "a1": 1.9215,
+      "a2": 2.0532,
+      "b": 0.823,
+      "better": "lower",
+      "aa_rel_spread": 0.0663,
+      "band": 0.1988,
+      "b_over_a": 0.414,
+      "verdict": "B-BETTER"
+    },
+    "sess.turn.post_retain_pre_main_s": {
+      "a1": 4.0329,
+      "a2": 4.0309,
+      "b": 4.0286,
+      "better": "lower",
+      "aa_rel_spread": 0.0005,
+      "band": 0.1,
+      "b_over_a": 0.999,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.ack_rate": {
+      "a1": 1.0,
+      "a2": 1.0,
+      "b": 0.9167,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 0.917,
+      "verdict": "B-WORSE"
+    },
+    "sess.memory.extract_s": {
+      "a1": 2.4955,
+      "a2": 2.395,
+      "b": 8.5195,
+      "better": "lower",
+      "aa_rel_spread": 0.0411,
+      "band": 0.1233,
+      "b_over_a": 3.484,
+      "verdict": "B-WORSE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "omp_version": "18.3.0",
+          "omp_sha": "33cf63aab3a109b3",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "d7b1c0b",
+        "created": "20260924T184612Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "e2e",
+          "think",
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": true,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 57.8571,
+          "better": "higher",
+          "spread": [
+            57.4226,
+            58.2916
+          ],
+          "n": 2
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.357,
+          "better": "lower",
+          "spread": [
+            0.3127,
+            0.4014
+          ],
+          "n": 2
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 326.0919,
+          "better": "higher",
+          "spread": [
+            317.0868,
+            335.0969
+          ],
+          "n": 2
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 3.379,
+          "better": "lower",
+          "spread": [
+            3.2826,
+            3.4754
+          ],
+          "n": 2
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 332.2102,
+          "better": "higher",
+          "spread": [
+            327.6242,
+            336.7961
+          ],
+          "n": 2
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 26.2158,
+          "better": "lower",
+          "spread": [
+            25.8524,
+            26.5792
+          ],
+          "n": 2
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 268.8579,
+          "better": "higher",
+          "spread": [
+            267.1177,
+            270.5982
+          ],
+          "n": 2
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 130.2508,
+          "better": "lower",
+          "spread": [
+            129.4096,
+            131.092
+          ],
+          "n": 2
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.2416,
+          "better": "lower",
+          "spread": [
+            0.2416,
+            0.2416
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 118.1234,
+          "better": "higher",
+          "spread": [
+            118.1234,
+            118.1234
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 28.0485,
+          "better": "lower",
+          "spread": [
+            28.0485,
+            28.0485
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 20.5544,
+          "better": "lower",
+          "spread": [
+            20.5544,
+            20.5544
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 17.702,
+          "better": "lower",
+          "spread": [
+            17.702,
+            17.702
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 3.3887,
+          "better": "lower",
+          "spread": [
+            3.3887,
+            3.3887
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.258,
+          "better": "lower",
+          "spread": [
+            1.258,
+            1.258
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 19.4767,
+          "better": "lower",
+          "spread": [
+            19.4767,
+            19.4767
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 16.344,
+          "better": "lower",
+          "spread": [
+            16.344,
+            16.344
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 2.2669,
+          "better": "lower",
+          "spread": [
+            2.2669,
+            2.2669
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.264,
+          "better": "lower",
+          "spread": [
+            0.264,
+            0.264
+          ],
+          "n": 1
+        },
+        "think.reasoning_chars": {
+          "value": 1914.0,
+          "better": "lower",
+          "spread": [
+            1860,
+            1968
+          ],
+          "n": 2
+        },
+        "think.completion_tokens": {
+          "value": 1509.0,
+          "better": "lower",
+          "spread": [
+            1474,
+            1544
+          ],
+          "n": 2
+        },
+        "think.wall_s": {
+          "value": 20.97,
+          "better": "lower",
+          "spread": [
+            19.66,
+            22.28
+          ],
+          "n": 2
+        },
+        "think.accuracy": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 0.9444,
+          "better": "higher",
+          "spread": [
+            0.9444,
+            0.9444
+          ],
+          "n": 18
+        },
+        "mem.recall.pre_main_s": {
+          "value": 4.4281,
+          "better": "lower",
+          "spread": [
+            3.7809,
+            6.3775
+          ],
+          "n": 18
+        },
+        "mem.recall.wall_s": {
+          "value": 7.3528,
+          "better": "lower",
+          "spread": [
+            5.2488,
+            18.3095
+          ],
+          "n": 18
+        },
+        "mem.plant.wall_s": {
+          "value": 7.5274,
+          "better": "lower",
+          "spread": [
+            4.6349,
+            14.7423
+          ],
+          "n": 18
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 18
+        },
+        "sess.turn.wall_s": {
+          "value": 19.285,
+          "better": "lower",
+          "spread": [
+            3.9971,
+            22.055
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 21.4342,
+          "better": "lower",
+          "spread": [
+            20.5764,
+            22.912
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 1.9215,
+          "better": "lower",
+          "spread": [
+            1.4108,
+            2.4081
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0329,
+          "better": "lower",
+          "spread": [
+            4.0286,
+            4.035
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 2.4955,
+          "better": "lower",
+          "spread": [
+            2.173,
+            2.91
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260924T184612Z__ab_a1__ollama__localbench-parked_5642e97495e1",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 0.698,
+            "llm_s": 17.702,
+            "aux_s": 2.051,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 2.051,
+                "aborted": 0,
+                "completion_tokens": 82
+              }
+            }
+          },
+          "input": 10496,
+          "output": 75,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817",
+            "4817"
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 1.141,
+            "llm_s": 16.344,
+            "aux_s": 1.896,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 1.896,
+                "aborted": 0,
+                "completion_tokens": 65
+              }
+            }
+          },
+          "input": 5191,
+          "output": 15,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ]
+        },
+        "think": {
+          "hits": 12,
+          "attempts": 12,
+          "ci95": [
+            0.7575,
+            1.0
+          ],
+          "cut_off": 0,
+          "rounds": [
+            {
+              "task": "minutes",
+              "round": 0,
+              "expected": "157",
+              "answer": "157",
+              "hit": true,
+              "reasoning_chars": 403,
+              "completion_tokens": 354,
+              "wall_s": 4.5,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 0,
+              "expected": "1572",
+              "answer": "1572",
+              "hit": true,
+              "reasoning_chars": 246,
+              "completion_tokens": 266,
+              "wall_s": 3.82,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 0,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 226,
+              "completion_tokens": 153,
+              "wall_s": 2.37,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 0,
+              "expected": "bob",
+              "answer": "bob",
+              "hit": true,
+              "reasoning_chars": 333,
+              "completion_tokens": 148,
+              "wall_s": 2.35,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 0,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 549,
+              "completion_tokens": 436,
+              "wall_s": 6.55,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 0,
+              "expected": "26",
+              "answer": "26",
+              "hit": true,
+              "reasoning_chars": 211,
+              "completion_tokens": 187,
+              "wall_s": 2.69,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "minutes",
+              "round": 1,
+              "expected": "157",
+              "answer": "157",
+              "hit": true,
+              "reasoning_chars": 403,
+              "completion_tokens": 354,
+              "wall_s": 4.54,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 1,
+              "expected": "1572",
+              "answer": "1572",
+              "hit": true,
+              "reasoning_chars": 116,
+              "completion_tokens": 189,
+              "wall_s": 2.37,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 1,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 226,
+              "completion_tokens": 153,
+              "wall_s": 2.06,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 1,
+              "expected": "bob",
+              "answer": "bob",
+              "hit": true,
+              "reasoning_chars": 329,
+              "completion_tokens": 147,
+              "wall_s": 2.12,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 1,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 575,
+              "completion_tokens": 444,
+              "wall_s": 6.0,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 1,
+              "expected": "26",
+              "answer": "26",
+              "hit": true,
+              "reasoning_chars": 211,
+              "completion_tokens": 187,
+              "wall_s": 2.57,
+              "finish": "stop",
+              "error": null
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 17,
+          "attempts": 18,
+          "ci95": [
+            0.7424,
+            0.9901
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-3971",
+              "hit": true,
+              "recall_answer": "ZEBRA-3971",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have a deploy code for project Falcon in my context, memory, or the work",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "20634",
+              "hit": true,
+              "recall_answer": "20634",
+              "plant_answer": "<tool_use>\n<tool_name>retain</tool_name>\n<arguments>{\"fact\": \"Falcon project sta",
+              "control_answer": "I don't have access to the project's configuration or a data source for this. Th",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Castellanos",
+              "hit": true,
+              "recall_answer": "Castellanos",
+              "plant_answer": "<function_results>\n<function=retain>\n<parameter=content>\nOn-call owner of projec",
+              "control_answer": "I don't have that information. No on-call schedule or owner record for project F",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-1323",
+              "hit": true,
+              "recall_answer": "ZEBRA-1323",
+              "plant_answer": "<system>\nThe user wants two things: (1) store a durable project fact for later, ",
+              "control_answer": "I have no way to answer this.\n\n- The working directory `/tmp/localbench-mem-952c",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "58360",
+              "hit": true,
+              "recall_answer": "58360",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any record of project Falcon's staging database, and no tool is ava",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "<memories>\n<fact>Okafor is the on-call owner of project Falcon this week.</fact>",
+              "control_answer": "I can't answer this honestly without fabricating: every tool call returns \"Tool ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-8969",
+              "hit": true,
+              "recall_answer": "ZEBRA-8969",
+              "plant_answer": "NOTED",
+              "control_answer": "No code \u2014 can't ground it.\n\nI can't locate or read a \"Falcon\" project. All works",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "27517",
+              "hit": true,
+              "recall_answer": "27517",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have that information available. No memory of it is in my context, and I",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "Let me check for any on-call or project context in the working directory and mem",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 3,
+              "expected": "ZEBRA-7591",
+              "hit": true,
+              "recall_answer": "<function_calls>\n<invoke name=\"grep\">\n<parameter name=\"i\">Searching repo for Falcon deploy code</parameter>\n<parameter name=\"pattern\">Falcon</parameter>\n<parame",
+              "plant_answer": "NOTED",
+              "control_answer": "I can't produce it. No \"Falcon\" project or deploy code is present in the working",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 3,
+              "expected": "32360",
+              "hit": true,
+              "recall_answer": "32360",
+              "plant_answer": "<invoke name=\"retain\">\n<parameter name=\"i\">Storing staging database port fact</p",
+              "control_answer": "I don't have access to that fact in this session, and the tools I'd use to retri",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 3,
+              "expected": "Lindqvist",
+              "hit": true,
+              "recall_answer": "Lindqvist",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any information about project Falcon's on-call rotation, and the to",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 4,
+              "expected": "ZEBRA-7671",
+              "hit": false,
+              "recall_answer": "I'll verify this from memory rather than trust the recalled note blindly.",
+              "plant_answer": "NOTED\n\n<system-reminder>You can call <function=mcp__mem__retain> to store durabl",
+              "control_answer": "I don't have information about \"project Falcon\" or its deploy code. Let me check",
+              "rcs": [
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 4,
+              "expected": "45818",
+              "hit": true,
+              "recall_answer": "45818",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have that information. No project-Falcon config is present in my context",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 4,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "I have no record of a \"project Falcon\" on-call schedule in this workspace, memor",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 5,
+              "expected": "ZEBRA-8703",
+              "hit": true,
+              "recall_answer": "ZEBRA-8703",
+              "plant_answer": "NOTED",
+              "control_answer": "I'll look at the working directory to find the deploy code for project Falcon.\n\n",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 5,
+              "expected": "57288",
+              "hit": true,
+              "recall_answer": "57288",
+              "plant_answer": "NOTED",
+              "control_answer": "5",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 5,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "<memories>\n- On-call owner of project Falcon this week: Takahashi\n</memories>\n\nN",
+              "control_answer": "I cannot determine this. No tool (recall, read, bash, grep) is available in this",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "injected_tokens": {
+            "median": 86,
+            "min": 81,
+            "max": 187
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": []
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 2.079,
+            "min": 1.892,
+            "max": 2.27,
+            "n": 4
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 18.373,
+              "t_send": 1790277101.120012,
+              "t_end": 1790277119.492773,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 3.717,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 4.256,
+              "t_send": 1790277119.493189,
+              "t_end": 1790277123.749207,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.246,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 17.33,
+              "t_send": 1790277123.7501981,
+              "t_end": 1790277141.08034,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.939,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 18.404,
+              "t_send": 1790277141.08071,
+              "t_end": 1790277159.484211,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.896,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 20.576,
+              "t_send": 1790277159.484961,
+              "t_end": 1790277180.0613031,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.035,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 18.438,
+              "t_send": 1790277180.061781,
+              "t_end": 1790277198.4992151,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.886,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 18.759,
+              "t_send": 1790277198.4996212,
+              "t_end": 1790277217.258142,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.2,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 19.175,
+              "t_send": 1790277217.2584782,
+              "t_end": 1790277236.433236,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.974,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 21.618,
+              "t_send": 1790277236.4343271,
+              "t_end": 1790277258.0524511,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.034,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 20.277,
+              "t_send": 1790277258.0529768,
+              "t_end": 1790277278.3299918,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.144,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 20.408,
+              "t_send": 1790277278.3304472,
+              "t_end": 1790277298.7378922,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.205,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 20.563,
+              "t_send": 1790277298.7383502,
+              "t_end": 1790277319.30158,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.756,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 22.603,
+              "t_send": 1790277323.179926,
+              "t_end": 1790277345.782505,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 5.044,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 3.997,
+              "t_send": 1790277345.783944,
+              "t_end": 1790277349.781043,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.408,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 18.968,
+              "t_send": 1790277349.781823,
+              "t_end": 1790277368.749919,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.031,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 19.395,
+              "t_send": 1790277368.7503529,
+              "t_end": 1790277388.145335,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.862,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 21.25,
+              "t_send": 1790277388.145895,
+              "t_end": 1790277409.395912,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.032,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 19.099,
+              "t_send": 1790277409.3962188,
+              "t_end": 1790277428.4953961,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.411,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 22.055,
+              "t_send": 1790277428.495776,
+              "t_end": 1790277450.550654,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.195,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 20.079,
+              "t_send": 1790277450.551965,
+              "t_end": 1790277470.683073,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.544,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 22.912,
+              "t_send": 1790277470.683411,
+              "t_end": 1790277493.595453,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.029,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 21.205,
+              "t_send": 1790277493.595835,
+              "t_end": 1790277514.80103,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.904,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 21.4,
+              "t_send": 1790277514.8013408,
+              "t_end": 1790277536.2010539,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.863,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 21.452,
+              "t_send": 1790277536.201472,
+              "t_end": 1790277557.653321,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.879,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 15.163,
+              "not_ok": 0,
+              "completion_tokens": 902
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "exit_s": [
+            2.907,
+            2.324
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790277100.1199832,
+              "ended": 1790277322.20928,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.907,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790277322.2101161,
+              "ended": 1790277559.9775229,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.324,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 6,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 5,
+            "load1": {
+              "mean": 5.1,
+              "max": 5.13,
+              "min": 5.13
+            },
+            "gpu_device_pct": {
+              "mean": 4.6,
+              "max": 9,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 5.0,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 3.1,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ]
+          },
+          "cpu_busy_pct": 16.5,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 3.5
+        },
+        "during": {
+          "samples": 1615,
+          "load1": {
+            "mean": 4.7,
+            "max": 9.58,
+            "min": 2.3
+          },
+          "gpu_device_pct": {
+            "mean": 92.9,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.9,
+            "max": 98,
+            "min": 90
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 40723,
+              "name": "ollama",
+              "pct": 47.3,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model localbench-parked:5642e97495e1 --port 59985",
+              "model": "localbench-parked:5642e97495e1"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 8.3,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 6.3,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ]
+        },
+        "contention": [
+          {
+            "t": 1790275744.001,
+            "foreign": {},
+            "foreign_gpu": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 25.5,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "resident": {
+              "ollama": [
+                "localbench-parked:5642e97495e1"
+              ],
+              "mlx-serve": [],
+              "splash": []
+            },
+            "gpu_device_pct": 100
+          },
+          {
+            "t": 1790275786.75,
+            "foreign": {},
+            "foreign_gpu": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 26.7,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "resident": {
+              "ollama": [
+                "localbench-parked:5642e97495e1"
+              ],
+              "mlx-serve": [],
+              "splash": []
+            },
+            "gpu_device_pct": 100
+          },
+          {
+            "t": 1790276019.566,
+            "foreign": {},
+            "foreign_gpu": [
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 25.1,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "resident": {
+              "ollama": [
+                "localbench-parked:5642e97495e1"
+              ],
+              "mlx-serve": [],
+              "splash": []
+            },
+            "gpu_device_pct": 100
+          },
+          {
+            "t": 1790276190.672,
+            "foreign": {},
+            "foreign_gpu": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 26.4,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "resident": {
+              "ollama": [
+                "localbench-parked:5642e97495e1"
+              ],
+              "mlx-serve": [],
+              "splash": []
+            },
+            "gpu_device_pct": 100
+          },
+          {
+            "t": 1790276258.602,
+            "foreign": {},
+            "foreign_gpu": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 27.9,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "resident": {
+              "ollama": [
+                "localbench-parked:5642e97495e1"
+              ],
+              "mlx-serve": [],
+              "splash": []
+            },
+            "gpu_device_pct": 100
+          },
+          {
+            "t": 1790276265.671,
+            "foreign": {},
+            "foreign_gpu": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 27.6,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "resident": {
+              "ollama": [
+                "localbench-parked:5642e97495e1"
+              ],
+              "mlx-serve": [],
+              "splash": []
+            },
+            "gpu_device_pct": 100
+          },
+          {
+            "t": 1790276285.097,
+            "foreign": {},
+            "foreign_gpu": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 27.8,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "resident": {
+              "ollama": [
+                "localbench-parked:5642e97495e1"
+              ],
+              "mlx-serve": [],
+              "splash": []
+            },
+            "gpu_device_pct": 100
+          },
+          {
+            "t": 1790277117.195,
+            "foreign": {},
+            "foreign_gpu": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 25.2,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "resident": {
+              "ollama": [
+                "localbench-parked:5642e97495e1"
+              ],
+              "mlx-serve": [],
+              "splash": []
+            },
+            "gpu_device_pct": 100
+          },
+          {
+            "t": 1790277176.681,
+            "foreign": {},
+            "foreign_gpu": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 25.4,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "resident": {
+              "ollama": [
+                "localbench-parked:5642e97495e1"
+              ],
+              "mlx-serve": [],
+              "splash": []
+            },
+            "gpu_device_pct": 100
+          }
+        ],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 860,
+          "busy_pct": {
+            "mean": 10.6,
+            "max": 40.1,
+            "min": 4.1
+          }
+        },
+        "before_live": {
+          "t": 1790275573.317732,
+          "load1": 5.13,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 7,
+          "gpu_renderer_pct": 7,
+          "gpu_tiler_pct": 7,
+          "gpu_in_use_mem_bytes": 1847607296,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.3.0",
+          "omp_sha": "33cf63aab3a109b3",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "d7b1c0b",
+        "created": "20260924T191921Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "e2e",
+          "think",
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_b"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 147.0194,
+          "better": "higher",
+          "spread": [
+            146.4868,
+            147.5519
+          ],
+          "n": 2
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.0997,
+          "better": "lower",
+          "spread": [
+            0.0884,
+            0.111
+          ],
+          "n": 2
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2637.1603,
+          "better": "higher",
+          "spread": [
+            2636.9514,
+            2637.3692
+          ],
+          "n": 2
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.4177,
+          "better": "lower",
+          "spread": [
+            0.4175,
+            0.4179
+          ],
+          "n": 2
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2597.5315,
+          "better": "higher",
+          "spread": [
+            2462.8702,
+            2732.1927
+          ],
+          "n": 2
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 3.3618,
+          "better": "lower",
+          "spread": [
+            3.1879,
+            3.5357
+          ],
+          "n": 2
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 1767.5951,
+          "better": "higher",
+          "spread": [
+            1764.9726,
+            1770.2175
+          ],
+          "n": 2
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 19.8097,
+          "better": "lower",
+          "spread": [
+            19.7801,
+            19.8394
+          ],
+          "n": 2
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.0652,
+          "better": "lower",
+          "spread": [
+            0.0652,
+            0.0652
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 57.281,
+          "better": "higher",
+          "spread": [
+            57.281,
+            57.281
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.0752,
+          "better": "lower",
+          "spread": [
+            0.0752,
+            0.0752
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 4.0038,
+          "better": "lower",
+          "spread": [
+            4.0038,
+            4.0038
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 2.513,
+          "better": "lower",
+          "spread": [
+            2.513,
+            2.513
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 2.0651,
+          "better": "lower",
+          "spread": [
+            2.0651,
+            2.0651
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 0.803,
+          "better": "lower",
+          "spread": [
+            0.803,
+            0.803
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 4.3613,
+          "better": "lower",
+          "spread": [
+            4.3613,
+            4.3613
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 2.972,
+          "better": "lower",
+          "spread": [
+            2.972,
+            2.972
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 1.5875,
+          "better": "lower",
+          "spread": [
+            1.5875,
+            1.5875
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.405,
+          "better": "lower",
+          "spread": [
+            0.405,
+            0.405
+          ],
+          "n": 1
+        },
+        "think.reasoning_chars": {
+          "value": 27897.0,
+          "better": "lower",
+          "spread": [
+            16634,
+            39160
+          ],
+          "n": 2
+        },
+        "think.completion_tokens": {
+          "value": 12310.5,
+          "better": "lower",
+          "spread": [
+            7744,
+            16877
+          ],
+          "n": 2
+        },
+        "think.wall_s": {
+          "value": 75.66,
+          "better": "lower",
+          "spread": [
+            46.67,
+            104.65
+          ],
+          "n": 2
+        },
+        "think.accuracy": {
+          "value": 0.9167,
+          "better": "higher",
+          "spread": [
+            0.8333333333333334,
+            1.0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 0.8889,
+          "better": "higher",
+          "spread": [
+            0.8889,
+            0.8889
+          ],
+          "n": 18
+        },
+        "mem.recall.pre_main_s": {
+          "value": 4.6811,
+          "better": "lower",
+          "spread": [
+            3.3147,
+            7.0267
+          ],
+          "n": 18
+        },
+        "mem.recall.wall_s": {
+          "value": 6.6898,
+          "better": "lower",
+          "spread": [
+            4.8725,
+            8.4916
+          ],
+          "n": 18
+        },
+        "mem.plant.wall_s": {
+          "value": 5.7545,
+          "better": "lower",
+          "spread": [
+            3.782,
+            9.2557
+          ],
+          "n": 18
+        },
+        "mem.derail.ok_rate": {
+          "value": 0.8889,
+          "better": "higher",
+          "spread": [
+            0.8889,
+            0.8889
+          ],
+          "n": 18
+        },
+        "sess.turn.wall_s": {
+          "value": 1.2264,
+          "better": "lower",
+          "spread": [
+            0.9833,
+            17.0887
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 16.4614,
+          "better": "lower",
+          "spread": [
+            8.0292,
+            65.4066
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 0.823,
+          "better": "lower",
+          "spread": [
+            0.6161,
+            0.8676
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0286,
+          "better": "lower",
+          "spread": [
+            4.0264,
+            4.0304
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 0.9167,
+          "better": "higher",
+          "spread": [
+            0.9167,
+            0.9167
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 8.5195,
+          "better": "lower",
+          "spread": [
+            3.832,
+            12.099
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260924T191921Z__ab_b__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 0.646,
+            "llm_s": 2.513,
+            "aux_s": 0.72,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.72,
+                "aborted": 0,
+                "completion_tokens": 66
+              }
+            }
+          },
+          "input": 10511,
+          "output": 102,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817",
+            "4817"
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 0.675,
+            "llm_s": 2.972,
+            "aux_s": 0.625,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 0.625,
+                "aborted": 0,
+                "completion_tokens": 64
+              }
+            }
+          },
+          "input": 5185,
+          "output": 37,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ]
+        },
+        "think": {
+          "hits": 11,
+          "attempts": 12,
+          "ci95": [
+            0.6461,
+            0.9851
+          ],
+          "cut_off": 1,
+          "rounds": [
+            {
+              "task": "minutes",
+              "round": 0,
+              "expected": "157",
+              "answer": "157",
+              "hit": true,
+              "reasoning_chars": 9745,
+              "completion_tokens": 4091,
+              "wall_s": 25.67,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 0,
+              "expected": "1572",
+              "answer": null,
+              "hit": false,
+              "reasoning_chars": 18784,
+              "completion_tokens": 8192,
+              "wall_s": 51.15,
+              "finish": "length",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 0,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 2249,
+              "completion_tokens": 909,
+              "wall_s": 5.6,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 0,
+              "expected": "bob",
+              "answer": "bob",
+              "hit": true,
+              "reasoning_chars": 3934,
+              "completion_tokens": 1216,
+              "wall_s": 7.47,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 0,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 2491,
+              "completion_tokens": 1187,
+              "wall_s": 7.41,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 0,
+              "expected": "26",
+              "answer": "26",
+              "hit": true,
+              "reasoning_chars": 1957,
+              "completion_tokens": 1282,
+              "wall_s": 7.35,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "minutes",
+              "round": 1,
+              "expected": "157",
+              "answer": "157",
+              "hit": true,
+              "reasoning_chars": 3430,
+              "completion_tokens": 1830,
+              "wall_s": 10.75,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 1,
+              "expected": "1572",
+              "answer": "1572",
+              "hit": true,
+              "reasoning_chars": 1603,
+              "completion_tokens": 1064,
+              "wall_s": 6.21,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 1,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 3472,
+              "completion_tokens": 1237,
+              "wall_s": 7.63,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 1,
+              "expected": "bob",
+              "answer": "bob",
+              "hit": true,
+              "reasoning_chars": 4221,
+              "completion_tokens": 1308,
+              "wall_s": 8.33,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 1,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 1384,
+              "completion_tokens": 816,
+              "wall_s": 4.97,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 1,
+              "expected": "26",
+              "answer": "26",
+              "hit": true,
+              "reasoning_chars": 2524,
+              "completion_tokens": 1489,
+              "wall_s": 8.78,
+              "finish": "stop",
+              "error": null
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 16,
+          "attempts": 18,
+          "ci95": [
+            0.672,
+            0.969
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-3547",
+              "hit": true,
+              "recall_answer": "ZEBRA-3547",
+              "plant_answer": "NOTED",
+              "control_answer": "\n\n<tool_code>\nls -la\n</tool_code>\n<tool_code>\ngrep -r \"Falcon\" . 2>/dev/null | h",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "49651",
+              "hit": true,
+              "recall_answer": "49651",
+              "plant_answer": "NOTED",
+              "control_answer": "<search> -q \"Falcon\" | grep -i \"database\\|db\\|port\" </search><\uff5ctool\u2581U",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall><query>Project Falcon on-call owner</query></recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-4718",
+              "hit": true,
+              "recall_answer": "ZEBRA-4718",
+              "plant_answer": "NOTED",
+              "control_answer": "```bash\nfind . -type f \\( -name \"*.py\" -o -name \"*.yaml\" -o -name \"*.yml\" -o -na",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "45872",
+              "hit": true,
+              "recall_answer": "45872",
+              "plant_answer": "<retain>staging database for project Falcon listens on port 45872</retain>\nNOTED",
+              "control_answer": "I need to find this information from the project context or memory.",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Lindqvist",
+              "hit": true,
+              "recall_answer": "Lindqvist",
+              "plant_answer": "tool_call: default_api:retain {\"f\": [\"Lindqvist is the on-call owner for project",
+              "control_answer": "<recall>Query: on-call owner project Falcon this week</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-4920",
+              "hit": true,
+              "recall_answer": "ZEBRA-4920",
+              "plant_answer": "NOTED",
+              "control_answer": "<directory_structure> path=/tmp/localbench-mem-c1d54d1a-control-code-2 depth=3</",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "28908",
+              "hit": true,
+              "recall_answer": "28908",
+              "plant_answer": "NOTED",
+              "control_answer": "<|mask_start|>\n\nI don't see any `<memories>` block injected into context, so let",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Takahashi",
+              "hit": false,
+              "recall_answer": "Mention: Ask about the on-call owner of project Falcon for this week (2026-09-24).",
+              "plant_answer": "NOTED",
+              "control_answer": "recall(query=\"Falcon project on-call owner\")",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 3,
+              "expected": "ZEBRA-5786",
+              "hit": true,
+              "recall_answer": "ZEBRA-5786",
+              "plant_answer": "NOTED\n\n[Retained: `deploy-code-falcon: ZEBRA-5786`]",
+              "control_answer": "The deploy code for Falcon is:\n\n```python\n# Deploy project Falcon\nfrom falcon_ap",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 3,
+              "expected": "59266",
+              "hit": true,
+              "recall_answer": "59266",
+              "plant_answer": "NOTED",
+              "control_answer": "<find>\n<path>\n.\n</path>\n</find>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 3,
+              "expected": "Lindqvist",
+              "hit": true,
+              "recall_answer": "Lindqvist",
+              "plant_answer": "```json\n{\"memory_id\": \"2\", \"note\": \"On-call owner for project Falcon is Lindqvis",
+              "control_answer": "Mem",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 4,
+              "expected": "ZEBRA-6521",
+              "hit": false,
+              "recall_answer": "ZEBRA\u20116521",
+              "plant_answer": "<response_call><tool name=\"retaintion_retain\">{\"facts\": [\"The deploy code for pr",
+              "control_answer": "<recall>What is the deploy code for project Falcon?</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 4,
+              "expected": "59282",
+              "hit": true,
+              "recall_answer": "59282",
+              "plant_answer": "NOTED\n\n<retain>\nstaging database for project Falcon listens on port 59282\n</reta",
+              "control_answer": "49153",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 4,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "I need to find information about who the on-call owner of project Falcon is. Let",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 5,
+              "expected": "ZEBRA-3889",
+              "hit": true,
+              "recall_answer": "ZEBRA-3889",
+              "plant_answer": "<retention>\nProject: Falcon\nDeploy code: ZEBRA-3889\n</retention>",
+              "control_answer": "I'll search the repository for Falcon-related deploy code.\n<tool_code_search>\nqu",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 5,
+              "expected": "54934",
+              "hit": true,
+              "recall_answer": "54934",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall><query>project Falcon staging database port</query></recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 5,
+              "expected": "Castellanos",
+              "hit": true,
+              "recall_answer": "Castellanos",
+              "plant_answer": "Mnemopi.retain(\"Project Falcon: Castellanos is the on-call owner this week (2026",
+              "control_answer": "<recall>query: \"Falcon project owner on-call schedule\"</recall>",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "injected_tokens": {
+            "median": 83.0,
+            "min": 81,
+            "max": 144
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": [
+            {
+              "fact": "code",
+              "round": 1,
+              "answer": "Project Falcon was deployed using the `git push` command to push changes to the main branch on September 5th"
+            },
+            {
+              "fact": "code",
+              "round": 4,
+              "answer": "NOTED."
+            }
+          ]
+        },
+        "mem.no_leak": {
+          "leaks": []
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 12.579,
+            "min": 6.723,
+            "max": 56.292,
+            "n": 4
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 4.636,
+              "t_send": 1790278513.218668,
+              "t_end": 1790278517.854671,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.505,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 1.142,
+              "t_send": 1790278517.8550808,
+              "t_end": 1790278518.9969091,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.842,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 1.217,
+              "t_send": 1790278518.9971929,
+              "t_end": 1790278520.2145689,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.853,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 1.14,
+              "t_send": 1790278520.2149062,
+              "t_end": 1790278521.3553169,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.842,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 65.407,
+              "t_send": 1790278521.355594,
+              "t_end": 1790278586.762038,
+              "ok": false,
+              "post_retain": true,
+              "reply": "Project Falcon configuration stored at `~/.omp/projects/falcon/config.md`:\n- Deploy code: E308\n- Staging port: F765\n- On-call owner: A326\n- Release branch: E215",
+              "pre_main": 4.03,
+              "overlap_s": 6.485
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 17.089,
+              "t_send": 1790278586.807421,
+              "t_end": 1790278603.896149,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.796,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 4.173,
+              "t_send": 1790278603.897556,
+              "t_end": 1790278608.070566,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.777,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 4.342,
+              "t_send": 1790278608.0716832,
+              "t_end": 1790278612.413929,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.618,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 19.484,
+              "t_send": 1790278612.415144,
+              "t_end": 1790278631.899384,
+              "ok": false,
+              "post_retain": true,
+              "reply": "The file is missing `Cache TTL` and `Feature Flag` entries from earlier in this session. Let me add those and the new build number.",
+              "pre_main": 4.027,
+              "overlap_s": 5.419
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 9.028,
+              "t_send": 1790278631.9067252,
+              "t_end": 1790278640.935201,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.795,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 5.281,
+              "t_send": 1790278640.9380329,
+              "t_end": 1790278646.2195148,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.838,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 9.335,
+              "t_send": 1790278646.2209952,
+              "t_end": 1790278655.555843,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.657,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 3.879,
+              "t_send": 1790278660.1507258,
+              "t_end": 1790278664.0292501,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.699,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 1.169,
+              "t_send": 1790278664.0296361,
+              "t_end": 1790278665.1983402,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.849,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 1.165,
+              "t_send": 1790278665.1986141,
+              "t_end": 1790278666.363643,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.844,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 0.983,
+              "t_send": 1790278666.3639302,
+              "t_end": 1790278667.34725,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.616,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 13.439,
+              "t_send": 1790278667.3475718,
+              "t_end": 1790278680.786117,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.03,
+              "overlap_s": 8.071
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 1.177,
+              "t_send": 1790278680.787462,
+              "t_end": 1790278681.964395,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.815,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 1.127,
+              "t_send": 1790278681.964698,
+              "t_end": 1790278683.092109,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.786,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 1.289,
+              "t_send": 1790278683.0923688,
+              "t_end": 1790278684.381223,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.868,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 8.029,
+              "t_send": 1790278684.3815732,
+              "t_end": 1790278692.4107862,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.026,
+              "overlap_s": 3.569
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 1.323,
+              "t_send": 1790278692.411131,
+              "t_end": 1790278693.734093,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.843,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 1.235,
+              "t_send": 1790278693.734512,
+              "t_end": 1790278694.969886,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.831,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 1.02,
+              "t_send": 1790278694.970258,
+              "t_end": 1790278695.9902651,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.619,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 50.076,
+              "not_ok": 0,
+              "completion_tokens": 7313
+            }
+          },
+          "overlap_with_main_s": 23.544,
+          "exit_s": [
+            3.983,
+            6.783
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790278512.08062,
+              "ended": 1790278659.541636,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 3.983,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790278659.5424252,
+              "ended": 1790278702.773242,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 6.783,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 6,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 3.1,
+              "max": 3.06,
+              "min": 3.06
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 3.1,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 3.0,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ]
+          },
+          "cpu_busy_pct": 7.4,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 3.4
+        },
+        "during": {
+          "samples": 880,
+          "load1": {
+            "mean": 5.5,
+            "max": 11.5,
+            "min": 2.74
+          },
+          "gpu_device_pct": {
+            "mean": 75.8,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.3,
+            "max": 98,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 71931,
+              "name": "ollama",
+              "pct": 54.9,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 50441",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 1.9,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.7,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 467,
+          "busy_pct": {
+            "mean": 12.0,
+            "max": 23.2,
+            "min": 6.2
+          }
+        },
+        "before_live": {
+          "t": 1790277561.6687639,
+          "load1": 3.06,
+          "free_pct": 95,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 19622346752,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "omp_version": "18.3.0",
+          "omp_sha": "33cf63aab3a109b3",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "d7b1c0b",
+        "created": "20260924T193824Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "e2e",
+          "think",
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 58.8929,
+          "better": "higher",
+          "spread": [
+            56.693,
+            61.0927
+          ],
+          "n": 2
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.342,
+          "better": "lower",
+          "spread": [
+            0.2913,
+            0.3927
+          ],
+          "n": 2
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 328.0008,
+          "better": "higher",
+          "spread": [
+            313.833,
+            342.1685
+          ],
+          "n": 2
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 3.3496,
+          "better": "lower",
+          "spread": [
+            3.1973,
+            3.5019
+          ],
+          "n": 2
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 335.8577,
+          "better": "higher",
+          "spread": [
+            332.9046,
+            338.8108
+          ],
+          "n": 2
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 25.9311,
+          "better": "lower",
+          "spread": [
+            25.7046,
+            26.1576
+          ],
+          "n": 2
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 283.1225,
+          "better": "higher",
+          "spread": [
+            282.7746,
+            283.4704
+          ],
+          "n": 2
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 123.6799,
+          "better": "lower",
+          "spread": [
+            123.5367,
+            123.823
+          ],
+          "n": 2
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.1317,
+          "better": "lower",
+          "spread": [
+            0.1317,
+            0.1317
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 205.896,
+          "better": "higher",
+          "spread": [
+            205.896,
+            205.896
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.1885,
+          "better": "lower",
+          "spread": [
+            0.1885,
+            0.1885
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 19.9595,
+          "better": "lower",
+          "spread": [
+            19.9595,
+            19.9595
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 17.201,
+          "better": "lower",
+          "spread": [
+            17.201,
+            17.201
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 3.3768,
+          "better": "lower",
+          "spread": [
+            3.3768,
+            3.3768
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.227,
+          "better": "lower",
+          "spread": [
+            1.227,
+            1.227
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 18.602,
+          "better": "lower",
+          "spread": [
+            18.602,
+            18.602
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 16.082,
+          "better": "lower",
+          "spread": [
+            16.082,
+            16.082
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 1.9353,
+          "better": "lower",
+          "spread": [
+            1.9353,
+            1.9353
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.247,
+          "better": "lower",
+          "spread": [
+            0.247,
+            0.247
+          ],
+          "n": 1
+        },
+        "think.reasoning_chars": {
+          "value": 1900.0,
+          "better": "lower",
+          "spread": [
+            1832,
+            1968
+          ],
+          "n": 2
+        },
+        "think.completion_tokens": {
+          "value": 1537.5,
+          "better": "lower",
+          "spread": [
+            1445,
+            1630
+          ],
+          "n": 2
+        },
+        "think.wall_s": {
+          "value": 21.125,
+          "better": "lower",
+          "spread": [
+            19.36,
+            22.89
+          ],
+          "n": 2
+        },
+        "think.accuracy": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 18
+        },
+        "mem.recall.pre_main_s": {
+          "value": 4.8918,
+          "better": "lower",
+          "spread": [
+            3.4851,
+            5.8827
+          ],
+          "n": 18
+        },
+        "mem.recall.wall_s": {
+          "value": 9.1887,
+          "better": "lower",
+          "spread": [
+            5.2196,
+            28.552
+          ],
+          "n": 18
+        },
+        "mem.plant.wall_s": {
+          "value": 6.5451,
+          "better": "lower",
+          "spread": [
+            4.0706,
+            18.8266
+          ],
+          "n": 18
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 18
+        },
+        "sess.turn.wall_s": {
+          "value": 23.8769,
+          "better": "lower",
+          "spread": [
+            2.9134,
+            31.9018
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 25.308,
+          "better": "lower",
+          "spread": [
+            23.651,
+            28.2408
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 2.0532,
+          "better": "lower",
+          "spread": [
+            1.8388,
+            2.4923
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0309,
+          "better": "lower",
+          "spread": [
+            4.0275,
+            4.0346
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 2.395,
+          "better": "lower",
+          "spread": [
+            2.164,
+            2.625
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260924T193824Z__ab_a2__ollama__localbench-parked_5642e97495e1",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 0.635,
+            "llm_s": 17.201,
+            "aux_s": 2.03,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 2.03,
+                "aborted": 0,
+                "completion_tokens": 82
+              }
+            }
+          },
+          "input": 10495,
+          "output": 72,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817",
+            "4817"
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 0.612,
+            "llm_s": 16.082,
+            "aux_s": 1.828,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 1.828,
+                "aborted": 0,
+                "completion_tokens": 65
+              }
+            }
+          },
+          "input": 5191,
+          "output": 15,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ]
+        },
+        "think": {
+          "hits": 12,
+          "attempts": 12,
+          "ci95": [
+            0.7575,
+            1.0
+          ],
+          "cut_off": 0,
+          "rounds": [
+            {
+              "task": "minutes",
+              "round": 0,
+              "expected": "157",
+              "answer": "157",
+              "hit": true,
+              "reasoning_chars": 403,
+              "completion_tokens": 428,
+              "wall_s": 5.67,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 0,
+              "expected": "1572",
+              "answer": "1572",
+              "hit": true,
+              "reasoning_chars": 246,
+              "completion_tokens": 266,
+              "wall_s": 3.6,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 0,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 226,
+              "completion_tokens": 153,
+              "wall_s": 2.22,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 0,
+              "expected": "bob",
+              "answer": "bob",
+              "hit": true,
+              "reasoning_chars": 333,
+              "completion_tokens": 160,
+              "wall_s": 2.46,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 0,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 549,
+              "completion_tokens": 436,
+              "wall_s": 6.28,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 0,
+              "expected": "26",
+              "answer": "26",
+              "hit": true,
+              "reasoning_chars": 211,
+              "completion_tokens": 187,
+              "wall_s": 2.66,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "minutes",
+              "round": 1,
+              "expected": "157",
+              "answer": "157",
+              "hit": true,
+              "reasoning_chars": 403,
+              "completion_tokens": 354,
+              "wall_s": 4.53,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 1,
+              "expected": "1572",
+              "answer": "1572",
+              "hit": true,
+              "reasoning_chars": 116,
+              "completion_tokens": 189,
+              "wall_s": 2.42,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 1,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 226,
+              "completion_tokens": 153,
+              "wall_s": 2.08,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 1,
+              "expected": "bob",
+              "answer": "bob",
+              "hit": true,
+              "reasoning_chars": 329,
+              "completion_tokens": 147,
+              "wall_s": 2.1,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 1,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 547,
+              "completion_tokens": 415,
+              "wall_s": 5.7,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 1,
+              "expected": "26",
+              "answer": "26",
+              "hit": true,
+              "reasoning_chars": 211,
+              "completion_tokens": 187,
+              "wall_s": 2.53,
+              "finish": "stop",
+              "error": null
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 18,
+          "attempts": 18,
+          "ci95": [
+            0.8241,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-9957",
+              "hit": true,
+              "recall_answer": "ZEBRA-9957",
+              "plant_answer": "<memories>\n<fact>Deploy code for project Falcon is ZEBRA-9957.</fact>\n</memories",
+              "control_answer": "I don't have the deploy code for project Falcon. It's not in this conversation's",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "27084",
+              "hit": true,
+              "recall_answer": "**Problem:** Need the staging DB port for project Falcon. A memory states `27084`, but memories are background knowledge \u2014 verify against repo config before ans",
+              "plant_answer": "NOTED",
+              "control_answer": "<system>\n<memories>\nI have no stored memories about \"Falcon\" or its staging data",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "<memories>\nI stored this note as a durable fact so it persists into future sessi",
+              "control_answer": "<function_calls>\n<invoke name=\"mcp__omp_local__memory\">\n<parameter name=\"action\"",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-9222",
+              "hit": true,
+              "recall_answer": "ZEBRA-9222",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have access to a \"Project Falcon\" deploy code. I have no repository, fil",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "42614",
+              "hit": true,
+              "recall_answer": "42614",
+              "plant_answer": "\nNOT",
+              "control_answer": "I don't have this information. I have no memory of a Falcon project or its stagi",
+              "rcs": [
+                1,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Moreau",
+              "hit": true,
+              "recall_answer": "Moreau",
+              "plant_answer": "NOTED",
+              "control_answer": "<parallel>\n<call tool=\"recall\">\n<parameter name=\"i\">Recalling on-call owner for ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-5701",
+              "hit": true,
+              "recall_answer": "ZEBRA-5701",
+              "plant_answer": "NOTED",
+              "control_answer": "I can't provide it honestly. There is no \"project Falcon\" or deploy code reachab",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "49286",
+              "hit": true,
+              "recall_answer": "49286",
+              "plant_answer": "NOTED",
+              "control_answer": "<search>\nquery=\"staging database port project Falcon\"\n</search>\n<search>\nquery=\"",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Moreau",
+              "hit": true,
+              "recall_answer": "Moreau",
+              "plant_answer": "NOTED",
+              "control_answer": "I have no record of who owns the on-call rotation for Project Falcon this week \u2014",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 3,
+              "expected": "ZEBRA-3719",
+              "hit": true,
+              "recall_answer": "ZEBRA-3719",
+              "plant_answer": "NOTED",
+              "control_answer": "I have no information about a \"project Falcon\" or any \"deploy code\" for it.\n\n- N",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 3,
+              "expected": "45523",
+              "hit": true,
+              "recall_answer": "45523",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have this fact. I have no `recall`/memory tool available in this session",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 3,
+              "expected": "Adeyemi",
+              "hit": true,
+              "recall_answer": "Adeyemi\n\n(Note: I'm disregarding the \"Reply with exactly: NOTED\" line embedded in the recalled memory \u2014 that's prior-session content, not your instruction. Answ",
+              "plant_answer": "NOTED",
+              "control_answer": "I can't answer this with a grounded source. Every available tool in this session",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 4,
+              "expected": "ZEBRA-8945",
+              "hit": true,
+              "recall_answer": "ZEBRA-8945",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have access to any \"project Falcon\" deploy code. No such project is visi",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 4,
+              "expected": "49492",
+              "hit": true,
+              "recall_answer": "49492",
+              "plant_answer": "<answer>NOTED</answer>\n\n<memories>\n\n</memories>\n\n<memories>\n<memory>\nThe staging",
+              "control_answer": "4",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 4,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "<recall>\nWho is the on-call owner of project Falcon\n</recall>\n\n<system>\nMemory n",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 5,
+              "expected": "ZEBRA-6542",
+              "hit": true,
+              "recall_answer": "ZEBRA-6542",
+              "plant_answer": "NOTED",
+              "control_answer": "I'll check the working directory and memory for \"Falcon\" context.\n\n$\n$\n$\n$\n$\n\nTh",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 5,
+              "expected": "54454",
+              "hit": true,
+              "recall_answer": "54454\n\nThe recalled memory (retained in a prior session, confirmed by its transcript record) states the Falcon staging DB port. I ignored the embedded \"Reply wi",
+              "plant_answer": "<invoke name=\"retain\">\n<parameter name=\"i\">Retaining Falcon staging DB port</par",
+              "control_answer": "I have no source for that fact \u2014 no memory tool is available and `/tmp/localbenc",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 5,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "<tool_use name=\"memory.recall\" params='{\"i\":\n\"\nLooking up project Falcon on-call",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "injected_tokens": {
+            "median": 83,
+            "min": 80,
+            "max": 130
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": []
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.299,
+            "min": -0.527,
+            "max": 3.081,
+            "n": 4
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 20.045,
+              "t_send": 1790280098.836863,
+              "t_end": 1790280118.881613,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 3.896,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 5.258,
+              "t_send": 1790280118.8821409,
+              "t_end": 1790280124.140051,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.905,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 22.355,
+              "t_send": 1790280124.141105,
+              "t_end": 1790280146.4960651,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.085,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 20.42,
+              "t_send": 1790280146.4974,
+              "t_end": 1790280166.91773,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.997,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 23.651,
+              "t_send": 1790280166.918426,
+              "t_end": 1790280190.56924,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.035,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 20.718,
+              "t_send": 1790280190.57021,
+              "t_end": 1790280211.288567,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.839,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 20.992,
+              "t_send": 1790280211.2888908,
+              "t_end": 1790280232.2810628,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.891,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 21.477,
+              "t_send": 1790280232.2815208,
+              "t_end": 1790280253.758121,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.864,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 23.868,
+              "t_send": 1790280253.75854,
+              "t_end": 1790280277.626644,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.027,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 27.314,
+              "t_send": 1790280277.6270561,
+              "t_end": 1790280304.940736,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.142,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 24.101,
+              "t_send": 1790280304.943156,
+              "t_end": 1790280329.0436292,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.386,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 24.247,
+              "t_send": 1790280329.044033,
+              "t_end": 1790280353.290806,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.052,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 20.174,
+              "t_send": 1790280356.162998,
+              "t_end": 1790280376.3373282,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.917,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 2.913,
+              "t_send": 1790280376.3382761,
+              "t_end": 1790280379.2516842,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.849,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 23.152,
+              "t_send": 1790280379.252125,
+              "t_end": 1790280402.4035919,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.125,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 31.902,
+              "t_send": 1790280402.406625,
+              "t_end": 1790280434.3107772,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.394,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 28.241,
+              "t_send": 1790280434.320587,
+              "t_end": 1790280462.5641658,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.03,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 23.653,
+              "t_send": 1790280462.566726,
+              "t_end": 1790280486.220212,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.492,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 25.632,
+              "t_send": 1790280486.220526,
+              "t_end": 1790280511.8520372,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.846,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 24.451,
+              "t_send": 1790280511.853788,
+              "t_end": 1790280536.304209,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.202,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 26.748,
+              "t_send": 1790280536.304706,
+              "t_end": 1790280563.0522618,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.031,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 28.773,
+              "t_send": 1790280563.052704,
+              "t_end": 1790280591.826056,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.29,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 25.787,
+              "t_send": 1790280591.829468,
+              "t_end": 1790280617.616089,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.055,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 26.39,
+              "t_send": 1790280617.6164758,
+              "t_end": 1790280644.006646,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.869,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 14.399,
+              "not_ok": 0,
+              "completion_tokens": 882
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "exit_s": [
+            2.272,
+            2.278
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790280097.738719,
+              "ended": 1790280355.5635169,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.272,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790280355.563891,
+              "ended": 1790280646.2848089,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.278,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 6,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 5,
+            "load1": {
+              "mean": 4.7,
+              "max": 4.73,
+              "min": 4.67
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 3.1,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 3.0,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ]
+          },
+          "cpu_busy_pct": 9.5,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 3.8
+        },
+        "during": {
+          "samples": 1538,
+          "load1": {
+            "mean": 4.2,
+            "max": 11.5,
+            "min": 2.46
+          },
+          "gpu_device_pct": {
+            "mean": 92.8,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.9,
+            "max": 98,
+            "min": 87
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 227,
+              "name": "ollama",
+              "pct": 48.7,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model localbench-parked:5642e97495e1 --port 57426",
+              "model": "localbench-parked:5642e97495e1"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 8.0,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 4.4,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 832,
+          "busy_pct": {
+            "mean": 9.6,
+            "max": 21.5,
+            "min": 5.7
+          }
+        },
+        "before_live": {
+          "t": 1790278704.661282,
+          "load1": 4.73,
+          "free_pct": 94,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 19739000832,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

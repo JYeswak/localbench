@@ -1,0 +1,1963 @@
+{
+  "kind": "ab",
+  "a": "ollama:localbench-parked:5642e97495e1",
+  "b": "ollama:hf.co/google/gemma-4-12B-it-qat-q4_0-gguf:Q4_0",
+  "order": [
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [],
+  "table": {
+    "think.reasoning_chars": {
+      "b": 81340,
+      "a1": 1968,
+      "a2": 1968,
+      "b_legs": [
+        81340
+      ],
+      "a_legs": [
+        1968,
+        1968
+      ],
+      "a_median": 1968.0,
+      "b_median": 81340,
+      "better": "lower",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 41.331,
+      "verdict": "B-WORSE"
+    },
+    "think.completion_tokens": {
+      "b": 38096,
+      "a1": 1630,
+      "a2": 1559,
+      "b_legs": [
+        38096
+      ],
+      "a_legs": [
+        1630,
+        1559
+      ],
+      "a_median": 1594.5,
+      "b_median": 38096,
+      "better": "lower",
+      "aa_rel_spread": 0.0445,
+      "bb_rel_spread": 0.0,
+      "band": 0.1336,
+      "b_over_a": 23.892,
+      "verdict": "B-WORSE"
+    },
+    "think.wall_s": {
+      "b": 1109.29,
+      "a1": 24.97,
+      "a2": 21.9,
+      "b_legs": [
+        1109.29
+      ],
+      "a_legs": [
+        24.97,
+        21.9
+      ],
+      "a_median": 23.435,
+      "b_median": 1109.29,
+      "better": "lower",
+      "aa_rel_spread": 0.131,
+      "bb_rel_spread": 0.0,
+      "band": 0.393,
+      "b_over_a": 47.335,
+      "verdict": "B-WORSE"
+    },
+    "think.accuracy": {
+      "b": 0.3333,
+      "a1": 1.0,
+      "a2": 1.0,
+      "b_legs": [
+        0.3333
+      ],
+      "a_legs": [
+        1.0,
+        1.0
+      ],
+      "a_median": 1.0,
+      "b_median": 0.3333,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 0.333,
+      "verdict": "B-WORSE"
+    },
+    "sess.turn.wall_s": {
+      "b": 27.9858,
+      "a1": 16.6285,
+      "a2": 18.9141,
+      "b_legs": [
+        27.9858
+      ],
+      "a_legs": [
+        16.6285,
+        18.9141
+      ],
+      "a_median": 17.7713,
+      "b_median": 27.9858,
+      "better": "lower",
+      "aa_rel_spread": 0.1286,
+      "bb_rel_spread": 0.0,
+      "band": 0.3858,
+      "b_over_a": 1.575,
+      "verdict": "B-WORSE"
+    },
+    "sess.turn.post_retain_wall_s": {
+      "b": 26.7847,
+      "a1": 18.0141,
+      "a2": 20.3961,
+      "b_legs": [
+        26.7847
+      ],
+      "a_legs": [
+        18.0141,
+        20.3961
+      ],
+      "a_median": 19.2051,
+      "b_median": 26.7847,
+      "better": "lower",
+      "aa_rel_spread": 0.124,
+      "bb_rel_spread": 0.0,
+      "band": 0.3721,
+      "b_over_a": 1.395,
+      "verdict": "B-WORSE"
+    },
+    "sess.turn.pre_main_s": {
+      "b": 3.5075,
+      "a1": 2.7075,
+      "a2": 2.8173,
+      "b_legs": [
+        3.5075
+      ],
+      "a_legs": [
+        2.7075,
+        2.8173
+      ],
+      "a_median": 2.7624,
+      "b_median": 3.5075,
+      "better": "lower",
+      "aa_rel_spread": 0.0397,
+      "bb_rel_spread": 0.0,
+      "band": 0.1192,
+      "b_over_a": 1.27,
+      "verdict": "B-WORSE"
+    },
+    "sess.turn.post_retain_pre_main_s": {
+      "b": 4.0696,
+      "a1": 4.044,
+      "a2": 4.0463,
+      "b_legs": [
+        4.0696
+      ],
+      "a_legs": [
+        4.044,
+        4.0463
+      ],
+      "a_median": 4.04515,
+      "b_median": 4.0696,
+      "better": "lower",
+      "aa_rel_spread": 0.0006,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 1.006,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.ack_rate": {
+      "b": 0.1667,
+      "a1": 1.0,
+      "a2": 0.9167,
+      "b_legs": [
+        0.1667
+      ],
+      "a_legs": [
+        1.0,
+        0.9167
+      ],
+      "a_median": 0.95835,
+      "b_median": 0.1667,
+      "better": "higher",
+      "aa_rel_spread": 0.0869,
+      "bb_rel_spread": 0.0,
+      "band": 0.2608,
+      "b_over_a": 0.174,
+      "verdict": "B-WORSE"
+    },
+    "sess.memory.extract_s": {
+      "b": 16.481,
+      "a1": 3.082,
+      "a2": 3.916,
+      "b_legs": [
+        16.481
+      ],
+      "a_legs": [
+        3.082,
+        3.916
+      ],
+      "a_median": 3.4989999999999997,
+      "b_median": 16.481,
+      "better": "lower",
+      "aa_rel_spread": 0.2384,
+      "bb_rel_spread": 0.0,
+      "band": 0.7151,
+      "b_over_a": 4.71,
+      "verdict": "B-WORSE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "omp_version": "18.3.0",
+          "omp_sha": "33cf63aab3a109b3",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "9b3956a",
+        "created": "20260925T043128Z",
+        "tiers": [
+          "think",
+          "sess"
+        ],
+        "repeats": 1,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "think.reasoning_chars": {
+          "value": 1968,
+          "better": "lower",
+          "spread": [
+            1968,
+            1968
+          ],
+          "n": 1
+        },
+        "think.completion_tokens": {
+          "value": 1630,
+          "better": "lower",
+          "spread": [
+            1630,
+            1630
+          ],
+          "n": 1
+        },
+        "think.wall_s": {
+          "value": 24.97,
+          "better": "lower",
+          "spread": [
+            24.97,
+            24.97
+          ],
+          "n": 1
+        },
+        "think.accuracy": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 6
+        },
+        "sess.turn.wall_s": {
+          "value": 16.6285,
+          "better": "lower",
+          "spread": [
+            4.6184,
+            18.7442
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 18.0141,
+          "better": "lower",
+          "spread": [
+            17.7655,
+            18.2627
+          ],
+          "n": 2
+        },
+        "sess.turn.pre_main_s": {
+          "value": 2.7075,
+          "better": "lower",
+          "spread": [
+            2.1918,
+            4.0578
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.044,
+          "better": "lower",
+          "spread": [
+            4.0357,
+            4.0523
+          ],
+          "n": 2
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 12
+        },
+        "sess.memory.extract_s": {
+          "value": 3.082,
+          "better": "lower",
+          "spread": [
+            3.019,
+            3.622
+          ],
+          "n": 3
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260925T043128Z__ab_a1__ollama__localbench-parked_5642e97495e1",
+      "details": {
+        "think": {
+          "hits": 6,
+          "attempts": 6,
+          "ci95": [
+            0.6097,
+            1.0
+          ],
+          "cut_off": 0,
+          "rounds": [
+            {
+              "task": "minutes",
+              "round": 0,
+              "expected": "157",
+              "answer": "157",
+              "hit": true,
+              "reasoning_chars": 403,
+              "completion_tokens": 428,
+              "wall_s": 6.61,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 0,
+              "expected": "1572",
+              "answer": "1572",
+              "hit": true,
+              "reasoning_chars": 246,
+              "completion_tokens": 266,
+              "wall_s": 4.23,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 0,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 226,
+              "completion_tokens": 153,
+              "wall_s": 2.31,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 0,
+              "expected": "bob",
+              "answer": "bob",
+              "hit": true,
+              "reasoning_chars": 333,
+              "completion_tokens": 160,
+              "wall_s": 2.38,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 0,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 549,
+              "completion_tokens": 436,
+              "wall_s": 6.62,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 0,
+              "expected": "26",
+              "answer": "26",
+              "hit": true,
+              "reasoning_chars": 211,
+              "completion_tokens": 187,
+              "wall_s": 2.82,
+              "finish": "stop",
+              "error": null
+            }
+          ]
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.968,
+            "min": 0.771,
+            "max": 1.165,
+            "n": 2
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 19.876,
+              "t_send": 1790310725.6886349,
+              "t_end": 1790310745.5640588,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 6.443,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 4.618,
+              "t_send": 1790310745.56479,
+              "t_end": 1790310750.183126,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 3.986,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 15.772,
+              "t_send": 1790310750.183558,
+              "t_end": 1790310765.9554188,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.324,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 16.756,
+              "t_send": 1790310765.956334,
+              "t_end": 1790310782.712478,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 3.176,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 17.766,
+              "t_send": 1790310782.7127192,
+              "t_end": 1790310800.478017,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.052,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 16.445,
+              "t_send": 1790310800.478473,
+              "t_end": 1790310816.92299,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.708,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 16.628,
+              "t_send": 1790310816.923651,
+              "t_end": 1790310833.5519419,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.751,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 16.239,
+              "t_send": 1790310833.552182,
+              "t_end": 1790310849.790787,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.192,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 18.263,
+              "t_send": 1790310849.791316,
+              "t_end": 1790310868.053777,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.036,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 18.744,
+              "t_send": 1790310868.054223,
+              "t_end": 1790310886.798239,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 4.058,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 17.022,
+              "t_send": 1790310886.798468,
+              "t_end": 1790310903.819853,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.594,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 16.796,
+              "t_send": 1790310903.820077,
+              "t_end": 1790310920.616334,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.246,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 3,
+              "busy_s": 9.723,
+              "not_ok": 0,
+              "completion_tokens": 444
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "exit_s": [
+            3.073
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790310724.292518,
+              "ended": 1790310923.689683,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 3.073,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 12,
+          "expected": 12
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 3,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 7,
+            "load1": {
+              "mean": 17.3,
+              "max": 17.8,
+              "min": 17.09
+            },
+            "gpu_device_pct": {
+              "mean": 2.4,
+              "max": 9,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 97.0,
+              "max": 97,
+              "min": 97
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 7,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 9.6,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.7,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.7,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 7,
+              "app_gpu_mean_pct": 14.1,
+              "app_gpu_p95_pct": 15.3,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 32.7,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 6.6
+        },
+        "during": {
+          "samples": 162,
+          "load1": {
+            "mean": 18.8,
+            "max": 23.82,
+            "min": 13.97
+          },
+          "gpu_device_pct": {
+            "mean": 94.1,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.9,
+            "max": 97,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 162,
+          "gpu_by_process": [
+            {
+              "pid": 66658,
+              "name": "ollama",
+              "pct": 62.1,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model localbench-parked:5642e97495e1 --port 58895",
+              "model": "localbench-parked:5642e97495e1"
+            },
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 20.0,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 4.4,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 3.8,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 162,
+            "app_gpu_mean_pct": 28.7,
+            "app_gpu_p95_pct": 44.3,
+            "app_spike_seconds": 81,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 82,
+          "busy_pct": {
+            "mean": 29.4,
+            "max": 34.2,
+            "min": 18.2
+          }
+        },
+        "before_live": {
+          "t": 1790310688.944646,
+          "load1": 17.8,
+          "free_pct": 97,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 9,
+          "gpu_renderer_pct": 8,
+          "gpu_tiler_pct": 9,
+          "gpu_in_use_mem_bytes": 2242707456,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1"
+            ],
+            "mlx-serve": [],
+            "splash": null
+          },
+          "user_idle_s": 6042.6
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "hf.co/google/gemma-4-12B-it-qat-q4_0-gguf:Q4_0",
+          "model_digest": "f6dc48d5e89e",
+          "backend_args": "",
+          "omp_version": "18.3.0",
+          "omp_sha": "33cf63aab3a109b3",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "hf.co/google/gemma-4-12B-it-qat-q4_0-gguf:Q4_0",
+          "model_digest": "f6dc48d5e89e",
+          "backend_args": "",
+          "architecture": "gemma4",
+          "quantization": "Q4_0",
+          "parameters": "11.9B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "9b3956a",
+        "created": "20260925T043525Z",
+        "tiers": [
+          "think",
+          "sess"
+        ],
+        "repeats": 1,
+        "label": "ab_b"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "think.reasoning_chars": {
+          "value": 81340,
+          "better": "lower",
+          "spread": [
+            81340,
+            81340
+          ],
+          "n": 1
+        },
+        "think.completion_tokens": {
+          "value": 38096,
+          "better": "lower",
+          "spread": [
+            38096,
+            38096
+          ],
+          "n": 1
+        },
+        "think.wall_s": {
+          "value": 1109.29,
+          "better": "lower",
+          "spread": [
+            1109.29,
+            1109.29
+          ],
+          "n": 1
+        },
+        "think.accuracy": {
+          "value": 0.3333,
+          "better": "higher",
+          "spread": [
+            0.3333333333333333,
+            0.3333333333333333
+          ],
+          "n": 6
+        },
+        "sess.turn.wall_s": {
+          "value": 27.9858,
+          "better": "lower",
+          "spread": [
+            13.9428,
+            85.2848
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 26.7847,
+          "better": "lower",
+          "spread": [
+            22.0702,
+            31.4992
+          ],
+          "n": 2
+        },
+        "sess.turn.pre_main_s": {
+          "value": 3.5075,
+          "better": "lower",
+          "spread": [
+            2.8674,
+            4.0519
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0696,
+          "better": "lower",
+          "spread": [
+            4.0312,
+            4.108
+          ],
+          "n": 2
+        },
+        "sess.turn.ack_rate": {
+          "value": 0.1667,
+          "better": "higher",
+          "spread": [
+            0.1667,
+            0.1667
+          ],
+          "n": 12
+        },
+        "sess.memory.extract_s": {
+          "value": 16.481,
+          "better": "lower",
+          "spread": [
+            13.063,
+            26.344
+          ],
+          "n": 3
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260925T043525Z__ab_b__ollama__hf.co_google_gemma-4-12B-it-qat-q4_0-gguf_Q4_0",
+      "details": {
+        "think": {
+          "hits": 2,
+          "attempts": 6,
+          "ci95": [
+            0.0968,
+            0.7
+          ],
+          "cut_off": 4,
+          "rounds": [
+            {
+              "task": "minutes",
+              "round": 0,
+              "expected": "157",
+              "answer": null,
+              "hit": false,
+              "reasoning_chars": 13572,
+              "completion_tokens": 8192,
+              "wall_s": 219.67,
+              "finish": "length",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 0,
+              "expected": "1572",
+              "answer": null,
+              "hit": false,
+              "reasoning_chars": 14809,
+              "completion_tokens": 8192,
+              "wall_s": 224.73,
+              "finish": "length",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 0,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 1259,
+              "completion_tokens": 612,
+              "wall_s": 16.89,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 0,
+              "expected": "bob",
+              "answer": null,
+              "hit": false,
+              "reasoning_chars": 28425,
+              "completion_tokens": 8192,
+              "wall_s": 247.45,
+              "finish": "length",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 0,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 10121,
+              "completion_tokens": 4716,
+              "wall_s": 151.88,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 0,
+              "expected": "26",
+              "answer": null,
+              "hit": false,
+              "reasoning_chars": 13154,
+              "completion_tokens": 8192,
+              "wall_s": 248.67,
+              "finish": "length",
+              "error": null
+            }
+          ]
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": -3.332,
+            "min": -21.398,
+            "max": 14.735,
+            "n": 2
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 15.835,
+              "t_send": 1790312057.166556,
+              "t_end": 1790312073.0017438,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 6.589,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 85.285,
+              "t_send": 1790312073.0044281,
+              "t_end": 1790312158.2899258,
+              "ok": false,
+              "post_retain": false,
+              "reply": "Done.",
+              "pre_main": 4.041,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 67.445,
+              "t_send": 1790312158.31949,
+              "t_end": 1790312225.764948,
+              "ok": false,
+              "post_retain": false,
+              "reply": "Done.",
+              "pre_main": 3.508,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 37.849,
+              "t_send": 1790312225.814625,
+              "t_end": 1790312263.663609,
+              "ok": false,
+              "post_retain": false,
+              "reply": "Done.",
+              "pre_main": 2.994,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 22.07,
+              "t_send": 1790312263.69595,
+              "t_end": 1790312285.7663739,
+              "ok": false,
+              "post_retain": true,
+              "reply": "Done.",
+              "pre_main": 4.108,
+              "overlap_s": 8.979
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 49.088,
+              "t_send": 1790312285.769554,
+              "t_end": 1790312334.858002,
+              "ok": false,
+              "post_retain": false,
+              "reply": "Done.",
+              "pre_main": 4.037,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 16.314,
+              "t_send": 1790312334.8835788,
+              "t_end": 1790312351.197855,
+              "ok": false,
+              "post_retain": false,
+              "reply": "Done.",
+              "pre_main": 2.867,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 13.943,
+              "t_send": 1790312351.203799,
+              "t_end": 1790312365.136907,
+              "ok": false,
+              "post_retain": false,
+              "reply": "Done.",
+              "pre_main": 3.545,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 31.499,
+              "t_send": 1790312365.139837,
+              "t_end": 1790312396.624352,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.031,
+              "overlap_s": 12.44
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 19.586,
+              "t_send": 1790312396.631063,
+              "t_end": 1790312416.215342,
+              "ok": false,
+              "post_retain": false,
+              "reply": "Done.",
+              "pre_main": 4.052,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 27.986,
+              "t_send": 1790312416.2177742,
+              "t_end": 1790312444.203108,
+              "ok": false,
+              "post_retain": false,
+              "reply": "Done.",
+              "pre_main": 3.299,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 15.235,
+              "t_send": 1790312444.211194,
+              "t_end": 1790312459.446246,
+              "ok": false,
+              "post_retain": false,
+              "reply": "Done.",
+              "pre_main": 3.306,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 3,
+              "busy_s": 55.878,
+              "not_ok": 0,
+              "completion_tokens": 1810
+            }
+          },
+          "overlap_with_main_s": 21.419,
+          "exit_s": [
+            26.467
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790312055.211203,
+              "ended": 1790312485.914494,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 26.467,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 12,
+          "expected": 12
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 3,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 6,
+            "load1": {
+              "mean": 22.6,
+              "max": 22.56,
+              "min": 22.56
+            },
+            "gpu_device_pct": {
+              "mean": 1.3,
+              "max": 8,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 97.7,
+              "max": 98,
+              "min": 97
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 6,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 7.3,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 3.4,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.8,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 6,
+              "app_gpu_mean_pct": 13.4,
+              "app_gpu_p95_pct": 14.1,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 19.4,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 5.0
+        },
+        "during": {
+          "samples": 924,
+          "load1": {
+            "mean": 69.2,
+            "max": 113.94,
+            "min": 18.32
+          },
+          "gpu_device_pct": {
+            "mean": 77.4,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 95.0,
+            "max": 95,
+            "min": 95
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 924,
+          "gpu_by_process": [
+            {
+              "pid": 87729,
+              "name": "llama-server",
+              "pct": 51.6,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/llama-server --model /Volumes/Models/ollama-models/blobs/sha256-93567e57a8fe10b23569b9d9ec38cd005deedf71e29477c421",
+              "model": "hf.co/google/gemma-4-12B-it-qat-q4_0-gguf:Q4_0",
+              "model_names": [
+                "hf.co/google/gemma-4-12B-it-qat-q4_0-gguf:Q4_0"
+              ]
+            },
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 5.0,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.9,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 924,
+            "app_gpu_mean_pct": 6.9,
+            "app_gpu_p95_pct": 8.7,
+            "app_spike_seconds": 3,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 421,
+          "busy_pct": {
+            "mean": 31.5,
+            "max": 35.2,
+            "min": 28.1
+          }
+        },
+        "before_live": {
+          "t": 1790310926.074,
+          "load1": 23.82,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 2234859520,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1"
+            ],
+            "mlx-serve": [],
+            "splash": null
+          },
+          "user_idle_s": 6279.6
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "omp_version": "18.3.0",
+          "omp_sha": "33cf63aab3a109b3",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "9b3956a",
+        "created": "20260925T050128Z",
+        "tiers": [
+          "think",
+          "sess"
+        ],
+        "repeats": 1,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "think.reasoning_chars": {
+          "value": 1968,
+          "better": "lower",
+          "spread": [
+            1968,
+            1968
+          ],
+          "n": 1
+        },
+        "think.completion_tokens": {
+          "value": 1559,
+          "better": "lower",
+          "spread": [
+            1559,
+            1559
+          ],
+          "n": 1
+        },
+        "think.wall_s": {
+          "value": 21.9,
+          "better": "lower",
+          "spread": [
+            21.9,
+            21.9
+          ],
+          "n": 1
+        },
+        "think.accuracy": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 6
+        },
+        "sess.turn.wall_s": {
+          "value": 18.9141,
+          "better": "lower",
+          "spread": [
+            18.0266,
+            19.6644
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 20.3961,
+          "better": "lower",
+          "spread": [
+            20.0642,
+            20.7279
+          ],
+          "n": 2
+        },
+        "sess.turn.pre_main_s": {
+          "value": 2.8173,
+          "better": "lower",
+          "spread": [
+            1.68,
+            3.083
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0463,
+          "better": "lower",
+          "spread": [
+            4.0406,
+            4.0521
+          ],
+          "n": 2
+        },
+        "sess.turn.ack_rate": {
+          "value": 0.9167,
+          "better": "higher",
+          "spread": [
+            0.9167,
+            0.9167
+          ],
+          "n": 12
+        },
+        "sess.memory.extract_s": {
+          "value": 3.916,
+          "better": "lower",
+          "spread": [
+            3.251,
+            3.993
+          ],
+          "n": 3
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260925T050128Z__ab_a2__ollama__localbench-parked_5642e97495e1",
+      "details": {
+        "think": {
+          "hits": 6,
+          "attempts": 6,
+          "ci95": [
+            0.6097,
+            1.0
+          ],
+          "cut_off": 0,
+          "rounds": [
+            {
+              "task": "minutes",
+              "round": 0,
+              "expected": "157",
+              "answer": "157",
+              "hit": true,
+              "reasoning_chars": 403,
+              "completion_tokens": 354,
+              "wall_s": 5.14,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 0,
+              "expected": "1572",
+              "answer": "1572",
+              "hit": true,
+              "reasoning_chars": 246,
+              "completion_tokens": 266,
+              "wall_s": 3.8,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 0,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 226,
+              "completion_tokens": 159,
+              "wall_s": 2.21,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 0,
+              "expected": "bob",
+              "answer": "bob",
+              "hit": true,
+              "reasoning_chars": 333,
+              "completion_tokens": 148,
+              "wall_s": 2.09,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 0,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 549,
+              "completion_tokens": 445,
+              "wall_s": 6.07,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 0,
+              "expected": "26",
+              "answer": "26",
+              "hit": true,
+              "reasoning_chars": 211,
+              "completion_tokens": 187,
+              "wall_s": 2.59,
+              "finish": "stop",
+              "error": null
+            }
+          ]
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 1.845,
+            "min": 1.736,
+            "max": 1.954,
+            "n": 2
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 31.53,
+              "t_send": 1790312543.503776,
+              "t_end": 1790312575.0335228,
+              "ok": false,
+              "post_retain": false,
+              "reply": "Noted: project Falcon deploy code = **B927**.\n\n(Stored automatically from context for this session; no explicit memory-write tool is exposed to persist it beyon",
+              "pre_main": 6.306,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 18.193,
+              "t_send": 1790312575.049963,
+              "t_end": 1790312593.2425768,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 3.082,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 19.664,
+              "t_send": 1790312593.2433732,
+              "t_end": 1790312612.907818,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 3.043,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 18.027,
+              "t_send": 1790312612.9097412,
+              "t_end": 1790312630.936343,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.817,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 20.064,
+              "t_send": 1790312630.936914,
+              "t_end": 1790312651.001199,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.052,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 18.631,
+              "t_send": 1790312651.002021,
+              "t_end": 1790312669.6326761,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 3.083,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 19.372,
+              "t_send": 1790312669.6332328,
+              "t_end": 1790312689.0050108,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.978,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 18.481,
+              "t_send": 1790312689.005882,
+              "t_end": 1790312707.486913,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.586,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 20.728,
+              "t_send": 1790312707.4874282,
+              "t_end": 1790312728.21535,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.041,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 19.066,
+              "t_send": 1790312728.215798,
+              "t_end": 1790312747.281713,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.483,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 18.914,
+              "t_send": 1790312747.282013,
+              "t_end": 1790312766.196116,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.68,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 19.441,
+              "t_send": 1790312766.196717,
+              "t_end": 1790312785.6380532,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.813,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 3,
+              "busy_s": 11.159,
+              "not_ok": 0,
+              "completion_tokens": 444
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "exit_s": [
+            3.375
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790312541.906036,
+              "ended": 1790312789.014401,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 3.375,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 12,
+          "expected": 12
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 3,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 7,
+            "load1": {
+              "mean": 63.0,
+              "max": 63.44,
+              "min": 62.68
+            },
+            "gpu_device_pct": {
+              "mean": 2.1,
+              "max": 8,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 95.0,
+              "max": 95,
+              "min": 95
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 7,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 8.7,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.9,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 7,
+              "app_gpu_mean_pct": 11.7,
+              "app_gpu_p95_pct": 12.1,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 34.6,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 6.4
+        },
+        "during": {
+          "samples": 189,
+          "load1": {
+            "mean": 41.7,
+            "max": 58.92,
+            "min": 21.4
+          },
+          "gpu_device_pct": {
+            "mean": 94.9,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.9,
+            "max": 98,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 189,
+          "gpu_by_process": [
+            {
+              "pid": 88690,
+              "name": "ollama",
+              "pct": 64.4,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model localbench-parked:5642e97495e1 --port 52520",
+              "model": "localbench-parked:5642e97495e1"
+            },
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 20.1,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 4.2,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 1.9,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ],
+          "load": {
+            "samples": 189,
+            "app_gpu_mean_pct": 26.6,
+            "app_gpu_p95_pct": 41.1,
+            "app_spike_seconds": 96,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 95,
+          "busy_pct": {
+            "mean": 32.7,
+            "max": 36.5,
+            "min": 24.2
+          }
+        },
+        "before_live": {
+          "t": 1790312489.3874738,
+          "load1": 63.44,
+          "free_pct": 95,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 16483827712,
+          "resident": {
+            "ollama": [
+              "hf.co/google/gemma-4-12B-it-qat-q4_0-gguf:Q4_0"
+            ],
+            "mlx-serve": [],
+            "splash": null
+          },
+          "user_idle_s": 7842.9
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

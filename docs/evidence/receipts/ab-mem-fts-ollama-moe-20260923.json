@@ -1,0 +1,1279 @@
+{
+  "kind": "ab",
+  "a": "ollama:qwen3.6:35b-mlx",
+  "b": "ollama:qwen3.6:35b-mlx",
+  "order": [
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [
+    "ab_a1: MUST FAIL: mem.no_leak"
+  ],
+  "table": {
+    "mem.recall.hit_rate": {
+      "a1": 1.0,
+      "a2": 1.0,
+      "b": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.pre_main_s": {
+      "a1": 3.0836,
+      "a2": 5.2469,
+      "b": 2.476,
+      "better": "lower",
+      "aa_rel_spread": 0.5194,
+      "band": 1.5581,
+      "b_over_a": 0.594,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.wall_s": {
+      "a1": 4.015,
+      "a2": 6.6885,
+      "b": 3.1459,
+      "better": "lower",
+      "aa_rel_spread": 0.4996,
+      "band": 1.4987,
+      "b_over_a": 0.588,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.plant.wall_s": {
+      "a1": 2.7978,
+      "a2": 5.1404,
+      "b": 2.146,
+      "better": "lower",
+      "aa_rel_spread": 0.5902,
+      "band": 1.7706,
+      "b_over_a": 0.541,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.derail.ok_rate": {
+      "a1": 1.0,
+      "a2": 0.8889,
+      "b": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.1176,
+      "band": 0.3529,
+      "b_over_a": 1.059,
+      "verdict": "WITHIN-NOISE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "7495d27",
+        "created": "20260923T164729Z",
+        "tiers": [
+          "mem"
+        ],
+        "repeats": 3,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [
+          "mem.no_leak"
+        ],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 9
+        },
+        "mem.recall.pre_main_s": {
+          "value": 3.0836,
+          "better": "lower",
+          "spread": [
+            2.2375,
+            5.2632
+          ],
+          "n": 9
+        },
+        "mem.recall.wall_s": {
+          "value": 4.015,
+          "better": "lower",
+          "spread": [
+            3.0255,
+            9.3903
+          ],
+          "n": 9
+        },
+        "mem.plant.wall_s": {
+          "value": 2.7978,
+          "better": "lower",
+          "spread": [
+            2.5037,
+            6.7307
+          ],
+          "n": 9
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20260923T164729Z__ab_a1__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.recall": {
+          "hits": 9,
+          "attempts": 9,
+          "ci95": [
+            0.7008,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-6224",
+              "hit": true,
+              "recall_answer": "ZEBRA-6224",
+              "plant_answer": "NOTED",
+              "control_answer": "The current working directory (`/tmp/localbench-mem-021ac673-control-code-0`) is",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "57829",
+              "hit": true,
+              "recall_answer": "57829",
+              "plant_answer": "NOTED",
+              "control_answer": "The working directory is empty and no information about \"project Falcon\" or its ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "There is no project \"Falcon\" in this environment. The working directory is empty",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-9284",
+              "hit": true,
+              "recall_answer": "ZEBRA-9284",
+              "plant_answer": "NOTED",
+              "control_answer": "No project called \"Falcon\" exists in this environment, and there's no deploy cod",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "54473",
+              "hit": true,
+              "recall_answer": "54473",
+              "plant_answer": "NOTED",
+              "control_answer": "5432",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Lindqvist",
+              "hit": true,
+              "recall_answer": "Lindqvist",
+              "plant_answer": "NOTED",
+              "control_answer": "I've searched extensively across all SQLite databases (am-recovered, am-backup, ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-8899",
+              "hit": true,
+              "recall_answer": "ZEBRA-8899",
+              "plant_answer": "NOTED",
+              "control_answer": "After extensive searching across all databases, filesystem locations, and config",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "29534",
+              "hit": true,
+              "recall_answer": "29534",
+              "plant_answer": "NOTED",
+              "control_answer": "",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "I cannot determine the on-call owner for project Falcon. The working directory `",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "injected_tokens": {
+            "median": 83.0,
+            "min": 81,
+            "max": 83
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": [
+            {
+              "fact": "owner",
+              "round": 1,
+              "answer": "I've searched extensively across all SQLite databases (am-recovered, am-backup, projects.db, agent-memory), all JSON files under /tmp and ~/Desktop/Pr"
+            }
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 3,
+            "load1": {
+              "mean": 2.9,
+              "max": 2.85,
+              "min": 2.85
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 1.5,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.3,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 5.3,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.8
+        },
+        "during": {
+          "samples": 1102,
+          "load1": {
+            "mean": 3.3,
+            "max": 5.13,
+            "min": 2.26
+          },
+          "gpu_device_pct": {
+            "mean": 58.1,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 94.6,
+            "max": 98,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 92325,
+              "name": "ollama",
+              "pct": 50.1,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 55960",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.9,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 1.0,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 603,
+          "busy_pct": {
+            "mean": 8.4,
+            "max": 25.3,
+            "min": 3.9
+          }
+        },
+        "before_live": {
+          "t": 1790182050.60384,
+          "load1": 2.85,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1831436288,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "3f3912800dc922f9",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "7495d27",
+        "created": "20260923T171004Z",
+        "tiers": [
+          "mem"
+        ],
+        "repeats": 3,
+        "label": "ab_b"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 9
+        },
+        "mem.recall.pre_main_s": {
+          "value": 2.476,
+          "better": "lower",
+          "spread": [
+            1.6681,
+            3.9605
+          ],
+          "n": 9
+        },
+        "mem.recall.wall_s": {
+          "value": 3.1459,
+          "better": "lower",
+          "spread": [
+            2.3404,
+            7.0566
+          ],
+          "n": 9
+        },
+        "mem.plant.wall_s": {
+          "value": 2.146,
+          "better": "lower",
+          "spread": [
+            1.6728,
+            6.0232
+          ],
+          "n": 9
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260923T171004Z__ab_b__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.recall": {
+          "hits": 9,
+          "attempts": 9,
+          "ci95": [
+            0.7008,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-8093",
+              "hit": true,
+              "recall_answer": "ZEBRA-8093",
+              "plant_answer": "NOTED",
+              "control_answer": "No project named \"Falcon\" exists in this workspace or anywhere on this system. T",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "27278",
+              "hit": true,
+              "recall_answer": "27278",
+              "plant_answer": "NOTED",
+              "control_answer": "No data found \u2014 the directory contains no files referencing project Falcon or an",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Adeyemi",
+              "hit": true,
+              "recall_answer": "Adeyemi",
+              "plant_answer": "NOTED",
+              "control_answer": "I cannot find a project called \"Falcon\" anywhere in this workspace or on the sys",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-8519",
+              "hit": true,
+              "recall_answer": "ZEBRA-8519",
+              "plant_answer": "NOTED",
+              "control_answer": "I can't find any information about a \"Project Falcon\" or its deploy code in the ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "45542",
+              "hit": true,
+              "recall_answer": "45542",
+              "plant_answer": "NOTED",
+              "control_answer": "The answer is **41024**.\n\nFound in `mem-103.json` which contains the plant promp",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "After an exhaustive search across the filesystem \u2014 including `/tmp/` and all sub",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-9031",
+              "hit": true,
+              "recall_answer": "ZEBRA-9031",
+              "plant_answer": "NOTED",
+              "control_answer": "I cannot find any deploy code for project Falcon \u2014 the current working directory",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "28423",
+              "hit": true,
+              "recall_answer": "28423",
+              "plant_answer": "NOTED",
+              "control_answer": "The working directory is empty and contains no configuration, code, or reference",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Moreau",
+              "hit": true,
+              "recall_answer": "Moreau",
+              "plant_answer": "NOTED",
+              "control_answer": "I cannot find any data about \"project Falcon\" or an on-call owner calendar anywh",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem-fts.yml",
+          "injected_tokens": {
+            "median": 83,
+            "min": 80,
+            "max": 83
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 3,
+            "load1": {
+              "mean": 3.2,
+              "max": 3.18,
+              "min": 3.18
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.8,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.3,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 6.2,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.8
+        },
+        "during": {
+          "samples": 614,
+          "load1": {
+            "mean": 2.8,
+            "max": 4.26,
+            "min": 1.95
+          },
+          "gpu_device_pct": {
+            "mean": 63.4,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 94.4,
+            "max": 98,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 45297,
+              "name": "ollama",
+              "pct": 55.3,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 61707",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.8,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 337,
+          "busy_pct": {
+            "mean": 7.1,
+            "max": 12.7,
+            "min": 3.7
+          }
+        },
+        "before_live": {
+          "t": 1790183405.0402439,
+          "load1": 3.28,
+          "free_pct": 94,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 25021939712,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "7495d27",
+        "created": "20260923T172312Z",
+        "tiers": [
+          "mem"
+        ],
+        "repeats": 3,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 9
+        },
+        "mem.recall.pre_main_s": {
+          "value": 5.2469,
+          "better": "lower",
+          "spread": [
+            4.7198,
+            7.4136
+          ],
+          "n": 9
+        },
+        "mem.recall.wall_s": {
+          "value": 6.6885,
+          "better": "lower",
+          "spread": [
+            5.6755,
+            8.8725
+          ],
+          "n": 9
+        },
+        "mem.plant.wall_s": {
+          "value": 5.1404,
+          "better": "lower",
+          "spread": [
+            3.8205,
+            9.4472
+          ],
+          "n": 9
+        },
+        "mem.derail.ok_rate": {
+          "value": 0.8889,
+          "better": "higher",
+          "spread": [
+            0.8889,
+            0.8889
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260923T172312Z__ab_a2__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.recall": {
+          "hits": 9,
+          "attempts": 9,
+          "ci95": [
+            0.7008,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-5567",
+              "hit": true,
+              "recall_answer": "ZEBRA-5567",
+              "plant_answer": "NOTED",
+              "control_answer": "No project named \"Falcon\" exists in this workspace. The directory is empty \u2014 the",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "53817",
+              "hit": true,
+              "recall_answer": "53817",
+              "plant_answer": "NOTED",
+              "control_answer": "3000",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Moreau",
+              "hit": true,
+              "recall_answer": "Moreau",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any information about a \"Falcon\" project or its on-call roster in t",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-7836",
+              "hit": true,
+              "recall_answer": "ZEBRA-7836",
+              "plant_answer": "NOTED",
+              "control_answer": "ZEBRA-5567",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "34211",
+              "hit": true,
+              "recall_answer": "34211",
+              "plant_answer": "NOTED",
+              "control_answer": "The working directory (`/tmp/localbench-mem-3cb63637-control-port-1`) is complet",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Moreau",
+              "hit": true,
+              "recall_answer": "Moreau",
+              "plant_answer": "NOTED",
+              "control_answer": "Project **Falcon** does not exist in any project register I can find. No `slug`,",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-9585",
+              "hit": true,
+              "recall_answer": "ZEBRA-9585",
+              "plant_answer": "NOTED",
+              "control_answer": "There is no deploy code for a project called \"Falcon\" in this workspace \u2014 it app",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "23153",
+              "hit": true,
+              "recall_answer": "23153",
+              "plant_answer": "NOTED",
+              "control_answer": "The working directory is completely empty \u2014 there is no project Falcon or its st",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Adeyemi",
+              "hit": true,
+              "recall_answer": "Adeyemi",
+              "plant_answer": "NOTED",
+              "control_answer": "The working directory `/tmp/localbench-mem-3cb63637-control-owner-2/` is empty a",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "injected_tokens": {
+            "median": 83.0,
+            "min": 80,
+            "max": 86
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": [
+            {
+              "fact": "owner",
+              "round": 0,
+              "answer": "OK\n\n### 1. **Introduction and Definitions (Rules 1\u201312)**\n\nThis RFC lists requirements language (`MUST`, `SHALL`, `SHOULD`, etc.) and defines how to interpret th"
+            }
+          ]
+        },
+        "mem.no_leak": {
+          "leaks": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 3,
+            "load1": {
+              "mean": 3.3,
+              "max": 3.34,
+              "min": 3.34
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.7,
+              "max": 98,
+              "min": 94
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 3.2,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.4,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 6.1,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.9
+        },
+        "during": {
+          "samples": 803,
+          "load1": {
+            "mean": 4.2,
+            "max": 8.23,
+            "min": 2.5
+          },
+          "gpu_device_pct": {
+            "mean": 44.2,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 95.2,
+            "max": 98,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 63411,
+              "name": "ollama",
+              "pct": 36.3,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model qwen3.6:35b-mlx --port 65473",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 2.3,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 1.1,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 439,
+          "busy_pct": {
+            "mean": 10.0,
+            "max": 23.8,
+            "min": 4.0
+          }
+        },
+        "before_live": {
+          "t": 1790184192.623822,
+          "load1": 3.34,
+          "free_pct": 94,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 25018662912,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

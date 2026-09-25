@@ -1,0 +1,11 @@
+# mem/sess tier variant: memory on (recall + retain), no memory LLM: retention stores the transcript without an
+# extraction call. Run as the B leg of `localbench ab <spec> <spec> --tiers sess --b-mem-config=<this file>`.
+# Consumer: the coexistence A/B (ledger 2026-09-23, "retention's memory-LLM call is free in an interactive omp
+# session": post-retain turns paid +7.3 s while extraction shared the GPU). Delete when: that row's retry predicate
+# is settled and this variant is not the recommended config.
+memory:
+  backend: mnemopi
+mnemopi:
+  autoRecall: true
+  autoRetain: true
+  llmMode: none

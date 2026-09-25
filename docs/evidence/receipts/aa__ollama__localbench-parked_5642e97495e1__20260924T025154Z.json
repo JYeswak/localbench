@@ -1,0 +1,818 @@
+{
+  "kind": "aa",
+  "runs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "omp_version": "18.3.0",
+          "omp_sha": "33cf63aab3a109b3",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "163972f",
+        "created": "20260924T025154Z",
+        "tiers": [
+          "e2e",
+          "replay"
+        ],
+        "repeats": 3,
+        "label": "aa1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "e2e.tool_read.first_wall_s": {
+          "value": 17.0758,
+          "better": "lower",
+          "spread": [
+            17.0758,
+            17.0758
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 13.682,
+          "better": "lower",
+          "spread": [
+            13.682,
+            13.682
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 3.532,
+          "better": "lower",
+          "spread": [
+            3.532,
+            3.532
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.492,
+          "better": "lower",
+          "spread": [
+            1.492,
+            1.492
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 15.1325,
+          "better": "lower",
+          "spread": [
+            15.1325,
+            15.1325
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 12.38,
+          "better": "lower",
+          "spread": [
+            12.38,
+            12.38
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 2.2183,
+          "better": "lower",
+          "spread": [
+            2.2183,
+            2.2183
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.288,
+          "better": "lower",
+          "spread": [
+            0.288,
+            0.288
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 254.5652,
+          "better": "lower",
+          "spread": [
+            254.5652,
+            254.5652
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.4047,
+          "better": "lower",
+          "spread": [
+            0.4047,
+            0.4047
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.5346,
+          "better": "lower",
+          "spread": [
+            0.5346,
+            0.5346
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 35.1704,
+          "better": "lower",
+          "spread": [
+            35.1704,
+            35.1704
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1617,
+          "better": "lower",
+          "spread": [
+            0.1617,
+            0.1617
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.3033,
+          "better": "lower",
+          "spread": [
+            0.3033,
+            0.3033
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260924T025154Z__aa1__ollama__localbench-parked_5642e97495e1",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 1.033,
+            "llm_s": 13.682,
+            "aux_s": 2.242,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 2.242,
+                "aborted": 0,
+                "completion_tokens": 82
+              }
+            }
+          },
+          "input": 10515,
+          "output": 104,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817",
+            "4817"
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 0.841,
+            "llm_s": 12.38,
+            "aux_s": 1.849,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 1.849,
+                "aborted": 0,
+                "completion_tokens": 65
+              }
+            }
+          },
+          "input": 5191,
+          "output": 15,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 15.2,
+              "max": 15.37,
+              "min": 15.1
+            },
+            "gpu_device_pct": {
+              "mean": 0.8,
+              "max": 3,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 3.2,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.5,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ]
+          },
+          "cpu_busy_pct": 17.5,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 334.9
+        },
+        "during": {
+          "samples": 270,
+          "load1": {
+            "mean": 11.9,
+            "max": 20.69,
+            "min": 6.23
+          },
+          "gpu_device_pct": {
+            "mean": 95.3,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.6,
+            "max": 98,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 12,
+          "gpu_by_process": [
+            {
+              "pid": 3350,
+              "name": "ollama",
+              "pct": 67.2,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model localbench-parked:5642e97495e1 --port 57763",
+              "model": "localbench-parked:5642e97495e1"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 10.1,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 5.6,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 156,
+          "busy_pct": {
+            "mean": 22.5,
+            "max": 41.6,
+            "min": 10.6
+          }
+        },
+        "before_live": {
+          "t": 1790218317.024145,
+          "load1": 21.64,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 2381938688,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "omp_version": "18.3.0",
+          "omp_sha": "33cf63aab3a109b3",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "163972f",
+        "created": "20260924T030408Z",
+        "tiers": [
+          "e2e",
+          "replay"
+        ],
+        "repeats": 3,
+        "label": "aa2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "e2e.tool_read.first_wall_s": {
+          "value": 20.5575,
+          "better": "lower",
+          "spread": [
+            20.5575,
+            20.5575
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 16.862,
+          "better": "lower",
+          "spread": [
+            16.862,
+            16.862
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 3.6311,
+          "better": "lower",
+          "spread": [
+            3.6311,
+            3.6311
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.348,
+          "better": "lower",
+          "spread": [
+            1.348,
+            1.348
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 17.5295,
+          "better": "lower",
+          "spread": [
+            17.5295,
+            17.5295
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 14.693,
+          "better": "lower",
+          "spread": [
+            14.693,
+            14.693
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 2.0852,
+          "better": "lower",
+          "spread": [
+            2.0852,
+            2.0852
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.336,
+          "better": "lower",
+          "spread": [
+            0.336,
+            0.336
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 288.2791,
+          "better": "lower",
+          "spread": [
+            288.2791,
+            288.2791
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.4015,
+          "better": "lower",
+          "spread": [
+            0.4015,
+            0.4015
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.671,
+          "better": "lower",
+          "spread": [
+            0.671,
+            0.671
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 33.2725,
+          "better": "lower",
+          "spread": [
+            33.2725,
+            33.2725
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.2338,
+          "better": "lower",
+          "spread": [
+            0.2338,
+            0.2338
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.333,
+          "better": "lower",
+          "spread": [
+            0.333,
+            0.333
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260924T030408Z__aa2__ollama__localbench-parked_5642e97495e1",
+      "details": {
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 1.344,
+            "llm_s": 16.862,
+            "aux_s": 2.222,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 2.222,
+                "aborted": 0,
+                "completion_tokens": 82
+              }
+            }
+          },
+          "input": 10501,
+          "output": 89,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817",
+            "4817"
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": null,
+            "startup_s": 0.917,
+            "llm_s": 14.693,
+            "aux_s": 1.857,
+            "side": {
+              "auto-thinking": {
+                "calls": 1,
+                "busy_s": 1.857,
+                "aborted": 0,
+                "completion_tokens": 65
+              }
+            }
+          },
+          "input": 5191,
+          "output": 21,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 5,
+            "load1": {
+              "mean": 13.8,
+              "max": 13.79,
+              "min": 13.79
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.9,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 2.7,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 22.7,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 5.6
+        },
+        "during": {
+          "samples": 280,
+          "load1": {
+            "mean": 15.0,
+            "max": 26.29,
+            "min": 6.52
+          },
+          "gpu_device_pct": {
+            "mean": 99.2,
+            "max": 100,
+            "min": 83
+          },
+          "free_pct": {
+            "mean": 93.4,
+            "max": 97,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 37483,
+              "name": "ollama",
+              "pct": 75.5,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --mlx-engine --model localbench-parked:5642e97495e1 --port 50798",
+              "model": "localbench-parked:5642e97495e1"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 9.3,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 6.2,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 149,
+          "busy_pct": {
+            "mean": 23.2,
+            "max": 31.7,
+            "min": 9.2
+          }
+        },
+        "before_live": {
+          "t": 1790219048.9198642,
+          "load1": 13.86,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1492992000,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1"
+            ],
+            "mlx-serve": [],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ],
+  "problems": []
+}

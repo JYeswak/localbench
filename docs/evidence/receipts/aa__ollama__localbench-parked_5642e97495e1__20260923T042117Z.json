@@ -1,0 +1,848 @@
+{
+  "kind": "aa",
+  "runs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "omp_version": "18.2.10",
+          "omp_sha": "acf06c76a4969558",
+          "omp_path": "~/.bun/bin/omp",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "daebfe2-dirty",
+        "created": "20260923T042117Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "aa1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 59.3607,
+          "better": "higher",
+          "spread": [
+            58.6847,
+            60.2875
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.2787,
+          "better": "lower",
+          "spread": [
+            0.2762,
+            0.4308
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 342.5158,
+          "better": "higher",
+          "spread": [
+            323.4729,
+            351.3525
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 3.2174,
+          "better": "lower",
+          "spread": [
+            3.1251,
+            3.3975
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 343.8348,
+          "better": "higher",
+          "spread": [
+            335.1627,
+            344.1006
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 25.3319,
+          "better": "lower",
+          "spread": [
+            25.3153,
+            25.9784
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 302.7771,
+          "better": "higher",
+          "spread": [
+            301.2526,
+            304.4702
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 115.6395,
+          "better": "lower",
+          "spread": [
+            115.0129,
+            116.2347
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.1651,
+          "better": "lower",
+          "spread": [
+            0.1651,
+            0.1651
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 153.6805,
+          "better": "higher",
+          "spread": [
+            153.6805,
+            153.6805
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.2771,
+          "better": "lower",
+          "spread": [
+            0.2771,
+            0.2771
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 287.8919,
+          "better": "lower",
+          "spread": [
+            287.8919,
+            287.8919
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.2088,
+          "better": "lower",
+          "spread": [
+            0.2088,
+            0.2088
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.4449,
+          "better": "lower",
+          "spread": [
+            0.4449,
+            0.4449
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 34.1423,
+          "better": "lower",
+          "spread": [
+            34.1423,
+            34.1423
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1474,
+          "better": "lower",
+          "spread": [
+            0.1474,
+            0.1474
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.2212,
+          "better": "lower",
+          "spread": [
+            0.2212,
+            0.2212
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 38.6646,
+          "better": "lower",
+          "spread": [
+            38.6646,
+            38.6646
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 34.959,
+          "better": "lower",
+          "spread": [
+            34.959,
+            34.959
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 4.1016,
+          "better": "lower",
+          "spread": [
+            4.1016,
+            4.1016
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.249,
+          "better": "lower",
+          "spread": [
+            1.249,
+            1.249
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 37.2814,
+          "better": "lower",
+          "spread": [
+            37.2814,
+            37.2814
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 33.229,
+          "better": "lower",
+          "spread": [
+            33.229,
+            33.229
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 2.7703,
+          "better": "lower",
+          "spread": [
+            2.7703,
+            2.7703
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.29,
+          "better": "lower",
+          "spread": [
+            0.29,
+            0.29
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260923T042117Z__aa1__ollama__localbench-parked_5642e97495e1",
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 5,
+            "load1": {
+              "mean": 7.5,
+              "max": 7.57,
+              "min": 7.45
+            },
+            "gpu_device_pct": {
+              "mean": 1.8,
+              "max": 5,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 98.0,
+              "max": 98,
+              "min": 98
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0
+          },
+          "cpu_busy_pct": 18.6,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 3.3
+        },
+        "during": {
+          "samples": 969,
+          "load1": {
+            "mean": 5.0,
+            "max": 7.96,
+            "min": 2.79
+          },
+          "gpu_device_pct": {
+            "mean": 99.1,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.6,
+            "max": 98,
+            "min": 90
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 4
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 538,
+          "busy_pct": {
+            "mean": 11.4,
+            "max": 32.7,
+            "min": 5.3
+          }
+        },
+        "before_live": {
+          "t": 1790137278.5595698,
+          "load1": 7.45,
+          "free_pct": 98,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1312915456,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "omp_version": "18.2.10",
+          "omp_sha": "acf06c76a4969558",
+          "omp_path": "~/.bun/bin/omp",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "daebfe2-dirty",
+        "created": "20260923T044143Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "aa2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 62.5516,
+          "better": "higher",
+          "spread": [
+            60.3066,
+            63.6246
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.2776,
+          "better": "lower",
+          "spread": [
+            0.2759,
+            0.3828
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 359.8242,
+          "better": "higher",
+          "spread": [
+            344.038,
+            372.3808
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 3.0543,
+          "better": "lower",
+          "spread": [
+            2.962,
+            3.2002
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 362.9875,
+          "better": "higher",
+          "spread": [
+            357.9901,
+            365.1672
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 23.9898,
+          "better": "lower",
+          "spread": [
+            23.8384,
+            24.3247
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 329.0503,
+          "better": "higher",
+          "spread": [
+            328.5579,
+            329.5656
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 106.4214,
+          "better": "lower",
+          "spread": [
+            106.249,
+            106.5779
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.1442,
+          "better": "lower",
+          "spread": [
+            0.1442,
+            0.1442
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 168.4546,
+          "better": "higher",
+          "spread": [
+            168.4546,
+            168.4546
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.1828,
+          "better": "lower",
+          "spread": [
+            0.1828,
+            0.1828
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 268.9245,
+          "better": "lower",
+          "spread": [
+            268.9245,
+            268.9245
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.3622,
+          "better": "lower",
+          "spread": [
+            0.3622,
+            0.3622
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.4518,
+          "better": "lower",
+          "spread": [
+            0.4518,
+            0.4518
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 31.8053,
+          "better": "lower",
+          "spread": [
+            31.8053,
+            31.8053
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1776,
+          "better": "lower",
+          "spread": [
+            0.1776,
+            0.1776
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.2495,
+          "better": "lower",
+          "spread": [
+            0.2495,
+            0.2495
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 36.0498,
+          "better": "lower",
+          "spread": [
+            36.0498,
+            36.0498
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 32.352,
+          "better": "lower",
+          "spread": [
+            32.352,
+            32.352
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 4.9906,
+          "better": "lower",
+          "spread": [
+            4.9906,
+            4.9906
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.477,
+          "better": "lower",
+          "spread": [
+            1.477,
+            1.477
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 36.1699,
+          "better": "lower",
+          "spread": [
+            36.1699,
+            36.1699
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 30.609,
+          "better": "lower",
+          "spread": [
+            30.609,
+            30.609
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 2.9567,
+          "better": "lower",
+          "spread": [
+            2.9567,
+            2.9567
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.39,
+          "better": "lower",
+          "spread": [
+            0.39,
+            0.39
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260923T044143Z__aa2__ollama__localbench-parked_5642e97495e1",
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 5,
+            "load1": {
+              "mean": 4.7,
+              "max": 4.77,
+              "min": 4.63
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 97.4,
+              "max": 98,
+              "min": 95
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0
+          },
+          "cpu_busy_pct": 9.5,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.8
+        },
+        "during": {
+          "samples": 931,
+          "load1": {
+            "mean": 2.9,
+            "max": 4.74,
+            "min": 1.92
+          },
+          "gpu_device_pct": {
+            "mean": 98.5,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.6,
+            "max": 98,
+            "min": 89
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 7
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 519,
+          "busy_pct": {
+            "mean": 7.8,
+            "max": 42.4,
+            "min": 4.0
+          }
+        },
+        "before_live": {
+          "t": 1790138503.564518,
+          "load1": 4.77,
+          "free_pct": 95,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 19642859520,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1"
+            ],
+            "mlx-serve": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ],
+  "problems": []
+}

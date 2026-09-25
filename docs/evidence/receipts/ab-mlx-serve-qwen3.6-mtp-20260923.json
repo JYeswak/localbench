@@ -1,0 +1,1337 @@
+{
+  "kind": "ab",
+  "a": "mlx-serve:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit",
+  "b": "mlx-serve:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit",
+  "order": [
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [],
+  "table": {
+    "micro.decode.decode_tps": {
+      "a1": 162.783,
+      "a2": 164.1611,
+      "b": 187.9573,
+      "better": "higher",
+      "aa_rel_spread": 0.0084,
+      "band": 0.05,
+      "b_over_a": 1.15,
+      "verdict": "B-BETTER"
+    },
+    "micro.decode.ttft_s": {
+      "a1": 0.0769,
+      "a2": 0.0759,
+      "b": 0.0827,
+      "better": "lower",
+      "aa_rel_spread": 0.0131,
+      "band": 0.1,
+      "b_over_a": 1.082,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_1k.prefill_tps": {
+      "a1": 2648.8801,
+      "a2": 2621.7109,
+      "b": 2546.8219,
+      "better": "higher",
+      "aa_rel_spread": 0.0103,
+      "band": 0.05,
+      "b_over_a": 0.966,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_1k.ttft_s": {
+      "a1": 0.416,
+      "a2": 0.4203,
+      "b": 0.4331,
+      "better": "lower",
+      "aa_rel_spread": 0.0103,
+      "band": 0.1,
+      "b_over_a": 1.036,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_8k.prefill_tps": {
+      "a1": 2954.2939,
+      "a2": 2952.9709,
+      "b": 2930.1377,
+      "better": "higher",
+      "aa_rel_spread": 0.0004,
+      "band": 0.05,
+      "b_over_a": 0.992,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_8k.ttft_s": {
+      "a1": 2.9483,
+      "a2": 2.9506,
+      "b": 2.9726,
+      "better": "lower",
+      "aa_rel_spread": 0.0008,
+      "band": 0.1,
+      "b_over_a": 1.008,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_32k.prefill_tps": {
+      "a1": 2199.2191,
+      "a2": 2195.2349,
+      "b": 2195.4392,
+      "better": "higher",
+      "aa_rel_spread": 0.0018,
+      "band": 0.05,
+      "b_over_a": 0.999,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_32k.ttft_s": {
+      "a1": 15.9252,
+      "a2": 15.9523,
+      "b": 15.9508,
+      "better": "lower",
+      "aa_rel_spread": 0.0017,
+      "band": 0.1,
+      "b_over_a": 1.001,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.cache_hit_8k.warm_ttft_s": {
+      "a1": 0.0904,
+      "a2": 0.0914,
+      "b": 0.1015,
+      "better": "lower",
+      "aa_rel_spread": 0.011,
+      "band": 0.1,
+      "b_over_a": 1.117,
+      "verdict": "B-WORSE"
+    },
+    "micro.cache_hit_8k.speedup_x": {
+      "a1": 32.7099,
+      "a2": 32.2398,
+      "b": 29.0933,
+      "better": "higher",
+      "aa_rel_spread": 0.0145,
+      "band": 0.05,
+      "b_over_a": 0.896,
+      "verdict": "B-WORSE"
+    },
+    "micro.eviction_probe_8k.a_again_ttft_s": {
+      "a1": 0.0247,
+      "a2": 0.0232,
+      "b": 0.0309,
+      "better": "lower",
+      "aa_rel_spread": 0.0626,
+      "band": 0.1879,
+      "b_over_a": 1.29,
+      "verdict": "B-WORSE"
+    },
+    "replay.full.cold_ttft_s": {
+      "a1": 44.6929,
+      "a2": 44.8627,
+      "b": 44.749,
+      "better": "lower",
+      "aa_rel_spread": 0.0038,
+      "band": 0.1,
+      "b_over_a": 0.999,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.full.warm_ttft_s": {
+      "a1": 0.3442,
+      "a2": 0.3431,
+      "b": 0.3909,
+      "better": "lower",
+      "aa_rel_spread": 0.0032,
+      "band": 0.1,
+      "b_over_a": 1.137,
+      "verdict": "B-WORSE"
+    },
+    "replay.full.turn2_ttft_s": {
+      "a1": 0.7061,
+      "a2": 0.7043,
+      "b": 0.7435,
+      "better": "lower",
+      "aa_rel_spread": 0.0026,
+      "band": 0.1,
+      "b_over_a": 1.054,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.lean.cold_ttft_s": {
+      "a1": 3.8017,
+      "a2": 3.8182,
+      "b": 3.8233,
+      "better": "lower",
+      "aa_rel_spread": 0.0043,
+      "band": 0.1,
+      "b_over_a": 1.004,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.lean.warm_ttft_s": {
+      "a1": 0.0982,
+      "a2": 0.0982,
+      "b": 0.1105,
+      "better": "lower",
+      "aa_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 1.125,
+      "verdict": "B-WORSE"
+    },
+    "replay.lean.turn2_ttft_s": {
+      "a1": 0.16,
+      "a2": 0.1599,
+      "b": 0.1703,
+      "better": "lower",
+      "aa_rel_spread": 0.0006,
+      "band": 0.1,
+      "b_over_a": 1.065,
+      "verdict": "WITHIN-NOISE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "4-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "ae2f784-dirty",
+        "created": "20260923T161044Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay"
+        ],
+        "repeats": 3,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 162.783,
+          "better": "higher",
+          "spread": [
+            162.1637,
+            162.9337
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.0769,
+          "better": "lower",
+          "spread": [
+            0.0769,
+            0.0775
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2648.8801,
+          "better": "higher",
+          "spread": [
+            2638.377,
+            2667.6301
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.416,
+          "better": "lower",
+          "spread": [
+            0.4131,
+            0.4173
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2954.2939,
+          "better": "higher",
+          "spread": [
+            2949.0005,
+            2955.2526
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 2.9483,
+          "better": "lower",
+          "spread": [
+            2.9476,
+            2.9529
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 2199.2191,
+          "better": "higher",
+          "spread": [
+            2198.2853,
+            2201.8554
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 15.9252,
+          "better": "lower",
+          "spread": [
+            15.9043,
+            15.9311
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.0904,
+          "better": "lower",
+          "spread": [
+            0.0904,
+            0.0904
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 32.7099,
+          "better": "higher",
+          "spread": [
+            32.7099,
+            32.7099
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.0247,
+          "better": "lower",
+          "spread": [
+            0.0247,
+            0.0247
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 44.6929,
+          "better": "lower",
+          "spread": [
+            44.6929,
+            44.6929
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.3442,
+          "better": "lower",
+          "spread": [
+            0.3442,
+            0.3442
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.7061,
+          "better": "lower",
+          "spread": [
+            0.7061,
+            0.7061
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 3.8017,
+          "better": "lower",
+          "spread": [
+            3.8017,
+            3.8017
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.0982,
+          "better": "lower",
+          "spread": [
+            0.0982,
+            0.0982
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.16,
+          "better": "lower",
+          "spread": [
+            0.16,
+            0.16
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20260923T161044Z__ab_a1__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {},
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 2.3,
+              "max": 2.38,
+              "min": 2.24
+            },
+            "gpu_device_pct": {
+              "mean": 0.8,
+              "max": 3,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.0,
+              "max": 98,
+              "min": 94
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 1.7,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.4,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 6.1,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.8
+        },
+        "during": {
+          "samples": 149,
+          "load1": {
+            "mean": 2.0,
+            "max": 2.68,
+            "min": 1.47
+          },
+          "gpu_device_pct": {
+            "mean": 98.8,
+            "max": 100,
+            "min": 95
+          },
+          "free_pct": {
+            "mean": 93.1,
+            "max": 94,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 58242,
+              "name": "mlx-serve",
+              "pct": 91.1,
+              "cmd": "mlx-serve --model ~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit --serve --host 127.0.0.1 --port 11234 --metrics",
+              "model": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 4.2,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 3.2,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 77,
+          "busy_pct": {
+            "mean": 4.5,
+            "max": 8.2,
+            "min": 2.1
+          }
+        },
+        "before_live": {
+          "t": 1790179845.308353,
+          "load1": 2.24,
+          "free_pct": 94,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 22444359680,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            ],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "--mtp",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "--mtp",
+          "architecture": "qwen3_5_moe",
+          "quantization": "4-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "ae2f784-dirty",
+        "created": "20260923T161343Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay"
+        ],
+        "repeats": 3,
+        "label": "ab_b"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 187.9573,
+          "better": "higher",
+          "spread": [
+            187.9358,
+            229.0121
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.0827,
+          "better": "lower",
+          "spread": [
+            0.0804,
+            0.0857
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2546.8219,
+          "better": "higher",
+          "spread": [
+            2523.4597,
+            2552.9523
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.4331,
+          "better": "lower",
+          "spread": [
+            0.4301,
+            0.4351
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2930.1377,
+          "better": "higher",
+          "spread": [
+            2922.3704,
+            2939.4386
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 2.9726,
+          "better": "lower",
+          "spread": [
+            2.9628,
+            2.9798
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 2195.4392,
+          "better": "higher",
+          "spread": [
+            2194.6183,
+            2195.8151
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 15.9508,
+          "better": "lower",
+          "spread": [
+            15.9494,
+            15.9568
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.1015,
+          "better": "lower",
+          "spread": [
+            0.1015,
+            0.1015
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 29.0933,
+          "better": "higher",
+          "spread": [
+            29.0933,
+            29.0933
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.0309,
+          "better": "lower",
+          "spread": [
+            0.0309,
+            0.0309
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 44.749,
+          "better": "lower",
+          "spread": [
+            44.749,
+            44.749
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.3909,
+          "better": "lower",
+          "spread": [
+            0.3909,
+            0.3909
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.7435,
+          "better": "lower",
+          "spread": [
+            0.7435,
+            0.7435
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 3.8233,
+          "better": "lower",
+          "spread": [
+            3.8233,
+            3.8233
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1105,
+          "better": "lower",
+          "spread": [
+            0.1105,
+            0.1105
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.1703,
+          "better": "lower",
+          "spread": [
+            0.1703,
+            0.1703
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20260923T161343Z__ab_b__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {},
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 1.5,
+              "max": 1.49,
+              "min": 1.45
+            },
+            "gpu_device_pct": {
+              "mean": 0.5,
+              "max": 2,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.0,
+              "max": 98,
+              "min": 94
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.2,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.5,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 4.1,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.7
+        },
+        "during": {
+          "samples": 148,
+          "load1": {
+            "mean": 1.6,
+            "max": 1.91,
+            "min": 1.4
+          },
+          "gpu_device_pct": {
+            "mean": 98.4,
+            "max": 100,
+            "min": 80
+          },
+          "free_pct": {
+            "mean": 93.1,
+            "max": 94,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 61476,
+              "name": "mlx-serve",
+              "pct": 90.3,
+              "cmd": "mlx-serve --model ~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit --serve --host 127.0.0.1 --port 11234 --metrics --mtp",
+              "model": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 4.3,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 3.4,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 77,
+          "busy_pct": {
+            "mean": 4.7,
+            "max": 9.6,
+            "min": 2.1
+          }
+        },
+        "before_live": {
+          "t": 1790180024.204502,
+          "load1": 1.49,
+          "free_pct": 94,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 22444867584,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            ],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.2.11",
+          "omp_sha": "ce797fb3ed92e768",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "4-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "34fe604-dirty",
+        "created": "20260923T161642Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay"
+        ],
+        "repeats": 3,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 164.1611,
+          "better": "higher",
+          "spread": [
+            164.1294,
+            164.2233
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.0759,
+          "better": "lower",
+          "spread": [
+            0.0751,
+            0.076
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2621.7109,
+          "better": "higher",
+          "spread": [
+            2612.5688,
+            2631.721
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.4203,
+          "better": "lower",
+          "spread": [
+            0.4191,
+            0.4222
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2952.9709,
+          "better": "higher",
+          "spread": [
+            2943.7694,
+            2962.3071
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 2.9506,
+          "better": "lower",
+          "spread": [
+            2.9413,
+            2.9585
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 2195.2349,
+          "better": "higher",
+          "spread": [
+            2193.2641,
+            2199.5281
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 15.9523,
+          "better": "lower",
+          "spread": [
+            15.9211,
+            15.9671
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.0914,
+          "better": "lower",
+          "spread": [
+            0.0914,
+            0.0914
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 32.2398,
+          "better": "higher",
+          "spread": [
+            32.2398,
+            32.2398
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.0232,
+          "better": "lower",
+          "spread": [
+            0.0232,
+            0.0232
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 44.8627,
+          "better": "lower",
+          "spread": [
+            44.8627,
+            44.8627
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.3431,
+          "better": "lower",
+          "spread": [
+            0.3431,
+            0.3431
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.7043,
+          "better": "lower",
+          "spread": [
+            0.7043,
+            0.7043
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 3.8182,
+          "better": "lower",
+          "spread": [
+            3.8182,
+            3.8182
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.0982,
+          "better": "lower",
+          "spread": [
+            0.0982,
+            0.0982
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.1599,
+          "better": "lower",
+          "spread": [
+            0.1599,
+            0.1599
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20260923T161642Z__ab_a2__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {},
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 4,
+            "load1": {
+              "mean": 2.3,
+              "max": 2.31,
+              "min": 2.31
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.0,
+              "max": 98,
+              "min": 94
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.1,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 27181,
+                "name": "Terminal",
+                "pct": 1.7,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ]
+          },
+          "cpu_busy_pct": 7.1,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 3.0
+        },
+        "during": {
+          "samples": 148,
+          "load1": {
+            "mean": 1.9,
+            "max": 2.31,
+            "min": 1.34
+          },
+          "gpu_device_pct": {
+            "mean": 98.8,
+            "max": 100,
+            "min": 95
+          },
+          "free_pct": {
+            "mean": 93.1,
+            "max": 94,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 64748,
+              "name": "mlx-serve",
+              "pct": 88.2,
+              "cmd": "mlx-serve --model ~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit --serve --host 127.0.0.1 --port 11234 --metrics",
+              "model": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 7.4,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 27181,
+              "name": "Terminal",
+              "pct": 2.7,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ]
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 77,
+          "busy_pct": {
+            "mean": 5.8,
+            "max": 12.7,
+            "min": 2.5
+          }
+        },
+        "before_live": {
+          "t": 1790180202.596799,
+          "load1": 2.31,
+          "free_pct": 94,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 22421438464,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            ],
+            "splash": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

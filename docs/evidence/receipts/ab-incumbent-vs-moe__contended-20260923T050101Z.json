@@ -1,0 +1,1566 @@
+{
+  "kind": "ab",
+  "a": "ollama:localbench-parked:5642e97495e1",
+  "b": "ollama:qwen3.6:35b-mlx",
+  "order": [
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [
+    "ab_b: MUST FAIL: e2e.ok.correct",
+    "ab_a2: CONTENDED: another model was resident during the run"
+  ],
+  "table": {
+    "micro.decode.decode_tps": {
+      "a1": 64.5991,
+      "a2": 61.8081,
+      "b": 153.2007,
+      "better": "higher",
+      "aa_rel_spread": 0.0442,
+      "band": 0.1325,
+      "b_over_a": 2.424,
+      "verdict": "B-BETTER"
+    },
+    "micro.decode.ttft_s": {
+      "a1": 0.2845,
+      "a2": 0.3117,
+      "b": 0.0846,
+      "better": "lower",
+      "aa_rel_spread": 0.0912,
+      "band": 0.2737,
+      "b_over_a": 0.284,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_1k.prefill_tps": {
+      "a1": 369.8356,
+      "a2": 349.8049,
+      "b": 2578.8022,
+      "better": "higher",
+      "aa_rel_spread": 0.0557,
+      "band": 0.167,
+      "b_over_a": 7.167,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_1k.ttft_s": {
+      "a1": 2.9716,
+      "a2": 3.1446,
+      "b": 0.4266,
+      "better": "lower",
+      "aa_rel_spread": 0.0566,
+      "band": 0.1697,
+      "b_over_a": 0.139,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_8k.prefill_tps": {
+      "a1": 366.0475,
+      "a2": 348.1391,
+      "b": 2718.8595,
+      "better": "higher",
+      "aa_rel_spread": 0.0502,
+      "band": 0.1505,
+      "b_over_a": 7.614,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_8k.ttft_s": {
+      "a1": 23.7947,
+      "a2": 25.0245,
+      "b": 3.2035,
+      "better": "lower",
+      "aa_rel_spread": 0.0504,
+      "band": 0.1511,
+      "b_over_a": 0.131,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_32k.prefill_tps": {
+      "a1": 319.7295,
+      "a2": 310.9908,
+      "b": 2031.7215,
+      "better": "higher",
+      "aa_rel_spread": 0.0277,
+      "band": 0.0831,
+      "b_over_a": 6.443,
+      "verdict": "B-BETTER"
+    },
+    "micro.prefill_32k.ttft_s": {
+      "a1": 109.5144,
+      "a2": 112.5982,
+      "b": 17.2356,
+      "better": "lower",
+      "aa_rel_spread": 0.0278,
+      "band": 0.1,
+      "b_over_a": 0.155,
+      "verdict": "B-BETTER"
+    },
+    "micro.cache_hit_8k.warm_ttft_s": {
+      "a1": 0.1338,
+      "a2": 0.1642,
+      "b": 0.0636,
+      "better": "lower",
+      "aa_rel_spread": 0.204,
+      "band": 0.6121,
+      "b_over_a": 0.427,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.cache_hit_8k.speedup_x": {
+      "a1": 181.2367,
+      "a2": 153.2167,
+      "b": 51.8928,
+      "better": "higher",
+      "aa_rel_spread": 0.1676,
+      "band": 0.5027,
+      "b_over_a": 0.31,
+      "verdict": "B-WORSE"
+    },
+    "micro.eviction_probe_8k.a_again_ttft_s": {
+      "a1": 0.3808,
+      "a2": 0.2338,
+      "b": 0.1054,
+      "better": "lower",
+      "aa_rel_spread": 0.4784,
+      "band": 1.4351,
+      "b_over_a": 0.343,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.full.cold_ttft_s": {
+      "a1": 273.6832,
+      "a2": 290.262,
+      "b": 53.3171,
+      "better": "lower",
+      "aa_rel_spread": 0.0588,
+      "band": 0.1764,
+      "b_over_a": 0.189,
+      "verdict": "B-BETTER"
+    },
+    "replay.full.warm_ttft_s": {
+      "a1": 0.2037,
+      "a2": 0.2529,
+      "b": 0.2185,
+      "better": "lower",
+      "aa_rel_spread": 0.2155,
+      "band": 0.6465,
+      "b_over_a": 0.957,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.full.turn2_ttft_s": {
+      "a1": 0.4524,
+      "a2": 0.503,
+      "b": 0.2455,
+      "better": "lower",
+      "aa_rel_spread": 0.1059,
+      "band": 0.3178,
+      "b_over_a": 0.514,
+      "verdict": "B-BETTER"
+    },
+    "replay.lean.cold_ttft_s": {
+      "a1": 33.0402,
+      "a2": 34.728,
+      "b": 4.4329,
+      "better": "lower",
+      "aa_rel_spread": 0.0498,
+      "band": 0.1494,
+      "b_over_a": 0.131,
+      "verdict": "B-BETTER"
+    },
+    "replay.lean.warm_ttft_s": {
+      "a1": 0.1465,
+      "a2": 0.1567,
+      "b": 0.0778,
+      "better": "lower",
+      "aa_rel_spread": 0.0673,
+      "band": 0.2018,
+      "b_over_a": 0.513,
+      "verdict": "B-BETTER"
+    },
+    "replay.lean.turn2_ttft_s": {
+      "a1": 0.2188,
+      "a2": 0.6331,
+      "b": 0.0903,
+      "better": "lower",
+      "aa_rel_spread": 0.9726,
+      "band": 2.9179,
+      "b_over_a": 0.212,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.first_wall_s": {
+      "a1": 37.5247,
+      "a2": 44.893,
+      "b": 7.8559,
+      "better": "lower",
+      "aa_rel_spread": 0.1788,
+      "band": 0.5364,
+      "b_over_a": 0.191,
+      "verdict": "B-BETTER"
+    },
+    "e2e.tool_read.first_llm_s": {
+      "a1": 33.764,
+      "a2": 36.083,
+      "b": 5.327,
+      "better": "lower",
+      "aa_rel_spread": 0.0664,
+      "band": 0.1992,
+      "b_over_a": 0.153,
+      "verdict": "B-BETTER"
+    },
+    "e2e.tool_read.repeat_wall_s": {
+      "a1": 4.3618,
+      "a2": 24.825,
+      "b": 2.9516,
+      "better": "lower",
+      "aa_rel_spread": 1.4022,
+      "band": 4.2067,
+      "b_over_a": 0.202,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.repeat_llm_s": {
+      "a1": 1.371,
+      "a2": 5.335,
+      "b": 0.728,
+      "better": "lower",
+      "aa_rel_spread": 1.1822,
+      "band": 3.5467,
+      "b_over_a": 0.217,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.first_wall_s": {
+      "a1": 35.1329,
+      "a2": 35.9574,
+      "b": 22.8723,
+      "better": "lower",
+      "aa_rel_spread": 0.0232,
+      "band": 0.1,
+      "b_over_a": 0.643,
+      "verdict": "B-BETTER"
+    },
+    "e2e.ok.first_llm_s": {
+      "a1": 31.522,
+      "a2": 29.155,
+      "b": 19.863,
+      "better": "lower",
+      "aa_rel_spread": 0.078,
+      "band": 0.2341,
+      "b_over_a": 0.655,
+      "verdict": "B-BETTER"
+    },
+    "e2e.ok.repeat_wall_s": {
+      "a1": 3.7061,
+      "a2": 7.5289,
+      "b": 3.9126,
+      "better": "lower",
+      "aa_rel_spread": 0.6805,
+      "band": 2.0415,
+      "b_over_a": 0.697,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.repeat_llm_s": {
+      "a1": 0.397,
+      "a2": 0.375,
+      "b": 1.681,
+      "better": "lower",
+      "aa_rel_spread": 0.057,
+      "band": 0.171,
+      "b_over_a": 4.355,
+      "verdict": "B-WORSE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "omp_version": "18.2.10",
+          "omp_sha": "acf06c76a4969558",
+          "omp_path": "~/.bun/bin/omp",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "d7a4ea2-dirty",
+        "created": "20260923T050101Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 64.5991,
+          "better": "higher",
+          "spread": [
+            60.8885,
+            66.7904
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.2845,
+          "better": "lower",
+          "spread": [
+            0.2765,
+            0.3723
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 369.8356,
+          "better": "higher",
+          "spread": [
+            347.8822,
+            376.2321
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 2.9716,
+          "better": "lower",
+          "spread": [
+            2.9317,
+            3.1562
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 366.0475,
+          "better": "higher",
+          "spread": [
+            357.5449,
+            370.3845
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 23.7947,
+          "better": "lower",
+          "spread": [
+            23.508,
+            24.3606
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 319.7295,
+          "better": "higher",
+          "spread": [
+            318.4491,
+            323.706
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 109.5144,
+          "better": "lower",
+          "spread": [
+            108.1753,
+            109.9705
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.1338,
+          "better": "lower",
+          "spread": [
+            0.1338,
+            0.1338
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 181.2367,
+          "better": "higher",
+          "spread": [
+            181.2367,
+            181.2367
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.3808,
+          "better": "lower",
+          "spread": [
+            0.3808,
+            0.3808
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 273.6832,
+          "better": "lower",
+          "spread": [
+            273.6832,
+            273.6832
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.2037,
+          "better": "lower",
+          "spread": [
+            0.2037,
+            0.2037
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.4524,
+          "better": "lower",
+          "spread": [
+            0.4524,
+            0.4524
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 33.0402,
+          "better": "lower",
+          "spread": [
+            33.0402,
+            33.0402
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1465,
+          "better": "lower",
+          "spread": [
+            0.1465,
+            0.1465
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.2188,
+          "better": "lower",
+          "spread": [
+            0.2188,
+            0.2188
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 37.5247,
+          "better": "lower",
+          "spread": [
+            37.5247,
+            37.5247
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 33.764,
+          "better": "lower",
+          "spread": [
+            33.764,
+            33.764
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 4.3618,
+          "better": "lower",
+          "spread": [
+            4.3618,
+            4.3618
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.371,
+          "better": "lower",
+          "spread": [
+            1.371,
+            1.371
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 35.1329,
+          "better": "lower",
+          "spread": [
+            35.1329,
+            35.1329
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 31.522,
+          "better": "lower",
+          "spread": [
+            31.522,
+            31.522
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 3.7061,
+          "better": "lower",
+          "spread": [
+            3.7061,
+            3.7061
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.397,
+          "better": "lower",
+          "spread": [
+            0.397,
+            0.397
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260923T050101Z__ab_a1__ollama__localbench-parked_5642e97495e1",
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 5,
+            "load1": {
+              "mean": 3.5,
+              "max": 3.5,
+              "min": 3.5
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.4,
+              "max": 98,
+              "min": 94
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0
+          },
+          "cpu_busy_pct": 8.3,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.9
+        },
+        "during": {
+          "samples": 928,
+          "load1": {
+            "mean": 3.3,
+            "max": 6.18,
+            "min": 2.42
+          },
+          "gpu_device_pct": {
+            "mean": 98.7,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 93.6,
+            "max": 98,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 7
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 517,
+          "busy_pct": {
+            "mean": 7.5,
+            "max": 17.8,
+            "min": 3.8
+          }
+        },
+        "before_live": {
+          "t": 1790139661.975431,
+          "load1": 3.5,
+          "free_pct": 94,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 20210171904,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1"
+            ],
+            "mlx-serve": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "omp_version": "18.2.10",
+          "omp_sha": "acf06c76a4969558",
+          "omp_path": "~/.bun/bin/omp",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "d7a4ea2-dirty",
+        "created": "20260923T052015Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "ab_b"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [
+          "e2e.ok.correct"
+        ],
+        "preflight_problems": [],
+        "allow_busy": false
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 153.2007,
+          "better": "higher",
+          "spread": [
+            139.9057,
+            160.3201
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.0846,
+          "better": "lower",
+          "spread": [
+            0.0833,
+            0.1134
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2578.8022,
+          "better": "higher",
+          "spread": [
+            2568.1766,
+            2641.6401
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.4266,
+          "better": "lower",
+          "spread": [
+            0.4172,
+            0.4287
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2718.8595,
+          "better": "higher",
+          "spread": [
+            2688.0605,
+            2728.9544
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 3.2035,
+          "better": "lower",
+          "spread": [
+            3.1906,
+            3.2388
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 2031.7215,
+          "better": "higher",
+          "spread": [
+            2024.9393,
+            2063.5718
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 17.2356,
+          "better": "lower",
+          "spread": [
+            16.9691,
+            17.2934
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.0636,
+          "better": "lower",
+          "spread": [
+            0.0636,
+            0.0636
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 51.8928,
+          "better": "higher",
+          "spread": [
+            51.8928,
+            51.8928
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.1054,
+          "better": "lower",
+          "spread": [
+            0.1054,
+            0.1054
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 53.3171,
+          "better": "lower",
+          "spread": [
+            53.3171,
+            53.3171
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.2185,
+          "better": "lower",
+          "spread": [
+            0.2185,
+            0.2185
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.2455,
+          "better": "lower",
+          "spread": [
+            0.2455,
+            0.2455
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 4.4329,
+          "better": "lower",
+          "spread": [
+            4.4329,
+            4.4329
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.0778,
+          "better": "lower",
+          "spread": [
+            0.0778,
+            0.0778
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.0903,
+          "better": "lower",
+          "spread": [
+            0.0903,
+            0.0903
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 7.8559,
+          "better": "lower",
+          "spread": [
+            7.8559,
+            7.8559
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 5.327,
+          "better": "lower",
+          "spread": [
+            5.327,
+            5.327
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 2.9516,
+          "better": "lower",
+          "spread": [
+            2.9516,
+            2.9516
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 0.728,
+          "better": "lower",
+          "spread": [
+            0.728,
+            0.728
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 22.8723,
+          "better": "lower",
+          "spread": [
+            22.8723,
+            22.8723
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 19.863,
+          "better": "lower",
+          "spread": [
+            19.863,
+            19.863
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 3.9126,
+          "better": "lower",
+          "spread": [
+            3.9126,
+            3.9126
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 1.681,
+          "better": "lower",
+          "spread": [
+            1.681,
+            1.681
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20260923T052015Z__ab_b__ollama__qwen3.6_35b-mlx",
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 5,
+            "load1": {
+              "mean": 2.7,
+              "max": 2.83,
+              "min": 2.65
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 97.2,
+              "max": 98,
+              "min": 94
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0
+          },
+          "cpu_busy_pct": 5.3,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 3.0
+        },
+        "during": {
+          "samples": 191,
+          "load1": {
+            "mean": 2.9,
+            "max": 4.15,
+            "min": 2.0
+          },
+          "gpu_device_pct": {
+            "mean": 96.3,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 92.5,
+            "max": 98,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 104,
+          "busy_pct": {
+            "mean": 7.4,
+            "max": 14.6,
+            "min": 4.2
+          }
+        },
+        "before_live": {
+          "t": 1790140816.127041,
+          "load1": 2.65,
+          "free_pct": 94,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 20159201280,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1"
+            ],
+            "mlx-serve": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "omp_version": "18.2.10",
+          "omp_sha": "acf06c76a4969558",
+          "omp_path": "~/.bun/bin/omp",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.32.15",
+          "backend_sha": "eee609f0a6da58b9",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "d7a4ea2-dirty",
+        "created": "20260923T052441Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": true,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 61.8081,
+          "better": "higher",
+          "spread": [
+            60.2999,
+            62.1763
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.3117,
+          "better": "lower",
+          "spread": [
+            0.2832,
+            0.4166
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 349.8049,
+          "better": "higher",
+          "spread": [
+            327.6192,
+            354.3942
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 3.1446,
+          "better": "lower",
+          "spread": [
+            3.1039,
+            3.3423
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 348.1391,
+          "better": "higher",
+          "spread": [
+            338.9255,
+            349.2431
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 25.0245,
+          "better": "lower",
+          "spread": [
+            24.9339,
+            25.6989
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 310.9908,
+          "better": "higher",
+          "spread": [
+            308.7369,
+            311.964
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 112.5982,
+          "better": "lower",
+          "spread": [
+            112.2405,
+            113.4234
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.1642,
+          "better": "lower",
+          "spread": [
+            0.1642,
+            0.1642
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 153.2167,
+          "better": "higher",
+          "spread": [
+            153.2167,
+            153.2167
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.2338,
+          "better": "lower",
+          "spread": [
+            0.2338,
+            0.2338
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 290.262,
+          "better": "lower",
+          "spread": [
+            290.262,
+            290.262
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.2529,
+          "better": "lower",
+          "spread": [
+            0.2529,
+            0.2529
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.503,
+          "better": "lower",
+          "spread": [
+            0.503,
+            0.503
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 34.728,
+          "better": "lower",
+          "spread": [
+            34.728,
+            34.728
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1567,
+          "better": "lower",
+          "spread": [
+            0.1567,
+            0.1567
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.6331,
+          "better": "lower",
+          "spread": [
+            0.6331,
+            0.6331
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 44.893,
+          "better": "lower",
+          "spread": [
+            44.893,
+            44.893
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 36.083,
+          "better": "lower",
+          "spread": [
+            36.083,
+            36.083
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 24.825,
+          "better": "lower",
+          "spread": [
+            24.825,
+            24.825
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 5.335,
+          "better": "lower",
+          "spread": [
+            5.335,
+            5.335
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 35.9574,
+          "better": "lower",
+          "spread": [
+            35.9574,
+            35.9574
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 29.155,
+          "better": "lower",
+          "spread": [
+            29.155,
+            29.155
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 7.5289,
+          "better": "lower",
+          "spread": [
+            7.5289,
+            7.5289
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.375,
+          "better": "lower",
+          "spread": [
+            0.375,
+            0.375
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260923T052441Z__ab_a2__ollama__localbench-parked_5642e97495e1",
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 5,
+            "load1": {
+              "mean": 3.7,
+              "max": 3.78,
+              "min": 3.64
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 97.2,
+              "max": 98,
+              "min": 94
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0
+          },
+          "cpu_busy_pct": 8.2,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 2.8
+        },
+        "during": {
+          "samples": 995,
+          "load1": {
+            "mean": 5.5,
+            "max": 31.32,
+            "min": 1.93
+          },
+          "gpu_device_pct": {
+            "mean": 95.8,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 92.9,
+            "max": 98,
+            "min": 85
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 14
+        },
+        "contention": [
+          {
+            "t": 1790142024.495,
+            "foreign": {
+              "ollama": [
+                "qwen3.8-uncensored:latest"
+              ]
+            },
+            "resident": {
+              "ollama": [
+                "localbench-parked:5642e97495e1",
+                "qwen3.8-uncensored:latest"
+              ],
+              "mlx-serve": []
+            },
+            "gpu_device_pct": 100
+          },
+          {
+            "t": 1790142246.768,
+            "foreign": {
+              "ollama": [
+                "qwen3.8-uncensored:latest"
+              ]
+            },
+            "resident": {
+              "ollama": [
+                "localbench-parked:5642e97495e1",
+                "qwen3.8-uncensored:latest"
+              ],
+              "mlx-serve": []
+            },
+            "gpu_device_pct": 98
+          }
+        ],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 558,
+          "busy_pct": {
+            "mean": 11.6,
+            "max": 36.9,
+            "min": 3.6
+          }
+        },
+        "before_live": {
+          "t": 1790141081.852831,
+          "load1": 3.78,
+          "free_pct": 94,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 25072713728,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": []
+          }
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+# Base omp settings of localbench's measured omp children. They run with PI_CODING_AGENT_DIR=runs/omp-agent, a
+# localbench-owned agent dir holding only this file and a generated models.yml (the localbench provider), so nothing
+# of the user's agent dir reaches a child: no MCP servers, plugins, settings or memory banks (2026-09-23: with the
+# user's dir, children called the user's Agent Mail MCP server and read other agents' databases under ~/.claude).
+# The --config overlays (child-config*.yml) apply on top.
+# Mirrors the user's default profile where it shapes a turn: auto thinking, i.e. the per-turn effort classifier runs
+# before the main call (omp's own default is high).
+# Consumer: workloads.child_env; pinned per run as omp_agent_config, which e2e/rel/mem/sess rows bind to.
+# Delete when: localbench stops running omp children.
+defaultThinkingLevel: auto

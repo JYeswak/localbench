@@ -1,0 +1,11 @@
+# mem tier variant: memory on, recall by full-text search only — no embedding model, so no embedding worker to spawn
+# per omp process. Run as `localbench ab <spec> <spec> --tiers mem --b-mem-config=fixtures/omp/child-config-mem-fts.yml`.
+# Consumer: the mem-retrieval A/B (ledger 2026-09-23, "memory LLM is off the one-shot path": one-shot memory cost is
+# in-process recall). Delete when: that A/B's ledger row is closed and this variant is not the recommended config.
+memory:
+  backend: mnemopi
+mnemopi:
+  autoRecall: true
+  autoRetain: true
+  llmMode: smol
+  noEmbeddings: true

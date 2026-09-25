@@ -1,0 +1,16 @@
+# claims.tsv — localbench claim registry (working copy; reference copy: templates/claims.tsv).
+# Anti-ceremony (CHECKLIST.md A12): consumer: the pre-commit hook + CI (B6);
+#   gate: claim discipline — every enforced README claim resolves to a proof;
+#   defect class: README drift, undecorated claims; delete when: never while
+#   public claims exist (the registry is load-bearing, not ceremony).
+# Columns: label | readme_pattern | capability_key | expected_substr | proof_path | enforce | notes
+# readme_pattern must match README prose EXACTLY. Set enforce=yes only when proof_path holds a banked,
+# same-generation receipt (packet §6) — a spike receipt is non-proof (packet §8).
+# Status vocabulary in notes: planned / documented / implemented_uncertified / validated / certified / blocked / retired.
+label	readme_pattern	capability_key	expected_substr	proof_path	enforce	notes
+lean_prompt_tokens	The lean flags cut omp's default-profile prompt from 73,779 to 11,433 tokens.	lb-04	"prompt_tokens": 11433	fixtures/omp/lean.meta.json	yes	validated: omp 18.2.11 (sha ce797fb3ed92e768) + child overlay 62eed267e219ddde, ollama qwen3.6 tokenizer, recorded 2026-09-23; full = 73,779 in fixtures/omp/full.meta.json. Token counts are deterministic for a pinned omp + tokenizer (replay reproduced them within 2% on ollama). Earlier 11,650 / 74,289 came from the ~/.local/bin/omp build and memory-on prompts.
+moe_prefill_ratio	On this Mac, Qwen3.6-35B-A3B prefills 6.4–6.6× faster than the qwen3.8 27B dense incumbent at 1k–8k tokens.	lb-06	"b_over_a": 6.572	docs/evidence/receipts/ab-incumbent-vs-moe.json	yes	validated: same-invocation A,B,A (ollama 0.32.15), no leg contended, preflight idle; micro.prefill_1k 6.407x and prefill_8k 6.572x with A/A bands 0.05; 32k is 5.746x with a 0.22 band, so the >=5x there is not claimed. Replay rows of this receipt are VOID (omp upgraded under the fixtures) by design.
+first_turn_under_10s	With the lean flags and memory off, omp on Qwen3.6-35B-A3B served by mlx-serve answered a tool-using task in 6.1 s on a cold first turn.	lb-05	"value": 6.0838	docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json	yes	validated: A/A pair, both legs every MUST PASS, uncontended, idle preflight; e2e.tool_read.first_wall_s 6.0838 / 5.9463 s, first call cached_tokens 0 (cold verified). Memory off = fixtures/omp/child-config.yml; the user's default profile with mnemopi memory on is NOT covered by this claim.
+must_conformance		lb-02		docs/evidence/receipts/conformance-chosen-config.json	no	documented: mlx-serve golden legs pass every MUST, but cold first-turn wrong answers were seen on both MoE backends (ledger 2026-09-23); relcold/relfresh measure the rate. Not claimed until that rate is known.
+mlx_serve_vs_ollama		lb-07		docs/evidence/receipts/ab-mlxserve-vs-ollama-moe.json	no	documented: memory-off A/B (omp 18.2.11) B/A: decode 1.078x (band 0.05), e2e.ok.first_wall 0.807, e2e.tool_read.first_wall 0.874, replay.full.turn2 2.12x slower on mlx-serve; legs B and A2 had a cold e2e.ok MUST FAIL, so the release gate does not admit it.
+swe_slice_latency		lb-08		docs/evidence/receipts/swe-slice.json	no	planned: per-instance agent wall on five pinned SWE-bench Lite instances; latency workload, not an accuracy score.
