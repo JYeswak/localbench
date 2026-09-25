@@ -104,6 +104,7 @@ class MemRounds(unittest.TestCase):
                       loaded_context=1024, mem_rounds=1)
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
+                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
                     mock.patch("localbench.workloads.subprocess.run",
                                return_value=subprocess.CompletedProcess([], 0, "", "")), \
                     mock.patch("localbench.memory.banks", return_value=[]), \
@@ -153,6 +154,7 @@ class MemPreMain(unittest.TestCase):
                       loaded_context=1024, mem_rounds=1)
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
+                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
                     mock.patch("localbench.workloads.subprocess.run", side_effect=omp_turn), \
                     mock.patch("localbench.workloads._mem_facts",
                                return_value=[(n, f"PLANT {n}", f"QUESTION {n}", n) for n in "abc"]), \
@@ -305,6 +307,7 @@ class AnswerReachesTheVerdict(unittest.TestCase):
                       loaded_context=8192)
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
+                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
                     mock.patch("localbench.workloads.subprocess.run", side_effect=run):
                 e2e_rows = e2e(ctx)
                 rel_rows = _rel(ctx, cold=False)

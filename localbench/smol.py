@@ -291,7 +291,8 @@ def start_server(state: dict, ready_timeout: float = 900) -> int:
         with log.open("a") as fh:
             proc = subprocess.Popen(argv, stdout=fh, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
                                     start_new_session=True)
-        alive = lambda: proc.poll() is None
+        def alive():
+            return proc.poll() is None
     started = time.time()
     deadline = started + ready_timeout
     while not server_up(state["port"]):

@@ -393,7 +393,8 @@ def execute(backend, model: str, *, tiers: list[str], repeats: int, allow_busy: 
     ctx = Ctx(backend=backend, model=model, repeats=repeats, run_dir=run_dir, emit=emit, pins=pins,
               loaded_context=fp.get("loaded_context"), mem_config=mem_config, mem_rounds=mem_rounds)
     results: list[Result] = []
-    on_contention = lambda ev: emit({"event": "contention", **ev})
+    def on_contention(ev):
+        emit({"event": "contention", **ev})
     with sysstats.Sampler(1.0, target=(backend.name, model), on_contention=on_contention,
                           gpu_foreign_max_pct=GPU_BUSY_MAX_PCT) as smp, \
             sysstats.PowerSampler(1000) as pwr, sysstats.CpuSampler(2) as cpu:
@@ -1492,7 +1493,8 @@ def cmd_ab(args) -> int:
     problems = [f"{leg['provenance']['label']}: {p}" for leg in legs for p in unsound(leg)]
     drift = golden.arm_pin_drift([leg["provenance"]["pins"] for leg in a_legs],
                                  [leg["provenance"]["pins"] for leg in b_legs], tiers)
-    busy = lambda leg: (((leg.get("system") or {}).get("cpu") or {}).get("busy_pct") or {}).get("mean")
+    def busy(leg):
+        return (((leg.get("system") or {}).get("cpu") or {}).get("busy_pct") or {}).get("mean")
     balance = golden.load_balance([busy(leg) for leg in a_legs], [busy(leg) for leg in b_legs])
     table = golden.ab_table([leg["metrics"] for leg in a_legs], [leg["metrics"] for leg in b_legs], void_tiers=drift,
                             load_favours=balance["favours"])

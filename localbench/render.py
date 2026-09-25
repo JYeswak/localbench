@@ -250,14 +250,16 @@ def show(doc: dict, label: str, *, cursor: int = 0, limit: int = PAGE, cmd: str 
                 f"{num(bal['tol_pct'])} CPU-busy points: time rows judged "
                 f"{'B-BETTER' if bal['favours'] == 'B' else 'B-WORSE'} are LOAD-FAVOURED (withheld)"
                 if bal.get("favours") else f"B within {num(bal['tol_pct'])} CPU-busy points of the A legs: no verdict withheld")))
-        note = lambda r: r.get("verdict") + (f" ({clip(str(r['void']), 60)})" if r.get("void") else "") + (
-            f" (withheld {r['withheld']})" if r.get("withheld") else "")
+        def note(r):
+            return r.get("verdict") + (f" ({clip(str(r['void']), 60)})" if r.get("void") else "") + (
+                f" (withheld {r['withheld']})" if r.get("withheld") else "")
         if all("a1" in r for r in tbl.values()):
             rows = [[k, num(r.get("a1")), num(r.get("a2")), num(r.get("b")), num(r.get("b_over_a")), num(r.get("band")),
                      note(r)] for k, r in tbl.items()]
             head = ["metric", "A1", "A2", "B", "B/A", "band", "verdict"]
         else:
-            legs_of = lambda xs: "/".join(num(x) for x in xs or [])
+            def legs_of(xs):
+                return "/".join(num(x) for x in xs or [])
             rows = [[k, num(r.get("a_median")), legs_of(r.get("a_legs")), num(r.get("b_median")), legs_of(r.get("b_legs")),
                      num(r.get("b_over_a")), num(r.get("band")), note(r)] for k, r in tbl.items()]
             head = ["metric", "A median", "A legs", "B median", "B legs", "B/A", "band", "verdict"]
