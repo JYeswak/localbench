@@ -19,6 +19,7 @@ OMLX_ROW = {"pid": 9, "name": "python3.13", "pct": 60.0,
 
 
 class _Proc:
+    pid = 4242
     returncode = None
 
     def poll(self):
@@ -99,14 +100,25 @@ class OneModelAtATime(unittest.TestCase):
         self.assertEqual((models, apps), ([OMLX_ROW], []))
 
     def test_a_model_loaded_in_omlx_is_resident(self):
-        def fake(url, timeout=2.0):
+        def fake(url, timeout=2.0, *, probe=None):
             if url.endswith("/api/status"):
-                return {"loaded_models": ["Qwen3.6-35B-A3B-MLX-Serve-4bit", {"id": "Other"}]}
+                return {"loaded_models": ["Qwen3.6-35B-A3B-MLX-Serve-4bit", "Other"]}
             return {}
         with mock.patch.object(sysstats, "_json", side_effect=fake):
             resident = sysstats.resident_models()
         self.assertEqual(resident["omlx"], ["Other", "Qwen3.6-35B-A3B-MLX-Serve-4bit"])
         self.assertEqual(sysstats.foreign_models(resident, *TARGET), {"omlx": resident["omlx"]})
+
+    def test_unrecognized_omlx_loaded_model_entry_is_unknown(self):
+        def fake(url, timeout=2.0, *, probe=None):
+            if url.endswith("/api/status"):
+                return {"loaded_models": [{"id": "Other"}]}
+            return {}
+        probes = {}
+        with mock.patch.object(sysstats, "_json", side_effect=fake):
+            resident = sysstats.resident_models(probes)
+        self.assertIsNone(resident["omlx"])
+        self.assertEqual(probes["omlx"]["error_class"], "schema")
 
 
 class Pins(Model):

@@ -1,0 +1,44 @@
+[
+  {
+    "label": "missing claims input accepted",
+    "file": "scripts/check-claim-discipline.sh",
+    "old": "  exit 1\nfi\n\n# NOTE: tab",
+    "new": "  exit 0\nfi\n\n# NOTE: tab",
+    "tests": ["tests.test_gate_scripts.GateScripts.test_missing_inputs_fail_and_name_the_path"]
+  },
+  {
+    "label": "caller cwd steals packet path",
+    "file": "scripts/check-readiness.sh",
+    "old": "case \"$PACKET\" in /*) ;; *) PACKET=\"$ROOT/$PACKET\" ;; esac",
+    "new": "case \"$PACKET\" in /*) ;; *) PACKET=\"$PWD/$PACKET\" ;; esac",
+    "tests": ["tests.test_gate_scripts.GateScripts.test_relative_inputs_have_same_result_from_another_cwd"]
+  },
+  {
+    "label": "missing packet input accepted",
+    "file": "scripts/check-readiness.sh",
+    "old": "  exit 1\nfi\n\nTMPD=",
+    "new": "  exit 0\nfi\n\nTMPD=",
+    "tests": ["tests.test_gate_scripts.GateScripts.test_missing_inputs_fail_and_name_the_path"]
+  },
+  {
+    "label": "caller cwd steals claims path",
+    "file": "scripts/check-claim-discipline.sh",
+    "old": "case \"$CLAIMS\" in /*) ;; *) CLAIMS=\"$ROOT/$CLAIMS\" ;; esac",
+    "new": "case \"$CLAIMS\" in /*) ;; *) CLAIMS=\"$PWD/$CLAIMS\" ;; esac",
+    "tests": ["tests.test_gate_scripts.GateScripts.test_relative_inputs_have_same_result_from_another_cwd"]
+  },
+  {
+    "label": "design substring masquerades as sign-off",
+    "file": "scripts/check-readiness.sh",
+    "old": "*SIGN-OFF*)         printf '2\\n1|w:signed,w:sign-off,w:signoff\\n' ;;",
+    "new": "*SIGN-OFF*)         printf '2\\n1|sign\\n' ;;",
+    "tests": ["tests.test_gate_scripts.GateScripts.test_sign_off_requires_real_marker_not_design_substring"]
+  },
+  {
+    "label": "unmatched enforced README claim passes",
+    "file": "scripts/check-claim-discipline.sh",
+    "old": "      echo \"FAIL  $label: enforce=yes but the pattern was NOT found in the README.\"\n      echo \"      restore the registered sentence or set enforce=no if the claim is retired.\"\n      unmatched=$((unmatched + 1))\n      fail=$((fail + 1))\n      continue",
+    "new": "      echo \"WARNING  $label: enforce=yes but the pattern was NOT found in the README — row NOT checked.\"\n      echo \"         pattern must match README prose EXACTLY (case-sensitive, same line breaks).\"\n      echo \"         This claim is registered but UNVERIFIED until the pattern matches.\"\n      unmatched=$((unmatched + 1))\n      continue",
+    "tests": ["tests.test_gate_scripts.GateScripts.test_enforced_readme_claim_drift_fails_loudly"]
+  }
+]

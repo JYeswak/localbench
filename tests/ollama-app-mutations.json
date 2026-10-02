@@ -1,0 +1,56 @@
+[
+  {
+    "label": "auto-update write backs the db up first",
+    "file": "localbench/ollama_app.py",
+    "old": "            con.backup(dest)   # a consistent copy, WAL included, taken before any write",
+    "new": "            pass",
+    "tests": [
+      "tests.test_cli.OllamaAutoUpdate.test_off_on_status_round_trip_backs_up_and_audits"
+    ]
+  },
+  {
+    "label": "auto-update already in the requested state is a no-op",
+    "file": "localbench/__main__.py",
+    "old": "if now is want else None",
+    "new": "if False else None",
+    "tests": [
+      "tests.test_cli.OllamaAutoUpdate.test_requesting_the_current_state_is_a_noop"
+    ]
+  },
+  {
+    "label": "status reports a staged update",
+    "file": "localbench/ollama_app.py",
+    "old": "    return sorted(p.name for p in d.iterdir()) if d.is_dir() else []",
+    "new": "    return []",
+    "tests": [
+      "tests.test_cli.OllamaAutoUpdate.test_status_reports_a_staged_update_even_when_off"
+    ]
+  },
+  {
+    "label": "doctor fails when Ollama.app auto-update is on",
+    "file": "localbench/doctor.py",
+    "old": "        return _row(\"FAIL\", detail + \": the app can install",
+    "new": "        return _row(\"WARN\", detail + \": the app can install",
+    "tests": [
+      "tests.test_cli.OllamaAutoUpdate.test_doctor_fails_when_auto_update_is_on"
+    ]
+  },
+  {
+    "label": "doctor warns on a staged update even when auto-update is off",
+    "file": "localbench/doctor.py",
+    "old": "    if staged:\n        return _row(\"WARN\", detail,",
+    "new": "    if False:\n        return _row(\"WARN\", detail,",
+    "tests": [
+      "tests.test_cli.OllamaAutoUpdate.test_doctor_warns_on_a_staged_update_even_when_off"
+    ]
+  },
+  {
+    "label": "doctor warns when the auto-update switch is unknown",
+    "file": "localbench/doctor.py",
+    "old": "    if auto is None:\n        return _row(\"WARN\"",
+    "new": "    if False:\n        return _row(\"WARN\"",
+    "tests": [
+      "tests.test_cli.OllamaAutoUpdate.test_doctor_warns_when_the_switch_is_unknown"
+    ]
+  }
+]

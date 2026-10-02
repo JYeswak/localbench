@@ -13,11 +13,10 @@ Anti-ceremony (A12):
     uv run python scripts/prune_models.py --delete NAME [NAME]   # delete exactly these candidates
 
 Kept: resident now; pinned by a golden (by model digest, so a parked name counts too); routed by an omp profile
-(omp's own resolved settings, via the original name for a parked copy); named in another tool's config or a skill
-(CONFIGS: Codex's socraticode/skill-search embed with nomic-embed-text, the splash skill requires its Splash model;
-neither goes through omp, and the first dry run offered both); cloud stubs (no local weights). Everything
-else is a candidate, shown with when observe.db last saw it resident. omp's own CPU models (tiny, fastembed) are out
-of scope: omp manages them.
+(omp's own resolved settings, via the original name for a parked copy); named in another tool's config or a skill;
+named in the title or description of any non-closed bead; cloud stubs (no local weights). Whole-token matching
+applies to named models. omp's own CPU models (tiny, fastembed) are out of scope: omp manages them.
+Everything else is a candidate, shown with when observe.db last saw it resident.
 """
 
 from __future__ import annotations
@@ -68,6 +67,22 @@ def named_in(row: dict, configs: dict[str, str]) -> list[str]:
     pats = [re.compile(r"(?<![\w.-])" + re.escape(n) + r"(?![\w-])") for n in names_of(row)]
     return [label for label, text in configs.items() if any(p.search(text) for p in pats)]
 
+def open_bead_texts(path: Path | None = None) -> dict[str, str]:
+    """Map each non-closed bead ID to its title and description for model-name matching; a checkout without a
+    bead graph (the public export) has no open beads."""
+    path = path or ROOT / ".beads" / "issues.jsonl"
+    if not path.is_file():
+        return {}
+    texts = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        bead = json.loads(line)
+        if bead.get("status") != "closed":
+            texts[f"open bead {bead['id']}"] = " ".join(
+                str(bead.get(field) or "") for field in ("title", "description"))
+    return texts
+
 
 def golden_pins(root: Path = golden.GOLDENS) -> list[dict]:
     """(backend, model, model_digest) of every banked golden on this checkout."""
@@ -91,14 +106,21 @@ def last_resident(db: Path = observe.DB) -> dict[tuple[str, str], float]:
 
 
 def plan(rows: list[dict], goldens: list[dict], routes: dict, resident: dict, last_seen: dict,
-         configs: dict[str, str] | None = None) -> list[dict]:
+         configs: dict[str, str] | None = None,
+         open_beads: dict[str, str] | None = None,
+         journaled: set[str] | None = None) -> list[dict]:
     """Each inventory row plus `keep` (reasons; empty means a delete candidate) and `last_seen` (epoch or None).
-    A row is matched to goldens and residents by its last path segment, so mlx-serve's `org/name` meets a pin's `name`."""
+    A row is matched to goldens and residents by its last path segment, so mlx-serve's `org/name` meets a pin's `name`.
+    A parked alias in `journaled` is kept: only `localbench unpark` can release its gateway park fence.
+    `journaled` defaults to empty so the helper stays pure; gather() passes the one live read."""
+    journaled = frozenset() if journaled is None else journaled
     out = []
     for r in rows:
         server, name = r["server"], r["name"]
         short = name.split("/")[-1]
         keep = []
+        if r.get("parked") and name in journaled:
+            keep.append("journaled parked alias; run `localbench unpark` first")
         if r.get("freshness", "").startswith("cloud model"):
             keep.append("cloud model (no local weights)")
         if short in (resident.get(server) or []):
@@ -113,21 +135,33 @@ def plan(rows: list[dict], goldens: list[dict], routes: dict, resident: dict, la
         where = named_in(r, configs or {})
         if where:
             keep.append("named in " + ", ".join(where[:3]) + (f" (+{len(where) - 3} more)" if len(where) > 3 else ""))
+        keep.extend(named_in(r, open_beads or {}))
         seen = [t for (s, m), t in last_seen.items() if s == server and m.split("/")[-1] == short]
         if r.get("parked"):
             seen += [t for (s, m), t in last_seen.items() if s == server and m == r.get("source")]
         out.append({**r, "keep": keep, "last_seen": max(seen) if seen else None})
     return out
 
+def journaled_aliases(state: Path | None = None) -> set[str]:
+    """Parked aliases PARKED.json still promises to restore: deleting one would orphan its gateway park fence,
+    which only `localbench unpark` releases (it reads the fence ids from the journal)."""
+    state = park.STATE if state is None else state
+    if not state.exists():
+        return set()
+    return {p.get("parked_as") for p in json.loads(state.read_text()) if p.get("parked_as")}
+
 
 def check_delete(planned: list[dict], names: list[str]) -> tuple[list[dict], list[str]]:
-    """The rows `names` select, and one refusal per name that is unknown or kept."""
+    """The rows `names` select, and one refusal per name that is unknown, kept, or a journaled parked alias."""
+    journaled = journaled_aliases()
     by_name = {r["name"]: r for r in planned}
     targets, refusals = [], []
     for n in names:
         r = by_name.get(n)
         if r is None:
             refusals.append(f"{n}: not installed (names are as listed, e.g. qwen3.6:35b-mlx or org/name)")
+        elif r.get("parked") and n in journaled:
+            refusals.append(f"{n}: journaled parked alias; run `localbench unpark` first, then prune the restored original")
         elif r["keep"]:
             refusals.append(f"{n}: kept ({'; '.join(r['keep'])})")
         else:
@@ -135,17 +169,26 @@ def check_delete(planned: list[dict], names: list[str]) -> tuple[list[dict], lis
     return targets, refusals
 
 
-def delete(row: dict, state: Path = park.STATE) -> None:
+def delete(row: dict, state: Path | None = None) -> None:
     """Remove one candidate. An ollama tag goes through ollama's API (blobs no other tag uses are freed); a parked copy
     also leaves PARKED.json, so `localbench unpark` does not try to restore it. A model directory is removed whole."""
+    state = park.STATE if state is None else state
     if row["server"] == "ollama":
-        park._delete(row["name"])
-        if row.get("parked") and state.exists():
-            left = [p for p in json.loads(state.read_text()) if p["parked_as"] != row["name"]]
-            if left:
-                state.write_text(json.dumps(left, indent=2) + "\n")
-            else:
-                state.unlink()
+        # Same lock park()/unpark() hold: the journaled-alias recheck and the tag/journal
+        # mutation below are atomic against a concurrent park or unpark changing the journal.
+        with park._park_operation_lock():
+            if row.get("parked") and row["name"] in journaled_aliases(state):
+                raise RuntimeError(f"{row['name']}: journaled parked alias; run `localbench unpark` first, "
+                                   "then prune the restored original")
+            park._delete(row["name"])
+            if row.get("parked") and state.exists():
+                entries = json.loads(state.read_text())
+                left = [p for p in entries if p["parked_as"] != row["name"]]
+                if len(left) != len(entries):
+                    if left:
+                        state.write_text(json.dumps(left, indent=2) + "\n")
+                    else:
+                        state.unlink()
         return
     base = models.SPLASH_MODELS if row["server"] == "splash" else models.MLX_MODELS
     path = (base / row["name"]).resolve()
@@ -161,7 +204,7 @@ def run_alive() -> bool:
 def gather() -> list[dict]:
     rows = models.ollama_models() + models.mlx_models()
     return plan(rows, golden_pins(), models.routes_by_model(models.profiles()), sysstats.resident_models(),
-                last_resident(), config_texts())
+                last_resident(), config_texts(), open_bead_texts(), journaled_aliases())
 
 
 def show(planned: list[dict]) -> None:

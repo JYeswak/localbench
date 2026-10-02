@@ -22,7 +22,7 @@ from collections.abc import Callable
 from functools import cache
 from pathlib import Path
 
-from . import backends, golden, park, smol, sysstats, workloads
+from . import backends, golden, ollama_app, park, smol, sysstats, workloads
 
 MUTATION_LOCK = workloads.ROOT / "runs" / ".mutation.lock"
 WRITE_GOLDEN = "localbench aa <spec> --write-golden"
@@ -98,13 +98,39 @@ def check_ollama(_fix: bool) -> dict:
     except (OSError, ValueError) as exc:
         return _row("WARN", f"not answering on {ollama.root} ({exc}); optional when mlx-serve or oMLX serves the "
                             "model", "open -a Ollama")
-    auto = sysstats.ollama_auto_update()
+    auto = sysstats.ollama_auto_update(ollama_app.app_db())
+    staged = ollama_app.staged_update()
     detail = f"ollama {version} on {ollama.root}; Ollama.app auto-update " + (
         "unknown (no Ollama.app settings database)" if auto is None else "ON" if auto else "off")
+    if staged:
+        detail += (f"; staged update {', '.join(staged)} in {ollama_app.UPDATES} installs at the next app start "
+                   "regardless of the switch")
     if auto:
-        return _row("WARN", detail + ": the app can install a new ollama under every golden (turn it off in "
-                                     "Ollama.app Settings)")
+        # Owner decision 2026-09-30: Ollama is upgraded by hand, each release A/B'd on the role suites first.
+        return _row("FAIL", detail + ": the app can install a new ollama under every golden (policy: manual "
+                                     "upgrades)", "localbench ollama-app auto-update off")
+    if staged:
+        return _row("WARN", detail, f"inspect/remove the staged bundle in {ollama_app.UPDATES} before restarting "
+                                    "Ollama.app")
+    if auto is None:
+        return _row("WARN", detail + ": cannot prove the app will not update ollama under the goldens",
+                    "localbench ollama-app auto-update status")
     return _row("PASS", detail)
+
+
+def check_features(_fix: bool) -> dict:
+    """The omp feature map (localbench features): the worst finding wins; its fix is the row's fix."""
+    from . import features  # imported at call time: it reads omp's installed package and settings
+
+    found = features.doctor_findings()
+    if not found:
+        return _row("PASS", "no features registered in registries/features.tsv")
+    rank = {"PASS": 0, "WARN": 1, "FAIL": 2}
+    level, message, fix = max(found, key=lambda f: rank[f[0]])
+    counts = ", ".join(f"{n} {lv}" for lv in ("FAIL", "WARN", "PASS") if (n := sum(f[0] == lv for f in found)))
+    if level == "PASS":
+        return _row("PASS", f"{len(found)} feature(s): {counts}")
+    return _row(level, f"{counts}; worst: {message}", fix)
 
 
 def check_mlx(_fix: bool) -> dict:
@@ -112,12 +138,18 @@ def check_mlx(_fix: bool) -> dict:
     for name, exe, install in (
             ("mlx-serve", backends.mlx_serve_bin(),
              "brew install ddalcu/mlx-serve/mlx-serve  # or: export LOCALBENCH_MLX_SERVE=<mlx-serve executable>"),
-            ("oMLX", "omlx", "uv tool install omlx")):
+            ("oMLX", "omlx", "uv tool install omlx"),
+            ("mlxfast", backends.mlxfast_bin(),
+             "export LOCALBENCH_MLXFAST=<mlx-server built from Layr-Labs/mlxfast-bonsai2-27b-engine, mlx.metallib "
+             "beside it>")):
         path = shutil.which(exe)
-        (found if path else missing).append((name, path or exe, install))
+        if path and name == "mlxfast" and not (Path(path).absolute().parent / "mlx.metallib").is_file():
+            missing.append((name, f"{path} without mlx.metallib beside it", install))
+        else:
+            (found if path else missing).append((name, path or exe, install))
     detail = "; ".join([f"{n} at {p}" for n, p, _ in found] + [f"{n} not found ({p})" for n, p, _ in missing])
     if missing:
-        return _row("WARN", detail + " (optional: needed only for mlx-serve: / omlx: specs)",
+        return _row("WARN", detail + " (optional: needed only for mlx-serve: / omlx: / mlxfast: specs)",
                     "; ".join(i for _, _, i in missing))
     return _row("PASS", detail)
 
@@ -256,8 +288,9 @@ def check_disk(_fix: bool) -> dict:
 
 CHECKS: list[tuple[str, Callable[[bool], dict]]] = [
     ("platform", check_platform), ("python", check_python), ("data root", check_data_root), ("omp", check_omp),
-    ("ollama", check_ollama), ("mlx-serve/oMLX", check_mlx), ("sudoers", check_sudoers), ("park", check_park),
+    ("ollama", check_ollama), ("mlx-serve/oMLX/mlxfast", check_mlx), ("sudoers", check_sudoers), ("park", check_park),
     ("smol server", check_smol), ("mutation lock", check_mutation_lock), ("goldens", check_goldens), ("disk", check_disk),
+    ("omp features", check_features),
 ]
 
 

@@ -1,0 +1,39 @@
+# features.tsv — every omp feature that can send work to a local model, tied to its omp call site.
+# Consumer: localbench/features.py (`localbench features [--json]`, doctor). One row per feature; tab-separated;
+# `#` lines and blank lines are ignored; every field is non-empty (`-` for none). Call sites verified against
+# @oh-my-pi/pi-coding-agent 18.4.5 and pi-mnemopi in ~/.bun/install/global/node_modules/@oh-my-pi on 2026-09-30.
+# consumer     product whose behavior the route changes (omp)
+# feature      unique id; proof receipts name it in their `feature` field
+# omp_package  package dir under node_modules/@oh-my-pi (pi-coding-agent, pi-mnemopi, pi-ai)
+# omp_module   file relative to that package root; its sha256 is what a receipt's `omp_module_sha` must match
+# omp_symbol   function/class/entry at the call site
+# role         omp model-role chain the call site resolves, first set role wins (`judge>tiny>smol`);
+#              `fastembed` = mnemopi's embedding model (local/<fastembed cache dir>)
+# route_kind   model_role: always live, route_key = first role of the chain
+#              agent:      bundled subagent, route_key = agent name; DISABLED when task.disabledAgents lists it
+#              setting:    live while one `|`-separated alternative holds: all its `&`-joined conditions, each
+#                          `key=value` / `key!=value` in omp's resolved settings (`omp config list --json`) or
+#                          `native-judge` (the role chain resolves first to a System One API model, omp's
+#                          hasNativeJudge; a models.yml provider with api typesafe counts)
+# local        a target is local when its provider is built-in local (park.LOCAL_PROVIDERS) or the profile's
+#              models.yml gives the provider a loopback baseUrl (e.g. ollama-sys1 -> 127.0.0.1:11434); a local
+#              route straight to ollama's :11434 instead of the localbench gateway :11300 is a doctor WARN
+# proof        a BETTER decision/memory run receipt for this feature, this module sha and the routed model's
+#              digest (localbench/features.py PROOF CONTRACT); a setting row turned off at a gating value by its
+#              preset (mnemopi-extraction at mnemopi.llmMode=none) is a no-model route, proved by pins.route
+#              {kind fixed, id none} and pins.model_calls 0 instead of a digest
+# proof_suite  localbench suite whose receipt proves the local route (decision, mem; - = none yet)
+# preset       preset family that switches the route (kit-presets-switcher-r3l; - = none)
+consumer	feature	omp_package	omp_module	omp_symbol	role	route_kind	route_key	proof_suite	preset	notes
+omp	auto-thinking	pi-coding-agent	src/auto-thinking/classifier.ts	classifyDifficulty	judge>tiny>smol	setting	defaultThinkingLevel=auto	decision	judge	called from session/model-controls.ts:609 applyAutoThinkingLevel every user turn, 4 s cap; classifier.ts:134-172
+omp	find-judgments	pi-coding-agent	src/tools/jfind/index.ts	FindTool	judge>tiny>smol	setting	find.enabled=on|find.enabled=auto&native-judge	decision	judge	index.ts:46-95 isFindEnabled; auto needs judgment/index.ts hasNativeJudge
+omp	ttsr-judge	pi-coding-agent	src/session/agent-session.ts	AgentSession.ruleJudge	judge>tiny>smol	setting	ttsr.judge=on|ttsr.judge=auto&native-judge	decision	judge	agent-session.ts:2771-2785 TTSR question rules; auto needs hasNativeJudge
+omp	unexpected-stop	pi-coding-agent	src/session/unexpected-stop-classifier.ts	classifyUnexpectedStop	judge>tiny>smol	setting	features.unexpectedStopDetection=smart	decision	judge	classifies text-only stops via resolveJudge; session model is the chain's last resort
+omp	mnemopi-extraction	pi-mnemopi	src/core/extraction.ts	extractFactCategories	memory>tiny>smol	setting	memory.backend=mnemopi&mnemopi.llmMode=smol	mem	memory	extraction.ts:387-393 callConfiguredCompletion (temperature 0); host entry pi-coding-agent mnemopi/state.ts:533-584 retain
+omp	recall-embeddings	pi-mnemopi	src/core/embeddings.ts	embed	fastembed	setting	memory.backend=mnemopi&mnemopi.noEmbeddings=false	mem	embeddings	fastembed ONNX on the CPU in a worker per memory-on omp process (local/fast-bge-base-en-v1.5 by default); proven against embeddings:fts with the embedder digest (workloads.fastembed_digest) as model_digest
+omp	titles	pi-coding-agent	src/utils/title-generator.ts	generateSessionTitle	tiny>commit>smol	model_role	tiny	-	-	title-generator.ts:131 collectOnlineTinyCandidates([tiny, commit, smol])
+omp	skill-description-compression	pi-coding-agent	src/extensibility/skill-descriptions.ts	createSkillDescriptionCompressor	smol>tiny	model_role	smol	-	-	skill-descriptions.ts:30-43 smol, else MODEL_PRIO.smol, else tiny
+omp	commit-messages	pi-coding-agent	src/commit/model-selection.ts	resolvePrimaryModel	commit>smol	model_role	commit	-	-	model-selection.ts:46 resolveRoleSelection([commit, smol, ...]); omp commit only
+omp	edit-auto-repair	pi-coding-agent	src/edit/auto-repair.ts	attemptEditAutoRepair	smol	setting	edit.autoRepair.enabled=true	-	-	auto-repair.ts:286-300 asks smol to fix an edit that broke the AST parse
+omp	scout-agent	pi-coding-agent	src/prompts/agents/scout.md	scout frontmatter (model: @smol)	smol	agent	scout	-	scout	bundled subagent; whole agent turns on @smol; task/spawn-policy.ts honors task.disabledAgents
+omp	sonic-agent	pi-coding-agent	src/task/agents.ts	sonic.md bundled entry (model: @smol)	smol	agent	sonic	-	sonic	task/agents.ts:64-69; whole agent turns on @smol

@@ -4,9 +4,9 @@ mlx-serve, Splash) this covers the models omp runs itself on the CPU: its tiny m
 
 Freshness is exact where the source allows: an ollama model's ID is the first 12 hex of sha256(registry manifest),
 so fetching the tag's manifest and hashing it says whether the installed build is the one the registry serves now
-(checked 2026-09-23: qwen3.6:35b-mlx → e92a3e94bbca both ways). A Hugging Face repo has no per-file digest in its
-summary, so an MLX directory is compared by time: upstream `lastModified` after the local copy's newest file means
-the upstream changed since download. Network reads only (registry, HF API); no inference leaves the machine.
+(checked 2026-09-23: qwen3.6:35b-mlx → e92a3e94bbca both ways). A Hugging Face directory is current only when a
+recorded commit for that repo matches the API's commit. That record does not verify the bytes on disk; without it,
+a digest of small configuration files identifies the local artifact but cannot establish upstream freshness.
 """
 
 from __future__ import annotations
@@ -63,7 +63,8 @@ def ollama_models() -> list[dict]:
         name, digest = m["name"], m["digest"][:12]
         source = parked.get(name, name)
         row = {"server": "ollama", "name": name, "digest": digest, "gb": round(m.get("size", 0) / 1e9, 1),
-               "source": source, "parked": name in parked}
+               "source": source, "parked": name in parked, "upstream_modified": None,
+               "upstream_date_source": "unavailable"}
         if source.endswith(":cloud") or m.get("remote_host"):
             row["freshness"] = "cloud model (runs remotely)"
         else:
@@ -80,28 +81,105 @@ def ollama_models() -> list[dict]:
     return out
 
 
+def _hf_artifact(d: Path, repo: str) -> tuple[str | None, str, str | None, str | None]:
+    """Return display identity, its provenance, comparable full commit, and reason if comparison is unsound."""
+    metadata = (".hf_commit", "refs/main", ".cache/huggingface/download/.gitattributes.metadata")
+    records: list[tuple[str, str]] = []
+    invalid = False
+    for name in metadata:
+        path = d / name
+        if path.is_file():
+            try:
+                value = path.read_text().split()[0]
+            except (OSError, UnicodeError, IndexError):
+                invalid = True
+                continue
+            if not re.fullmatch(r"[0-9a-fA-F]{40}", value):
+                invalid = True
+                continue
+            records.append((name, value.lower()))
+
+    # A naked commit in an unrelated directory is not evidence that it belongs to the requested repo.
+    linked = "/".join(d.parts[-2:]) == repo
+    config = d / "config.json"
+    if config.is_file():
+        try:
+            configured_repo = json.loads(config.read_text()).get("_name_or_path")
+            if configured_repo:
+                linked = configured_repo == repo
+        except (OSError, UnicodeError, ValueError, AttributeError):
+            pass
+
+    if records and linked and not invalid and len({value for _, value in records}) == 1:
+        name, commit = records[0]
+        return commit[:12], f"{name} (recorded HF commit; bytes not verified)", commit, None
+
+    # No weights are read here. This is an artifact identifier, not a proof of upstream revision.
+    h = hashlib.sha256()
+    names = ("config.json", "model.safetensors.index.json", "tokenizer_config.json")
+    found = []
+    for name in names:
+        path = d / name
+        if path.is_file():
+            h.update(path.read_bytes())
+            found.append(name)
+    identity = "files:" + h.hexdigest()[:12] if found else None
+    source = "config/index/tokenizer SHA-256 (partial file digest; weights not hashed)" if found else "no small artifact files"
+    if invalid:
+        reason = "invalid recorded HF commit"
+    elif len({value for _, value in records}) > 1:
+        reason = "conflicting recorded HF commits"
+    elif records and not linked:
+        reason = f"recorded commit repo cannot be linked to {repo}"
+    else:
+        reason = "no recorded HF commit; file digest cannot be compared with upstream commit"
+    return identity, source, None, reason
+
+
 def _hf_row(d: Path, server: str, name: str, repo: str) -> dict:
-    """A model directory downloaded from Hugging Face repo `repo`: size, newest local file, and whether the repo changed
-    after that (HF summaries carry no per-file digest, so this compares times)."""
+    """Inventory an HF directory without treating timestamps or a partial file digest as commit evidence."""
     files = [f for f in d.rglob("*") if f.is_file() and not any(p.startswith(".") for p in f.relative_to(d).parts)]
     local = max((f.stat().st_mtime for f in files), default=d.stat().st_mtime)
+    identity, identity_source, commit, reason = _hf_artifact(d, repo)
     row = {"server": server, "name": name, "repo": repo, "gb": round(sum(f.stat().st_size for f in files) / 1e9, 1),
-           "local_copy": time.strftime("%Y-%m-%d %H:%M", time.localtime(local))}
+           "local_copy": time.strftime("%Y-%m-%d %H:%M", time.localtime(local)),
+           "installed_artifact": identity, "installed_artifact_source": identity_source,
+           "upstream_modified": None, "upstream_date_source": "unavailable"}
     code, body = _fetch(f"{HF_API}/{repo}")
-    if code == 200:
+    if code != 200:
+        row["freshness"] = f"unavailable (Hugging Face API HTTP {code or 'unreachable'})"
+        return row
+    try:
         info = json.loads(body)
-        upstream = datetime.fromisoformat(info["lastModified"]).timestamp()
-        row.update(upstream_sha=info.get("sha", "")[:12], upstream_modified=info["lastModified"][:16])
-        row["freshness"] = ("upstream changed after the local copy" if upstream > local + 60
-                            else "current (local copy is newer than the last upstream change)")
+        sha = info.get("sha")
+        if not isinstance(sha, str) or not re.fullmatch(r"[0-9a-fA-F]{40}", sha):
+            raise ValueError("missing or invalid commit SHA")
+        sha = sha.lower()
+    except (ValueError, TypeError, AttributeError, UnicodeError):
+        row["freshness"] = "unknown (invalid Hugging Face response: missing or invalid commit SHA)"
+        return row
+    row["upstream_sha"] = sha[:12]
+    for date_field in ("lastModified", "createdAt"):
+        value = info.get(date_field)
+        if isinstance(value, str):
+            try:
+                datetime.fromisoformat(value)
+            except ValueError:
+                continue
+            row.update(upstream_modified=value[:16], upstream_date_source=date_field)
+            break
+    if info.get("id") and info["id"] != repo:
+        row["freshness"] = f"unknown (Hugging Face response repo {info['id']} differs from {repo})"
+    elif commit is not None:
+        row["freshness"] = ("current (recorded HF commit matches; bytes not verified)" if commit == sha
+                            else f"update available (upstream commit {sha[:12]} differs from recorded commit)")
     else:
-        row["freshness"] = f"no Hugging Face repo {repo} (HTTP {code or 'unreachable'})"
+        row["freshness"] = f"unknown ({reason})"
     return row
 
 
 def mlx_models() -> list[dict]:
-    """mlx-serve model dirs (<org>/<name>/config.json) and Inco Splash packages (<org>/<name>/target|draft): both are
-    Hugging Face repos, compared by time."""
+    """mlx-serve model dirs (<org>/<name>/config.json) and Inco Splash packages (<org>/<name>/target|draft)."""
     dirs = [(c.parent, "mlx-serve") for c in sorted(MLX_MODELS.glob("*/*/config.json"))] if MLX_MODELS.is_dir() else []
     if SPLASH_MODELS.is_dir():
         dirs += [(d, "splash") for d in sorted(SPLASH_MODELS.glob("*/*")) if (d / "target").is_dir()]
@@ -135,11 +213,71 @@ def profiles() -> list[str]:
                               (Path.home() / ".omp" / "profiles").glob("*/agent/config.yml"))]
 
 
-def routes_by_model(names: list[str]) -> dict[str, dict[str, list[str]]]:
-    """model name → {feature: [profiles]} over the profiles `names` (omp's own resolved settings per profile)."""
+DISABLED = "disabled (task.disabledAgents)"
+
+
+def agent_config(profile: str) -> Path:
+    """The config.yml omp reads for `profile`: ~/.omp/agent for default, else ~/.omp/profiles/<profile>/agent."""
+    home = Path.home() / ".omp"
+    return (home / "agent" if profile == "default" else home / "profiles" / profile / "agent") / "config.yml"
+
+
+def disabled_agents(profile: str) -> set[str]:
+    """The bundled subagents `profile` disables (`task.disabledAgents` in its config.yml; block or flow list). Read
+    from the file, not `omp config list`, so listing routes costs no second omp call per profile."""
+    cfg = agent_config(profile)
+    lines = cfg.read_text(encoding="utf-8").splitlines() if cfg.is_file() else []
+    task = next((i for i, line in enumerate(lines) if re.fullmatch(r"task:\s*(#.*)?", line)), None)
+    if task is None:
+        return set()
+    out: set[str] = set()
+    key_indent = None
+    for line in lines[task + 1:]:
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        indent = len(line) - len(line.lstrip())
+        if indent == 0:
+            break
+        if key_indent is None:
+            m = re.fullmatch(r"(\s+)['\"]?disabledAgents['\"]?:\s*(.*?)\s*(#.*)?", line)
+            if not m:
+                continue
+            flow = m.group(2)
+            if flow.startswith("["):
+                return {a.strip().strip("'\"") for a in flow.strip("[]").split(",") if a.strip()}
+            key_indent = len(m.group(1))
+        elif line.lstrip().startswith("-") and indent >= key_indent:
+            out.add(line.lstrip()[1:].split("#", 1)[0].strip().strip("'\""))
+        else:
+            break
+    return out
+
+
+def _agent(feature: str) -> str | None:
+    """The bundled subagent a park.local_routes feature is (`scout subagents (...)` -> scout), else None."""
+    m = re.match(r"(\S+) subagents\b", feature)
+    return m.group(1) if m else None
+
+
+def local_routes(profile: str = "default") -> dict[str, str]:
+    """park.local_routes for `profile`, with every subagent the profile disables mapped to DISABLED instead of the
+    model it would run on: since 2026-10-01 01:43Z scout is in task.disabledAgents of every local-smol profile, so
+    no scout turn reaches ollama/qwen3.8 there."""
+    off = disabled_agents(profile)
+    return {feature: DISABLED if _agent(feature) in off else target
+            for feature, target in park.local_routes(profile).items()}
+
+
+def routes_by_model(names: list[str], disabled: dict[str, list[str]] | None = None) -> dict[str, dict[str, list[str]]]:
+    """model name → {feature: [profiles]} over the profiles `names` (omp's own resolved settings per profile). A
+    disabled subagent is not a route: it is left out, and recorded as feature → [profiles] in `disabled` when given."""
     uses: dict[str, dict[str, list[str]]] = {}
     for profile in names:
-        for feature, target in park.local_routes(profile).items():
+        for feature, target in local_routes(profile).items():
+            if target == DISABLED:
+                if disabled is not None:
+                    disabled.setdefault(feature, []).append(profile)
+                continue
             model = target.split("/", 1)[1]
             base, _, last = model.rpartition(":")
             if base and last in park.THINKING:

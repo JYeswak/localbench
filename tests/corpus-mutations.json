@@ -1,0 +1,122 @@
+[
+  {
+    "label": "corpus output inside the repo is refused",
+    "file": "localbench/corpus.py",
+    "old": "if target == REPO_ROOT or REPO_ROOT in target.parents:",
+    "new": "if target == REPO_ROOT:",
+    "tests": ["tests.test_corpus.ImportProfile.test_output_inside_the_repo_is_refused_before_anything_is_written"]
+  },
+  {
+    "label": "invalid hosted answers are skipped, never imported",
+    "file": "localbench/corpus.py",
+    "old": "            except CorpusError:\n                skipped[\"invalid_answer\"] += 1\n                continue",
+    "new": "            except CorpusError:\n                skipped[\"invalid_answer\"] += 1",
+    "tests": ["tests.test_corpus.ToItems.test_noul_items_carry_bool_labels_and_validated_references"]
+  },
+  {
+    "label": "answers from several models without a pin are refused",
+    "file": "localbench/corpus.py",
+    "old": "if len(models) != 1:",
+    "new": "if False:",
+    "tests": ["tests.test_corpus.ToItems.test_two_answering_models_without_a_pin_are_refused"]
+  },
+  {
+    "label": "suites pin a snapshot, not the live cache",
+    "file": "localbench/corpus.py",
+    "old": "items=items, sources=[snapshot], gate=gate",
+    "new": "items=items, sources=[source_db], gate=gate",
+    "tests": ["tests.test_corpus.ImportProfile.test_suite_pins_a_snapshot_and_survives_later_cache_appends"]
+  },
+  {
+    "label": "an explicit gate is required to build",
+    "file": "localbench/corpus.py",
+    "old": "if gate is None:",
+    "new": "if False:",
+    "tests": ["tests.test_corpus.ImportProfile.test_import_without_an_explicit_gate_is_refused_before_anything_is_written"]
+  },
+  {
+    "label": "a disabled capture spec captures nothing",
+    "file": "localbench/gateway.py",
+    "old": "return (isinstance(spec, dict) and spec.get(\"enabled\") is True",
+    "new": "return (isinstance(spec, dict) and True",
+    "tests": ["tests.test_gateway.CaptureOptIn.test_off_writes_nothing"]
+  },
+  {
+    "label": "an expired capture spec captures nothing",
+    "file": "localbench/gateway.py",
+    "old": "spec[\"until\"] > time.time()",
+    "new": "True",
+    "tests": ["tests.test_gateway.CaptureOptIn.test_expiry_disables_capture"]
+  },
+  {
+    "label": "the capture cap is respected per purpose",
+    "file": "localbench/gateway.py",
+    "old": "if kind == \"request\" and corpus.capture_purpose_items(None, purpose) >= plan[\"max_items\"]:",
+    "new": "if False:",
+    "tests": ["tests.test_gateway.CaptureOptIn.test_cap_is_respected",
+              "tests.test_gateway.CaptureOptIn.test_cap_is_per_purpose"]
+  },
+  {
+    "label": "a capture failure never breaks forwarding",
+    "file": "localbench/gateway.py",
+    "old": "    except Exception:  # noqa: BLE001 - see above\n        return None",
+    "new": "    except Exception:  # noqa: BLE001 - see above\n        raise",
+    "tests": ["tests.test_gateway.CaptureOptIn.test_capture_failure_still_forwards_with_200"]
+  },
+  {
+    "label": "created corpora dirs are re-resolved against repo trees",
+    "file": "localbench/corpus.py",
+    "old": "    return refuse_repo_path(path.resolve())",
+    "new": "    return path",
+    "tests": ["tests.test_corpus.ImportProfile.test_symlink_swapped_in_after_the_upfront_check_is_refused"]
+  },
+  {
+    "label": "corpora dirs stay owner-only",
+    "file": "localbench/corpus.py",
+    "old": "        path.chmod(0o700)",
+    "new": "        path.chmod(0o777)",
+    "tests": ["tests.test_corpus.ImportProfile.test_suite_dirs_and_files_are_owner_only"]
+  },
+  {
+    "label": "omp identity comes only from an explicit token",
+    "file": "localbench/gateway.py",
+    "old": "        version, sha = match.group(1) or None, match.group(2)",
+    "new": "        version, sha = None, None",
+    "tests": ["tests.test_gateway.OmpIdentity.test_version_and_sha_come_only_from_an_explicit_omp_token"]
+  },
+  {
+    "label": "stats reports live capture counts",
+    "file": "localbench/corpus.py",
+    "old": "\"capture\": {\"items\": status[\"items\"], \"active\": status[\"active\"]}",
+    "new": "\"capture\": {\"items\": 0, \"active\": False}",
+    "tests": ["tests.test_corpus.CaptureSpec.test_stats_counts_captured_pairs_and_activity"]
+  },
+  {
+    "label": "known choice criteria keep omp order, not cache order",
+    "file": "localbench/corpus.py",
+    "old": "question[\"criteria\"] = dict(known[\"criteria\"])",
+    "new": "question[\"criteria\"] = dict(sorted(known[\"criteria\"]))",
+    "tests": ["tests.test_corpus.ToItems.test_ttsr_state_and_level_criteria_round_trip_in_omp_order"]
+  },
+  {
+    "label": "ttsr states send output before content",
+    "file": "localbench/corpus.py",
+    "old": "return {\"output\": parsed[\"output\"], \"content\": parsed[\"content\"]}",
+    "new": "return {\"content\": parsed[\"content\"], \"output\": parsed[\"output\"]}",
+    "tests": ["tests.test_corpus.ToItems.test_ttsr_state_and_level_criteria_round_trip_in_omp_order"]
+  },
+  {
+    "label": "hosted choice probabilities rescale before validation",
+    "file": "localbench/corpus.py",
+    "old": "                if kind == \"choice\" and isinstance(raw, dict) and isinstance(\n                        question.get(\"criteria\"), dict):",
+    "new": "                if False:",
+    "tests": ["tests.test_corpus.ToItems.test_ttsr_state_and_level_criteria_round_trip_in_omp_order"]
+  },
+  {
+    "label": "drifted known questions are skipped, not silently reordered",
+    "file": "localbench/corpus.py",
+    "old": "                    skipped[\"drifted_question\"] += 1\n                    continue",
+    "new": "                    pass",
+    "tests": ["tests.test_corpus.ToItems.test_known_name_with_drifted_text_is_skipped_not_reordered"]
+  }
+]

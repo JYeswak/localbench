@@ -1,0 +1,201 @@
+[
+  {
+    "label": "negative finite duration remains rejected",
+    "file": "localbench/gateway.py",
+    "old": "if value[0] == \"-\":",
+    "new": "if False:",
+    "tests": ["tests.test_gateway.Duration.test_finite_duration_parser_bounds_values_and_rejects_unbounded_spellings"]
+  },
+  {
+    "label": "default keep remains finite",
+    "file": "localbench/__main__.py",
+    "old": "default=\"5m\"",
+    "new": "default=\"forever\"",
+    "tests": ["tests.test_keep_pull.Keep.test_default_keep_is_five_minutes_and_records_a_finite_lease"]
+  },
+  {
+    "label": "confirmed unload does not claim a later external resident",
+    "file": "localbench/gateway.py",
+    "old": "\"unloaded_confirmed\", \"not_resident_confirmed\", \"unmanaged_on_remove\"",
+    "new": "\"not_resident_confirmed\", \"unmanaged_on_remove\"",
+    "tests": ["tests.test_gateway.StoreAndExpiry.test_resident_reloaded_after_confirmed_gateway_unload_is_unowned"]
+  },
+  {
+    "label": "streaming reads available chunks without buffering",
+    "file": "localbench/gateway.py",
+    "old": "read_chunk = getattr(upstream, \"read1\", upstream.read)",
+    "new": "read_chunk = upstream.read",
+    "tests": ["tests.test_gateway.HttpGateway.test_metadata_is_unleased_and_sse_is_attributed_and_streamed_before_completion"]
+  },
+  {
+    "label": "idle unload waits the full five minutes",
+    "file": "localbench/gateway.py",
+    "old": "IDLE_SECONDS = 300.0",
+    "new": "IDLE_SECONDS = 299.0",
+    "tests": ["tests.test_gateway.StoreAndExpiry.test_concurrent_requests_hold_lease_until_last_completion_then_idle_window"]
+  },
+  {
+    "label": "established external sockets always defer unload",
+    "file": "localbench/gateway.py",
+    "old": "if clients:",
+    "new": "if False:",
+    "tests": ["tests.test_gateway.ExpirySafety.test_persistent_external_connection_defers_unload_past_five_minutes"]
+  },
+  {
+    "label": "partial request bodies obey the total read deadline",
+    "file": "localbench/gateway.py",
+    "old": "remaining = deadline - time.monotonic()",
+    "new": "remaining = REQUEST_BODY_TIMEOUT_SECONDS + 3600",
+    "tests": ["tests.test_gateway.HttpGateway.test_partial_request_body_times_out_before_upstream_forwarding"]
+  },
+  {
+    "label": "in-flight unload claim blocks a new request",
+    "file": "localbench/gateway.py",
+    "old": "if pending is not None and pending[\"last_outcome\"] == \"unload_pending\":",
+    "new": "if False:",
+    "tests": ["tests.test_gateway.StoreAndExpiry.test_unload_claim_excludes_new_requests_and_manual_keep_until_outcome"]
+  },
+  {
+    "label": "Ollama residency must be absent after unload",
+    "file": "localbench/gateway.py",
+    "old": "if model in after:",
+    "new": "if False:",
+    "tests": ["tests.test_gateway.ExpirySafety.test_unload_and_readback_failures_remain_visible_and_do_not_claim_success"]
+  },
+  {
+    "label": "profile install preserves concurrent edits",
+    "file": "localbench/omp_profiles.py",
+    "old": "if path.is_symlink() or current_exists != existed or current != original:",
+    "new": "if path.is_symlink() or current_exists != existed or False:",
+    "tests": ["tests.test_gateway.OmpProfiles.test_install_preserves_profile_edit_that_races_the_write"]
+  },
+  {
+    "label": "gateway install dry-run does not call installer",
+    "file": "localbench/__main__.py",
+    "old": "if (rc := mutation.gate(steps, refuse=refuse, noop=noop)) is not None:",
+    "new": "if False:",
+    "tests": ["tests.test_gateway.GatewayCli.test_install_dry_run_reports_profile_plan_without_writing_profile_or_manifest"]
+  },
+  {
+    "label": "removed gateway no longer claims old expiry",
+    "file": "localbench/gateway.py",
+    "old": "last_outcome='unmanaged_on_remove'",
+    "new": "last_outcome=NULL",
+    "tests": ["tests.test_gateway.StoreAndExpiry.test_removed_gateway_no_longer_claims_expired_model_leases"]
+  },
+  {
+    "label": "nonfinite expiry never enters manual model lease store",
+    "file": "localbench/gateway.py",
+    "old": "not math.isfinite(expires_at) or not math.isfinite(current) or expires_at <= current",
+    "new": "not math.isfinite(current) or expires_at <= current",
+    "tests": ["tests.test_gateway.StoreAndExpiry.test_manual_lease_refuses_nonfinite_expiry_or_clock_before_any_row_is_written"]
+  },
+  {
+    "label": "systemone route stays registered on both loopback paths",
+    "file": "localbench/gateway.py",
+    "old": "\"completions\", \"embeddings\", \"systemone\"",
+    "new": "\"completions\", \"embeddings\", \"systemone_unregistered\"",
+    "tests": ["tests.test_gateway.RoutePolicy.test_systemone_routes_forward_to_ollama_unchanged"]
+  },
+  {
+    "label": "park fence still refuses while a decision request is in flight",
+    "file": "localbench/gateway.py",
+    "old": "if fenced is not None:",
+    "new": "if False:",
+    "tests": ["tests.test_gateway.HttpGateway.test_park_fence_refuses_while_a_decision_request_is_in_flight"]
+  },
+  {
+    "label": "decision purpose reads object-form question keys",
+    "file": "localbench/gateway.py",
+    "old": "if isinstance(questions, dict):",
+    "new": "if False:",
+    "tests": ["tests.test_gateway.DecisionPurpose.test_question_names_join_the_decision_purpose"]
+  },
+  {
+    "label": "long decision purposes stay under the store bound",
+    "file": "localbench/gateway.py",
+    "old": "if len(joined) > 184:",
+    "new": "if False:",
+    "tests": ["tests.test_gateway.DecisionPurpose.test_long_question_names_are_bounded_with_a_stable_hash_suffix",
+              "tests.test_gateway.HttpGateway.test_many_long_question_names_still_forward_with_status_200"]
+  },
+  {
+    "label": "health check bypasses the lease store",
+    "file": "localbench/gateway.py",
+    "old": "route = route_request(self.command, self.path, ())",
+    "new": "route = route_request(self.command, self.path, self.server.store.profile_paths())",
+    "tests": ["tests.test_gateway.HealthzIndependence.test_healthz_never_touches_the_lease_store"]
+  },
+  {
+    "label": "lease sweep stays off the accept thread",
+    "file": "localbench/gateway.py",
+    "old": "server.maintenance()",
+    "new": "pass",
+    "tests": ["tests.test_gateway.HealthzIndependence.test_lease_sweep_runs_off_the_accept_thread",
+              "tests.test_gateway.HealthzIndependence.test_maintenance_loop_keeps_sweeping_until_stopped"]
+  },
+  {
+    "label": "status reports the timed probe latency",
+    "file": "localbench/gateway.py",
+    "old": "\"health_latency_s\": probe[\"latency_s\"]",
+    "new": "\"health_latency_s\": 0.0",
+    "tests": ["tests.test_gateway.HealthProbeStatus.test_both_status_verbs_share_one_timed_probe"]
+  },
+  {
+    "label": "gateway capture keeps the shared purpose validator",
+    "file": "localbench/gateway.py",
+    "old": "if not corpus.valid_capture_purpose(purpose):",
+    "new": "if False:",
+    "tests": ["tests.test_gateway.CaptureOptIn.test_gateway_capture_uses_the_shared_purpose_validator"]
+  },
+  {
+    "label": "capture_on fails fast on uncapturable purposes",
+    "file": "localbench/corpus.py",
+    "old": "if any(not valid_capture_purpose(purpose) for purpose in purposes):",
+    "new": "if False:",
+    "tests": ["tests.test_gateway.CaptureOptIn.test_capture_on_rejects_purposes_the_gateway_cannot_capture"]
+  },
+  {
+    "label": "unfence releases a fence that park holds",
+    "file": "localbench/__main__.py",
+    "old": "              if fence_id in _park_fence_ids() else None)",
+    "new": "              if False else None)",
+    "tests": ["tests.test_gateway.GatewayCli.test_fence_holds_until_its_own_unfence_and_never_releases_park"]
+  },
+  {
+    "label": "a fenced request is reported as an unregistered profile",
+    "file": "localbench/gateway.py",
+    "old": "\"gateway is draining and will not accept new requests\" if \"draining\" in reason else\n                           \"model is fenced at the gateway (park or an agreed window); retry after it is released\"\n                           if \"fenced\" in reason else\n                           \"OMP profile is not registered with the residency gateway\" if \"not registered\" in reason\n                           else reason)",
+    "new": "\"gateway is draining and will not accept new requests\" if \"draining\" in reason else\n                           \"OMP profile is not registered with the residency gateway\")",
+    "tests": ["tests.test_gateway.HttpGateway.test_a_fenced_decision_request_is_refused_at_once_and_says_why"]
+  },
+  {
+    "label": "fence reports success while a request is in flight (fence never acquired)",
+    "file": "localbench/__main__.py",
+    "old": "        while (refusal := store.acquire_park_fence(models, fence_id)) is not None:",
+    "new": "        while (refusal := store.acquire_park_fence(models, fence_id)) is not None and False:",
+    "tests": ["tests.test_gateway.GatewayCli.test_fence_waits_out_an_in_flight_request_then_refuses_when_time_is_up"]
+  },
+  {
+    "label": "stop returns only after the gateway is down",
+    "file": "localbench/gateway.py",
+    "old": "        _await_gateway_down(run, unload_timeout)",
+    "new": "        pass",
+    "tests": ["tests.test_gateway.StopStartRace.test_stop_waits_out_stale_loaded_and_lingering_health",
+              "tests.test_gateway.StopStartRace.test_stop_timeout_names_which_side_is_stuck"]
+  },
+  {
+    "label": "stop waits for health silence as well as unload",
+    "file": "localbench/gateway.py",
+    "old": "        if _probe_health(timeout=STOP_PROBE_TIMEOUT)[\"ok\"]:",
+    "new": "        if False:",
+    "tests": ["tests.test_gateway.StopStartRace.test_stop_timeout_names_which_side_is_stuck"]
+  },
+  {
+    "label": "start re-probes before claiming already healthy",
+    "file": "localbench/__main__.py",
+    "old": "            elif service[\"launchd_loaded\"] and service[\"health\"]:\n                service = gateway.service_status()\n                if service[\"launchd_loaded\"] and service[\"health\"]:\n                    noop = \"gateway LaunchAgent is already healthy\"",
+    "new": "            elif service[\"launchd_loaded\"] and service[\"health\"]:\n                noop = \"gateway LaunchAgent is already healthy\"",
+    "tests": ["tests.test_gateway.StopStartRace.test_start_reprobes_before_claiming_already_healthy"]
+  }
+]

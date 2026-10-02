@@ -10,6 +10,7 @@ the exact request shape omp sends to local backends, with TTFT per LLM call.
 from __future__ import annotations
 
 import json
+import os
 import sys
 import threading
 import time
@@ -33,7 +34,7 @@ def _has_token(ev: dict) -> bool:
     return False
 
 
-# Markers of omp's tool-free side calls, taken from request bodies omp 18.2.11 sent through this proxy (2026-09-23,
+# Markers of omp's side calls, taken from request bodies omp 18.2.11 sent through this proxy (2026-09-23,
 # save_dir) and from its prompt files: (purpose, turn the marker is sent in, marker). The auto-thinking classifier is
 # one judge question, so it is matched first. mnemopi's extraction sends its instructions as the system turn
 # (src/prompts/system/memory-extraction-system.md); consolidation renders memory-consolidation-system.md into the user
@@ -46,13 +47,21 @@ SIDE_CALLS = (("auto-thinking", "system", "Choose the reasoning effort this turn
 
 
 def purpose(meta: dict) -> str:
-    """`main` for turns that carry omp's tools; otherwise the side call a marker identifies, else `aux`."""
-    if meta.get("tools"):
-        return "main"
+    """The side call a system-turn marker identifies, else `main` for turns that carry omp's tools, else the side call
+    a user-turn marker identifies, else `aux`. System markers come first because omp's judge retries an answer that
+    is not a label with a forced `submit_judgment` tool (omp 18.3.1, pi-ai judgment/chat.ts; seen through a stub
+    server, 2026-09-26): that retry is still the effort classifier, not main work, and not a turn's answer call.
+    omp's main-turn system prompt carries none of these markers; a user turn can quote memory text, so user-turn
+    markers only name tool-free calls."""
     text = {role: " ".join(m["content"] if isinstance(m.get("content"), str) else json.dumps(m.get("content"))
                            for m in meta.get("messages") or [] if m.get("role") == role)
             for role in ("system", "user")}
-    return next((name for name, where, marker in SIDE_CALLS if marker in text[where]), "aux")
+    hit = next((name for name, where, marker in SIDE_CALLS if where == "system" and marker in text["system"]), None)
+    if hit:
+        return hit
+    if meta.get("tools"):
+        return "main"
+    return next((name for name, where, marker in SIDE_CALLS if where == "user" and marker in text["user"]), "aux")
 
 
 def make_handler(upstream: str, calls_log: Path, save_dir: Path | None, label: str):
@@ -75,12 +84,16 @@ def make_handler(upstream: str, calls_log: Path, save_dir: Path | None, label: s
                     req.add_header(k, v)
             is_chat = method == "POST" and path.endswith("/chat/completions")
             body_file = None
+            response_file = None
+            response_path = None
             if is_chat and save_dir is not None:
                 with lock:
                     counter["n"] += 1
                     n = counter["n"]
                 save_dir.mkdir(parents=True, exist_ok=True)
                 body_file = f"{label}-{n:02d}.json"
+                response_file = f"{label}-{n:02d}.response.jsonl"
+                response_path = save_dir / response_file
                 (save_dir / body_file).write_bytes(body or b"{}")
             t0 = time.perf_counter()
             t_start = time.time()
@@ -98,8 +111,12 @@ def make_handler(upstream: str, calls_log: Path, save_dir: Path | None, label: s
             self.send_header("Transfer-Encoding", "chunked")
             self.end_headers()
             aborted = False
+            stream_complete = False
+            response_stream = response_path.open("wb") if response_path is not None else None
             try:
                 for line in iter(resp.readline, b""):
+                    if response_stream is not None:
+                        response_stream.write(line)
                     if is_chat and line.startswith(b"data:") and line[5:].strip() not in (b"", b"[DONE]"):
                         try:
                             ev = json.loads(line[5:])
@@ -112,12 +129,17 @@ def make_handler(upstream: str, calls_log: Path, save_dir: Path | None, label: s
                     self.wfile.write(f"{len(line):x}\r\n".encode() + line + b"\r\n")
                     self.wfile.flush()
                 self.wfile.write(b"0\r\n\r\n")
+                stream_complete = True
             except (BrokenPipeError, ConnectionResetError):
-                # omp dropped the stream mid-response. Still a call the backend served: log it, and close
-                # upstream so the backend stops generating for nobody.
+                # omp dropped the stream mid-response. Record the aborted call and close the
+                # upstream connection; whether generation stops depends on the backend.
                 aborted = True
                 self.close_connection = True
             finally:
+                if response_stream is not None:
+                    response_stream.flush()
+                    os.fsync(response_stream.fileno())
+                    response_stream.close()
                 resp.close()
             if is_chat:
                 meta = json.loads(body or b"{}")
@@ -130,7 +152,7 @@ def make_handler(upstream: str, calls_log: Path, save_dir: Path | None, label: s
                     "total_s": round(time.perf_counter() - t0, 3),
                     "prompt_tokens": usage.get("prompt_tokens"), "completion_tokens": usage.get("completion_tokens"),
                     "cached_tokens": (usage.get("prompt_tokens_details") or {}).get("cached_tokens"),
-                    "body": body_file,
+                    "body": body_file, "response_body": response_file, "response_complete": stream_complete,
                 }
                 with lock, calls_log.open("a") as fh:
                     fh.write(json.dumps(row) + "\n")

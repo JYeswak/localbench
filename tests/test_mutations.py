@@ -81,6 +81,9 @@ class ParkPlan(Ledgered):
         self.patch(park, "HISTORY", self.tmp / "park-history.jsonl")
         self.patch(park, "smol_targets", lambda: [TARGET])
         self.patch(park, "omp_resolves", omp_like([TARGET, SIBLING]))
+        self.patch(cli.gateway, "database_path", lambda home=None: self.tmp / "gateway" / "leases.sqlite")
+        self.patch(cli.gateway, "safe_to_unload",
+                   lambda model, home=None, *, park_fence_id=None: (True, None))
 
     def test_a_dry_run_changes_nothing_and_the_real_run_does_what_it_printed(self):
         tags = dict(self.ollama.tags)
@@ -126,14 +129,16 @@ class ParkPlan(Ledgered):
         def broken(selector, ids):
             raise RuntimeError("omp resolver failed")
         self.patch(park, "omp_resolves", broken)
-        with self.assertRaises(RuntimeError), contextlib.redirect_stdout(io.StringIO()):
-            cli.main(["park", "--dry-run"])
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            self.assertEqual(cli.main(["park", "--dry-run"]), 1)
+        self.assertIn("omp resolver failed", err.getvalue())
         self.assertEqual(audit.rows(), [])
 
     def test_a_park_that_raises_is_recorded_as_failed(self):
         self.patch(park, "_copy", lambda src, dst: self.ollama.tags.__setitem__(dst, "sha256:wrong"))
-        with self.assertRaises(RuntimeError), contextlib.redirect_stdout(io.StringIO()):
-            cli.main(["park"])
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(cli.main(["park"]), 1)
         [row] = audit.rows()
         self.assertEqual(row["outcome"], "failed")
         self.assertIn("digest", row["detail"]["error"])
@@ -215,24 +220,31 @@ class KeepPlan(keep_pull.CliAgainstFake):
         p.start()
         self.addCleanup(p.stop)
 
-    def test_keeping_forever_what_is_kept_forever_sends_nothing(self):
-        keep_pull.FakeOllama.loaded = {"m:1": keep_pull.FOREVER}
-        rc, _ = self.run_cli("keep", "ollama:m:1", "forever")
-        self.assertEqual((rc, keep_pull.FakeOllama.requests, audit.rows()[0]["actions"]), (0, [], []))
+    def test_unbounded_keep_is_a_usage_error_with_no_audit_or_ollama_call(self):
+        with self.assertRaises(SystemExit) as stop:
+            self.run_cli("keep", "ollama:m:1", "forever")
+        self.assertEqual(stop.exception.code, 2)
+        self.assertEqual((keep_pull.FakeOllama.requests, audit.rows()), ([], []))
 
     def test_unloading_what_is_not_loaded_sends_nothing(self):
         rc, _ = self.run_cli("keep", "ollama:m:1", "0")
         self.assertEqual((rc, keep_pull.FakeOllama.requests), (0, []))
 
     def test_a_dry_run_sends_nothing_and_writes_no_row(self):
-        rc, out = self.run_cli("keep", "ollama:m:1", "forever", "--dry-run")
+        rc, out = self.run_cli("keep", "ollama:m:1", "5m", "--dry-run")
         self.assertEqual((rc, keep_pull.FakeOllama.requests, audit.rows()), (0, [], []))
         self.assertEqual(len(out.splitlines()), 1)
+        self.assertIn("keep_alive 5m", out)
 
-    def test_a_real_keep_records_one_done_row(self):
-        rc, _ = self.run_cli("keep", "ollama:m:1", "forever")
+    def test_a_real_default_keep_records_one_finite_expiry(self):
+        rc, _ = self.run_cli("keep", "ollama:m:1")
         [row] = audit.rows()
-        self.assertEqual((rc, row["verb"], row["outcome"], len(row["actions"])), (0, "keep", "done", 1))
+        self.assertEqual((rc, row["verb"], row["outcome"], len(row["actions"])),
+                         (0, "keep", "done", 1))
+        self.assertEqual(keep_pull.FakeOllama.requests,
+                         [("/api/generate", {"model": "m:1", "keep_alive": "5m"})])
+        expiry = row["detail"]["finite_lease_expires_at"]
+        self.assertRegex(expiry, r"^\d{4}-\d{2}-\d{2}T.*\+00:00$")
 
 
 class QuietPlan(Ledgered):
@@ -279,6 +291,27 @@ class Validate(unittest.TestCase):
         rc, err = self.check(doc)
         self.assertEqual(rc, 1)
         self.assertIn("model_digest", err)
+
+    def test_a_leg_without_commit_provenance_is_invalid(self):
+        doc = json.loads(RECEIPT.read_text())
+        del doc["legs"][0]["provenance"]["localbench_rev"]
+        rc, err = self.check(doc)
+        self.assertEqual(rc, 1)
+        self.assertIn("localbench_rev", err)
+
+    def test_a_leg_without_worker_identity_is_invalid(self):
+        doc = json.loads(RECEIPT.read_text())
+        del doc["legs"][0]["provenance"]["fingerprint"]
+        rc, err = self.check(doc)
+        self.assertEqual(rc, 1)
+        self.assertIn("fingerprint", err)
+
+    def test_a_worker_without_model_identity_is_invalid(self):
+        doc = json.loads(RECEIPT.read_text())
+        del doc["legs"][0]["provenance"]["fingerprint"]["model"]
+        rc, err = self.check(doc)
+        self.assertEqual(rc, 1)
+        self.assertIn("fingerprint.model", err)
 
     def test_a_golden_without_metrics_is_invalid(self):
         doc = json.loads(GOLDEN.read_text())

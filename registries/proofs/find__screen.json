@@ -1,0 +1,46 @@
+{
+  "assertions": [
+    {
+      "id": "paired-vs-recorded",
+      "params": {
+        "alpha": 0.05,
+        "min_n": 100,
+        "rule": "NOT_WORSE",
+        "seed": 20261001
+      },
+      "type": "paired"
+    },
+    {
+      "id": "gate-accuracy",
+      "params": {
+        "max": null,
+        "metric": "decision.noul.accuracy",
+        "min": 0.9
+      },
+      "type": "metric"
+    }
+  ],
+  "candidates": [
+    {
+      "route": "ollama:nimble-ctx21507"
+    }
+  ],
+  "dataset": {
+    "items_sha256": "d84903b9b56cfdc53f3e37e78be0e2dac6f88e62ef85cb45f1051100906e7507",
+    "suite": "decision.noul/screen-muse-find-100-seed20261001"
+  },
+  "description": "find-judgments screen on 100 recorded find calls with hosted ranks (seed 20261001). Candidate is the derived 21507-ctx nimble (decision derive first); the recorded screen ran nimble-ctx21507.",
+  "feature": "find-judgments",
+  "fresh_per_round": false,
+  "kind": "decision",
+  "regime": "side",
+  "repeats": 1,
+  "seed": 20261001,
+  "stage": "screen",
+  "wins": [
+    {
+      "metric": "privacy"
+    }
+  ],
+  "wins_needed": 1
+}

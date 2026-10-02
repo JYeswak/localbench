@@ -1,0 +1,16 @@
+[
+  {
+    "label": "oMLX Python worker is excluded from its own backend",
+    "file": "localbench/sysstats.py",
+    "old": "if backend == \"omlx\" and re.search(r\"(?:^|/)omlx-server(?:\\s|$)\", row[\"cmd\"]):",
+    "new": "if backend == \"never-omlx\" and re.search(r\"(?:^|/)omlx-server(?:\\s|$)\", row[\"cmd\"]):",
+    "tests": ["tests.test_sysstats.RunnerAttribution.test_omlx_python_worker_is_its_own_gpu_load_not_application_load"]
+  },
+  {
+    "label": "foreign oMLX Python worker is mistaken for application load",
+    "file": "localbench/sysstats.py",
+    "old": "or bool(re.search(r\"\\b(omlx|splash) serve\\b|(?:^|/)omlx-server(?:\\s|$)\", row.get(\"cmd\") or \"\")))",
+    "new": "or bool(re.search(r\"\\b(omlx|splash) serve\\b\", row.get(\"cmd\") or \"\")))",
+    "tests": ["tests.test_sysstats.RunnerAttribution.test_foreign_omlx_python_worker_voids_an_ollama_run"]
+  }
+]

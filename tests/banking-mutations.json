@@ -1,0 +1,68 @@
+[
+  {
+    "label": "aa banks an unsound pair instead of returning early",
+    "file": "localbench/__main__.py",
+    "old": "    if _unknown_residency(s1, s2):",
+    "new": "    if problems:",
+    "tests": [
+      "tests.test_cli.UnknownResidencyComparisonBank.test_unsound_aa_pair_banks_an_unsound_receipt_but_writes_no_golden"
+    ]
+  },
+  {
+    "label": "ab banks an unsound leg set instead of returning early",
+    "file": "localbench/__main__.py",
+    "old": "    if _unknown_residency(*legs):",
+    "new": "    if problems:",
+    "tests": [
+      "tests.test_cli.UnknownResidencyComparisonBank.test_unsound_ab_leg_banks_a_diagnostic_receipt_and_exits_1"
+    ]
+  },
+  {
+    "label": "an unsound aa pair never writes a golden",
+    "file": "localbench/__main__.py",
+    "old": "    if problems:\n        print(\"golden left unwritten",
+    "new": "    if False:\n        print(\"golden left unwritten",
+    "tests": [
+      "tests.test_cli.UnknownResidencyComparisonBank.test_unsound_aa_pair_banks_an_unsound_receipt_but_writes_no_golden"
+    ]
+  },
+  {
+    "label": "unknown residency still cannot bank an aa receipt",
+    "file": "localbench/__main__.py",
+    "old": "    return any(_resident_unknown(s) != 0 for s in summaries if not workloads.side_regime(s))",
+    "new": "    return False",
+    "tests": [
+      "tests.test_cli.UnknownResidencyComparisonBank.test_unknown_aa_pair_does_not_bank_or_write_a_golden",
+      "tests.test_cli.UnknownResidencyComparisonBank.test_unknown_ab_leg_does_not_bank_receipt"
+    ]
+  },
+  {
+    "label": "rescore refuses a campaign graded by an older grader",
+    "file": "localbench/__main__.py",
+    "old": "    stale = sorted(str(v) for v in versions if v != GRADER_VERSION)",
+    "new": "    stale = []",
+    "tests": [
+      "tests.test_cli.StaleGraderRescore.test_a_v1_spec_campaign_is_refused_and_its_scores_stay_unchanged"
+    ]
+  },
+  {
+    "label": "a missing residency count is not read as zero unknown samples",
+    "file": "localbench/__main__.py",
+    "old": "    n = ((summary.get(\"system\") or {}).get(\"during\") or {}).get(\"resident_unknown_samples\")",
+    "new": "    n = ((summary.get(\"system\") or {}).get(\"during\") or {}).get(\"resident_unknown_samples\", 0)",
+    "tests": [
+      "tests.test_cli.E2ECaseStatus.test_a_missing_residency_count_voids_and_is_unsound",
+      "tests.test_cli.UnknownResidencyBank.test_a_missing_residency_count_cannot_create_a_banked_receipt",
+      "tests.test_cli.UnknownResidencyComparisonBank.test_aa_leg_without_a_residency_count_does_not_bank_or_write_a_golden"
+    ]
+  },
+  {
+    "label": "unsound names incomplete residency sampling",
+    "file": "localbench/__main__.py",
+    "old": "    if not side and unknown is None:\n        reasons.append(\"residency sampling incomplete",
+    "new": "    if False:\n        reasons.append(\"residency sampling incomplete",
+    "tests": [
+      "tests.test_cli.E2ECaseStatus.test_a_missing_residency_count_voids_and_is_unsound"
+    ]
+  }
+]

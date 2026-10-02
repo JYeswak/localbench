@@ -151,6 +151,146 @@ class ReceiptViews(unittest.TestCase):
         self.assertEqual(seen, list(doc["table"]))
 
 
+    def test_turn_gate_metrics_and_details_are_visible(self):
+        leg = {
+            "provenance": {"label": "run", "pins": {}, "tiers": ["mem", "sess"], "repeats": 1},
+            "metrics": {
+                "mem.turn.max_tool_calls": {"value": 356, "better": "lower", "spread": [0, 356], "n": 48},
+                "mem.turn.timeouts": {"value": 1, "better": "lower", "spread": [1, 1], "n": 48},
+                "sess.turn.max_tool_calls": {"value": 8, "better": "lower", "spread": [0, 8], "n": 12},
+                "sess.turn.timeouts": {"value": 0, "better": "lower", "spread": [0, 0], "n": 12},
+            },
+            "details": {"mem.turn": {"turns": [{"tool_calls": 356, "timeout": True}]},
+                        "sess.turn": {"turns": [{"tool_calls": 8, "timeout": False}]}},
+            "conformance": {}, "run_dir": "runs/x", "verdicts": {},
+        }
+        out = render.show({"kind": "run", "run": leg}, "summary.json", limit=ALL)
+        for metric in ("mem.turn.max_tool_calls", "mem.turn.timeouts",
+                       "sess.turn.max_tool_calls", "sess.turn.timeouts"):
+            self.assertIn(f"| {metric} |", out)
+        self.assertIn("mem.turn", out)
+        self.assertIn("sess.turn", out)
+
+    def test_nonpassing_replay_detail_is_visible_and_reachable_by_path(self):
+        from localbench.__main__ import _receipt_view
+
+        detail = {"recorded": 11433, "replayed": 10853}
+        summary = {"provenance": {"label": "run", "pins": {}, "tiers": ["replay"], "repeats": 1},
+                   "verdicts": {}, "metrics": {}, "conformance": {
+                       "replay.lean.prompt_tokens": {"level": "SHOULD", "verdict": "FAIL"},
+                       "replay.full.prompt_tokens": {"level": "SHOULD", "verdict": "PASS"}},
+                   "run_dir": "runs/x", "system": {"before": {"live": {}, "host": {}}},
+                   "results": [
+                       {"case": "replay.lean.prompt_tokens", "tier": "replay", "verdict": "FAIL", "detail": detail},
+                       {"case": "replay.full.prompt_tokens", "tier": "replay", "verdict": "PASS",
+                        "detail": {"recorded": 73779, "replayed": 73779}},
+                       {"case": "replay.full", "tier": "replay", "verdict": None,
+                        "detail": {"prompt_tokens": 73779, "fixture_prompt_tokens": 73779}},
+                   ]}
+        doc = {"kind": "run", "run": _receipt_view(summary)}
+        shown = render.show(doc, "receipt.json")
+        self.assertIn("replay.lean.prompt_tokens: recorded=11433 replayed=10853", shown)
+        self.assertNotIn("replay.full.prompt_tokens:", shown)
+        self.assertNotIn("replay.full:", shown)
+        ptr = "/run/details/replay.lean.prompt_tokens"
+        self.assertEqual(json.loads(render.subtree(doc, ptr, "receipt.json")), detail)
+        perf_ptr = "/run/details/replay.full"
+        self.assertEqual(json.loads(render.subtree(doc, perf_ptr, "receipt.json")),
+                         {"prompt_tokens": 73779, "fixture_prompt_tokens": 73779})
+        all_pass = {**summary,
+                    "conformance": {case: {**entry, "verdict": "PASS"}
+                                    for case, entry in summary["conformance"].items()},
+                    "results": [{**r, "verdict": "PASS"} if r["verdict"] is not None else r
+                                for r in summary["results"]]}
+        pass_doc = {"kind": "run", "run": _receipt_view(all_pass)}
+        empty_doc = {"kind": "run", "run": _receipt_view({**all_pass, "results": []})}
+        self.assertEqual(len(render.show(pass_doc, "receipt.json")),
+                         len(render.show(empty_doc, "receipt.json")))
+        legacy_pass = {**pass_doc, "run": {**pass_doc["run"], "details": {
+            **pass_doc["run"]["details"], "replay.full.prompt_tokens": {"recorded": 73779, "replayed": 73779}}}}
+        self.assertNotIn("replay.full.prompt_tokens:", render.show(legacy_pass, "receipt.json"))
+        ab_doc = {"kind": "ab", "a": "s", "b": "s", "order": ["A", "B", "A"],
+                  "problems": [], "table": {}, "legs": [_receipt_view(all_pass), _receipt_view(summary),
+                                                         _receipt_view(all_pass)]}
+        self.assertIn("replay.lean.prompt_tokens: recorded=11433 replayed=10853",
+                      render.show(ab_doc, "receipt.json"))
+        self.assertEqual(json.loads(render.subtree(
+            ab_doc, "/legs/1/details/replay.lean.prompt_tokens", "receipt.json")), detail)
+
+class SummaryViews(unittest.TestCase):
+    @staticmethod
+    def summary(*, resident_unknown_samples: int, app_gpu_pct: float, contended: bool = False,
+                resident_owned_stop_samples: int = 0) -> dict:
+        return {
+            "provenance": {"label": "run", "created": "2026-09-30T15:58:47Z", "localbench_rev": "rev",
+                           "tiers": ["conf"], "repeats": 1, "pins": {}},
+            "verdicts": {"contended": contended, "must_fail": [], "preflight_problems": [], "pins_changed": {}},
+            "metrics": {},
+            "conformance": {},
+            "system": {"during": {"resident_unknown_samples": resident_unknown_samples,
+                                  "resident_owned_stop_samples": resident_owned_stop_samples,
+                                  "load": {"app_gpu_mean_pct": app_gpu_pct, "app_gpu_p95_pct": app_gpu_pct}}},
+            "run_dir": "runs/test",
+        }
+
+    @staticmethod
+    def contended_cell(out: str) -> str:
+        columns = next(line for line in out.splitlines() if line.startswith("| leg |"))
+        values = next(line for line in out.splitlines() if line.startswith("| run |"))
+        column_names = [value.strip() for value in columns.strip("|").split("|")]
+        cells = [value.strip() for value in values.strip("|").split("|")]
+        return dict(zip(column_names, cells))["contended"]
+
+    def test_unknown_residency_summary_is_unsound_without_claiming_contention(self):
+        out = render.show(self.summary(resident_unknown_samples=1, app_gpu_pct=0), "summary.json")
+
+        self.assertTrue(out.startswith("# summary · UNSOUND · summary.json"))
+        self.assertIn("UNSOUND: resident model state unknown in 1 sampler sample(s); run is non-proof", out)
+        self.assertEqual(self.contended_cell(out), "no")
+
+    def test_missing_residency_sample_count_is_unsound_and_incomplete(self):
+        doc = self.summary(resident_unknown_samples=0, app_gpu_pct=0)
+        del doc["system"]["during"]["resident_unknown_samples"]
+        out = render.show(doc, "summary.json")
+
+        self.assertTrue(out.startswith("# summary · UNSOUND · summary.json"))
+        self.assertIn("residency sampling incomplete: resident_unknown_samples is missing; run is non-proof", out)
+
+    def test_known_isolation_with_app_gpu_load_remains_sound(self):
+        out = render.show(self.summary(resident_unknown_samples=0, app_gpu_pct=80), "summary.json")
+
+        self.assertTrue(out.startswith("# summary · SOUND · summary.json"))
+        self.assertEqual(self.contended_cell(out), "no")
+        row = next(line for line in out.splitlines() if line.startswith("| run |"))
+        self.assertIn("| 80/80 |", row)
+
+    def test_known_second_model_is_contended_and_unsound(self):
+        out = render.show(self.summary(resident_unknown_samples=0, app_gpu_pct=0, contended=True), "summary.json")
+
+        self.assertTrue(out.startswith("# summary · UNSOUND · summary.json"))
+        self.assertIn("UNSOUND: CONTENDED: another model was resident or running during the run (system.contention)",
+                      out)
+        self.assertEqual(self.contended_cell(out), "yes")
+
+
+
+    def test_owned_stop_samples_are_visible_without_marking_unknown(self):
+        doc = self.summary(resident_unknown_samples=0, resident_owned_stop_samples=1, app_gpu_pct=0)
+        out = render.show(doc, "summary.json")
+
+        self.assertTrue(out.startswith("# summary · SOUND · summary.json"))
+        header = next(line for line in out.splitlines() if line.startswith("| leg |"))
+        row = next(line for line in out.splitlines() if line.startswith("| run |"))
+        columns = [value.strip() for value in header.strip("|").split("|")]
+        values = [value.strip() for value in row.strip("|").split("|")]
+        self.assertEqual(dict(zip(columns, values))["owned-stop samples"], "1")
+
+        doc["provenance"]["pins"] = {"backend": "mlx-serve", "model": "target"}
+        doc["system"]["before"] = {"host": {"chip": "test", "gpu_cores": 1, "mem_gb": 1, "macos": "test"}}
+        report = render.run_report(doc, [], "CURRENT", [])
+        self.assertIn("- residency samples: 0 unknown · 1 owned-stop", report)
+
+
 class GoldenViews(unittest.TestCase):
     def test_every_golden_row_keeps_value_and_tol(self):
         for path in GOLDENS:

@@ -1,0 +1,30 @@
+[
+  {
+    "label": "concurrent unpark must not erase an in-progress park journal",
+    "file": "localbench/park.py",
+    "old": "fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)",
+    "new": "pass  # BUG: no interprocess lock",
+    "tests": ["tests.test_park_safety.ParkSafety.test_unpark_cannot_race_a_park_between_journal_and_fence"]
+  },
+  {
+    "label": "pre-existing same-digest parked tag is not owned by an empty journal",
+    "file": "localbench/park.py",
+    "old": "if owned_digest is None:",
+    "new": "if False:",
+    "tests": ["tests.test_park_fallbacks.ParkRoundTrip.test_preexisting_same_digest_alias_is_refused_and_preserved"]
+  },
+  {
+    "label": "unpark must not claim same-digest alias that copy never journaled",
+    "file": "localbench/park.py",
+    "old": "if alias not in owned:",
+    "new": "if False:",
+    "tests": ["tests.test_park_fallbacks.ParkRoundTrip.test_planned_entry_does_not_claim_matching_alias_created_by_another_client", "tests.test_park_safety.ParkSafety.test_copy_failure_with_uncheckpointed_alias_refuses_cleanup_until_alias_removed"]
+  },
+  {
+    "label": "alias activity must refuse before restoring original tag",
+    "file": "localbench/park.py",
+    "old": "if not acquired:\n                    raise RuntimeError(f\"cannot remove parked alias: \"",
+    "new": "if False:\n                    raise RuntimeError(f\"cannot remove parked alias: \"",
+    "tests": ["tests.test_park_fallbacks.ParkRoundTrip.test_unpark_refuses_active_gateway_request_on_parked_alias", "tests.test_park_fallbacks.ParkRoundTrip.test_unpark_refuses_external_activity_on_parked_alias"]
+  }
+]

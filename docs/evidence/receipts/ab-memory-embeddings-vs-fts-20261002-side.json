@@ -1,0 +1,5997 @@
+{
+  "kind": "ab",
+  "verdict": "SOUND",
+  "a": "ollama:qwen3.6:35b-mlx",
+  "b": "ollama:qwen3.6:35b-mlx",
+  "order": [
+    "A",
+    "B",
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [],
+  "pin_drift": {},
+  "load_balance": {
+    "a": [
+      39.5,
+      37.9,
+      38.3
+    ],
+    "b": [
+      38.4,
+      38.5
+    ],
+    "tol_pct": 5.0,
+    "favours": null
+  },
+  "table": {
+    "mem.turn.max_tool_calls": {
+      "a_legs": [
+        24,
+        18,
+        8
+      ],
+      "b_legs": [
+        6,
+        13
+      ],
+      "a_median": 18,
+      "b_median": 9.5,
+      "better": "lower",
+      "aa_rel_spread": 0.8889,
+      "bb_rel_spread": 0.7368,
+      "band": 2.6667,
+      "b_over_a": 0.528,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.turn.timeouts": {
+      "a_legs": [
+        0,
+        0,
+        0
+      ],
+      "b_legs": [
+        0,
+        0
+      ],
+      "a_median": 0,
+      "b_median": 0.0,
+      "better": "lower",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.hit_rate": {
+      "a_legs": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "b_legs": [
+        1.0,
+        1.0
+      ],
+      "a_median": 1.0,
+      "b_median": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.pre_main_s": {
+      "a_legs": [
+        14.0611,
+        21.8846,
+        18.6556
+      ],
+      "b_legs": [
+        9.2449,
+        11.002
+      ],
+      "a_median": 18.6556,
+      "b_median": 10.12345,
+      "better": "lower",
+      "aa_rel_spread": 0.4194,
+      "bb_rel_spread": 0.1736,
+      "band": 1.2581,
+      "b_over_a": 0.543,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.wall_s": {
+      "a_legs": [
+        24.468,
+        34.7053,
+        27.0063
+      ],
+      "b_legs": [
+        12.3725,
+        13.1017
+      ],
+      "a_median": 27.0063,
+      "b_median": 12.7371,
+      "better": "lower",
+      "aa_rel_spread": 0.3791,
+      "bb_rel_spread": 0.0573,
+      "band": 1.1372,
+      "b_over_a": 0.472,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.plant.wall_s": {
+      "a_legs": [
+        18.3122,
+        35.6275,
+        21.9768
+      ],
+      "b_legs": [
+        12.716,
+        16.8176
+      ],
+      "a_median": 21.9768,
+      "b_median": 14.7668,
+      "better": "lower",
+      "aa_rel_spread": 0.7879,
+      "bb_rel_spread": 0.2778,
+      "band": 2.3637,
+      "b_over_a": 0.672,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.derail.ok_rate": {
+      "a_legs": [
+        0.6667,
+        1.0,
+        1.0
+      ],
+      "b_legs": [
+        0.6667,
+        1.0
+      ],
+      "a_median": 1.0,
+      "b_median": 0.83335,
+      "better": "higher",
+      "aa_rel_spread": 0.3333,
+      "bb_rel_spread": 0.4,
+      "band": 1.1999,
+      "b_over_a": 0.833,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.max_tool_calls": {
+      "a_legs": [
+        4,
+        0,
+        0
+      ],
+      "b_legs": [
+        1,
+        2
+      ],
+      "a_median": 0,
+      "b_median": 1.5,
+      "better": "lower",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.6667,
+      "band": 2.0,
+      "b_over_a": Infinity,
+      "verdict": "B-WORSE"
+    },
+    "sess.turn.timeouts": {
+      "a_legs": [
+        0,
+        0,
+        0
+      ],
+      "b_legs": [
+        0,
+        0
+      ],
+      "a_median": 0,
+      "b_median": 0.0,
+      "better": "lower",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.wall_s": {
+      "a_legs": [
+        5.4303,
+        4.7056,
+        5.2884
+      ],
+      "b_legs": [
+        4.9853,
+        4.9416
+      ],
+      "a_median": 5.2884,
+      "b_median": 4.96345,
+      "better": "lower",
+      "aa_rel_spread": 0.137,
+      "bb_rel_spread": 0.0088,
+      "band": 0.4111,
+      "b_over_a": 0.939,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.post_retain_wall_s": {
+      "a_legs": [
+        6.3943,
+        5.1635,
+        5.1357
+      ],
+      "b_legs": [
+        5.8473,
+        5.055
+      ],
+      "a_median": 5.1635,
+      "b_median": 5.45115,
+      "better": "lower",
+      "aa_rel_spread": 0.2437,
+      "bb_rel_spread": 0.1453,
+      "band": 0.7312,
+      "b_over_a": 1.056,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.pre_main_s": {
+      "a_legs": [
+        3.592,
+        3.5051,
+        3.6713
+      ],
+      "b_legs": [
+        4.0114,
+        3.939
+      ],
+      "a_median": 3.592,
+      "b_median": 3.9752,
+      "better": "lower",
+      "aa_rel_spread": 0.0463,
+      "bb_rel_spread": 0.0182,
+      "band": 0.1388,
+      "b_over_a": 1.107,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.post_retain_pre_main_s": {
+      "a_legs": [
+        4.0712,
+        4.0745,
+        4.0605
+      ],
+      "b_legs": [
+        4.0932,
+        4.0565
+      ],
+      "a_median": 4.0712,
+      "b_median": 4.07485,
+      "better": "lower",
+      "aa_rel_spread": 0.0034,
+      "bb_rel_spread": 0.009,
+      "band": 0.1,
+      "b_over_a": 1.001,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.ack_rate": {
+      "a_legs": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "b_legs": [
+        1.0,
+        1.0
+      ],
+      "a_median": 1.0,
+      "b_median": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.memory.extract_s": {
+      "a_legs": [
+        2.283,
+        2.059,
+        2.1525
+      ],
+      "b_legs": [
+        2.7985,
+        2.1825
+      ],
+      "a_median": 2.1525,
+      "b_median": 2.4905,
+      "better": "lower",
+      "aa_rel_spread": 0.1041,
+      "bb_rel_spread": 0.2473,
+      "band": 0.742,
+      "b_over_a": 1.157,
+      "verdict": "WITHIN-NOISE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.4.10",
+          "omp_sha": "479729e68fe4d401",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "embedder": "local/fast-bge-base-en-v1.5",
+          "embedder_digest": "d7176de16bfe",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb",
+          "smol_model": "qwen3.8:27b-mlx",
+          "smol_digest": "5642e97495e1",
+          "regime": "side"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "1f01ff8",
+        "created": "20261002T044502Z",
+        "tiers": [
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_a1",
+        "regime": "side"
+      },
+      "verdicts": {
+        "contended": true,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.turn.max_tool_calls": {
+          "value": 24,
+          "better": "lower",
+          "spread": [
+            0,
+            24
+          ],
+          "n": 12
+        },
+        "mem.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "mem.recall.pre_main_s": {
+          "value": 14.0611,
+          "better": "lower",
+          "spread": [
+            13.9773,
+            14.5852
+          ],
+          "n": 3
+        },
+        "mem.recall.wall_s": {
+          "value": 24.468,
+          "better": "lower",
+          "spread": [
+            18.9584,
+            26.1113
+          ],
+          "n": 3
+        },
+        "mem.plant.wall_s": {
+          "value": 18.3122,
+          "better": "lower",
+          "spread": [
+            14.4133,
+            39.1154
+          ],
+          "n": 3
+        },
+        "mem.derail.ok_rate": {
+          "value": 0.6667,
+          "better": "higher",
+          "spread": [
+            0.6667,
+            0.6667
+          ],
+          "n": 3
+        },
+        "sess.turn.max_tool_calls": {
+          "value": 4,
+          "better": "lower",
+          "spread": [
+            0,
+            4
+          ],
+          "n": 24
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.wall_s": {
+          "value": 5.4303,
+          "better": "lower",
+          "spread": [
+            3.9546,
+            6.5124
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 6.3943,
+          "better": "lower",
+          "spread": [
+            5.056,
+            9.9442
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 3.592,
+          "better": "lower",
+          "spread": [
+            3.0454,
+            4.0887
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0712,
+          "better": "lower",
+          "spread": [
+            4.0434,
+            4.0985
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 2.283,
+          "better": "lower",
+          "spread": [
+            2.016,
+            17.282
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20261002T044502Z__ab_a1__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.turn": {
+          "turns": [
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 39.115
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 26.111
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "control",
+              "tool_calls": 7,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 70.399
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 16.689
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "plant",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 18.312
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 18.958
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "control",
+              "tool_calls": 24,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 101.863
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 17.145
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "plant",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 14.413
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 24.468
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "control",
+              "tool_calls": 4,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 51.625
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "derail",
+              "tool_calls": 4,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 41.808
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 3,
+          "attempts": 3,
+          "ci95": [
+            0.4385,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-3457",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "ZEBRA-3457",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any stored information about a project Falcon or its deploy code.",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "24324",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "fresh-process-recall",
+              "recall_answer": "24324",
+              "plant_answer": "NOTED",
+              "control_answer": "I cannot determine which port the staging database for Project Falcon listens on",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": []
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Takahashi",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "fresh-process-recall",
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "Unknown to me \u2014 no stored records about a \"Falcon\" project or its on-call roster",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": []
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            }
+          ],
+          "config": "~/.localbench/tmp/wt-runner/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.8:27b-mlx",
+          "injected_tokens": {
+            "median": 83,
+            "min": 81,
+            "max": 154
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": [
+            {
+              "fact": "owner",
+              "round": 0,
+              "answer": "ID 30 did not exist. Created new memory via `retain` instead:\n\n**Updated content:** \"During the on-call rotation for project Falcon this week, Nate will be Kian"
+            }
+          ]
+        },
+        "mem.no_leak": {
+          "leaks": [],
+          "invalid": [],
+          "reason": null
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.524,
+            "min": 0.007,
+            "max": 3.618,
+            "n": 4
+          },
+          "config": "~/.localbench/tmp/wt-runner/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.8:27b-mlx",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 13.157,
+              "t_send": 1790916793.9435892,
+              "t_end": 1790916807.100068,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 12.131,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 5.635,
+              "t_send": 1790916807.101084,
+              "t_end": 1790916812.7360482,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.633,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 3.955,
+              "t_send": 1790916812.738549,
+              "t_end": 1790916816.693154,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.067,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 6.512,
+              "t_send": 1790916816.6937962,
+              "t_end": 1790916823.206205,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 1,
+              "pre_main": 3.545,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 9.944,
+              "t_send": 1790916823.209219,
+              "t_end": 1790916833.153449,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 4,
+              "pre_main": 4.064,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 6.14,
+              "t_send": 1790916833.1575732,
+              "t_end": 1790916839.2975419,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 1,
+              "pre_main": 4.039,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 5.387,
+              "t_send": 1790916839.298917,
+              "t_end": 1790916844.685586,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 1,
+              "pre_main": 3.281,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 5.899,
+              "t_send": 1790916844.687576,
+              "t_end": 1790916850.5864372,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 2,
+              "pre_main": 3.045,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 6.859,
+              "t_send": 1790916850.588594,
+              "t_end": 1790916857.447801,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 1,
+              "pre_main": 4.043,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 6.219,
+              "t_send": 1790916857.4490938,
+              "t_end": 1790916863.668025,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 1,
+              "pre_main": 4.083,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 5.393,
+              "t_send": 1790916863.6696,
+              "t_end": 1790916869.06284,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 1,
+              "pre_main": 3.072,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 5.404,
+              "t_send": 1790916869.06378,
+              "t_end": 1790916874.468204,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 1,
+              "pre_main": 3.284,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 13.572,
+              "t_send": 1790916882.3067589,
+              "t_end": 1790916895.878999,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 12.754,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 6.063,
+              "t_send": 1790916895.879474,
+              "t_end": 1790916901.942456,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.59,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 5.316,
+              "t_send": 1790916901.94367,
+              "t_end": 1790916907.260155,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.064,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 5.456,
+              "t_send": 1790916907.2611709,
+              "t_end": 1790916912.717531,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.078,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 5.929,
+              "t_send": 1790916912.718538,
+              "t_end": 1790916918.6480699,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.098,
+              "overlap_s": 1.781,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 5.909,
+              "t_send": 1790916918.649417,
+              "t_end": 1790916924.5582342,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.064,
+              "overlap_s": 1.839,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 5.304,
+              "t_send": 1790916924.559607,
+              "t_end": 1790916929.863184,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.042,
+              "overlap_s": 1.225,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 5.542,
+              "t_send": 1790916929.8642619,
+              "t_end": 1790916935.4065988,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.089,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 5.056,
+              "t_send": 1790916935.40735,
+              "t_end": 1790916940.463445,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.079,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 4.556,
+              "t_send": 1790916940.464517,
+              "t_end": 1790916945.0209,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.594,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 4.373,
+              "t_send": 1790916945.021589,
+              "t_end": 1790916949.39493,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.225,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 4.805,
+              "t_send": 1790916949.396031,
+              "t_end": 1790916954.2013628,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.485,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 28.72,
+              "not_ok": 0,
+              "completion_tokens": 886,
+              "models": [
+                "qwen3.8:27b-mlx"
+              ]
+            }
+          },
+          "overlap_with_main_s": 4.845,
+          "extract_overlap_with_main_s": 4.845,
+          "exit_s": [
+            4.109,
+            4.115
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790916789.723199,
+              "ended": 1790916878.578846,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 4.109,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790916878.586976,
+              "ended": 1790916958.316975,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 4.115,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "reason": null,
+          "failures": [],
+          "turns": 24,
+          "acks": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "reason": "no positive memory-extract/main overlap in each session",
+          "llm_mode": "smol",
+          "memory_calls": 6,
+          "successful_extracts": 6,
+          "extract_overlap_with_main_s": 4.845,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 8,
+            "load1": {
+              "mean": 49.7,
+              "max": 50.81,
+              "min": 48.91
+            },
+            "gpu_device_pct": {
+              "mean": 98.4,
+              "max": 100,
+              "min": 97
+            },
+            "free_pct": {
+              "mean": 86.9,
+              "max": 89,
+              "min": 85
+            },
+            "swap_used_mb": {
+              "mean": 9.4,
+              "max": 9.44,
+              "min": 9.44
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "resident_owned_stop_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 80730,
+                "name": "ollama",
+                "pct": 44.8,
+                "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.8:27b-mlx --port 65265",
+                "model": "qwen3.8:27b-mlx"
+              },
+              {
+                "pid": 80127,
+                "name": "llama-server",
+                "pct": 30.2,
+                "cmd": "/Applications/Ollama.app/Contents/Resources/llama-server --model /Volumes/Models/ollama-models/blobs/sha256-bbf1d6fc03bb0ed24d88f4c214ed7b5d1768aeb43d5cf433fb",
+                "model": "nimble:latest, nimble-ctx21507:latest",
+                "model_names": [
+                  "nimble:latest",
+                  "nimble-ctx21507:latest"
+                ]
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 8.1,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 5256,
+                "name": "Google Chrome He",
+                "pct": 7.0,
+                "cmd": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/154.0.8037.59/Helpers/Google Chrome Helper.app/Contents/MacOS/Goo"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 4.4,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 83575,
+                "name": "com.apple.WebKit",
+                "pct": 1.3,
+                "cmd": "/System/Library/Frameworks/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.GPU.xpc/Contents/MacOS/com.apple.WebKit.GPU"
+              }
+            ],
+            "load": {
+              "samples": 8,
+              "app_gpu_mean_pct": 21.9,
+              "app_gpu_p95_pct": 31.8,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 44.1,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 11.2,
+          "regime": "side"
+        },
+        "during": {
+          "samples": 352,
+          "load1": {
+            "mean": 56.2,
+            "max": 67.74,
+            "min": 44.43
+          },
+          "gpu_device_pct": {
+            "mean": 75.2,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 85.4,
+            "max": 90,
+            "min": 81
+          },
+          "swap_used_mb": {
+            "mean": 9.4,
+            "max": 9.44,
+            "min": 9.44
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "resident_owned_stop_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 80730,
+              "name": "ollama",
+              "pct": 32.8,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.8:27b-mlx --port 65265",
+              "model": "qwen3.8:27b-mlx"
+            },
+            {
+              "pid": 70588,
+              "name": "ollama",
+              "pct": 19.3,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.6:35b-mlx --port 63319",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 80127,
+              "name": "llama-server",
+              "pct": 4.9,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/llama-server --model /Volumes/Models/ollama-models/blobs/sha256-bbf1d6fc03bb0ed24d88f4c214ed7b5d1768aeb43d5cf433fb",
+              "model": "nimble:latest, nimble-ctx21507:latest",
+              "model_names": [
+                "nimble:latest",
+                "nimble-ctx21507:latest"
+              ]
+            },
+            {
+              "pid": 5256,
+              "name": "Google Chrome He",
+              "pct": 4.3,
+              "cmd": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/154.0.8037.59/Helpers/Google Chrome Helper.app/Contents/MacOS/Goo"
+            },
+            {
+              "pid": 9392,
+              "name": "Terminal",
+              "pct": 4.0,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ],
+          "load": {
+            "samples": 352,
+            "app_gpu_mean_pct": 9.2,
+            "app_gpu_p95_pct": 18.6,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [
+          {
+            "t": 1790916349.476,
+            "foreign": {
+              "ollama": [
+                "nimble:latest"
+              ]
+            },
+            "foreign_gpu": [],
+            "resident": {
+              "ollama": [
+                "nimble:latest",
+                "qwen3.6:35b-mlx",
+                "qwen3.8:27b-mlx"
+              ],
+              "mlx-serve": [],
+              "omlx": [],
+              "mlx-smol": [],
+              "mlxfast": []
+            },
+            "gpu_device_pct": 99
+          }
+        ],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 157,
+          "busy_pct": {
+            "mean": 39.5,
+            "max": 43.7,
+            "min": 36.1
+          }
+        },
+        "before_live": {
+          "t": 1790916305.5974321,
+          "load1": 50.81,
+          "free_pct": 89,
+          "swap_used_mb": 9.44,
+          "pressure_level": "normal",
+          "gpu_device_pct": 97,
+          "gpu_renderer_pct": 94,
+          "gpu_tiler_pct": 94,
+          "gpu_in_use_mem_bytes": 14071873536,
+          "resident": {
+            "ollama": [
+              "nimble:latest",
+              "qwen3.6:35b-mlx",
+              "qwen3.8:27b-mlx"
+            ],
+            "mlx-serve": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "resident_probes": {
+            "ollama": {
+              "server": "ollama",
+              "port": 11434,
+              "probe_start": 980106.815024416,
+              "probe_end": 980106.816806875,
+              "error_class": null,
+              "http_status": 200
+            },
+            "mlx-serve": {
+              "server": "mlx-serve",
+              "port": 11234,
+              "probe_start": 980106.816832,
+              "probe_end": 980106.8171725,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "omlx": {
+              "server": "omlx",
+              "port": 11236,
+              "probe_start": 980106.817177416,
+              "probe_end": 980106.817678875,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlx-smol": {
+              "server": "mlx-smol",
+              "port": 11235,
+              "probe_start": 980106.817687625,
+              "probe_end": 980106.818216041,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlxfast": {
+              "server": "mlxfast",
+              "port": 11237,
+              "probe_start": 980106.818222916,
+              "probe_end": 980106.818619291,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            }
+          },
+          "user_idle_s": 962.7
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.4.10",
+          "omp_sha": "479729e68fe4d401",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "3f3912800dc922f9",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "embedder": null,
+          "embedder_digest": null,
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb",
+          "smol_model": "qwen3.8:27b-mlx",
+          "smol_digest": "5642e97495e1",
+          "regime": "side"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "1f01ff8",
+        "created": "20261002T045607Z",
+        "tiers": [
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_b1",
+        "regime": "side"
+      },
+      "verdicts": {
+        "contended": true,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.turn.max_tool_calls": {
+          "value": 6,
+          "better": "lower",
+          "spread": [
+            0,
+            6
+          ],
+          "n": 12
+        },
+        "mem.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "mem.recall.pre_main_s": {
+          "value": 9.2449,
+          "better": "lower",
+          "spread": [
+            8.475,
+            11.311
+          ],
+          "n": 3
+        },
+        "mem.recall.wall_s": {
+          "value": 12.3725,
+          "better": "lower",
+          "spread": [
+            9.748,
+            13.2571
+          ],
+          "n": 3
+        },
+        "mem.plant.wall_s": {
+          "value": 12.716,
+          "better": "lower",
+          "spread": [
+            11.2691,
+            12.77
+          ],
+          "n": 3
+        },
+        "mem.derail.ok_rate": {
+          "value": 0.6667,
+          "better": "higher",
+          "spread": [
+            0.6667,
+            0.6667
+          ],
+          "n": 3
+        },
+        "sess.turn.max_tool_calls": {
+          "value": 1,
+          "better": "lower",
+          "spread": [
+            0,
+            1
+          ],
+          "n": 24
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.wall_s": {
+          "value": 4.9853,
+          "better": "lower",
+          "spread": [
+            4.3227,
+            5.9156
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 5.8473,
+          "better": "lower",
+          "spread": [
+            4.9033,
+            7.381
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 4.0114,
+          "better": "lower",
+          "spread": [
+            3.344,
+            4.1615
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0932,
+          "better": "lower",
+          "spread": [
+            4.0419,
+            4.1644
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 2.7985,
+          "better": "lower",
+          "spread": [
+            2.136,
+            20.18
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20261002T045607Z__ab_b1__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.turn": {
+          "turns": [
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "plant",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 12.77
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 12.372
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "control",
+              "tool_calls": 3,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 14.2
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 8.292
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "plant",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 12.716
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 9.748
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "control",
+              "tool_calls": 5,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 24.903
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 15.097
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "plant",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 11.269
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 13.257
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "control",
+              "tool_calls": 6,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 19.418
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 8.856
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 3,
+          "attempts": 3,
+          "ci95": [
+            0.4385,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-6984",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "fresh-process-recall",
+              "recall_answer": "ZEBRA-6984",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any record of a deploy code for \"project Falcon.\" If you have conte",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": []
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "40354",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "fresh-process-recall",
+              "recall_answer": "40354",
+              "plant_answer": "NOTED",
+              "control_answer": "5432",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": []
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Takahashi",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "fresh-process-recall",
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have stored information about the on-call owner of project Falcon. This ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": []
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            }
+          ],
+          "config": "~/.localbench/tmp/wt-runner/fixtures/omp/child-config-mem-fts.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.8:27b-mlx",
+          "injected_tokens": {
+            "median": 83,
+            "min": 81,
+            "max": 83
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": [
+            {
+              "fact": "code",
+              "round": 0,
+              "answer": "$ cd /tmp/localbench-mem-216b35c3-code-0 && ls -la"
+            }
+          ]
+        },
+        "mem.no_leak": {
+          "leaks": [],
+          "invalid": [],
+          "reason": null
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.971,
+            "min": -0.544,
+            "max": 2.416,
+            "n": 4
+          },
+          "config": "~/.localbench/tmp/wt-runner/fixtures/omp/child-config-mem-fts.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.8:27b-mlx",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 13.244,
+              "t_send": 1790917174.642593,
+              "t_end": 1790917187.887009,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 1,
+              "pre_main": 6.196,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 4.532,
+              "t_send": 1790917187.892627,
+              "t_end": 1790917192.42441,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.643,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 4.808,
+              "t_send": 1790917192.425499,
+              "t_end": 1790917197.233078,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.964,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 5.347,
+              "t_send": 1790917197.23399,
+              "t_end": 1790917202.58098,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.805,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 5.333,
+              "t_send": 1790917202.581619,
+              "t_end": 1790917207.914429,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.164,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 4.993,
+              "t_send": 1790917207.915437,
+              "t_end": 1790917212.9081228,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.033,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 5.813,
+              "t_send": 1790917212.90889,
+              "t_end": 1790917218.7220879,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.078,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 4.323,
+              "t_send": 1790917218.723983,
+              "t_end": 1790917223.046701,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.344,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 6.362,
+              "t_send": 1790917223.047352,
+              "t_end": 1790917229.409329,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.139,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 4.842,
+              "t_send": 1790917229.4120362,
+              "t_end": 1790917234.254117,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.683,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 4.868,
+              "t_send": 1790917234.25472,
+              "t_end": 1790917239.122954,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.99,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 5.33,
+              "t_send": 1790917239.124005,
+              "t_end": 1790917244.454122,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.048,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 6.039,
+              "t_send": 1790917250.604943,
+              "t_end": 1790917256.643541,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.903,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 5.024,
+              "t_send": 1790917256.644813,
+              "t_end": 1790917261.66925,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.037,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 4.934,
+              "t_send": 1790917261.670395,
+              "t_end": 1790917266.604657,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.812,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 4.978,
+              "t_send": 1790917266.605442,
+              "t_end": 1790917271.5835788,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.129,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 4.903,
+              "t_send": 1790917271.5840662,
+              "t_end": 1790917276.487432,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.042,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 5.916,
+              "t_send": 1790917276.488458,
+              "t_end": 1790917282.404086,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.162,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 4.744,
+              "t_send": 1790917282.4055738,
+              "t_end": 1790917287.149909,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.754,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 4.478,
+              "t_send": 1790917287.150688,
+              "t_end": 1790917291.628479,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.6,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 7.381,
+              "t_send": 1790917291.629322,
+              "t_end": 1790917299.010452,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.048,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 5.452,
+              "t_send": 1790917299.013021,
+              "t_end": 1790917304.465465,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.057,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 5.594,
+              "t_send": 1790917304.466343,
+              "t_end": 1790917310.0599308,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.051,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 5.548,
+              "t_send": 1790917310.06092,
+              "t_end": 1790917315.6088681,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.045,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 33.311,
+              "not_ok": 0,
+              "completion_tokens": 884,
+              "models": [
+                "qwen3.8:27b-mlx"
+              ]
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "extract_overlap_with_main_s": 0.0,
+          "exit_s": [
+            3.434,
+            20.311
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790917169.724633,
+              "ended": 1790917247.888781,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 3.434,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790917247.9102452,
+              "ended": 1790917335.920801,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 20.311,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "reason": null,
+          "failures": [],
+          "turns": 24,
+          "acks": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "reason": "no positive memory-extract/main overlap in each session",
+          "llm_mode": "smol",
+          "memory_calls": 6,
+          "successful_extracts": 6,
+          "extract_overlap_with_main_s": 0.0,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 7,
+            "load1": {
+              "mean": 50.8,
+              "max": 53.04,
+              "min": 48.75
+            },
+            "gpu_device_pct": {
+              "mean": 94.6,
+              "max": 96,
+              "min": 94
+            },
+            "free_pct": {
+              "mean": 86.0,
+              "max": 86,
+              "min": 86
+            },
+            "swap_used_mb": {
+              "mean": 9.4,
+              "max": 9.44,
+              "min": 9.44
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "resident_owned_stop_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 80730,
+                "name": "ollama",
+                "pct": 88.6,
+                "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.8:27b-mlx --port 65265",
+                "model": "qwen3.8:27b-mlx"
+              },
+              {
+                "pid": 5256,
+                "name": "Google Chrome He",
+                "pct": 2.6,
+                "cmd": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/154.0.8037.59/Helpers/Google Chrome Helper.app/Contents/MacOS/Goo"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 1.7,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 7,
+              "app_gpu_mean_pct": 4.3,
+              "app_gpu_p95_pct": 5.8,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 38.0,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 14.1,
+          "regime": "side"
+        },
+        "during": {
+          "samples": 194,
+          "load1": {
+            "mean": 52.8,
+            "max": 61.46,
+            "min": 46.44
+          },
+          "gpu_device_pct": {
+            "mean": 79.6,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 84.8,
+            "max": 90,
+            "min": 81
+          },
+          "swap_used_mb": {
+            "mean": 9.4,
+            "max": 9.44,
+            "min": 9.44
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "resident_owned_stop_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 80730,
+              "name": "ollama",
+              "pct": 48.6,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.8:27b-mlx --port 65265",
+              "model": "qwen3.8:27b-mlx"
+            },
+            {
+              "pid": 70588,
+              "name": "ollama",
+              "pct": 15.1,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.6:35b-mlx --port 63319",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 80127,
+              "name": "llama-server",
+              "pct": 2.3,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/llama-server --model /Volumes/Models/ollama-models/blobs/sha256-bbf1d6fc03bb0ed24d88f4c214ed7b5d1768aeb43d5cf433fb",
+              "model": "nimble:latest, nimble-ctx21507:latest",
+              "model_names": [
+                "nimble:latest",
+                "nimble-ctx21507:latest"
+              ]
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.6,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 194,
+            "app_gpu_mean_pct": 3.5,
+            "app_gpu_p95_pct": 9.7,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [
+          {
+            "t": 1790917007.685,
+            "foreign": {
+              "ollama": [
+                "nimble:latest"
+              ]
+            },
+            "foreign_gpu": [],
+            "resident": {
+              "ollama": [
+                "nimble:latest",
+                "qwen3.6:35b-mlx",
+                "qwen3.8:27b-mlx"
+              ],
+              "mlx-serve": [],
+              "omlx": [],
+              "mlx-smol": [],
+              "mlxfast": []
+            },
+            "gpu_device_pct": 94
+          }
+        ],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 88,
+          "busy_pct": {
+            "mean": 38.4,
+            "max": 41.7,
+            "min": 35.8
+          }
+        },
+        "before_live": {
+          "t": 1790916970.19199,
+          "load1": 53.04,
+          "free_pct": 86,
+          "swap_used_mb": 9.44,
+          "pressure_level": "normal",
+          "gpu_device_pct": 94,
+          "gpu_renderer_pct": 79,
+          "gpu_tiler_pct": 79,
+          "gpu_in_use_mem_bytes": 32341344256,
+          "resident": {
+            "ollama": [
+              "nimble:latest",
+              "qwen3.6:35b-mlx",
+              "qwen3.8:27b-mlx"
+            ],
+            "mlx-serve": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "resident_probes": {
+            "ollama": {
+              "server": "ollama",
+              "port": 11434,
+              "probe_start": 980771.344668333,
+              "probe_end": 980771.409446,
+              "error_class": null,
+              "http_status": 200
+            },
+            "mlx-serve": {
+              "server": "mlx-serve",
+              "port": 11234,
+              "probe_start": 980771.409468666,
+              "probe_end": 980771.409945291,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "omlx": {
+              "server": "omlx",
+              "port": 11236,
+              "probe_start": 980771.409951,
+              "probe_end": 980771.410237208,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlx-smol": {
+              "server": "mlx-smol",
+              "port": 11235,
+              "probe_start": 980771.410241791,
+              "probe_end": 980771.410485916,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlxfast": {
+              "server": "mlxfast",
+              "port": 11237,
+              "probe_start": 980771.410490541,
+              "probe_end": 980771.410760208,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            }
+          },
+          "user_idle_s": 1627.4
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.4.10",
+          "omp_sha": "479729e68fe4d401",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "embedder": "local/fast-bge-base-en-v1.5",
+          "embedder_digest": "d7176de16bfe",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb",
+          "smol_model": "qwen3.8:27b-mlx",
+          "smol_digest": "5642e97495e1",
+          "regime": "side"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "1f01ff8",
+        "created": "20261002T050222Z",
+        "tiers": [
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_a2",
+        "regime": "side"
+      },
+      "verdicts": {
+        "contended": true,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.turn.max_tool_calls": {
+          "value": 18,
+          "better": "lower",
+          "spread": [
+            0,
+            18
+          ],
+          "n": 12
+        },
+        "mem.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "mem.recall.pre_main_s": {
+          "value": 21.8846,
+          "better": "lower",
+          "spread": [
+            12.9152,
+            26.1923
+          ],
+          "n": 3
+        },
+        "mem.recall.wall_s": {
+          "value": 34.7053,
+          "better": "lower",
+          "spread": [
+            17.0367,
+            36.9697
+          ],
+          "n": 3
+        },
+        "mem.plant.wall_s": {
+          "value": 35.6275,
+          "better": "lower",
+          "spread": [
+            22.4621,
+            37.0126
+          ],
+          "n": 3
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "sess.turn.max_tool_calls": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.wall_s": {
+          "value": 4.7056,
+          "better": "lower",
+          "spread": [
+            3.8953,
+            7.1616
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 5.1635,
+          "better": "lower",
+          "spread": [
+            4.9161,
+            6.1743
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 3.5051,
+          "better": "lower",
+          "spread": [
+            2.9676,
+            4.1042
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0745,
+          "better": "lower",
+          "spread": [
+            4.0326,
+            4.187
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 2.059,
+          "better": "lower",
+          "spread": [
+            1.888,
+            2.236
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20261002T050222Z__ab_a2__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.turn": {
+          "turns": [
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 22.462
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 17.037
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "control",
+              "tool_calls": 3,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 39.875
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 22.089
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "plant",
+              "tool_calls": 2,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 37.013
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 36.97
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "control",
+              "tool_calls": 10,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 72.28
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 24.984
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 35.628
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 34.705
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "control",
+              "tool_calls": 18,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 90.139
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 25.065
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 3,
+          "attempts": 3,
+          "ci95": [
+            0.4385,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-2574",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "ZEBRA-2574",
+              "plant_answer": "NOTED",
+              "control_answer": "No deploy code for project Falcon is found in memory or any accessible repositor",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "49026",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "49026",
+              "plant_answer": "NOTED",
+              "control_answer": "No prior memory found for \"project Falcon\" or its staging database. I don't have",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Moreau",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "Moreau",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any stored information about the on-call owner of project Falcon. M",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            }
+          ],
+          "config": "~/.localbench/tmp/wt-runner/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.8:27b-mlx",
+          "injected_tokens": {
+            "median": 151,
+            "min": 146,
+            "max": 163
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": [],
+          "invalid": [],
+          "reason": null
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.309,
+            "min": -0.825,
+            "max": 1.517,
+            "n": 4
+          },
+          "config": "~/.localbench/tmp/wt-runner/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.8:27b-mlx",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 21.548,
+              "t_send": 1790917822.073055,
+              "t_end": 1790917843.621013,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 20.621,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 4.978,
+              "t_send": 1790917843.622006,
+              "t_end": 1790917848.5998101,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.966,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 4.392,
+              "t_send": 1790917848.6005352,
+              "t_end": 1790917852.992459,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.509,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 4.426,
+              "t_send": 1790917852.993033,
+              "t_end": 1790917857.419559,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.481,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 4.999,
+              "t_send": 1790917857.4210281,
+              "t_end": 1790917862.420324,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.187,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 5.042,
+              "t_send": 1790917862.420794,
+              "t_end": 1790917867.46305,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.104,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 4.868,
+              "t_send": 1790917867.463516,
+              "t_end": 1790917872.3312929,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.415,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 4.053,
+              "t_send": 1790917872.332466,
+              "t_end": 1790917876.3850482,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.188,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 4.916,
+              "t_send": 1790917876.385692,
+              "t_end": 1790917881.301855,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.074,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 5.075,
+              "t_send": 1790917881.303015,
+              "t_end": 1790917886.378512,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.051,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 4.436,
+              "t_send": 1790917886.379453,
+              "t_end": 1790917890.8152661,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.445,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 4.935,
+              "t_send": 1790917890.815918,
+              "t_end": 1790917895.750989,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.038,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 21.428,
+              "t_send": 1790917911.209505,
+              "t_end": 1790917932.637941,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 20.62,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 4.3,
+              "t_send": 1790917932.6393259,
+              "t_end": 1790917936.939303,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.398,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 4.508,
+              "t_send": 1790917936.9400089,
+              "t_end": 1790917941.448359,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.042,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 5.145,
+              "t_send": 1790917941.4503129,
+              "t_end": 1790917946.595298,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.36,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 5.328,
+              "t_send": 1790917946.596257,
+              "t_end": 1790917951.9240901,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.075,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 7.162,
+              "t_send": 1790917951.927192,
+              "t_end": 1790917959.0888581,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.05,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 4.739,
+              "t_send": 1790917959.093559,
+              "t_end": 1790917963.8329961,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.888,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 3.895,
+              "t_send": 1790917963.833406,
+              "t_end": 1790917967.728739,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.968,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 6.174,
+              "t_send": 1790917967.729401,
+              "t_end": 1790917973.90369,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.033,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 5.419,
+              "t_send": 1790917973.9062982,
+              "t_end": 1790917979.325581,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.058,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 4.672,
+              "t_send": 1790917979.326559,
+              "t_end": 1790917983.99838,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.554,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 4.556,
+              "t_send": 1790917983.999171,
+              "t_end": 1790917988.555603,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.501,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 12.284,
+              "not_ok": 0,
+              "completion_tokens": 884,
+              "models": [
+                "qwen3.8:27b-mlx"
+              ]
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "extract_overlap_with_main_s": 0.0,
+          "exit_s": [
+            7.72,
+            3.741
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790917812.870136,
+              "ended": 1790917903.4716191,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 7.72,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790917903.476328,
+              "ended": 1790917992.297855,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 3.741,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "reason": null,
+          "failures": [],
+          "turns": 24,
+          "acks": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "reason": "no positive memory-extract/main overlap in each session",
+          "llm_mode": "smol",
+          "memory_calls": 6,
+          "successful_extracts": 6,
+          "extract_overlap_with_main_s": 0.0,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 6,
+            "load1": {
+              "mean": 46.6,
+              "max": 47.69,
+              "min": 46.03
+            },
+            "gpu_device_pct": {
+              "mean": 65.2,
+              "max": 100,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 87.3,
+              "max": 90,
+              "min": 86
+            },
+            "swap_used_mb": {
+              "mean": 9.4,
+              "max": 9.44,
+              "min": 9.44
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "resident_owned_stop_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 80730,
+                "name": "ollama",
+                "pct": 30.5,
+                "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.8:27b-mlx --port 65265",
+                "model": "qwen3.8:27b-mlx"
+              },
+              {
+                "pid": 80127,
+                "name": "llama-server",
+                "pct": 11.4,
+                "cmd": "/Applications/Ollama.app/Contents/Resources/llama-server --model /Volumes/Models/ollama-models/blobs/sha256-bbf1d6fc03bb0ed24d88f4c214ed7b5d1768aeb43d5cf433fb",
+                "model": "nimble:latest, nimble-ctx21507:latest",
+                "model_names": [
+                  "nimble:latest",
+                  "nimble-ctx21507:latest"
+                ]
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.3,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 6,
+              "app_gpu_mean_pct": 2.3,
+              "app_gpu_p95_pct": 3.3,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 37.0,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 7.5,
+          "regime": "side"
+        },
+        "during": {
+          "samples": 339,
+          "load1": {
+            "mean": 71.3,
+            "max": 98.99,
+            "min": 41.32
+          },
+          "gpu_device_pct": {
+            "mean": 56.2,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 86.6,
+            "max": 90,
+            "min": 81
+          },
+          "swap_used_mb": {
+            "mean": 9.4,
+            "max": 9.44,
+            "min": 9.44
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "resident_owned_stop_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 80730,
+              "name": "ollama",
+              "pct": 27.9,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.8:27b-mlx --port 65265",
+              "model": "qwen3.8:27b-mlx"
+            },
+            {
+              "pid": 70588,
+              "name": "ollama",
+              "pct": 10.0,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.6:35b-mlx --port 63319",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 80127,
+              "name": "llama-server",
+              "pct": 3.3,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/llama-server --model /Volumes/Models/ollama-models/blobs/sha256-bbf1d6fc03bb0ed24d88f4c214ed7b5d1768aeb43d5cf433fb",
+              "model": "nimble:latest, nimble-ctx21507:latest",
+              "model_names": [
+                "nimble:latest",
+                "nimble-ctx21507:latest"
+              ]
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 2.3,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 339,
+            "app_gpu_mean_pct": 2.8,
+            "app_gpu_p95_pct": 6.0,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [
+          {
+            "t": 1790917355.511,
+            "foreign": {
+              "ollama": [
+                "nimble:latest"
+              ]
+            },
+            "foreign_gpu": [],
+            "resident": {
+              "ollama": [
+                "nimble:latest",
+                "qwen3.6:35b-mlx",
+                "qwen3.8:27b-mlx"
+              ],
+              "mlx-serve": [],
+              "omlx": [],
+              "mlx-smol": [],
+              "mlxfast": []
+            },
+            "gpu_device_pct": 85
+          }
+        ],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 144,
+          "busy_pct": {
+            "mean": 37.9,
+            "max": 42.9,
+            "min": 35.2
+          }
+        },
+        "before_live": {
+          "t": 1790917343.998088,
+          "load1": 47.69,
+          "free_pct": 86,
+          "swap_used_mb": 9.44,
+          "pressure_level": "normal",
+          "gpu_device_pct": 99,
+          "gpu_renderer_pct": 91,
+          "gpu_tiler_pct": 91,
+          "gpu_in_use_mem_bytes": 32286687232,
+          "resident": {
+            "ollama": [
+              "nimble:latest",
+              "qwen3.6:35b-mlx",
+              "qwen3.8:27b-mlx"
+            ],
+            "mlx-serve": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "resident_probes": {
+            "ollama": {
+              "server": "ollama",
+              "port": 11434,
+              "probe_start": 981145.156298416,
+              "probe_end": 981145.210133333,
+              "error_class": null,
+              "http_status": 200
+            },
+            "mlx-serve": {
+              "server": "mlx-serve",
+              "port": 11234,
+              "probe_start": 981145.210152958,
+              "probe_end": 981145.210597,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "omlx": {
+              "server": "omlx",
+              "port": 11236,
+              "probe_start": 981145.210606041,
+              "probe_end": 981145.211083083,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlx-smol": {
+              "server": "mlx-smol",
+              "port": 11235,
+              "probe_start": 981145.211102416,
+              "probe_end": 981145.211515291,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlxfast": {
+              "server": "mlxfast",
+              "port": 11237,
+              "probe_start": 981145.211520875,
+              "probe_end": 981145.212005541,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            }
+          },
+          "user_idle_s": 2001.1
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.4.10",
+          "omp_sha": "479729e68fe4d401",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "3f3912800dc922f9",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "embedder": null,
+          "embedder_digest": null,
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb",
+          "smol_model": "qwen3.8:27b-mlx",
+          "smol_digest": "5642e97495e1",
+          "regime": "side"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "1f01ff8",
+        "created": "20261002T051322Z",
+        "tiers": [
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_b2",
+        "regime": "side"
+      },
+      "verdicts": {
+        "contended": true,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.turn.max_tool_calls": {
+          "value": 13,
+          "better": "lower",
+          "spread": [
+            0,
+            13
+          ],
+          "n": 12
+        },
+        "mem.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "mem.recall.pre_main_s": {
+          "value": 11.002,
+          "better": "lower",
+          "spread": [
+            10.2709,
+            11.9885
+          ],
+          "n": 3
+        },
+        "mem.recall.wall_s": {
+          "value": 13.1017,
+          "better": "lower",
+          "spread": [
+            12.47,
+            13.3488
+          ],
+          "n": 3
+        },
+        "mem.plant.wall_s": {
+          "value": 16.8176,
+          "better": "lower",
+          "spread": [
+            14.2273,
+            21.9251
+          ],
+          "n": 3
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "sess.turn.max_tool_calls": {
+          "value": 2,
+          "better": "lower",
+          "spread": [
+            0,
+            2
+          ],
+          "n": 24
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.wall_s": {
+          "value": 4.9416,
+          "better": "lower",
+          "spread": [
+            4.0402,
+            8.932
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 5.055,
+          "better": "lower",
+          "spread": [
+            5.0414,
+            5.3865
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 3.939,
+          "better": "lower",
+          "spread": [
+            3.1122,
+            4.1439
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0565,
+          "better": "lower",
+          "spread": [
+            4.0351,
+            4.1538
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 2.1825,
+          "better": "lower",
+          "spread": [
+            1.962,
+            2.391
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20261002T051322Z__ab_b2__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.turn": {
+          "turns": [
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "plant",
+              "tool_calls": 2,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 14.227
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 13.102
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "control",
+              "tool_calls": 9,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 36.294
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 9.276
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 16.818
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 13.349
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "control",
+              "tool_calls": 13,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 58.047
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 11.508
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 21.925
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 12.47
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "control",
+              "tool_calls": 6,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 27.554
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 9.863
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 3,
+          "attempts": 3,
+          "ci95": [
+            0.4385,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-7641",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "ZEBRA-7641",
+              "plant_answer": "NOTED",
+              "control_answer": "No deploy code for \"Falcon\" exists in long-term memory. I searched with multiple",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "38110",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "38110",
+              "plant_answer": "NOTED",
+              "control_answer": "5433",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Okafor",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "No information stored about a \"Falcon\" project or its on-call roster in my long-",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            }
+          ],
+          "config": "~/.localbench/tmp/wt-runner/fixtures/omp/child-config-mem-fts.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.8:27b-mlx",
+          "injected_tokens": {
+            "median": 126,
+            "min": 114,
+            "max": 146
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": [],
+          "invalid": [],
+          "reason": null
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.328,
+            "min": 0.034,
+            "max": 0.604,
+            "n": 4
+          },
+          "config": "~/.localbench/tmp/wt-runner/fixtures/omp/child-config-mem-fts.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.8:27b-mlx",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 7.026,
+              "t_send": 1790918277.64704,
+              "t_end": 1790918284.673543,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 5.694,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 5.426,
+              "t_send": 1790918284.675423,
+              "t_end": 1790918290.101311,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.117,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 5.96,
+              "t_send": 1790918290.103297,
+              "t_end": 1790918296.063385,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.06,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 4.923,
+              "t_send": 1790918296.0652318,
+              "t_end": 1790918300.988055,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.082,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 5.041,
+              "t_send": 1790918300.988321,
+              "t_end": 1790918306.0297852,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.065,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 4.96,
+              "t_send": 1790918306.030522,
+              "t_end": 1790918310.9909,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.047,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 8.932,
+              "t_send": 1790918310.9922318,
+              "t_end": 1790918319.924265,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 2,
+              "pre_main": 3.599,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 4.716,
+              "t_send": 1790918319.930989,
+              "t_end": 1790918324.647042,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.748,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 5.046,
+              "t_send": 1790918324.647701,
+              "t_end": 1790918329.693233,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.048,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 5.308,
+              "t_send": 1790918329.694145,
+              "t_end": 1790918335.001972,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.144,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 4.671,
+              "t_send": 1790918335.002573,
+              "t_end": 1790918339.673738,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.83,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 4.397,
+              "t_send": 1790918339.6744661,
+              "t_end": 1790918344.0715158,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.443,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 5.713,
+              "t_send": 1790918353.1191208,
+              "t_end": 1790918358.831985,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.912,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 4.361,
+              "t_send": 1790918358.8338702,
+              "t_end": 1790918363.194963,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.479,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 4.263,
+              "t_send": 1790918363.195864,
+              "t_end": 1790918367.458986,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.273,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 4.436,
+              "t_send": 1790918367.4599109,
+              "t_end": 1790918371.896142,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.406,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 5.386,
+              "t_send": 1790918371.897215,
+              "t_end": 1790918377.2837162,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.154,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 5.128,
+              "t_send": 1790918377.285082,
+              "t_end": 1790918382.4135418,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.081,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 5.209,
+              "t_send": 1790918382.414263,
+              "t_end": 1790918387.6232362,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.103,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 4.04,
+              "t_send": 1790918387.623805,
+              "t_end": 1790918391.664035,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.112,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 5.065,
+              "t_send": 1790918391.6648908,
+              "t_end": 1790918396.729433,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.035,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 4.976,
+              "t_send": 1790918396.730788,
+              "t_end": 1790918401.707262,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.061,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 4.076,
+              "t_send": 1790918401.707587,
+              "t_end": 1790918405.783166,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.136,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 5.01,
+              "t_send": 1790918405.7838311,
+              "t_end": 1790918410.794158,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.086,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 13.109,
+              "not_ok": 0,
+              "completion_tokens": 898,
+              "models": [
+                "qwen3.8:27b-mlx"
+              ]
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "extract_overlap_with_main_s": 0.0,
+          "exit_s": [
+            2.258,
+            2.513
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790918270.577599,
+              "ended": 1790918346.330699,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.258,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790918346.3466082,
+              "ended": 1790918413.307698,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.513,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "reason": null,
+          "failures": [],
+          "turns": 24,
+          "acks": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "reason": "no positive memory-extract/main overlap in each session",
+          "llm_mode": "smol",
+          "memory_calls": 6,
+          "successful_extracts": 6,
+          "extract_overlap_with_main_s": 0.0,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 10,
+            "load1": {
+              "mean": 79.4,
+              "max": 80.41,
+              "min": 78.69
+            },
+            "gpu_device_pct": {
+              "mean": 19.2,
+              "max": 97,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 90.0,
+              "max": 90,
+              "min": 90
+            },
+            "swap_used_mb": {
+              "mean": 9.4,
+              "max": 9.44,
+              "min": 9.44
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "resident_owned_stop_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 80127,
+                "name": "llama-server",
+                "pct": 10.5,
+                "cmd": "/Applications/Ollama.app/Contents/Resources/llama-server --model /Volumes/Models/ollama-models/blobs/sha256-bbf1d6fc03bb0ed24d88f4c214ed7b5d1768aeb43d5cf433fb",
+                "model": "nimble:latest, nimble-ctx21507:latest",
+                "model_names": [
+                  "nimble:latest",
+                  "nimble-ctx21507:latest"
+                ]
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 3.1,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 10,
+              "app_gpu_mean_pct": 3.1,
+              "app_gpu_p95_pct": 3.4,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 35.9,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 14.4,
+          "regime": "side"
+        },
+        "during": {
+          "samples": 214,
+          "load1": {
+            "mean": 83.5,
+            "max": 104.08,
+            "min": 70.38
+          },
+          "gpu_device_pct": {
+            "mean": 77.4,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 85.2,
+            "max": 90,
+            "min": 81
+          },
+          "swap_used_mb": {
+            "mean": 9.4,
+            "max": 9.44,
+            "min": 9.44
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "resident_owned_stop_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 80730,
+              "name": "ollama",
+              "pct": 37.1,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.8:27b-mlx --port 65265",
+              "model": "qwen3.8:27b-mlx"
+            },
+            {
+              "pid": 70588,
+              "name": "ollama",
+              "pct": 23.2,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.6:35b-mlx --port 63319",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 80127,
+              "name": "llama-server",
+              "pct": 2.1,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/llama-server --model /Volumes/Models/ollama-models/blobs/sha256-bbf1d6fc03bb0ed24d88f4c214ed7b5d1768aeb43d5cf433fb",
+              "model": "nimble:latest, nimble-ctx21507:latest",
+              "model_names": [
+                "nimble:latest",
+                "nimble-ctx21507:latest"
+              ]
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.7,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 214,
+            "app_gpu_mean_pct": 1.8,
+            "app_gpu_p95_pct": 3.3,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [
+          {
+            "t": 1790918026.67,
+            "foreign": {
+              "ollama": [
+                "nimble:latest"
+              ]
+            },
+            "foreign_gpu": [],
+            "resident": {
+              "ollama": [
+                "nimble:latest",
+                "qwen3.6:35b-mlx",
+                "qwen3.8:27b-mlx"
+              ],
+              "mlx-serve": [],
+              "omlx": [],
+              "mlx-smol": [],
+              "mlxfast": []
+            },
+            "gpu_device_pct": 94
+          }
+        ],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 94,
+          "busy_pct": {
+            "mean": 38.5,
+            "max": 40.6,
+            "min": 36.2
+          }
+        },
+        "before_live": {
+          "t": 1790918005.517615,
+          "load1": 82.97,
+          "free_pct": 90,
+          "swap_used_mb": 9.44,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 11091591168,
+          "resident": {
+            "ollama": [
+              "nimble:latest",
+              "qwen3.6:35b-mlx",
+              "qwen3.8:27b-mlx"
+            ],
+            "mlx-serve": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "resident_probes": {
+            "ollama": {
+              "server": "ollama",
+              "port": 11434,
+              "probe_start": 981806.74664725,
+              "probe_end": 981806.749544583,
+              "error_class": null,
+              "http_status": 200
+            },
+            "mlx-serve": {
+              "server": "mlx-serve",
+              "port": 11234,
+              "probe_start": 981806.749564083,
+              "probe_end": 981806.75014575,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "omlx": {
+              "server": "omlx",
+              "port": 11236,
+              "probe_start": 981806.750152666,
+              "probe_end": 981806.751580291,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlx-smol": {
+              "server": "mlx-smol",
+              "port": 11235,
+              "probe_start": 981806.75158875,
+              "probe_end": 981806.754887208,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlxfast": {
+              "server": "mlxfast",
+              "port": 11237,
+              "probe_start": 981806.754904625,
+              "probe_end": 981806.759412666,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            }
+          },
+          "user_idle_s": 2662.9
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.4.10",
+          "omp_sha": "479729e68fe4d401",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "embedder": "local/fast-bge-base-en-v1.5",
+          "embedder_digest": "d7176de16bfe",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb",
+          "smol_model": "qwen3.8:27b-mlx",
+          "smol_digest": "5642e97495e1",
+          "regime": "side"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "1f01ff8",
+        "created": "20261002T052021Z",
+        "tiers": [
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_a3",
+        "regime": "side"
+      },
+      "verdicts": {
+        "contended": true,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.turn.max_tool_calls": {
+          "value": 8,
+          "better": "lower",
+          "spread": [
+            0,
+            8
+          ],
+          "n": 12
+        },
+        "mem.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "mem.recall.pre_main_s": {
+          "value": 18.6556,
+          "better": "lower",
+          "spread": [
+            11.0938,
+            34.5728
+          ],
+          "n": 3
+        },
+        "mem.recall.wall_s": {
+          "value": 27.0063,
+          "better": "lower",
+          "spread": [
+            14.3597,
+            52.2406
+          ],
+          "n": 3
+        },
+        "mem.plant.wall_s": {
+          "value": 21.9768,
+          "better": "lower",
+          "spread": [
+            17.9099,
+            36.9006
+          ],
+          "n": 3
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "sess.turn.max_tool_calls": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.wall_s": {
+          "value": 5.2884,
+          "better": "lower",
+          "spread": [
+            4.2298,
+            6.4829
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 5.1357,
+          "better": "lower",
+          "spread": [
+            4.9953,
+            7.2862
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 3.6713,
+          "better": "lower",
+          "spread": [
+            3.1677,
+            4.1055
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0605,
+          "better": "lower",
+          "spread": [
+            4.0377,
+            4.1015
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 2.1525,
+          "better": "lower",
+          "spread": [
+            2.038,
+            16.9
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20261002T052021Z__ab_a3__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.turn": {
+          "turns": [
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "plant",
+              "tool_calls": 2,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 36.901
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 52.241
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "control",
+              "tool_calls": 6,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 74.056
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 23.056
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 17.91
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 14.36
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "control",
+              "tool_calls": 8,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 61.38
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 28.018
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "plant",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 21.977
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 27.006
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "control",
+              "tool_calls": 3,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 36.478
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 27.999
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 3,
+          "attempts": 3,
+          "ci95": [
+            0.4385,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-1946",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "ZEBRA-1946",
+              "plant_answer": "NOTED",
+              "control_answer": "I couldn't find any information about a \"project Falcon\" or its deploy code in m",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "52896",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "52896",
+              "plant_answer": "NOTED",
+              "control_answer": "54321",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Takahashi",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "fresh-process-recall",
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any stored information about a project called \"Falcon\" or its on-ca",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": []
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            }
+          ],
+          "config": "~/.localbench/tmp/wt-runner/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.8:27b-mlx",
+          "injected_tokens": {
+            "median": 116,
+            "min": 81,
+            "max": 147
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": [],
+          "invalid": [],
+          "reason": null
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.456,
+            "min": -0.187,
+            "max": 1.627,
+            "n": 4
+          },
+          "config": "~/.localbench/tmp/wt-runner/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.8:27b-mlx",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 11.821,
+              "t_send": 1790918869.612597,
+              "t_end": 1790918881.433461,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 10.945,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 5.603,
+              "t_send": 1790918881.434985,
+              "t_end": 1790918887.0381079,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.272,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 5.003,
+              "t_send": 1790918887.040753,
+              "t_end": 1790918892.04401,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.053,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 4.34,
+              "t_send": 1790918892.044831,
+              "t_end": 1790918896.385355,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.445,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 5.081,
+              "t_send": 1790918896.386234,
+              "t_end": 1790918901.4675882,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.076,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 6.196,
+              "t_send": 1790918901.468281,
+              "t_end": 1790918907.664433,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.034,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 4.741,
+              "t_send": 1790918907.6664581,
+              "t_end": 1790918912.407553,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.671,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 4.23,
+              "t_send": 1790918912.408635,
+              "t_end": 1790918916.6384509,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.223,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 5.19,
+              "t_send": 1790918916.639343,
+              "t_end": 1790918921.82946,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.038,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 4.457,
+              "t_send": 1790918921.830545,
+              "t_end": 1790918926.2878551,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.518,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 4.522,
+              "t_send": 1790918926.288722,
+              "t_end": 1790918930.810753,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.462,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 5.176,
+              "t_send": 1790918930.811483,
+              "t_end": 1790918935.987272,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.106,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 17.138,
+              "t_send": 1790918946.566584,
+              "t_end": 1790918963.704587,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 16.24,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 6.483,
+              "t_send": 1790918963.7057972,
+              "t_end": 1790918970.188759,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.548,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 5.401,
+              "t_send": 1790918970.189388,
+              "t_end": 1790918975.590525,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.062,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 5.409,
+              "t_send": 1790918975.591121,
+              "t_end": 1790918981.000503,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.049,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 7.286,
+              "t_send": 1790918981.001467,
+              "t_end": 1790918988.2876768,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.102,
+              "overlap_s": 3.159,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 5.909,
+              "t_send": 1790918988.289469,
+              "t_end": 1790918994.198972,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.056,
+              "overlap_s": 1.823,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 5.986,
+              "t_send": 1790918994.200326,
+              "t_end": 1790919000.186074,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.051,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 4.356,
+              "t_send": 1790919000.187335,
+              "t_end": 1790919004.5435479,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.168,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 4.995,
+              "t_send": 1790919004.54471,
+              "t_end": 1790919009.540033,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.045,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 5.502,
+              "t_send": 1790919009.540965,
+              "t_end": 1790919015.0433779,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.099,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 4.785,
+              "t_send": 1790919015.044041,
+              "t_end": 1790919019.829182,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.672,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 6.135,
+              "t_send": 1790919019.8300018,
+              "t_end": 1790919025.9652338,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.495,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 27.814,
+              "not_ok": 0,
+              "completion_tokens": 891,
+              "models": [
+                "qwen3.8:27b-mlx"
+              ]
+            }
+          },
+          "overlap_with_main_s": 4.981,
+          "extract_overlap_with_main_s": 4.981,
+          "exit_s": [
+            5.116,
+            10.059
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790918864.9352,
+              "ended": 1790918941.10393,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 5.116,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790918941.1083982,
+              "ended": 1790919036.029307,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 10.059,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "reason": null,
+          "failures": [],
+          "turns": 24,
+          "acks": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "reason": "no positive memory-extract/main overlap in each session",
+          "llm_mode": "smol",
+          "memory_calls": 6,
+          "successful_extracts": 6,
+          "extract_overlap_with_main_s": 4.981,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 7,
+            "load1": {
+              "mean": 74.5,
+              "max": 74.97,
+              "min": 74.19
+            },
+            "gpu_device_pct": {
+              "mean": 26.9,
+              "max": 95,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 90.0,
+              "max": 90,
+              "min": 90
+            },
+            "swap_used_mb": {
+              "mean": 9.4,
+              "max": 9.44,
+              "min": 9.44
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "resident_owned_stop_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 80127,
+                "name": "llama-server",
+                "pct": 7.8,
+                "cmd": "/Applications/Ollama.app/Contents/Resources/llama-server --model /Volumes/Models/ollama-models/blobs/sha256-bbf1d6fc03bb0ed24d88f4c214ed7b5d1768aeb43d5cf433fb",
+                "model": "nimble:latest, nimble-ctx21507:latest",
+                "model_names": [
+                  "nimble:latest",
+                  "nimble-ctx21507:latest"
+                ]
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.9,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 7,
+              "app_gpu_mean_pct": 2.9,
+              "app_gpu_p95_pct": 3.2,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 36.6,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 10.2,
+          "regime": "side"
+        },
+        "during": {
+          "samples": 310,
+          "load1": {
+            "mean": 67.5,
+            "max": 82.55,
+            "min": 49.59
+          },
+          "gpu_device_pct": {
+            "mean": 72.8,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 85.8,
+            "max": 90,
+            "min": 81
+          },
+          "swap_used_mb": {
+            "mean": 9.4,
+            "max": 9.44,
+            "min": 9.44
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "resident_owned_stop_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 80730,
+              "name": "ollama",
+              "pct": 43.1,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.8:27b-mlx --port 65265",
+              "model": "qwen3.8:27b-mlx"
+            },
+            {
+              "pid": 70588,
+              "name": "ollama",
+              "pct": 10.7,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.6:35b-mlx --port 63319",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 80127,
+              "name": "llama-server",
+              "pct": 4.7,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/llama-server --model /Volumes/Models/ollama-models/blobs/sha256-bbf1d6fc03bb0ed24d88f4c214ed7b5d1768aeb43d5cf433fb",
+              "model": "nimble:latest, nimble-ctx21507:latest",
+              "model_names": [
+                "nimble:latest",
+                "nimble-ctx21507:latest"
+              ]
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 2.0,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 310,
+            "app_gpu_mean_pct": 2.1,
+            "app_gpu_p95_pct": 3.3,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [
+          {
+            "t": 1790918444.031,
+            "foreign": {
+              "ollama": [
+                "nimble:latest"
+              ]
+            },
+            "foreign_gpu": [],
+            "resident": {
+              "ollama": [
+                "nimble:latest",
+                "qwen3.6:35b-mlx",
+                "qwen3.8:27b-mlx"
+              ],
+              "mlx-serve": [],
+              "omlx": [],
+              "mlx-smol": [],
+              "mlxfast": []
+            },
+            "gpu_device_pct": 98
+          }
+        ],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 137,
+          "busy_pct": {
+            "mean": 38.3,
+            "max": 43.3,
+            "min": 34.8
+          }
+        },
+        "before_live": {
+          "t": 1790918424.241243,
+          "load1": 74.47,
+          "free_pct": 90,
+          "swap_used_mb": 9.44,
+          "pressure_level": "normal",
+          "gpu_device_pct": 96,
+          "gpu_renderer_pct": 83,
+          "gpu_tiler_pct": 83,
+          "gpu_in_use_mem_bytes": 11383144448,
+          "resident": {
+            "ollama": [
+              "nimble:latest",
+              "qwen3.6:35b-mlx",
+              "qwen3.8:27b-mlx"
+            ],
+            "mlx-serve": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "resident_probes": {
+            "ollama": {
+              "server": "ollama",
+              "port": 11434,
+              "probe_start": 982225.44886125,
+              "probe_end": 982225.462042708,
+              "error_class": null,
+              "http_status": 200
+            },
+            "mlx-serve": {
+              "server": "mlx-serve",
+              "port": 11234,
+              "probe_start": 982225.462065208,
+              "probe_end": 982225.465010958,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "omlx": {
+              "server": "omlx",
+              "port": 11236,
+              "probe_start": 982225.465023166,
+              "probe_end": 982225.471825208,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlx-smol": {
+              "server": "mlx-smol",
+              "port": 11235,
+              "probe_start": 982225.471834458,
+              "probe_end": 982225.475541791,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlxfast": {
+              "server": "mlxfast",
+              "port": 11237,
+              "probe_start": 982225.475551291,
+              "probe_end": 982225.480609416,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            }
+          },
+          "user_idle_s": 3081.5
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

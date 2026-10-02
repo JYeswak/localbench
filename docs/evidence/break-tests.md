@@ -290,7 +290,7 @@ fail: omp auto-retried 10 times with backoff, 07:33:20Z → 07:39:59Z (6 m 39 s)
 
 ## B6 — first enforced claims, and what the claim gate does and does not catch (2026-09-23)
 
-Three rows enforced (lean_prompt_tokens, moe_prefill_ratio, first_turn_under_10s). Current tree:
+At that time, three rows were enforced (lean_prompt_tokens, moe_prefill_ratio, first_turn_under_10s):
 `check-claim-discipline: 3 passed, 0 failed, 3 skipped (3 enforced, 3 actually checked, 0 pattern-unmatched).`
 
 Proof drift is caught — the receipt copy with `"value": 6.0838` changed to `9.9999`:
@@ -313,6 +313,38 @@ By the kit's design an unmatched pattern is a warning (a claim removed from the 
 so an edited number becomes an unregistered claim the checker cannot see. README edits that touch a registered
 sentence are review-enforced; the WARNING line is the reviewer's signal. Not changed here (a gate policy change,
 not a fix).
+
+### B6/kit-b14 gate repair (2026-09-29)
+
+The warning/exit-0 result above is historical, not the current gate policy. An enforced README pattern that
+disappears now prints `FAIL` with the claim label and exits 1; demote or retire the claim explicitly with
+`enforce=no`. The test originally changed the registered 6.1 s sentence to 4.1 s; after D6 demotion it changes
+the remaining enforced historical lean-token sentence from 11,433 to 8,192 and checks that refusal.
+Before the two D6 demotions, `sh scripts/check-claim-discipline.sh` returned
+`3 passed, 0 failed, 4 skipped (3 enforced, 3 actually checked, 0 pattern-unmatched)`, exit 0; a nonempty public
+README with zero enforced claims returned `0 passed, 1 failed, 1 skipped (0 enforced)`, exit 1.
+`sh scripts/check-readiness.sh` returned READY, exit 0; `tests.test_gate_scripts` ran 4 tests OK.
+`tests/gate-mutations.json` has six deliberately planted defects, all `caught=true`, `restored=true`, with good
+exit 0 and bad exit 1; the new unmatched-pattern mutation is caught by the claim-drift test. Mutation output:
+`runs/kit-b14-gate-mutations-20260929T0505Z.jsonl` (gitignored local scratch). This repairs the specific
+enforced-claim drift; it does not discover arbitrary unregistered sentences elsewhere in the README.
+
+The D6 audit later demoted two speed claims whose banked receipts predate the current backend/omp pins; see the
+2026-09-29 UNKNOWN rows in `docs/evidence/NEGATIVE_EVIDENCE.md`. The README retained only the pinned historical
+request-shape claim. At that intermediate point the claim gate printed `1 passed, 0 failed, 6 skipped (1 enforced,
+1 actually checked, 0 pattern-unmatched)` and exited 0. After the test switched to that sentence, all six
+`tests/gate-mutations.json` defects were planted again and caught/restored, including the unmatched-pattern case.
+
+The remaining enforced row cited `fixtures/omp/lean.meta.json`, an omp 18.2.11 fixture sidecar rather than a banked
+same-generation receipt. Demoting it under D4 leaves no valid enforced claim. `sh scripts/check-claim-discipline.sh`
+now exits 1: `0 passed, 1 failed, 7 skipped (0 enforced, 0 actually checked, 0 pattern-unmatched)`. `kit-b6` is
+reopened. Do not re-enforce a historical sidecar or weaken the zero-enforced gate to make the pre-commit hook green;
+a banked current-generation claim must be earned first. The old speed receipts and fixture remain historical evidence.
+
+The gate's test fixture now supplies an independently valid enforced row and a drifted README, so the gate's
+intended fail-closed production state does not mask the detector test. `uv run python -m unittest tests.test_gate_scripts`
+ran 4 tests, OK. `tests/gate-mutations.json` caught and restored all six planted defects with good_rc 0 and bad_rc 1,
+including the unmatched enforced claim and caller-cwd path defects.
 
 ## lb-01 — per-process GPU contention (Sampler gpu_foreign_max_pct, preflight attribution)
 
@@ -419,3 +451,402 @@ refusing --write-golden with --server-arg: the golden for a spec is its default 
 First version tested the key's presence instead of its value (golden_tier_pins fills every key with None), which
 turned every golden GENERATION-MISMATCH on `{"backend_args": [null, ""]}` — caught by `localbench status` on the real
 goldens before commit; fixed to `is None`.
+
+## kit-receipt-conf-details-vej — non-PASS detail retention (2026-09-29)
+
+Before the change, `tests.test_cli.ReceiptView` failed: `_receipt_view` dropped FAIL conf/replay diagnostics and
+the verdict-less `replay.full` perf count. The render test failed because banking that perf count expanded the
+all-PASS inline view. The CLI duplicate-tier test failed for run, AA, and AB: a second case with the same ID could
+overwrite the first case's detail/verdict. After the change, `uv run python -m unittest tests.test_cli
+tests.test_render -v` ran 43 tests, all OK. FAIL and VOID diagnostics retain recorded/replayed/reason fields;
+verdict-less replay perf detail retains the full-prompt token counts through `--path`; PASS case detail is excluded
+and the all-PASS rendered view is the same length as a view without per-case results. Duplicate tiers are refused
+by argparse before any measurement handler runs.
+
+`env TMPDIR=~/Developer/localbench/runs uv run --quiet python scripts/mutate.py
+tests/receipt-mutations.json` planted seven defects: drop FAIL, drop VOID, drop perf-only replay counts, bank PASS,
+show perf-only counts inline, render PASS detail inline from a banked receipt, and accept duplicate tier IDs. Each
+reported `caught=true`, `restored=true`, good exit 0 and bad exit 1; the named tests failed on the planted defects.
+
+A synthetic AB receipt (no model invoked) exercised the real CLI reader: `uv run python -m localbench show
+runs/receipt-detail-ab-smoke.json` displayed each leg's FAIL recorded/replayed fields without displaying PASS
+or perf-only detail inline. `--path /legs/1/details/replay.lean.prompt_tokens` returned
+`{"recorded":11433,"replayed":10853}`; `--path /legs/1/details/replay.full/prompt_tokens` returned `73779`.
+`uv run python -m localbench run ollama:no-such-model --tiers replay,replay` exited 2 at argument parsing with
+`duplicate tier in --tiers`, before backend access. The scratch receipt was removed. Existing banked receipts are
+not retroactively filled, and this smoke does not establish a live inference result.
+
+## kit-b3 — a receipt without commit or worker identity is invalid (2026-09-29)
+
+`localbench validate` previously accepted an A/B leg after removing `provenance.localbench_rev` or
+`provenance.fingerprint`, or after removing `fingerprint.model`; each of the three new
+`tests.test_mutations.Validate` cases failed before the validator change with `AssertionError: 0 != 1`.
+The validator now rejects those legs, naming the missing field. A banked historical A/B still
+passes: `localbench validate docs/evidence/receipts/ab-incumbent-vs-moe.json` ->
+`valid ab: docs/evidence/receipts/ab-incumbent-vs-moe.json`.
+`uv run python -m unittest tests.test_mutations.Validate` -> 7 tests OK.
+Read-only receipt inventory: 59 `docs/evidence/receipts/*.json` documents passed
+`localbench.__main__.validate_doc` with zero invalid receipts; this checks field presence,
+not soundness or current-generation applicability.
+`env TMPDIR=~/Developer/localbench/runs uv run --quiet python scripts/mutate.py
+tests/receipt-mutations.json` -> 10/10 `caught=true`, `restored=true`, with good exit 0
+and bad exit 1. The three new plants accept a leg missing its commit revision,
+worker fingerprint, or worker model; each named validator test rejects that regression.
+Validation of the receipt's fields does not establish that its old Ollama/omp generation proves
+today's speed; the two D6 demotions are recorded in `NEGATIVE_EVIDENCE.md:887-905`.
+
+## oMLX worker attribution — own load versus foreign contention (2026-09-29)
+
+The SOUND descriptive session receipt
+`docs/evidence/receipts/ab-mlxserve-vs-omlx-qwen36-sess-descriptive-20260929.json`
+records the oMLX GPU worker as `name=python3.13`, `cmd=omlx-server`, 63.9% in its
+first B leg. Before the change, `gpu_is_ours` matched `omlx` but not
+`omlx-server`, and `is_inference` required `omlx serve`: the worker inflated
+app-GPU and the same foreign process could evade CONTENDED on an Ollama run.
+The two new `tests.test_sysstats.RunnerAttribution.test_omlx_python_worker_*`
+and `test_foreign_omlx_python_worker_voids_an_ollama_run` cases failed before
+the fix with `False is not true` and `[] != [worker]`, respectively.
+
+The classifier now recognizes `omlx-server` in a worker command even when its
+process name is `python3.13`; a measured oMLX worker is its own GPU work, and
+one above the foreign GPU threshold is a model contender for an Ollama run.
+Both focused tests passed; `tests/sysstats-mutations.json` planted each
+missing classification separately, with `caught=true`, `restored=true`,
+good exit 0 and bad exit 1 in both cases. A throwaway read of the **actual
+receipt row** after reloading the changed module returned
+`own_worker=True`, `app_gpu_from_worker=0.0`,
+`foreign_worker_blocks_ollama=True`. The full unittest suite ran 418 tests
+OK (with a ResourceWarning for an unclosed SQLite connection); Ruff and
+`git diff --check` passed. Existing receipts retain their recorded load
+summaries: their app-GPU figures are not retroactively corrected, and
+CONTENDED cannot be re-judged from an incomplete historical process series.
+
+## Unknown residency in E2E campaigns — non-proof, not contention (2026-09-29)
+
+`cmd_eval_run` now records a case as VOID if its sampler observed an unknown
+resident-model state; a confirmed second model remains CONTENDED, while known
+isolation and application GPU load alone do not void it. The offline status
+smoke printed `isolated PASS`, `unknown VOID`, `contended VOID`.
+`tests/unknown-residency-mutations.json` planted six defects: accepting an
+unknown E2E sample, hiding a known competitor behind another endpoint's
+unknown state, ignoring unknown samples in the shared soundness gate, and
+persisting unknown-residency bank, A/A, or A/B receipts. Each named regression
+failed, and all six mutants were restored (`good_rc=0`, `bad_rc=1`). Before the
+A/A and A/B fix, their two unknown-leg tests failed because receipts existed;
+after it, the focused 9-test suite passed, including known-leg banking. A
+filesystem smoke also observed `bank` returning `(1, False)` for unknown
+samples and `(0, True)` for known isolation (exit code, receipt exists). The
+shared-tree suite then ran 478 tests OK; readiness, Ruff and `git diff --check`
+passed. These are offline handler and oracle checks, not a live model campaign.
+
+## Memory oracle — exact recall and successful control response (2026-09-29)
+
+The one-shot memory oracle rejects a recall answer that merely contains the
+planted value and voids a fresh-control result without a completed successful
+main response. An offline `mem()` smoke using the existing subprocess/proxy
+fixture produced `valid hits 3 no_leak PASS`, `stale_recall hits 0 no_leak PASS`,
+and `failed_control hits 0 no_leak VOID`: no-leak is separate from recall
+correctness. `tests/memory-oracle-mutations.json` planted a substring-match
+recall and a control check that ignored proxy completion; each named test
+failed and each mutant was restored (`good_rc=0`, `bad_rc=1`). The shared-tree
+unittest suite ran 478 tests OK after correcting a test fixture that lacked
+the real summary's required `conformance.level`; readiness, Ruff, and
+`git diff --check` passed. This is offline oracle evidence, not a live
+memory-plus-model acceptance run.
+
+## Summary view and seeded READ campaign controls (2026-09-30)
+
+`localbench show runs/20260930T155847Z__run__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit`
+now prints `# summary · UNSOUND` and `resident model state unknown in 2 sampler sample(s); run is non-proof`.
+The saved report already labeled this run UNSOUND, and the run exit predicate rejects unknown residency;
+only the `show` summary view had called it SOUND.
+The renderer tests distinguish unknown residency (`contended=no`) from a known second model
+(`CONTENDED`, `contended=yes`) and preserve SOUND for known isolation despite 80% application GPU load.
+
+The seeded READ campaign test executes an offline OMP fixture through `run_trial`, saves real workspace and
+trajectory files, records both cases in `EvaluationCampaign`, and re-scores them. A matching successful
+`target.txt` read passes; reading `decoy.txt` while returning the correct target answer fails. The fixture
+checks unchanged target and decoy bytes, recorded paths and responses, and campaign trace provenance.
+`uv run --quiet python -m unittest tests.test_render tests.test_load tests.test_evaluation tests.test_varied`
+ran 63 tests OK; `uv run python -m unittest discover -s tests -t .` ran 495 tests OK (two SQLite
+ResourceWarnings). Gateway status reported four in-flight requests, so no isolated GPU run or live held-out
+agent trial was performed. Neither offline control closes the corresponding live-acceptance Bead.
+
+## Shared parked alias — restore every tag before deleting the alias (2026-09-30)
+
+Two original Ollama tags with the same digest receive one `localbench-parked:<digest>` alias.
+Before the fix, the new roundtrip test failed with `cannot restore qwen3.8-uncensored:latest:
+neither original nor parked copy has digest ...`; an interrupted restore test lost that alias
+before retry (`KeyError`). `unpark()` now keeps the alias until every original is restored,
+then deletes each unique alias before releasing the park journal and admission fence.
+Both tests pass. An isolated fake-Ollama smoke called `park.park()` and `park.unpark()`:
+both originals disappeared during park, then reappeared with the same digest; the shared
+alias and journal were gone afterward. The early-deletion mutation was caught and restored
+(`good_rc=0`, `bad_rc=1`); 84 park/gateway/smol tests passed after the initial repair.
+No live model, real Ollama tag, or gateway request was touched by this smoke.
+
+A separate pane-2 review found that two different full digests can share the 12-character alias:
+the old park path moved the first name before detecting the collision, then `unpark` refused
+an intact second original and held the journal/fence on every retry. Both new regression tests
+failed before correction. `park` now refuses the collision before moving a tag; `unpark` can
+recover a previously journaled partial collision after validating every original and the alias.
+An alias matching no journaled digest is retained with its journal and fence instead of deleted.
+The isolated fake-service smoke printed `collision_refused`, `tags_unchanged: True`,
+`journal_absent: True`; three causal mutations each reported `caught=true`, `restored=true`,
+`good_rc=0`, `bad_rc=1`. This is offline recovery proof, not a live Ollama park.
+
+The same peer then found a collision between a *new* park plan and an alias already in a
+partial `PARKED.json`: the old preflight added a journal entry and a new admission fence
+before refusing. The new regression failed first; `safety_refusal()` now checks recorded
+aliases before the plan, without probing or moving a previously parked name. The separate
+causal mutation omitting that journal check failed the test and restored the source. An
+isolated fake-service smoke printed `continuation_refused_before_journal_write: True`,
+`new_fence_absent: True` and then `prior_fence_released: True` after `unpark()` recovered
+both originals. The full 501-test suite passed; the live park gate remains unverified.
+
+With gateway requests in flight at zero, `localbench gpu --seconds 5` still found
+an established direct Ollama client (`omp profile=p15-fake`, PID 76764, `proj-b` scratch
+project). `localbench park --dry-run` printed smol and fallback plans, then exited 1:
+`cannot park qwen3.8:27b-mlx: established non-gateway Ollama client connection remains`.
+This is a live known-bad refusal, not a successful park/unpark or isolated model run.
+
+## Cross-process park and agent outcome controls (2026-09-30)
+
+`park()` and `unpark()` now hold the same persistent `PARKED.json.lock`
+across the plan recheck, journal, admission fence, tag changes and cleanup.
+A pre-existing same-digest alias without journal ownership is refused before
+mutation. The subprocess race test holds park immediately after its journal
+write: unpark returns 1 without changing tags or journal; park completes,
+then unpark restores both original tags and removes the fence. The alias
+test preserves the original tags, journal absence and fence absence on
+refusal. Both tests failed before the fix. `tests/park-safety-mutations.json`
+planted a missing lock and an omitted alias refusal; both were caught and
+restored (`good_rc=0`, `bad_rc=1`). These tests use fake services, not Ollama.
+Parked-alias prune fence orphan (2026-10-01, uncommitted): an independent review found
+`scripts/prune_models.py --delete` could remove a journaled parked alias and drop its PARKED.json
+entries without releasing the gateway park fence, whose ids live only in the journal — leaving the
+original model fenced with no `unpark` able to release it. `prune_models.delete()` now refuses a
+journaled parked alias (naming `localbench unpark`), and rechecks the journal under park's
+`PARKED.json.lock` at the mutation boundary, so a concurrent park/unpark cannot change the journal
+`tests/test_prune_models.py` covers CLI and direct-delete refusal without any
+model deletion, the lock-held mutation boundary, and truthful `KEPT` inventory
+output. Targeted suite: `uv run --quiet python -m unittest tests.test_prune_models`
+— 30 tests OK.
+
+Session RPC teardown now closes and reaps the child on an interrupted turn
+and when interruption occurs inside `close()`; both real child-process tests
+failed before the fix and passed afterward. Both
+`tests/memory-rpc-mutations.json` plants were caught and restored. A timed-out
+varied trial now kills its OMP process group before capturing final files;
+offline tests caught a child that otherwise rewrote `target.txt` after the
+snapshot. Offline re-scoring rejects a hashed snapshot that disagrees with
+the current workspace, and the scorer rejects boolean wall durations.
+`tests/evaluation-mutations.json` caught and restored all eight defects,
+including those three. The `localbench eval rescore` offline fake-OMP smoke
+returned 0 and PASS for a matching workspace, then 1 with
+`final snapshot differs from workspace: target.txt` for a contradictory one.
+No live held-out OMP agent trial or memory plant/control/recall is proved by
+these fixtures.
+
+Direct finite gateway leases now reject NaN, infinity and overflowing
+expiry before storing a row. `tests/gateway-mutations.json` caught and
+restored all 13 defects, including this guard. Shared-tree verification:
+`uv run python -m unittest discover -s tests -t .` ran 512 tests OK
+(two SQLite ResourceWarnings); `uvx ruff check localbench`,
+`sh scripts/check-readiness.sh`, and `git diff --check` passed. The unchanged
+claim-discipline gate still exits 1: 0 enforced of 13 registered claims.
+
+After the owner authorized pausing the verified proj-a clients, their three OMP
+agent processes exited while the tmux shells remained. A separate
+user-owned `ollama run nimble` client (PID 85093, localbench pane `%19`)
+then held a direct Ollama socket. `localbench gpu --seconds 5` identified
+that client and `localbench park --dry-run` exited 1 with
+`cannot park qwen3.8:27b-mlx: established non-gateway Ollama client connection remains`.
+No live park, model run, unknown-residency sample or model comparison was
+started. the owner subsequently reported an Ollama upgrade; the earlier
+0.34.4 binary readback does not pin its new generation.
+
+## Peer-reviewed alias, RPC and varied-trial safeguards (2026-09-30)
+
+Peer review found that `unpark()` could delete a matching parked alias while
+a request used it, or treat an alias as owned before `_copy` completed.
+Three fake-service regressions failed before the repair: an active gateway
+request, simulated external client activity and another client's same-digest
+alias after a failed copy. The earlier two-tag recovery test now refuses
+cleanup until an unowned alias is removed. `unpark()` checks journal phase
+ownership, fences the alias before restoring originals, rechecks unload
+safety before removal and preserves the journal/fence on refusal. Targeted
+park tests: 38 passed. Four `tests/park-safety-mutations.json` plants were
+caught and restored (`good_rc=0`, `bad_rc=1`). Direct clients can still
+connect between socket checks; no host-wide exclusion is claimed.
+
+The RPC constructor now kills and reaps its child and closes pipes if pump
+startup is interrupted. The real-child regression failed before the fix;
+`tests.test_workloads.SessTurns tests.test_workloads.RpcCancellation` ran
+12 tests OK. Three `tests/memory-rpc-mutations.json` plants were caught
+and restored. This is not a live memory plant/control/recall result.
+
+A detached OMP tool can escape the process-group kill and write after the
+timeout snapshot, or keep stdout/stderr pipes open after the OMP parent exits.
+The first scenario previously made a timed-out FAIL receipt unscorable
+after its workspace hash changed; the second raised another timeout before
+writing a result. Timed-out trials now hash only the bounded saved evidence,
+not a workspace a detached child can still mutate; offline re-scoring keeps
+the timeout as FAIL without treating the mutable workspace as success proof.
+If detached children keep the pipes open, the runner closes its own pipe
+ends, reaps OMP, saves available output and records a timeout instead of
+discarding the verdict. Non-timeout snapshots and re-scoring open workspace
+files with `O_NOFOLLOW` and check the opened descriptor is regular; two
+tests deliberately made path-level symlink metadata stale, and both failed
+before the repair. Absent process exit metadata now scores ERROR, not a
+model FAIL. `tests.test_varied.VariedTrialRunner` plus
+`tests.test_evaluation.VariedTrialScoring` ran 12 tests OK; all 12
+`tests/evaluation-mutations.json` plants were caught and restored. A real
+`localbench eval rescore` offline fake-OMP smoke returned 0/PASS for an
+unchanged saved trial and 1 with `trace is missing or changed:
+attempt/workspace/target.txt` after a contradictory workspace write.
+No held-out real OMP agent trial is proved by these fixtures.
+
+The first 520-test shared-suite run after the changes failed solely because
+new `errno` and `stat` stdlib imports were missing from
+`docs/port/interfaces.tsv`. Both rows were added; the specific
+`tests.test_port_map.CodeIsMapped.test_every_import_has_a_row` check passed.
+`localbench status` then reported Ollama backend 0.35.0 SHA
+`add45eb02df0252f` versus the old golden's 0.34.4 SHA
+`bba8b79eac84ab09` (GENERATION-MISMATCH), while mlx-serve's
+conf/e2e/micro/replay golden was CURRENT. A new foreign direct Ollama
+connection from decision service PID 12925 appeared in `localbench gpu --seconds 5`;
+`localbench park --dry-run --explain` exited 1 with
+`cannot park qwen3.8:27b-mlx: established non-gateway Ollama client connection remains`.
+No live park, model run or unknown-residency acceptance leg was started.
+
+## Live park and residency controls (2026-10-01)
+
+The later direct Ollama client released its socket without intervention.
+`localbench gpu --seconds 5` then reported no foreign Ollama client;
+`localbench park --dry-run --explain` admitted the operation, and
+`localbench park --explain` parked both the smol and fallback tags as
+`localbench-parked:5642e97495e1` and
+`localbench-parked:34875c4701a6`. `localbench status` reported both parked
+and no Ollama model loaded. The live refusal above remains a separate
+negative control; the park is not yet a proven recovery until an eventual
+safe `localbench unpark` restores both tags.
+
+With smol parked and a fresh GPU/gateway preflight, the pinned
+`mlx-serve:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit`
+ran `--tiers e2e --repeats 1 --wait-idle 1800` twice. The first receipt is
+`runs/20261001T004006Z__run__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit`;
+the predeclared second control is
+`runs/20261001T004614Z__run__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit`.
+Both e2e MUST cases passed on both runs and neither reported contention,
+but **both receipts are UNSOUND/non-proof**: each sampler recorded two
+`resident.mlx-serve=null` intervals. One preceded server startup and one
+occurred while the model process was active. The `/v1/models` probe did not
+return a parsable success response in those intervals; the saved evidence
+does not establish why. Neither leg is banked as a golden or a
+current-generation performance/reliability claim. Starting a second model
+would violate the one-model measurement rule; the live competitor control
+remains unproved.
+
+The MLX-serve log does not show the GET timing or error, and its server
+supports up to three resident models: the launched process's `--model`
+argument cannot substitute for an authoritative resident-set response.
+Keep the unknown samples non-proof until an independently timestamped,
+complete resident-set observation is available; do not infer a timeout
+from `null` alone.
+
+The second shared 520-test run failed at the documentation reader count:
+`docs/port/INTERFACES.md` still said 38 after the import table grew to 40.
+The count was corrected and
+`tests.test_port_map.TableShape.test_the_readers_counts_match_the_table`
+passed. The post-integration `uv run python -m unittest discover -s tests -t .`
+run passed all 520 tests. Those pure-logic checks do not upgrade the two
+live UNSOUND E2E receipts.
+
+The claim audit reconciled `registries/claims.tsv` with the current README:
+13 rows, 8 populated README patterns and 8 exact matches; 5 rows have no
+README pattern, including the withdrawn speed and cold-first-turn claims.
+None of the 8 matched claims has a banked same-generation proof under the
+observed Ollama 0.35.0 and omp 18.4.5 pins, so all 13 remain `enforce=no`.
+The claim-discipline gate still fails honestly: `sh scripts/check-claim-discipline.sh`
+observed 0 enforced, 0 actually checked, 0 pattern-unmatched, with all 13
+rows at `enforce=no`. It was not relaxed and no historical proof was promoted.
+
+## Live memory/session diagnostic (2026-10-01)
+
+`localbench run
+mlx-serve:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit
+--tiers mem,sess --repeats 1 --mem-rounds 1 --wait-idle 1800` wrote
+`runs/20261001T005315Z__run__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit`.
+`localbench show` reported **SOUND**, 0 unknown-residency samples,
+no contention and conformance 3/3 PASS. Three planted facts had exact
+fresh-process recall; the independent controls did not return those facts.
+The `sess` path acknowledged 12/12 turns with zero timeouts, made three
+successful memory-extract calls (`not_ok=0`) and overlapped extraction
+with main work by 5.265 s
+(`summary.json#/results/6/detail`). This is one sound diagnostic, not a
+banked A/A reliability distribution; the two earlier UNSOUND E2E receipts
+remain non-proof.
+
+## Held-out varied read/edit campaign (2026-10-01)
+
+After `localbench gpu --seconds 5` showed no direct inference clients and
+gateway status showed no in-flight requests, the preregistered command ran
+once: `localbench eval varied
+mlx-serve:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit
+--phase heldout --seed 700 --trials 2 --wait-idle 1800`. The score is
+`runs/eval-varied-1790817008175348000-Qwen3.6-35B-A3B-MLX-Serve-4bit/scores/b6fedd57b670dc9ea74256f711f01e9f1a86be9563e168414c7a7de1bf1ab3ba.json`:
+4 graded, 1 PASS, 3 FAIL, 0 ERROR, 0 void (Wilson 95% interval
+`[0.0456, 0.6994]`). `read-700` answered `INITIAL`: the server stream
+stopped mid-value although the model's own reasoning quoted the full planted
+value (`trials/read-700/bodies/eval-varied-03.response.jsonl`). `edit-700`
+wrote the exact expected bytes with omp 18.4.5's default hashline `edit`
+tool, whose only argument is `input` (the path sits in its `[PATH#TAG]`
+header). The grader requires `args.path` (`localbench/evaluation.py:365-368`),
+so this FAIL is a grader defect, not a model miss. `read-701` passed.
+`edit-701` wrote the expected value without the required trailing newline
+(33 of 34 bytes). Corrected 2026-10-01 from the saved trajectories; the
+saved score is unchanged, and a fixed grader is a new campaign identity.
+These fixed inputs were not rerolled. The small result is functional
+evidence only, not an accuracy distribution or performance evidence.
+
+## Live park restoration (2026-10-01)
+
+With gateway healthy and zero requests in flight, and `localbench gpu --seconds 5`
+showing no inference clients or resident models, `localbench unpark --explain`
+restored `qwen3.8:27b-mlx` (`5642e97495e1`) and
+`thinkingcap-qwen3.8:27b-nvfp4` (`34875c4701a6`). The CLI refreshed and read
+back all 13 OMP catalogs; each listed both restored tags. `localbench park
+--status` then reported `parked: []`, and `localbench models --json` reported
+the tags installed and `parked: false`. Audit row
+`20261001T012433Z-c1c7de` (`localbench why` rc=0) records the successful
+restore and catalog refresh.
+
+A subsequent `localbench gpu --seconds 5` observed the restored smol model
+resident, with a live OMP client from
+`~/Developer/proj-a` using the gateway. The model was
+left resident; no client or process was killed. This later use is not part of
+the parked-state measurement.
+
+## Parked-alias prune fence leak and repair (2026-10-01)
+
+Static source trace found that the old `scripts/prune_models.py` path could
+delete a journaled parked alias and remove its `PARKED.json` entry without
+releasing the gateway park fence. `park()` stores fence IDs only on journal
+rows; `unpark()` releases only IDs remaining in that journal
+(`localbench/park.py:322–334,493–498`). Losing the last carrier left the
+original model permanently fenced (`localbench/gateway.py:293–296`).
+
+Fixed in the working tree: `plan()` receives a deterministic journaled-alias
+set and lists those entries as kept; `check_delete()` refuses with
+`localbench unpark` guidance; `delete()` rechecks under the shared
+`PARKED.json.lock` before touching the tag or journal. Red-first regression
+tests cover the CLI and direct refusal, the lock-held mutation boundary, and
+the `KEPT` inventory. No live tag or park state was changed. Verification:
+the targeted prune suite passed 30 tests, and the post-integration full suite
+passed 525 tests.
+
+Separate static issue, not exercised at runtime: the gateway maps any
+non-draining `GatewayError` from request admission to “OMP profile is not
+registered,” including a parked-model fence refusal
+(`localbench/gateway.py:753–761,293–296`).

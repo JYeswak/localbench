@@ -6,7 +6,8 @@
   localbench ab   ollama:qwen3.8:27b-mlx ollama:qwen3.6:35b-mlx --bank ab-incumbent-vs-moe
   localbench record --label lean ollama:qwen3.6:35b-mlx -- --no-skills ...
 
-A backend spec is `ollama:<model>`, `mlx-serve:<model dir>` or `omlx:<model dir>` (the process is pinned to that model).
+A backend spec is `ollama:<model>`, `mlx-serve:<model dir>`, `omlx:<model dir>` or `mlxfast:<model dir>` (the process is
+pinned to that model).
 """
 
 from __future__ import annotations
@@ -15,19 +16,38 @@ import argparse
 import contextlib
 import importlib.metadata
 import json
+import math
 import os
+import plistlib
 import shutil
+import statistics
 import subprocess
 import sys
 import time
 import urllib.error
 import urllib.request
+import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import NamedTuple, NoReturn
 
-from . import audit, backends, golden, memory, models, observe, park, quiet, render, smol, sysstats
-from .backends import OMLX, MlxServe, Ollama, _first_line, _post, sha16, splash_pin
+from . import (
+    audit,
+    backends,
+    gateway,
+    golden,
+    memory,
+    models,
+    observe,
+    ollama_app,
+    park,
+    quiet,
+    render,
+    smol,
+    sysstats,
+    workloads,
+)
+from .backends import OMLX, MlxFast, MlxServe, Ollama, _first_line, _post, sha16, splash_pin
 from .workloads import (
     AGENT_CONFIG,
     AGENT_DIR,
@@ -35,28 +55,32 @@ from .workloads import (
     FIXTURES,
     MEM_CONFIG,
     MEM_ROUNDS,
+    MEM_TOOLS,
     ROOT,
     TIERS,
     Ctx,
     Result,
     child_env,
+    embedding_pins,
     ensure_localbench_model,
     fixtures_sha,
     omp_bin,
+    smol_pins,
 )
 
 RUNS = ROOT / "runs"
 RECEIPTS = ROOT / "docs" / "evidence" / "receipts"
 # Verbs that read nothing under ROOT: they run from any install. Every other verb needs a clone's data root. doctor
 # reports a missing root itself, as one FAIL row.
-ROOTLESS = frozenset({"stats", "memory", "keep", "pull", "create", "audit", "why", "validate", "doctor"})
+ROOTLESS = frozenset({"stats", "memory", "keep", "pull", "create", "audit", "why", "validate", "doctor",
+                      "ollama-app", "gateway"})
 
 EPILOG = """\
 exit status:
   0    ok; every verdict a claim could rest on is sound
-  1    unsound, regressed or refused: a MUST FAIL (not listed in DISCREPANCIES.md), a CONTENDED run, a golden row
-       that REGRESSED / FAILed / is MISSING / GENERATION-MISMATCH / TOL-UNPROVEN, or a refusal (a run is alive,
-       preflight, a download that does not fit); a claim must not rest on it
+  1    unsound, regressed or refused: an unlisted MUST FAIL, a MUST VOID without proof, a CONTENDED run, a golden
+       row that REGRESSED / FAILed / is MUST-VOID / MISSING / GENERATION-MISMATCH / TOL-UNPROVEN, or a refusal
+       (a run is alive, preflight, a download that does not fit); a claim must not rest on it
   2    usage error: a bad flag or argument value, or no data root (see LOCALBENCH_HOME)
   141  stdout was closed early (`localbench memory | head`)
 Failures print to stderr; stdout carries only results (with --json, one JSON document). No color output.
@@ -64,7 +88,8 @@ Failures print to stderr; stdout carries only results (with --json, one JSON doc
 environment:
   LOCALBENCH_HOME     the clone holding fixtures/, goldens/, runs/ (default: the checkout this install runs from)
   LOCALBENCH_HF_DIR   `pull hf:` download root (default ~/.cache/localbench/hf)
-  LOCALBENCH_OMP, LOCALBENCH_MLX_SERVE   the omp / mlx-serve executables (default: PATH)
+  LOCALBENCH_OMP, LOCALBENCH_MLX_SERVE, LOCALBENCH_MLXFAST   the omp / mlx-serve / mlx-server (mlxfast) executables
+                      (default: PATH)
 """
 
 
@@ -193,10 +218,13 @@ def _stamp() -> str:
 
 
 def omp_pins(mem_config: Path = MEM_CONFIG) -> dict:
+    """omp's identity and the overlays its children run, plus the embedding model the mem overlay's children load
+    (embedder / embedder_digest; both None when that overlay runs no embeddings)."""
     binary = omp_bin()
     return {"omp_version": _first_line(binary, "--version").removeprefix("omp/").strip() or None,
             "omp_sha": sha16(binary), "omp_path": binary, "omp_child_config": sha16(str(CHILD_CONFIG)),
-            "omp_mem_config": sha16(str(mem_config)), "omp_agent_config": sha16(str(AGENT_CONFIG))}
+            "omp_mem_config": sha16(str(mem_config)), "omp_agent_config": sha16(str(AGENT_CONFIG)),
+            "omp_mem_tools": ",".join(sorted(MEM_TOOLS)), **embedding_pins(mem_config)}
 
 
 def run_pins(backend, model: str, host: dict, mem_config: Path = MEM_CONFIG) -> dict:
@@ -223,9 +251,9 @@ def _exe_path(path: str) -> Path:
 
 @contextlib.contextmanager
 def _binaries_for_leg(overrides: dict[str, Path | None]):
-    """Run one leg under other binaries, e.g. {"LOCALBENCH_OMP": <omp>, "LOCALBENCH_MLX_SERVE": <mlx-serve>}: omp_bin()
-    and mlx_serve_bin() read these at every call, so the leg's launches and its start/end pins all name them. Each is
-    restored afterwards, so the next A leg is back on the default. None leaves a variable alone."""
+    """Run one leg under other binaries, e.g. {"LOCALBENCH_OMP": <omp>, "LOCALBENCH_MLX_SERVE": <mlx-serve>}: omp_bin(),
+    mlx_serve_bin() and mlxfast_bin() read these at every call, so the leg's launches and its start/end pins all name
+    them. Each is restored afterwards, so the next A leg is back on the default. None leaves a variable alone."""
     old = {k: os.environ.get(k) for k, v in overrides.items() if v is not None}
     os.environ.update({k: str(v) for k, v in overrides.items() if v is not None})
     try:
@@ -249,23 +277,35 @@ def _mem_rounds(text: str) -> int:
     return n
 
 
+def _unique_tiers(text: str) -> str:
+    """Reject duplicate case IDs before a repeated tier could overwrite earlier receipt diagnostics."""
+    tiers = text.split(",")
+    if len(tiers) != len(set(tiers)):
+        raise argparse.ArgumentTypeError("duplicate tier in --tiers")
+    return text
+
+
+# The servers the harness starts and stops, by backend name (= spec prefix = pins["backend"]).
+SERVERS = {"mlx-serve": MlxServe, "omlx": OMLX, "mlxfast": MlxFast}
+
+
 @contextlib.contextmanager
 def open_backend(spec: str, server_args: tuple[str, ...] = ()):
-    """Yield (backend, model) for `ollama:<model>`, `mlx-serve:<dir>` or `omlx:<dir>`; mlx-serve and oMLX are started
-    and stopped here. One model at a time: a run refuses while another harness server is serving."""
+    """Yield (backend, model) for `ollama:<model>` or `<server>:<model dir>` (mlx-serve, omlx, mlxfast); servers are
+    started and stopped here. One model at a time: a run refuses while another harness server is serving."""
     kind, _, rest = spec.partition(":")
-    servers = {"mlx-serve": MlxServe("."), "omlx": OMLX(".")}
-    busy = [f"{n} on :{s.port}" for n, s in servers.items() if n != kind and s.up()]
+    busy = [f"{n} on :{s.port}" for n, cls in SERVERS.items() if n != kind and (s := cls(".")).up()]
     if busy and rest:
         sys.exit(f"{', '.join(busy)} is serving during a {kind} run; stop it first (one model at a time)")
     if kind == "ollama" and rest:
         yield Ollama(), rest
-    elif kind in ("mlx-serve", "omlx") and rest:
+    elif kind in SERVERS and rest:
         unload_ollama()
-        with (MlxServe if kind == "mlx-serve" else OMLX)(rest, server_args) as srv:
+        with SERVERS[kind](rest, server_args) as srv:
             yield srv, srv.model_id()
     else:
-        _usage(f"bad backend spec {spec!r}: use ollama:<model>, mlx-serve:<model dir> or omlx:<model dir>")
+        _usage(f"bad backend spec {spec!r}: use ollama:<model>, mlx-serve:<model dir>, omlx:<model dir> or "
+               "mlxfast:<model dir>")
 
 
 def unload_ollama() -> list[str]:
@@ -281,7 +321,10 @@ def unload_ollama() -> list[str]:
 GPU_BUSY_MAX_PCT = 25.0
 
 
-def _busy_check() -> tuple[dict, float | None, list[str]]:
+def _busy_check(side: bool = False) -> tuple[dict, float | None, list[str]]:
+    """Preflight problems. `side` (the side-model regime, workloads.SIDE_REGIME): another model running or resident,
+    unknown residency, a loadable smol model, the smol server and stuck sessions are the measured condition (recorded
+    per leg in system.contention / during), not refusals; only an unreadable GPU/CPU signal and swapping refuse."""
     with sysstats.Sampler(0.5) as s:
         cpu = sysstats.cpu_busy_pct()
     summ = s.summary()
@@ -292,13 +335,17 @@ def _busy_check() -> tuple[dict, float | None, list[str]]:
         # Only another model running refuses a start: apps and the person at the keyboard are the condition the
         # measurement is taken under (the owner, 2026-09-24), recorded per leg as system.during.load, not a veto.
         busy = [r for r in summ.get("gpu_by_process", []) if r["pct"] > GPU_BUSY_MAX_PCT and sysstats.is_inference(r)]
-        if busy:
+        if busy and not side:
             problems.append("another model is running: " + ", ".join(sysstats.proc_label(r) for r in busy)
                             + " (a run would be CONTENDED)")
+    if summ.get("resident_unknown_samples", 0) and not side:
+        problems.append("resident model state unknown during preflight; cannot prove no other model was resident")
     if cpu is None:
         problems.append("CPU signal unavailable (/usr/bin/top printed no CPU usage line)")
     if summ.get("swap_used_mb", {}).get("max", 0) > 1024:
         problems.append("swapping")
+    if side:
+        return summ, cpu, problems
     with contextlib.suppress(OSError):
         loadable_smol = park.reachable_smol()
         if loadable_smol:
@@ -332,15 +379,16 @@ def _stuck_problem(stuck: list[dict], loadable: list[str]) -> str | None:
             f"{who}; `localbench park` parks it too, or restart them (a run would be CONTENDED)")
 
 
-def preflight(allow_busy: bool, wait_idle_s: float = 0, emit=None) -> dict:
+def preflight(allow_busy: bool, wait_idle_s: float = 0, emit=None, side: bool = False) -> dict:
     """Refuse to measure while another model can run (a loadable smol model, a stuck session's fallback, another
     model's runner busy), while swapping, or when the GPU/CPU signal cannot be read. A busy machine is not refused:
     apps and user activity are the measured condition (system.during.load). load1 is recorded, not judged.
     With wait_idle_s, re-check every 30 s until the machine is idle or the wait runs out; the verdict is the
-    same gate, applied to the state the run actually starts in (other agents share this host)."""
+    same gate, applied to the state the run actually starts in (other agents share this host). `side`: the side-model
+    regime's gate (_busy_check): no refusal, and no wait, for co-resident models."""
     t0 = time.time()
     while True:
-        summ, cpu, problems = _busy_check()
+        summ, cpu, problems = _busy_check(side)
         if not problems or allow_busy or time.time() - t0 >= wait_idle_s:
             break
         if emit:
@@ -350,7 +398,7 @@ def preflight(allow_busy: bool, wait_idle_s: float = 0, emit=None) -> dict:
         sys.exit("preflight refused: " + "; ".join(problems) + "  (rerun with --allow-busy to measure anyway; "
                  "such a run is non-proof)")
     return {"idle_check": summ, "cpu_busy_pct": cpu, "problems": problems, "allow_busy": allow_busy,
-            "waited_s": round(time.time() - t0, 1)}
+            "waited_s": round(time.time() - t0, 1), **({"regime": workloads.SIDE_REGIME} if side else {})}
 
 
 def _emitter(progress: Path):
@@ -369,8 +417,19 @@ def _emitter(progress: Path):
 
 def execute(backend, model: str, *, tiers: list[str], repeats: int, allow_busy: bool, purge: bool,
             label: str = "run", wait_idle_s: float = 0, mem_config: Path = MEM_CONFIG,
-            mem_rounds: int = MEM_ROUNDS) -> dict:
-    """One measurement of one model: preflight, isolate, tiers under the samplers, summary on disk."""
+            mem_rounds: int = MEM_ROUNDS, e2e_case: str | None = None,
+            evaluation_campaign: dict | None = None, smol_model: str | None = None,
+            side_regime: bool = False) -> dict:
+    """One measurement of one model: preflight, isolate, tiers under the samplers, summary on disk. `smol_model`: a
+    separate memory (smol-role) model for the mem and sess tiers' omp children, on the same ollama server; pinned
+    as smol_model/smol_digest, warmed after isolation and watched by the sampler as the run's own second model.
+    `side_regime` (workloads.SIDE_REGIME; ab --side-regime): no isolation: nothing resident is unloaded, the model
+    (and smol model) are only warmed; co-resident models are recorded as contention as always; the leg is marked
+    regime side in provenance and pins."""
+    try:   # before the run dir: a smol model on a one-model server is a usage error, not a run
+        smol = smol_pins(backend, smol_model)
+    except ValueError as exc:
+        _usage(f"--smol-model: {exc}")
     stamp = _stamp()
     run_dir = RUNS / f"{stamp}__{label}__{backend.name}__{golden.slug(model)}"
     run_dir.mkdir(parents=True)
@@ -382,20 +441,30 @@ def execute(backend, model: str, *, tiers: list[str], repeats: int, allow_busy: 
     emit({"event": "start", "backend": backend.name, "model": model, "tiers": tiers, "label": label})
 
     before = sysstats.snapshot()
-    pre = preflight(allow_busy, wait_idle_s, emit)
-    freed = unload_ollama() if backend.name != "ollama" else []
+    pre = preflight(allow_busy, wait_idle_s, emit, side=side_regime)
+    freed = unload_ollama() if backend.name != "ollama" and not side_regime else []
     purged = sysstats.purge_file_cache() if purge else None
-    evicted = backend.isolate(model)
+    if side_regime:
+        evicted = []
+        backends._warm(backend.base_url, model)   # loaded beside whatever else is resident; nothing is unloaded
+    else:
+        evicted = backend.isolate(model)
+    if smol_model is not None:
+        backends._warm(backend.base_url, smol_model)   # resident before the sampler starts: it is ours, not foreign
     fp = backend.fingerprint(model)
-    pins = run_pins(backend, model, before["host"], mem_config)
+    pins = {**run_pins(backend, model, before["host"], mem_config), **smol,
+            **({"regime": workloads.SIDE_REGIME} if side_regime else {})}
     emit({"event": "isolated", "evicted": evicted, "freed": freed, "purged": purged, "fingerprint": fp})
+    tok_identity = backend.tokenizer_identity(model) if "replay" in tiers else None
 
     ctx = Ctx(backend=backend, model=model, repeats=repeats, run_dir=run_dir, emit=emit, pins=pins,
-              loaded_context=fp.get("loaded_context"), mem_config=mem_config, mem_rounds=mem_rounds)
+              loaded_context=fp.get("loaded_context"), tok_identity=tok_identity,
+              mem_config=mem_config, mem_rounds=mem_rounds, e2e_case=e2e_case, smol_model=smol_model)
     results: list[Result] = []
     def on_contention(ev):
         emit({"event": "contention", **ev})
-    with sysstats.Sampler(1.0, target=(backend.name, model), on_contention=on_contention,
+    target = (backend.name, model, *([smol_model] if smol_model else []))
+    with sysstats.Sampler(1.0, target=target, on_contention=on_contention,
                           gpu_foreign_max_pct=GPU_BUSY_MAX_PCT) as smp, \
             sysstats.PowerSampler(1000) as pwr, sysstats.CpuSampler(2) as cpu:
         for tier in tiers:
@@ -404,7 +473,8 @@ def execute(backend, model: str, *, tiers: list[str], repeats: int, allow_busy: 
     after = sysstats.snapshot()
     # A pin that moved during the run (omp was upgraded in place mid-campaign on 2026-09-23) means part of the
     # run measured another generation; the start pins would be a false label for it.
-    pins_changed = golden.pin_diff(pins, run_pins(backend, model, after["host"], mem_config))
+    pins_changed = golden.pin_diff(pins, {**run_pins(backend, model, after["host"], mem_config),
+                                          **smol_pins(backend, smol_model)})
 
     metrics, conformance = golden.flatten(results)
     listed = golden.listed_discrepancies(backend.name, model)
@@ -412,7 +482,8 @@ def execute(backend, model: str, *, tiers: list[str], repeats: int, allow_busy: 
                        if e["level"] == "MUST" and e["verdict"] == "FAIL" and c not in listed)
     summary = {
         "provenance": {"pins": pins, "fingerprint": fp, "localbench_rev": _rev(), "created": stamp,
-                       "tiers": tiers, "repeats": repeats, "label": label},
+                       "tiers": tiers, "repeats": repeats, "label": label,
+                       **({"regime": workloads.SIDE_REGIME} if side_regime else {})},
         "verdicts": {"contended": bool(smp.contention), "must_fail": must_fail,
                      "preflight_problems": pre["problems"], "allow_busy": allow_busy, "pins_changed": pins_changed},
         "metrics": metrics, "conformance": conformance,
@@ -421,6 +492,8 @@ def execute(backend, model: str, *, tiers: list[str], repeats: int, allow_busy: 
                    "contention": smp.contention, "power": pwr.summary(), "cpu": cpu.summary()},
         "run_dir": str(run_dir.relative_to(ROOT)),
     }
+    if evaluation_campaign:
+        summary["evaluation_campaign"] = evaluation_campaign
     (run_dir / "summary.json").write_text(json.dumps(summary, indent=2, default=str))
     (run_dir / "samples.jsonl").write_text("".join(json.dumps(s) + "\n" for s in ctx.samples))
     # 1 Hz machine series (GPU, memory, load, resident models on every local server): the contention evidence.
@@ -429,13 +502,34 @@ def execute(backend, model: str, *, tiers: list[str], repeats: int, allow_busy: 
     return summary
 
 
+def _resident_unknown(summary: dict) -> int | None:
+    """Sampler samples whose resident-model state was unreadable; None when the summary carries no such count (no
+    sampler block, or an incomplete one), which proves isolation no more than an unreadable sample does."""
+    n = ((summary.get("system") or {}).get("during") or {}).get("resident_unknown_samples")
+    return n if isinstance(n, int) and not isinstance(n, bool) and n >= 0 else None
+
+
 def unsound(summary: dict) -> list[str]:
     v = summary["verdicts"]
     reasons = []
-    if v["contended"]:
+    if summary.get("evaluation_campaign"):
+        reasons.append("behavioral evaluation campaign: these runs are not performance or golden evidence")
+    # The side-model regime (workloads.side_regime) records co-resident models and unreadable residency; they do not
+    # make its legs unsound.
+    side = workloads.side_regime(summary)
+    if v["contended"] and not side:
         reasons.append("CONTENDED: another model was resident or running during the run (system.contention)")
+    # An unreadable resident endpoint is missing evidence, not evidence of a competing model; so is a missing count.
+    unknown = _resident_unknown(summary)
+    if not side and unknown is None:
+        reasons.append("residency sampling incomplete: no system.during.resident_unknown_samples; run is non-proof")
+    elif not side and unknown:
+        reasons.append(f"resident model state unknown in {unknown} sampler sample(s); run is non-proof")
     if v["must_fail"]:
         reasons.append(f"MUST FAIL: {', '.join(v['must_fail'])}")
+    for case, entry in sorted(summary["conformance"].items()):
+        if entry["level"] == "MUST" and entry["verdict"] == "VOID":
+            reasons.append(f"MUST VOID: {case} (required conformance was not established)")
     if v["preflight_problems"]:
         reasons.append(f"preflight: {'; '.join(v['preflight_problems'])}")
     if v.get("pins_changed"):
@@ -458,17 +552,16 @@ def _bank(name: str, payload: dict) -> Path:
     return path
 
 
-# Tiers whose per-case details stay in runs/ only. Every other tier's details are banked, so a new tier is
-# auditable from its receipt by default (think was dropped for a day because the kept set was a hand list).
-DETAILS_NOT_BANKED = frozenset({"micro", "conf", "replay"})
+# Micro samples remain in runs/. Passing conf/replay diagnostics stay compact; non-PASS verdicts and replay
+# perf rows retain their counts in receipts (perf rows have no verdict and are accessible via --path).
+DETAILS_NOT_BANKED = frozenset({"micro"})
 
 
 def _receipt_view(summary: dict) -> dict:
-    """What a banked receipt keeps: everything except raw per-sample rows (those stay in runs/), plus the details of
-    every tier outside DETAILS_NOT_BANKED (e2e/rel call splits and wrong answers verbatim, mem recall attempts, sess
-    per-turn rows and memory-LLM overlap, think answers and cut-offs) that a reader needs to audit a rate, accuracy
-    or wall-time row. mem/sess details were dropped until 2026-09-23, think until 2026-09-24."""
-    details = {r["case"]: r["detail"] for r in summary.get("results", []) if r["tier"] not in DETAILS_NOT_BANKED}
+    """Bank non-PASS conf/replay diagnostics, including replay perf counts needed to audit fixture context."""
+    details = {r["case"]: r["detail"] for r in summary.get("results", [])
+               if r["tier"] not in DETAILS_NOT_BANKED
+               and (r["tier"] not in ("conf", "replay") or r.get("verdict") != "PASS")}
     return {k: summary[k] for k in ("provenance", "verdicts", "metrics", "conformance", "run_dir")} | {
         "details": details,
         "system": {k: summary["system"].get(k) for k in ("preflight", "during", "contention", "power", "cpu")} | {
@@ -497,7 +590,7 @@ def golden_states(host: dict) -> list[dict]:
                 backend = Ollama()
             else:
                 receipt = json.loads((ROOT / g["aa_receipt"]).read_text())
-                backend = MlxServe(receipt["runs"][0]["provenance"]["fingerprint"]["model_dir"])
+                backend = SERVERS[gp["backend"]](receipt["runs"][0]["provenance"]["fingerprint"]["model_dir"])
             pins = run_pins(backend, gp["model"], host)
         except (OSError, KeyError, ValueError) as exc:
             row["unavailable"] = f"cannot read current pins: {exc}"[:200]
@@ -543,6 +636,7 @@ def status_report() -> dict:
             "ollama_loaded": None if residents is None else [{"model": m, "until": u} for m, u in residents],
             "ollama_auto_update": sysstats.ollama_auto_update(), "smol": smol_view,
             "quiet_paused": quiet.paused(), "started_while_parked": park.stuck_sessions(sysstats.omp_processes()),
+            "gateway": gateway.status(resident_state=residents),
             "gpu_last_3s": sysstats.gpu_share(before, sysstats.gpu_time_by_pid(), time.time() - t0, min_pct=5.0)}
 
 
@@ -576,6 +670,24 @@ def cmd_status(args) -> int:
     print("loaded on ollama: " + (
         "unknown: /api/ps did not answer within 10 s (ollama stalls it while loading a model); rerun `localbench status`"
         if loaded is None else ", ".join(f"{m['model']} (until {m['until']})" for m in loaded) or "none"))
+    residency = st["gateway"]
+    service = residency["service"]
+    health = "healthy" if service["health"] else "UNAVAILABLE"
+    print(f"OMP Ollama gateway: {health} ({service['launchd_state']}; {service['bind']})")
+    routes = ", ".join(f"{name}={url}" for name, url in residency["profiles"].items()) or "none"
+    print("OMP Ollama profiles: " + routes)
+    print(f"gateway requests in flight: {residency['active_requests']}")
+    for lease in residency["leases"]:
+        expires = max((t for t in (lease["idle_expires_at"], lease["manual_expires_at"]) if t is not None),
+                      default=None)
+        when = _when(expires) if expires is not None else "none"
+        completed = _when(lease["last_completed_at"]) if lease["last_completed_at"] is not None else "never"
+        print(f"  lease {lease['model']}: profiles={','.join(lease['profiles']) or 'unknown'} "
+              f"active={lease['active_requests']} last_completed={completed} expires={when} "
+              f"outcome={lease['last_outcome'] or 'active'}")
+    unowned = residency["unowned_residents"]
+    print("unowned Ollama residents: " +
+          ("unknown (/api/ps unavailable)" if unowned is None else ", ".join(unowned) or "none"))
     auto = st["ollama_auto_update"]
     print("ollama app auto-update: " + ("unknown (no Ollama.app settings database)" if auto is None else
                                         "ON: the app can install a new ollama under every golden" if auto else "off"))
@@ -613,7 +725,7 @@ def cmd_gpu(args) -> int:
     for c in report["clients"]:
         if "omp_profile" in c:
             prof = c["omp_profile"]
-            routes.setdefault(prof, park.local_routes(prof))
+            routes.setdefault(prof, models.local_routes(prof))   # a disabled subagent prints as disabled, not a route
             c["local_routes"] = routes[prof]
     if args.json:
         print(json.dumps(report, indent=2))
@@ -670,7 +782,10 @@ def _since(text: str) -> float:
 
 def cmd_report(args) -> int:
     """What used local models over `--since` (e.g. 90m, 24h, 7d): GPU-seconds by process/model, residency, clients.
-    A window with no samples is an empty answer, not an error: exit 0, and the same shape under --json."""
+    A window with no samples is an empty answer, not an error: exit 0, and the same shape under --json.
+    `--by-purpose` / `--by-profile` instead sum the gateway's request counts and busy seconds (no request content)."""
+    if args.by_purpose or args.by_profile:
+        return _report_purposes(args)
     r = observe.report(args.since)
     if args.json:
         print(json.dumps(r, indent=2))
@@ -691,13 +806,38 @@ def cmd_report(args) -> int:
     print("Connected to a local inference server (samples seen):")
     for c in r["clients"][:15]:
         print(f"  {c['samples']:>5}  {c['who']}  cwd={c['cwd']}  {c['servers']}")
-    print("Traffic by client (down = responses, i.e. generated tokens; up = requests; model = what that server had "
-          "loaded then):")
+    print("Traffic by client (down = sampled response bytes; up = sampled request bytes; model = sample-time "
+          "resident on that server, not per-request attribution):")
     for t in r["traffic"][:15]:
         print(f"  {_size(t['down']):>9} down {_size(t['up']):>9} up  {t['who']}  cwd={t['cwd']}  "
               f"-> {t['server']} ({t['while_resident']})")
     if not r["traffic"]:
         print("  none recorded (traffic is sampled since this watcher version; restart `localbench watch`)")
+    return 0
+
+
+def _report_purposes(args) -> int:
+    """Gateway purpose_stats over the window, grouped by purpose, by profile, or (both flags) by the pair. Hourly
+    buckets are summed whole, so the window edges are approximate to the hour."""
+    until = time.time()
+    since = until - args.since
+    path = gateway.database_path()
+    rows = gateway.GatewayStore(path).purpose_report(since, until) if path.is_file() else []
+    keys = [k for k, on in (("profile", args.by_profile), ("purpose", args.by_purpose)) if on]
+    groups: dict[tuple, dict] = {}
+    for r in rows:
+        g = groups.setdefault(tuple(r[k] for k in keys), {**{k: r[k] for k in keys}, "requests": 0, "busy_s": 0.0})
+        g["requests"] += r["requests"]
+        g["busy_s"] += r["busy_s"]
+    out = sorted(groups.values(), key=lambda g: (-g["busy_s"], -g["requests"], *[g[k] for k in keys]))
+    if args.json:
+        print(json.dumps({"since": since, "until": until, "by": keys, "rows": out}, indent=2))
+        return 0
+    if not path.is_file():
+        print(f"no gateway database at {path}; `localbench gateway start` records purposes", file=sys.stderr)
+    print("\n".join(render.table([*keys, "requests", "busy_s"],
+                                 [[*(str(g[k]) for k in keys), str(g["requests"]), f"{g['busy_s']:.1f}"]
+                                  for g in out])))
     return 0
 
 
@@ -708,26 +848,851 @@ def cmd_models(args) -> int:
     installed = models.ollama_models() + models.mlx_models()
     cpu = models.omp_cpu_models()
     names = models.profiles()
-    uses = models.routes_by_model(names)
+    disabled: dict[str, list[str]] = {}
+    uses = models.routes_by_model(names, disabled)
     for m in installed + cpu:
         m["routes"] = uses.get(m.get("source", m["name"]), {})
     new = models.releases(args.days, installed)
     if args.json:
         # Profiles once; per model {feature: [profiles]} (was a flat "profile: feature" string per pair, which repeated
         # every feature name once per profile: 3.5k tokens, audit 2026-09-23).
-        print(json.dumps({"profiles": names, "installed": installed, "omp_cpu": cpu, "releases": new},
-                         separators=(",", ":")))
+        print(json.dumps({"profiles": names, "installed": installed, "omp_cpu": cpu, "releases": new,
+                          "disabled": disabled}, separators=(",", ":")))
         return 0
     print(f"omp profiles ({len(names)}): {', '.join(names)}")
     for m in installed + cpu:
         label = m["name"] + (f"  [parked: {m['source']}]" if m.get("parked") else "")
-        print(f"{m['server']:<9} {label:<48} {m.get('digest', m.get('upstream_sha', '')):<12} {m['gb']:>6.1f} GB  "
-              f"{m['freshness']}")
+        print(f"{m['server']:<9} {label:<48} {(m.get('digest') or m.get('installed_artifact') or 'unknown'):<12} "
+              f"{m['gb']:>6.1f} GB  {m['freshness']}")
+        if source := m.get("installed_artifact_source"):
+            print(f"  installed identity source: {source}")
+            date = (f"{m['upstream_date_source']} {m['upstream_modified']}"
+                    if m.get("upstream_modified") else "date unavailable")
+            print(f"  upstream {m.get('upstream_sha') or 'unavailable'} ({date})")
+        elif m["server"] == "ollama" and not m["freshness"].startswith("cloud"):
+            print("  upstream release date: unavailable")
         for feature, who in m["routes"].items():
             print(f"{'':12}{feature}: {render.members(who, names, 'profiles')}")
+    for feature, who in disabled.items():
+        print(f"disabled  {feature}: {render.members(who, names, 'profiles')} ({models.DISABLED})")
     print(f"\nNew or updated upstream in the last {args.days} days (publishers and families in use):")
     for r in new:
         print(f"  {r['modified']}  {r['id']}  ({r['task'] or '-'})")
+    return 0
+
+
+DECISION_BASE = "http://127.0.0.1:11434"   # the Ollama runtime itself, like every backend; never the gateway
+
+
+def cmd_decision(args) -> int:
+    """`decision run ollama:<model> --suite <role|path>`: every suite item, `--repeats` times, against Ollama's POST
+    /v1/systemone on loopback (localbench/decision.py), under a Sampler that records co-resident load. Side-model law:
+    load is the measured condition, never a refusal or a void, so there is no one-model preflight and the receipt's
+    verdicts.contended stays false. `--hosted-arm` adds hosted decision service on the same items in the same invocation (a
+    comparison arm, never a fallback; refused without its key). `--feature <registry id>` stamps the receipt with that
+    features.tsv row and the sha of its module in the installed omp, the pair a feature's proof is matched on. Writes
+    runs/<UTC>__decision__<model>/summary.json and banks the receipt as run_suite returns it (verdict, problems,
+    feature); exit 1 when it carries problems, a comparison that is not BETTER among them."""
+    from . import decision
+    if getattr(args, "decision_action", "run") == "derive":
+        return cmd_decision_derive(args)
+    if getattr(args, "decision_action", "run") == "paired":
+        return cmd_decision_paired(args)
+    if args.spec.startswith(decision.LAYA_PREFIX):
+        return cmd_decision_laya(args)
+
+    model = _ollama_model(args.spec)
+    try:
+        suite = decision.resolve_suite(args.suite)
+    except (decision.SuiteError, OSError) as exc:
+        _usage(f"decision run --suite {args.suite}: {exc}")
+    hosted = decision.Hosted() if args.hosted_arm else None
+    feature, module_sha, module_why = args.feature, None, None
+    if feature is not None:
+        module_sha, module_why = _feature_module_sha(feature)
+    refuse = None
+    if _run_alive():
+        refuse = "a localbench run is alive; a decision run would share its GPU and perturb both"
+    elif hosted is not None and not os.environ.get(hosted.api_key_env, "").strip():
+        refuse = (f"--hosted-arm needs {hosted.api_key_env} in the environment; the hosted arm never runs without it "
+                  "and never stands in for the local arm")
+    elif feature is not None and module_sha is None:
+        refuse = f"--feature {feature}: {module_why}; a receipt without its module sha proves nothing for the feature"
+    created = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    run_dir = RUNS / f"{created}__decision__{golden.slug(model)}"
+    rel_dir = run_dir.relative_to(ROOT)
+    arms = f"{model}" + (f" and hosted {hosted.model}" if hosted else "")
+    steps = [Step(f"ask {arms} every item of suite {suite.name} ({len(suite.items)} item(s), role {suite.role}) "
+                  f"{args.repeats} time(s) via {DECISION_BASE}/v1/systemone",
+                  "label log-probs, no sampling: quality is deterministic; latency is measured under the recorded load"),
+             Step(f"write {rel_dir / 'summary.json'}", "the run as measured; the receipt is banked from it"),
+             Step(f"bank {Path('docs/evidence/receipts') / f'decision__{model}__{suite.name}__<created>.json'}",
+                  "the evidence a feature's proof cites; a run with problems banks too and exits 1"
+                  + (f" (feature {feature}, omp_module_sha {module_sha[:12]})" if module_sha else ""))]
+    m = _mut(args)
+    if (rc := m.gate(steps, refuse=refuse)) is not None:
+        return rc
+    waited = _decision_wait_idle(args.wait_idle)
+    sampler = sysstats.Sampler(target=("ollama", model))   # unentered: run_suite enters it around the requests
+    try:
+        receipt = decision.run_suite(DECISION_BASE, model, suite, repeats=args.repeats, hosted=hosted,
+                                     sampler=sampler, rev=_rev(), feature=feature, omp_module_sha=module_sha,
+                                     allow_evict=getattr(args, "allow_evict", False),
+                                     in_use=None)   # None: decision.default_in_use, the live users of the model
+    except decision.ContextError as exc:
+        # The model cannot get the suite's context without evicting a user of it: refused before any item was sent.
+        m.outcome, m.detail["reason"] = "refused", str(exc)
+        return _fail(str(exc))
+    except decision.RequestError as exc:
+        return _fail(f"decision run: {exc}")
+    run = receipt["run"]
+    run["run_dir"] = str(rel_dir)
+    run["system"]["wait_idle"] = waited
+    run_dir.mkdir(parents=True, exist_ok=True)
+    (run_dir / "summary.json").write_text(json.dumps(run, indent=2, default=str) + "\n")
+    problems = list(receipt["problems"])
+    path = _bank(f"decision__{model}__{suite.name}__{run['provenance']['created']}",
+                 {**receipt, "problems": problems, "run": run})
+    rel = str(path.relative_to(ROOT))
+    m.detail.update(receipt=rel, run_dir=str(rel_dir), unsound=problems)
+    print(f"banked decision receipt {rel}")
+    for p in problems:
+        print(f"UNSOUND  {p}", file=sys.stderr)
+    m.outcome = "done"   # banked either way; exit 1 says the run has problems
+    return 1 if problems else 0
+
+
+def cmd_decision_paired(args) -> int:
+    """`decision paired <receipt.json>`: per-question-type paired local-vs-hosted scoring of a banked decision
+    receipt against the suite on disk (localbench/decision.py paired). Read-only: exit 1 on a scoring refusal,
+    otherwise 0 with the table (exit code says nothing about the verdicts)."""
+    from . import decision
+
+    if not 0.0 < args.alpha < 1.0:
+        _usage(f"decision paired --alpha {args.alpha}: a significance level strictly between 0 and 1")
+    try:
+        receipt = json.loads(Path(args.receipt).expanduser().read_text(encoding="utf-8"))
+    except OSError as exc:
+        _usage(f"decision paired {args.receipt}: {exc}")
+    except ValueError as exc:
+        return _fail(f"decision paired {args.receipt}: not JSON ({exc})")
+    try:
+        report = decision.paired(receipt, alpha=args.alpha, seed=args.seed)
+    except decision.PairedError as exc:
+        print(f"decision paired: refused: {exc}", file=sys.stderr)
+        return 1
+    if args.json:
+        print(json.dumps(report, indent=2))
+        return 0
+    print(f"{report['suite']['name']}  alpha={report['alpha']} seed={report['seed']}")
+    print("type n local hosted diff_pp b c mcnemar_p boot_mean [boot_lo,boot_hi] verdict")
+    for kind, row in report["types"].items():
+        boot = row["bootstrap"]
+        print(f"{kind} {row['n']} {row['local_accuracy']:.4f} {row['hosted_accuracy']:.4f} "
+              f"{row['diff_pp']:+.2f} {row['b']} {row['c']} {row['mcnemar_p']:.4g} "
+              f"{boot['mean_pp']:+.2f} [{boot['lo_pp']:+.2f},{boot['hi_pp']:+.2f}] {row['verdict']}")
+    return 0
+
+
+def cmd_decision_laya(args) -> int:
+    """`decision run laya:<hf repo>[@<subfolder>] --suite ...`: cmd_decision for a Laya-MLX checkpoint. A loopback
+    shim (localbench/shims/laya_systemone.py, run by the laya venv's python3; decision.LayaShim) loads the checkpoint
+    from the local Hugging Face cache, serves /v1/systemone on a free 127.0.0.1 port for this run only, and is always
+    stopped afterwards; its log is runs/<UTC>__decision__<model>/laya-shim.log. No Ollama runner is touched: Laya
+    truncates states over its max_len instead of refusing them, counted as decision.laya.truncated_items. A shim
+    that cannot start is a refusal before any item (exit 1); the receipt is banked as for an ollama: spec."""
+    from . import decision
+    try:
+        spec = decision.parse_laya_spec(args.spec)
+    except ValueError as exc:
+        _usage(f"decision run {exc}")
+    model = spec.name
+    try:
+        suite = decision.resolve_suite(args.suite)
+    except (decision.SuiteError, OSError) as exc:
+        _usage(f"decision run --suite {args.suite}: {exc}")
+    hosted = decision.Hosted() if args.hosted_arm else None
+    feature, module_sha, module_why = args.feature, None, None
+    if feature is not None:
+        module_sha, module_why = _feature_module_sha(feature)
+    venv = decision.laya_venv()
+    refuse = None
+    if _run_alive():
+        refuse = "a localbench run is alive; a decision run would share its GPU and perturb both"
+    elif not (venv / "bin" / "python3").is_file():
+        refuse = f"no python3 in the laya venv {venv}; set LOCALBENCH_LAYA_VENV to the venv that has laya_mlx"
+    elif hosted is not None and not os.environ.get(hosted.api_key_env, "").strip():
+        refuse = (f"--hosted-arm needs {hosted.api_key_env} in the environment; the hosted arm never runs without it "
+                  "and never stands in for the local arm")
+    elif feature is not None and module_sha is None:
+        refuse = f"--feature {feature}: {module_why}; a receipt without its module sha proves nothing for the feature"
+    created = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    run_dir = RUNS / f"{created}__decision__{golden.slug(model)}"
+    rel_dir = run_dir.relative_to(ROOT)
+    arms = f"{model}" + (f" and hosted {hosted.model}" if hosted else "")
+    receipt_name = f"decision__{golden.slug(model)}__{suite.name}"
+    steps = [Step(f"start {venv / 'bin' / 'python3'} {decision.LAYA_SHIM.name} for {model} on a free 127.0.0.1 "
+                  f"port, offline (log {rel_dir / 'laya-shim.log'})",
+                  "Laya-MLX answers System One-shaped requests from the HF cache; stopped when the run ends, also "
+                  "on failure"),
+             Step(f"ask {arms} every item of suite {suite.name} ({len(suite.items)} item(s), role {suite.role}) "
+                  f"{args.repeats} time(s) via the shim's /v1/systemone",
+                  "label probabilities from one forward pass, no sampling: quality is deterministic; states over "
+                  "Laya's max_len are truncated and counted"),
+             Step(f"write {rel_dir / 'summary.json'}", "the run as measured; the receipt is banked from it"),
+             Step(f"bank {Path('docs/evidence/receipts') / f'{receipt_name}__<created>.json'}",
+                  "the evidence a feature's proof cites; a run with problems banks too and exits 1"
+                  + (f" (feature {feature}, omp_module_sha {module_sha[:12]})" if module_sha else ""))]
+    m = _mut(args)
+    if (rc := m.gate(steps, refuse=refuse)) is not None:
+        return rc
+    waited = _decision_wait_idle(args.wait_idle)
+    run_dir.mkdir(parents=True, exist_ok=True)
+    # The backend's own GPU rows are matched by executable name in their command line (sysstats.gpu_is_ours): for
+    # the shim that is the script the venv's python3 runs. Entered by run_suite around the requests.
+    sampler = sysstats.Sampler(target=(decision.LAYA_SHIM.name, model))
+    try:
+        receipt = decision.run_laya(spec, suite, shim=decision.LayaShim(spec, log=run_dir / "laya-shim.log"),
+                                    repeats=args.repeats, hosted=hosted, sampler=sampler, rev=_rev(),
+                                    feature=feature, omp_module_sha=module_sha)
+    except decision.ShimError as exc:
+        m.outcome, m.detail["reason"] = "refused", str(exc)
+        return _fail(f"decision run: {exc}")
+    except decision.RequestError as exc:
+        return _fail(f"decision run: {exc}")
+    run = receipt["run"]
+    run["run_dir"] = str(rel_dir)
+    run["system"]["wait_idle"] = waited
+    (run_dir / "summary.json").write_text(json.dumps(run, indent=2, default=str) + "\n")
+    problems = list(receipt["problems"])
+    path = _bank(f"{receipt_name}__{run['provenance']['created']}", {**receipt, "problems": problems, "run": run})
+    rel = str(path.relative_to(ROOT))
+    m.detail.update(receipt=rel, run_dir=str(rel_dir), unsound=problems)
+    print(f"banked decision receipt {rel}")
+    for p in problems:
+        print(f"UNSOUND  {p}", file=sys.stderr)
+    m.outcome = "done"   # banked either way; exit 1 says the run has problems
+    return 1 if problems else 0
+
+
+def cmd_decision_derive(args) -> int:
+    """`decision derive ollama:<model> --num-ctx N [--name NAME]`: a model FROM <model> whose params layer sets
+    num_ctx N (POST /api/create {model: NAME, from, parameters: {num_ctx}}), for /v1/systemone, which takes no options
+    and loads a runner at the num_ctx the model ships (localbench/decision.py check_shipped_context). Read back via
+    /api/show: num_ctx N, the base's weights blob and other parameters, the base's digest unchanged. NAME defaults to
+    <model>-ctx<N>; an existing NAME is refused unless it already is this derivation (then a no-op). Never touches
+    the base model."""
+    from . import decision
+
+    base = _ollama_model(args.spec)
+    if args.num_ctx < 1:
+        _usage(f"decision derive --num-ctx {args.num_ctx}: give a positive token count")
+    m = _mut(args)
+    try:
+        plan = decision.plan_derive(DECISION_BASE, base, args.num_ctx, args.name)
+    except decision.DeriveError as exc:
+        return m.gate([], refuse=f"decision derive: {exc}")
+    weights = (plan.get("base_weights") or "?")[:12]
+    steps = [Step(f"POST {DECISION_BASE}/api/create {json.dumps(plan['request'])}",
+                  f"a new model {plan['name']} FROM {base} (same weights blob {weights}) whose params layer sets "
+                  f"num_ctx {args.num_ctx}: /v1/systemone loads runners at the shipped num_ctx"),
+             Step(f"read back {plan['name']} via /api/show and /api/tags",
+                  f"num_ctx {args.num_ctx}, weights {weights} and the base's other parameters, and {base} unchanged")]
+    if (rc := m.gate(steps, refuse=plan["refuse"], noop=plan["noop"])) is not None:
+        return rc
+    try:
+        out = decision.derive(DECISION_BASE, plan)
+    except decision.DeriveError as exc:
+        return _fail(f"decision derive: {exc}")
+    m.detail.update(out)
+    print(f"derived {out['name']} (digest {str(out['digest']).removeprefix('sha256:')[:12]}) from {base}: num_ctx "
+          f"{out['num_ctx']}, weights {out['weights'][:12]} (the base's)")
+    return 0
+
+
+def _feature_module_sha(feature: str) -> tuple[str | None, str | None]:
+    """(sha of the feature's registered module in the installed omp, None) or (None, why it cannot be read). An id
+    that is not in registries/features.tsv is a usage error."""
+    from . import features
+
+    try:
+        rows = features.load()
+    except (OSError, ValueError) as exc:
+        return None, f"feature registry unreadable ({exc})"
+    row = next((r for r in rows if r["feature"] == feature), None)
+    if row is None:
+        _usage(f"decision run --feature {feature}: not a feature in {features.REGISTRY}; one of "
+               f"{', '.join(sorted(r['feature'] for r in rows))} (`localbench features` lists them)")
+    try:
+        path = features.package_root(row["omp_package"], park.omp_package(omp_bin())) / row["omp_module"]
+    except (OSError, ValueError, RuntimeError) as exc:
+        return None, f"installed omp unreadable ({exc})"
+    sha = features.module_sha(path)
+    return (sha, None) if sha else (None, f"{row['omp_module']} is not in the installed {row['omp_package']} ({path})")
+
+
+def _decision_wait_idle(seconds: float) -> dict | None:
+    """`--wait-idle`: up to `seconds`, re-check the machine every 30 s and start once it is idle. Whatever is still
+    busy is recorded, never a refusal (side-model law)."""
+    if not seconds:
+        return None
+    t0 = time.time()
+    while True:
+        _summ, _cpu, problems = _busy_check()
+        if not problems or time.time() - t0 >= seconds:
+            return {"waited_s": round(time.time() - t0, 1), "still_busy": problems}
+        time.sleep(min(30, max(0.0, seconds - (time.time() - t0))))
+
+
+def cmd_features(args) -> int:
+    """omp features that can route to a local model (registries/features.tsv) and the receipt proving each, per
+    profile (localbench/features.py). Read-only. Exit 1 when any finding is FAIL: a local route without a current
+    proof. --queue files or updates one open proof bead per unproven local route (audited)."""
+    from . import features, proofqueue
+
+    if getattr(args, "queue", False):
+        units, open_beads, skipped = proofqueue.collect()
+        planned = proofqueue.plan(units, open_beads)
+        steps = [Step(*proofqueue.describe(a)) for a in planned if a["op"] != "noop"]
+        m = _mut(args)
+        noop = ("proof queue is empty: every local route already carries its trigger bead"
+                if not steps else None)
+        if (rc := m.gate(steps, noop=noop)) is not None:
+            if not args.json:
+                for entry in skipped:
+                    print(f"skipped: {entry['preset']} ({entry['reason']})")
+            return rc
+        try:
+            summary = proofqueue.apply([a for a in planned if a["op"] != "noop"])
+        except proofqueue.BeadError as exc:
+            return _fail(f"features --queue: {exc}")
+        summary["skipped"] = skipped
+        m.detail.update({key: summary[key] for key in ("filed", "updated", "adopted", "closed")})
+        if args.json:
+            print(json.dumps(summary, indent=2))
+        else:
+            for key in ("filed", "updated", "adopted", "closed"):
+                for title in summary[key]:
+                    print(f"{key}: {title}")
+            for entry in skipped:
+                print(f"skipped: {entry['preset']} ({entry['reason']})")
+            print(f"proof queue: {len(summary['filed'])} filed, {len(summary['updated'])} updated, "
+                  f"{len(summary['adopted'])} adopted, {len(summary['closed'])} closed, "
+                  f"{len(summary['noop'])} unchanged, {len(skipped)} skipped")
+        return 0
+
+    names = models.profiles()
+    rows = features.report(names)
+    found = features.findings(rows)
+    if args.json:
+        print(json.dumps({"profiles": names, "features": rows}, default=str))
+    else:
+        print("\n".join(features.lines(rows, names)))
+        for level, message, fix in found:
+            if level != "PASS":
+                print(f"{level}  {message}" + (f"\n      fix: {fix}" if fix else ""), file=sys.stderr)
+    return 1 if any(level == "FAIL" for level, _, _ in found) else 0
+
+
+def cmd_prove(args) -> int:
+    """Run declarative proof specs (localbench/prove.py): `prove <spec>` runs one spec end to end
+    (pre-reg commit, dataset pin, every candidate through its kind tier, assertions, banking,
+    grading, bead updates); `--due` runs every spec with an open bead whose regime allows it.
+    Audited mutation with a dry run that plans without inference or writes."""
+    from . import prove
+
+    if bool(args.spec) == bool(args.due):
+        _usage("localbench prove <spec> | --due: exactly one")
+    if args.due:
+        try:
+            pairs = [(path, prove.load_spec(path)) for path in prove.list_specs()]
+        except prove.ProveError as exc:
+            return _fail(f"prove --due: {exc}")
+        try:
+            due = prove.due_specs(pairs)
+        except prove.ProveError as exc:
+            return _fail(f"prove --due: {exc}")
+        if not due:
+            print("prove --due: no spec with an open bead and an allowing regime")
+            return 0
+        rc = 0
+        for path, _ in due:
+            rc = cmd_prove(_mimic(args, spec=str(path), due=False)) or rc
+        return rc
+    try:
+        spec = prove.load_spec(args.spec)
+    except prove.ProveError as exc:
+        _usage(f"prove {args.spec}: {exc}")
+    try:
+        commit = prove.spec_commit(args.spec)
+    except prove.ProveError as exc:
+        return _fail(f"prove {args.spec}: {exc}")
+    steps = [Step(action, why) for action, why in prove.plan_steps(spec, commit)]
+    m = _mut(args)
+    if (code := m.gate(steps)) is not None:
+        return code
+    try:
+        report = prove.prove_spec(args.spec)
+    except prove.ProveError as exc:
+        return _fail(f"prove {args.spec}: {exc}")
+    m.detail.update({c["route"]: c["grade"] for c in report.get("candidates", [])} or {"ran": True})
+    if args.json:
+        print(json.dumps(report, indent=2, sort_keys=True, default=str))
+    else:
+        for candidate in report.get("candidates", []):
+            print(f"{candidate['route']}: {candidate['grade']} ({candidate['reason']})")
+        print(f"prove {args.spec}: " + ", ".join(
+            f"{c['route']}={c['grade']}" for c in report.get("candidates", [])))
+    return 0
+
+
+def _mimic(args, **overrides):
+    """A copy of parsed args with fields replaced (for --due dispatch without re-parsing)."""
+    return argparse.Namespace(**{**vars(args), **overrides})
+
+
+def cmd_watch_releases(args) -> int:
+    """Upstream release watch (localbench/releasewatch.py). Bare: the queue of screens it filed (read-only). `--once`:
+    one watch pass now (files beads, queues screens, marks seen); `--install-agent`: the daily LaunchAgent. Both
+    change state, so they are audited mutations with a dry run."""
+    from . import releasewatch
+
+    if args.once or args.install_agent:
+        steps, refuse = [], None
+        try:
+            if args.install_agent:
+                steps.append(Step(f"write {releasewatch.plist_path()} and (re)load it with launchctl",
+                                  f"a daily {releasewatch.SCHEDULE['Hour']:02d}:"
+                                  f"{releasewatch.SCHEDULE['Minute']:02d} watch pass; launchctl bootout and rm undo it"))
+            if args.once:
+                steps.append(Step(f"one watch pass now: fetch upstream releases, file a bead per new release, queue "
+                                  f"its screen and mark it seen under {releasewatch.watch_dir()}",
+                                  "new releases of the model families in use become screen work, never an install"))
+        except releasewatch.WatchError as exc:   # e.g. a watch dir inside the repo: refused, never written
+            refuse = f"watch-releases: {exc}"
+        if (rc := _mut(args).gate(steps, refuse=refuse)) is not None:
+            return rc
+    rc = releasewatch.cli(once=args.once, install=args.install_agent, as_json=args.json)
+    if args.once:
+        from . import proofqueue
+        try:
+            queued = proofqueue.queue()
+        except Exception as exc:  # the trigger must not take down the pass it follows
+            print(f"proof queue: {type(exc).__name__}: {exc}", file=sys.stderr)
+        else:
+            _mut(args).detail.update(proof_queue={key: queued[key] for key in ("filed", "updated", "adopted", "closed")})
+            if not args.json:
+                print(f"proof queue: {len(queued['filed'])} filed, {len(queued['updated'])} updated, "
+                      f"{len(queued['adopted'])} adopted, {len(queued['closed'])} closed")
+    return rc
+
+
+def _profiles_arg(text: str) -> list[str]:
+    profiles = [p.strip() for p in text.split(",") if p.strip()]
+    if not profiles:
+        raise argparse.ArgumentTypeError("name at least one omp profile, e.g. --profiles default,lab")
+    bad = [p for p in profiles if "/" in p or "\\" in p or p in (".", "..") or ".." in p]
+    if bad:   # a profile is a directory name under ~/.omp/profiles; a path would escape it
+        raise argparse.ArgumentTypeError(f"profile name(s) {bad}: plain profile names only, no '/' or '..'")
+    return profiles
+
+
+def cmd_preset(args) -> int:
+    """omp config presets (localbench/presets.py, registries/presets.json): `list`, `show`, `plan` (read-only),
+    `apply` (backed up, read back through omp, restored on any mismatch; a local preset on the live target needs a
+    PROVEN feature receipt unless --force), `rollback <id>` and `drift` (exit 1 when live config left an applied
+    preset)."""
+    from . import presets
+
+    action = args.preset_action
+    if action == "list":
+        rows = presets.load()["presets"]
+        if args.json:
+            print(json.dumps(rows, indent=2))
+        else:
+            for p in rows:
+                print(f"{p['name']:<32} {'local' if p['local'] else 'hosted':<6} {len(p['ops'])} op(s)")
+        return 0
+    if action == "show":
+        print(json.dumps(presets.find(args.name), indent=2))
+        return 0
+    if action == "drift":
+        rows = presets.drift(args.profiles)
+        if args.json:
+            print(json.dumps(rows, indent=2))
+        else:
+            for r in rows:
+                print(f"DRIFT {r['profile']}: {r['preset']} ({r['id']}) {r['key']} expected {json.dumps(r['expected'])}"
+                      f", is {json.dumps(r['actual'])}")
+            if not rows:
+                print("no drift: every applied preset still holds")
+        return 1 if rows else 0
+    if action == "rollback":
+        steps = [Step(f"restore every profile file preset apply {args.id} backed up, byte for byte",
+                      "undoes exactly that apply; refused when a file changed after it unless --force")]
+        if (rc := _mut(args).gate(steps)) is not None:
+            return rc
+        out = presets.rollback(args.id, force=args.force)
+        print(f"rolled back {out['preset']} ({out['id']}): restored {', '.join(out['restored']) or 'nothing'}")
+        return 0
+    p = presets.plan(args.name, args.profiles, args.target, force=args.force)
+    if action == "plan":
+        print(json.dumps(p, indent=2, default=str) if args.json else "\n".join(presets.lines(p)))
+        return 1 if p["refused"] else 0
+    # apply: the plan's lines are the dry run; the refusal (an unproven local preset on live) is the gate's.
+    why = "backed up under ~/.localbench/rollback/preset-<id>, read back through omp, restored on any mismatch"
+    steps = [Step(line, why) for line in presets.lines(p)]
+    noop = None if any(s["changed"] for s in p["steps"]) else f"preset {args.name} already holds on {args.profiles}"
+    m = _mut(args)
+    if (rc := m.gate(steps, refuse=p["refused"], noop=noop)) is not None:
+        return rc
+    try:
+        manifest = presets.apply(args.name, args.profiles, args.target, force=args.force)
+    except presets.PresetRefused as exc:   # the plan moved between the gate and the write
+        return _fail(f"preset apply: {exc}")
+    m.detail.update(id=manifest["id"], forced=manifest["forced"])
+    print(f"applied {args.name} to {','.join(args.profiles)} ({args.target}); rollback id {manifest['id']}")
+    for note in p["notes"]:
+        print(f"note: {note}", file=sys.stderr)
+    return 0
+
+
+def _gate_arg(text: str) -> dict:
+    """`--gate METRIC=OP:VALUE` (e.g. decision.noul.accuracy=min:0.8) -> {metric: {op: value}}."""
+    metric, _, bound = text.partition("=")
+    op, _, value = bound.partition(":")
+    try:
+        number = float(value)
+    except ValueError:
+        number = None
+    if not metric or op not in ("min", "max") or number is None or not math.isfinite(number):
+        raise argparse.ArgumentTypeError(f"gate {text!r}: use METRIC=min:VALUE or METRIC=max:VALUE, e.g. "
+                                         "decision.noul.accuracy=min:0.8")
+    return {metric: {op: number}}
+
+
+def _gates(values: list[dict]) -> dict:
+    out: dict = {}
+    for g in values:
+        dup = set(out) & set(g)
+        if dup:
+            _usage(f"--gate {sorted(dup)[0]} given twice; one bound per metric")
+        out |= g
+    return out
+
+
+def cmd_corpus(args) -> int:
+    """Private decision corpora (localbench/corpus.py, localbench/jevsuites.py) under ~/.localbench/corpora, never in
+    the repo. `import` turns one omp profile's hosted judgments into a suite; `proj-b-build` builds a named suite from
+    the proj-b checkout; both need an explicit --gate (no default bar). `capture on|off|status` sets the opt-in,
+    capped, expiring capture of request bodies by purpose. import, proj-b-build and capture on/off are audited
+    mutations with a dry run; list, stats and capture status read."""
+    from . import corpus, decision, jevsuites
+
+    action = args.corpus_action
+    state = getattr(args, "capture_state", None)
+    if action == "capture" and state == "on" and not (args.purpose and args.max_items and args.minutes):
+        _usage("corpus capture on needs --purpose P (repeatable), --max-items N and --minutes M: capture is "
+               "opt-in, capped and expiring")
+    if action == "capture" and state != "on" and (args.purpose or args.max_items or args.minutes):
+        _usage(f"corpus capture {state} takes no --purpose/--max-items/--minutes")
+    steps, refuse = None, None
+    if action == "import":
+        try:
+            source = corpus.cache_path(args.profile)
+        except corpus.CorpusError as exc:
+            source, refuse = args.profile, f"corpus import: {exc}"
+        steps = [Step(f"read {source} and write a {args.role} suite under {corpus.CORPORA}/{args.role}/<sha>/ "
+                      f"(gate {json.dumps(_gates(args.gate))})",
+                      "hosted judgments become a private, content-addressed decision suite; never in the repo")]
+    elif action == "proj-b-build":
+        steps = [Step(f"build suite {args.name} under {jevsuites.OUT_ROOT} (gate {json.dumps(_gates(args.gate))})",
+                      "a named suite from the proj-b checkout, with an explicit pass bar")]
+    elif action == "capture" and state in ("on", "off"):
+        what = (f"enable capture of {', '.join(args.purpose)} request bodies: at most {args.max_items} item(s), "
+                f"expiring in {args.minutes:g} min" if state == "on" else "disable capture (purposes and cap kept)")
+        steps = [Step(f"write {corpus.capture_spec_path()}: {what}",
+                      "request bodies hold user code: capture is opt-in, capped and expires on its own")]
+    if steps is not None and (rc := _mut(args).gate(steps, refuse=refuse)) is not None:
+        return rc
+    try:
+        if action == "list":
+            out = corpus.list_corpora()
+            text = [f"{s['role'] or '-':<16} {s['items']:>6} item(s)  {s['name']}  {s['directory']}" for s in out]
+        elif action == "stats":
+            out = corpus.stats()
+            text = [f"{out['suites']} suite(s), {out['items']} item(s)"] + [
+                f"  {role}: {e['suites']} suite(s), {e['items']} item(s)" for role, e in sorted(out["roles"].items())]
+        elif action == "capture":
+            out = (corpus.capture_on(args.purpose, args.max_items, args.minutes) if state == "on" else
+                   corpus.capture_off() if state == "off" else corpus.capture_status())
+            text = [f"capture {state}: " + json.dumps(out, sort_keys=True, default=str)]
+        elif action == "import":
+            out = corpus.import_profile(args.profile, roles=(args.role,), model=args.model, gate=_gates(args.gate))
+            text = [f"{role}: {s['items']} item(s) -> {s['suite'] or '(none)'} {s['directory'] or ''}".rstrip()
+                    + f"  skipped {s['skipped']}" for role, s in out.items()]
+        else:
+            out = jevsuites.build(args.name, gate=_gates(args.gate))
+            text = [f"built {out['suite']['name']} ({out['suite']['n_items']} item(s)) in {out['directory']}"] + [
+                f"  excluded {reason}: {e['n']}" for reason, e in out["excluded"].items()]
+    except (corpus.CorpusError, decision.SuiteError, jevsuites.BuildError, OSError) as exc:
+        return _fail(f"corpus {action}: {exc}")
+    print(json.dumps(out, indent=2, default=str) if args.json else "\n".join(text))
+    return 0
+
+
+def _memory_legs(sources: list[str]) -> list[dict]:
+    """`memory-verdict` legs: execute summaries from run dirs (their summary.json) or summary files, or the run views
+    a receipt banked (kind run: run; aa: runs; ab: legs)."""
+    legs = []
+    for src in sources:
+        path = Path(src).expanduser()
+        path = path / "summary.json" if path.is_dir() else path
+        if not path.is_file():
+            _usage(f"memory-verdict: no such run dir or receipt {src}")
+        doc = _load_json("memory-verdict", path)
+        kind = doc.get("kind")
+        found = ([doc["run"]] if kind == "run" else doc.get("runs") if kind == "aa" else doc.get("legs")
+                 if kind == "ab" else [doc] if "provenance" in doc else None)
+        if not found:
+            _usage(f"memory-verdict: {src} is neither a run summary nor a run/aa/ab receipt")
+        legs += found
+    return legs
+
+
+def cmd_memory_verdict(args) -> int:
+    """Bank a memory proof receipt (workloads.memory_verdict) comparing candidate legs of a memory configuration with
+    baseline-route legs (mem+sess tiers, >= 2 per arm), stamped with the feature's installed omp_module_sha as
+    `decision run --feature` does. Legs with unknown resident-model state are non-proof and refused, as aa/ab do.
+    Exit 1 when the receipt carries problems (it is banked all the same, as evidence). A receipt `localbench validate`
+    would call INVALID (validate_doc) is never written: exit 1, each reason on stderr."""
+    candidate, baseline = _memory_legs(args.candidate), _memory_legs(args.baseline)
+    module_sha, why = _feature_module_sha(args.feature)
+    refuse = (f"--feature {args.feature}: {why}" if module_sha is None else
+              "memory-verdict: a leg's resident-model state is unknown or unrecorded; cannot bank an unproven "
+              "comparison" if _unknown_residency(*candidate, *baseline) else None)
+    path = _receipt_path(args.bank)
+    rel = path.relative_to(ROOT) if path.is_relative_to(ROOT) else path
+    steps = [Step(f"{'replace' if path.exists() else 'write'} {rel}: memory verdict of {len(candidate)} candidate vs "
+                  f"{len(baseline)} baseline leg(s) for {args.feature}"
+                  + (f" (omp_module_sha {module_sha[:12]})" if module_sha else ""),
+                  "the receipt a memory feature's proof is matched on; a not-BETTER verdict banks as evidence")]
+    m = _mut(args)
+    if (rc := m.gate(steps, refuse=refuse)) is not None:
+        return rc
+    receipt = workloads.memory_verdict(candidate, baseline, feature=args.feature, omp_module_sha=module_sha)
+    invalid = validate_doc(receipt)
+    if invalid:
+        m.outcome = "refused"
+        m.detail.update(invalid=invalid)
+        print(f"INVALID memory verdict for {rel}; nothing written:", file=sys.stderr)
+        for reason in invalid:
+            print(f"  {reason}", file=sys.stderr)
+        return 1
+    banked = _bank(args.bank, receipt)
+    problems = list(receipt.get("problems") or [])
+    m.detail.update(receipt=str(banked), unsound=problems)
+    print(f"banked memory verdict {rel}: {(receipt.get('verdict') or {}).get('compare', receipt.get('verdict'))}")
+    for p in problems:
+        print(f"UNSOUND  {p}", file=sys.stderr)
+    m.outcome = "done"   # banked either way; exit 1 says it is not proof
+    return 1 if problems else 0
+
+
+def _omp_watch_plist() -> Path:
+    from . import ompupdate
+
+    return Path.home() / "Library" / "LaunchAgents" / f"{ompupdate.DEFAULT_LABEL}.plist"
+
+
+def _freeze_steps(p) -> list[Step]:
+    """The plan of `omp freeze` for ompfreeze.plan() `p` (empty when its snapshot exists: reuse copies nothing)."""
+    from . import ompfreeze
+
+    if p.exists:
+        return []
+    steps = [Step(f"copy {len(p.packages)} packages ({p.size_bytes / 1e6:.0f} MB) from {p.install} into "
+                  f"{p.target.parent}/.tmp-{p.snapshot_id}-<pid>, then rename it to {p.target}",
+                  "omp and its runtime dependency closure as one read-only copy: an omp update (uca, about every 3 h) "
+                  "cannot change it under a running study"),
+             Step(f"copy bun {p.bun} to {p.target / 'bin' / 'bun'}",
+                  "the runtime that runs omp's dist entry, pinned with it (its version goes into the marker)"),
+             Step(f"write {ompfreeze.entry_path(p.target)}: exec the frozen bun on the frozen "
+                  f"{p.entry.relative_to(p.package)}",
+                  "the LOCALBENCH_OMP entry; its sha16 is the omp_sha every leg run through it pins")]
+    steps += [Step(f"remove snapshot {d}", f"retention keeps the newest {ompfreeze.KEEP} snapshots this verb made "
+                                           "(a run holding one keeps it)")
+              for d in ompfreeze.prune_candidates(p.snapshot_id)]
+    return steps
+
+
+def _omp_freeze(args, m: Mutation) -> int:
+    """`omp freeze`: snapshot the omp omp_bin() resolves into ~/.localbench/omp-frozen/<version>-<sha16>/ (localbench/
+    ompfreeze.py) and print LOCALBENCH_OMP=<entry>. An existing snapshot of the same omp is reused."""
+    from . import ompfreeze
+
+    try:
+        p = ompfreeze.plan()
+    except FileNotFoundError as exc:
+        return _fail(f"omp freeze: {exc}")
+    entry = ompfreeze.entry_path(p.target)
+    noop = f"omp snapshot {p.snapshot_id} exists at {p.target}: reused, nothing copied" if p.exists else None
+    # A real reuse proceeds (its row says noop) so stdout carries only LOCALBENCH_OMP=, as for a fresh copy.
+    if (rc := m.gate(_freeze_steps(p), refuse=p.refuse, noop=noop if m.dry_run else None)) is not None:
+        return rc
+    manifest = ompfreeze.freeze(p)
+    pruned = [str(d) for d in ompfreeze.prune(p.snapshot_id)] if manifest.get("created") else []
+    m.detail.update(snapshot_id=p.snapshot_id, entry=str(entry), omp_version=manifest.get("omp_version"),
+                    bun_version=manifest.get("bun_version"), size_bytes=manifest.get("size_bytes"),
+                    created=manifest.get("created"), pruned=pruned)
+    if not manifest.get("created"):
+        m.detail["noop"] = noop or f"omp snapshot {p.snapshot_id} was made by a concurrent freeze: reused"
+    if args.json:
+        print(json.dumps({**manifest, "entry": str(entry), "pruned": pruned}, indent=2, sort_keys=True))
+        return 0
+    print((f"omp {manifest.get('omp_version')} frozen at {p.target}" if manifest.get("created") else m.detail["noop"])
+          + f" ({(manifest.get('size_bytes') or 0) / 1e6:.0f} MB, {len(p.packages)} packages, bun "
+          f"{manifest.get('bun_version')})" + "".join(f"; removed {d}" for d in pruned), file=sys.stderr)
+    print(f"LOCALBENCH_OMP={entry}")
+    return 0
+
+
+def _with_frozen_omp(handler, args) -> int:
+    """`run|ab --omp-frozen`: freeze the omp omp_bin() resolves (or reuse its snapshot), then run the whole invocation
+    with LOCALBENCH_OMP at the frozen entry, so every leg pins one omp_version and omp_sha even when uca updates omp
+    mid-run (2026-10-02: 18.4.9 -> 18.4.10 between legs voided a memory A/B). ab --b-omp still overrides its B legs.
+    The freeze writes its own audit row (verb `omp freeze`); the snapshot is held, so no other freeze prunes it."""
+    from . import ompfreeze
+
+    try:
+        p = ompfreeze.plan()
+    except FileNotFoundError as exc:
+        return _fail(f"{args.cmd} --omp-frozen: {exc}")
+    if p.refuse:
+        audit.record("omp freeze", [args.cmd, "--omp-frozen"], [], "refused", {"reason": p.refuse})
+        return _fail(f"{args.cmd} --omp-frozen: {p.refuse}")
+    actions = [s.action for s in _freeze_steps(p)]
+    try:
+        manifest = ompfreeze.freeze(p)
+        pruned = [str(d) for d in ompfreeze.prune(p.snapshot_id)] if manifest.get("created") else []
+    except BaseException as exc:
+        audit.record("omp freeze", [args.cmd, "--omp-frozen"], actions, "failed",
+                     {"error": f"{type(exc).__name__}: {exc}"})
+        raise
+    entry = ompfreeze.entry_path(p.target)
+    audit.record("omp freeze", [args.cmd, "--omp-frozen"], actions if manifest.get("created") else [], "done",
+                 {"snapshot_id": p.snapshot_id, "entry": str(entry), "created": manifest.get("created"),
+                  "pruned": pruned, **({} if manifest.get("created") else {"noop": "snapshot reused"})})
+    print(f"omp {p.version} {'frozen' if manifest.get('created') else 'snapshot reused'}: LOCALBENCH_OMP={entry} "
+          "for every leg", file=sys.stderr)
+    args.omp_frozen = False
+    with ompfreeze.hold(p.snapshot_id), _binaries_for_leg({"LOCALBENCH_OMP": entry}):
+        return handler(args)
+
+
+def cmd_omp(args) -> int:
+    """After an omp update (localbench/ompupdate.py). `refresh`: capture omp's feature requests against a local mock,
+    diff them and the registered module shas against the stored baseline, and carry each feature's proof forward only
+    when both are identical; every other feature goes STALE with its re-proof queued (exit 1). `watch install|remove|
+    status`: the WatchPaths LaunchAgent that runs `localbench omp refresh` when omp's package.json changes."""
+    from . import ompupdate
+
+    m = _mut(args)
+    if args.omp_action == "freeze":
+        return _omp_freeze(args, m)
+    if args.omp_action == "refresh":
+        steps = [Step("capture omp's feature requests in an isolated session against a local mock server",
+                      "the exact request bytes omp sends now; no model is called"),
+                 Step(f"diff them and the registered module shas against {ompupdate.BASELINE_PATH}; record the "
+                      "outcome per feature",
+                      "a proof carries forward only for byte-identical requests from an unchanged module; the rest "
+                      "go STALE and queue their re-proof")]
+        if (rc := m.gate(steps)) is not None:
+            return rc
+        try:
+            report = ompupdate.refresh()
+        except (ompupdate.CaptureError, ValueError, OSError) as exc:
+            return _fail(f"omp refresh: {exc}")
+        outcomes = report.get("outcomes") or {}
+        stale = sorted(name for name, o in outcomes.items() if o.get("status") != "CARRIED")
+        m.detail.update(omp_version=report.get("omp_version"), stale=stale)
+        m.outcome = "done"   # the refresh ran and recorded every outcome; exit 1 says a proof went STALE
+        try:
+            from . import proofqueue
+            queued = proofqueue.queue()
+        except Exception as exc:  # the trigger must not take down the refresh it follows
+            print(f"proof queue: {type(exc).__name__}: {exc}", file=sys.stderr)
+        else:
+            queued_counts = {key: queued[key] for key in ("filed", "updated", "adopted", "closed")}
+            m.detail.update(proof_queue=queued_counts)
+            report["proof_queue"] = queued_counts
+            if not args.json:
+                print(f"proof queue: {len(queued['filed'])} filed, {len(queued['updated'])} updated, "
+                      f"{len(queued['adopted'])} adopted, {len(queued['closed'])} closed")
+        if args.json:
+            print(json.dumps(report, indent=2, sort_keys=True, default=str))
+        else:
+            print(f"omp {report.get('omp_version')}: {len(outcomes) - len(stale)} carried, {len(stale)} STALE")
+            for name, o in sorted(outcomes.items()):
+                queue = ", ".join(o.get("queue") or [])
+                print(f"  {name}: {o.get('status')}" + (f" (feature {o['feature']})" if o.get("feature") else "")
+                      + (f"; re-prove: {queue}" if queue else ""))
+        return 1 if stale else 0
+
+    path, label = _omp_watch_plist(), ompupdate.DEFAULT_LABEL
+    domain = f"gui/{os.getuid()}"
+    existing = None
+    if path.is_file() and not path.is_symlink():
+        try:
+            existing = plistlib.loads(path.read_bytes())
+        except (OSError, ValueError, plistlib.InvalidFileException):
+            existing = {}
+    if args.watch_state == "status":
+        loaded = subprocess.run(["launchctl", "print", f"{domain}/{label}"], capture_output=True, text=True,
+                                check=False).returncode == 0
+        view = {"plist": str(path), "installed": existing is not None and existing.get("Label") == label,
+                "loaded": loaded, "watch_paths": (existing or {}).get("WatchPaths"),
+                "program": (existing or {}).get("ProgramArguments")}
+        if args.json:
+            print(json.dumps(view))
+        else:
+            print(f"omp watch: {'installed' if view['installed'] else 'not installed'} ({path}), "
+                  f"{'loaded' if loaded else 'not loaded'}; watches {view['watch_paths'] or '-'}")
+        return 0
+    refuse = None
+    if path.is_symlink():
+        refuse = f"{path} is a symlink; refusing"
+    elif existing is not None and existing.get("Label") != label:
+        refuse = f"{path} is not localbench's omp watch (Label {existing.get('Label')!r}); refusing"
+    if args.watch_state == "install":
+        body = ompupdate.render_watch_plist(localbench_bin=shutil.which("localbench") or ompupdate.DEFAULT_LOCALBENCH)
+        steps = [Step(f"write {path}", f"WatchPaths {plistlib.loads(body)['WatchPaths']}: runs `localbench omp "
+                                       "refresh` when omp's package.json changes (an omp update)"),
+                 Step(f"launchctl bootout {domain}/{label}; launchctl bootstrap {domain} {path}",
+                      "(re)loads the job so the new plist takes effect")]
+        if (rc := m.gate(steps, refuse=refuse)) is not None:
+            return rc
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+        try:
+            tmp.write_bytes(body)
+            tmp.chmod(0o644)
+            os.replace(tmp, path)
+        finally:
+            tmp.unlink(missing_ok=True)
+        subprocess.run(["launchctl", "bootout", f"{domain}/{label}"], capture_output=True, text=True, check=False)
+        p = subprocess.run(["launchctl", "bootstrap", domain, str(path)], capture_output=True, text=True, check=False)
+        if p.returncode:
+            return _fail(f"launchctl bootstrap {path} failed: {(p.stderr or p.stdout).strip()}")
+        print(f"installed {path}; remove: localbench omp watch remove")
+        return 0
+    steps = [Step(f"launchctl bootout {domain}/{label}; remove {path}", "omp updates no longer trigger a refresh")]
+    noop = None if path.exists() or path.is_symlink() else f"omp watch not installed ({path} absent)"
+    if (rc := m.gate(steps, refuse=refuse if not noop else None, noop=noop)) is not None:
+        return rc
+    subprocess.run(["launchctl", "bootout", f"{domain}/{label}"], capture_output=True, text=True, check=False)
+    path.unlink()
+    print(f"removed {path}")
     return 0
 
 
@@ -790,7 +1755,8 @@ def cmd_park(args) -> int:
     noop = None if plan else "nothing to park: " + (
         f"already parked: {', '.join(already)}; restore with: localbench unpark" if already else
         "no smol target or fallback is installed under its own name, and no smol server is up")
-    if (rc := _mut(args).gate([_park_step(e) for e in plan], noop=noop)) is not None:
+    refuse = park.safety_refusal(plan)
+    if (rc := _mut(args).gate([_park_step(e) for e in plan], refuse=refuse, noop=noop)) is not None:
         return rc
     park.park(plan=plan)
     for p in plan:
@@ -846,13 +1812,23 @@ def _stuck_lines(stuck: list[dict]) -> list[str]:
             for s in stuck]
 
 
-RUN_PATTERN = "localbench (aa|run|ab|record)"
-KEEP_ALIASES = {"forever": -1, "unload": 0, "0": 0}
+RUN_PATTERN = "localbench (aa|run|ab|record|decision run)"   # a decision run shares the GPU like any measurement
+KEEP_ALIASES = {"unload": 0, "0": 0}
 
+
+def _finite_keep(value: str) -> str:
+    if value not in KEEP_ALIASES:
+        try:
+            gateway.parse_finite_duration(value)
+        except ValueError as exc:
+            raise argparse.ArgumentTypeError(str(exc)) from exc
+    return value
 
 def _run_alive() -> bool:
-    """A measurement is in progress (loading a model or downloading one now would perturb it)."""
-    return subprocess.run(["pgrep", "-f", RUN_PATTERN], capture_output=True, check=False).returncode == 0
+    """A measurement is in progress (loading a model or downloading one now would perturb it). This process and its
+    parent (a `uv run` wrapper) are not another run: `decision run` checks this about itself."""
+    out = subprocess.run(["pgrep", "-f", RUN_PATTERN], capture_output=True, text=True, check=False).stdout.split()
+    return any(int(pid) not in (os.getpid(), os.getppid()) for pid in out)
 
 
 def _ollama_model(spec: str) -> str:
@@ -863,32 +1839,43 @@ def _ollama_model(spec: str) -> str:
 
 
 def cmd_keep(args) -> int:
-    """Set how long ollama keeps a model loaded: `forever`, a duration (`30m`, `2h`), or `0`/`unload`; loads it if
-    needed. A run's isolate reloads the model under test with ollama's default keep-alive, so a model the user keeps
-    resident needs this afterwards. Refused while a run is alive: loading a model mid-run is contention. Keeping
-    forever what is kept forever, or unloading what is not loaded, is a no-op."""
+    """Set a finite Ollama keep-alive (default 5m); zero/unload requests a guarded unload."""
     model = _ollama_model(args.spec)
-    keep = KEEP_ALIASES.get(args.duration, args.duration)
+    duration = args.duration
+    keep = KEEP_ALIASES.get(duration)
+    if keep is None:
+        try:
+            keep = gateway.parse_finite_duration(duration)
+        except ValueError as exc:
+            _usage(str(exc))
     refuse = "a localbench run is alive; set keep-alive after it ends" if _run_alive() else None
     noop = None
     residents = None if refuse else sysstats.ollama_residents(Ollama().root, timeout=10.0)
-    if residents is not None:
-        until = dict(residents).get(model)
-        if keep == 0 and until is None:
+    if keep == 0 and not refuse:
+        if residents is None:
+            refuse = "cannot verify Ollama resident state; unload refused"
+        elif model not in dict(residents):
             noop = f"{model}: not loaded; nothing to unload"
-        elif keep == -1 and until == "forever":   # sysstats.keep_until's reading of keep_alive -1
-            noop = f"{model}: already loaded until forever"
-    step = (Step(f"unload ollama {model} (keep_alive 0)", "frees its memory and GPU now; the next request reloads it")
-            if keep == 0 else
-            Step(f"set ollama {model} keep_alive {args.duration} (loads it if it is not loaded)",
-                 "a run's isolate reloads the model under test with ollama's default keep-alive (5 min), so a model "
-                 "kept resident needs this afterwards"))
-    if (rc := _mut(args).gate([step], refuse=refuse, noop=noop)) is not None:
+        else:
+            safe, reason = gateway.safe_to_unload(model)
+            if safe is not True:
+                refuse = reason or "external Ollama client activity is unknown; unload refused"
+    step = (Step(f"unload ollama {model} (keep_alive 0)",
+                 "frees its memory and GPU after active gateway/external clients are ruled out") if keep == 0 else
+            Step(f"set ollama {model} keep_alive {duration} (finite lease)",
+                 "loads it if needed; the finite lease is visible to localbench status"))
+    mutation = _mut(args)
+    if (rc := mutation.gate([step], refuse=refuse, noop=noop)) is not None:
         return rc
-    body = {"model": model, "keep_alive": keep}
+    if keep > 0:
+        expires_at = gateway.keep_state(model, duration)
+        mutation.detail["finite_lease_expires_at"] = datetime.fromtimestamp(expires_at, UTC).isoformat()
+    body = {"model": model, "keep_alive": 0 if keep == 0 else duration}
     try:
         backends._post(Ollama().root + "/api/generate", body, timeout=900)
     except urllib.error.HTTPError as exc:
+        if keep > 0:
+            gateway.clear_manual_lease(model)
         return _fail(f"ollama refused {model}: HTTP {exc.code} {exc.read().decode(errors='replace')[:200]}")
     residents = sysstats.ollama_residents(Ollama().root, timeout=120.0)
     if residents is None:
@@ -897,12 +1884,186 @@ def cmd_keep(args) -> int:
     if keep == 0:
         if model in loaded:
             return _fail(f"{model}: still loaded")
+        gateway.mark_unloaded(model)
         print(f"{model}: unloaded")
         return 0
     if model not in loaded:
         return _fail(f"{model}: not loaded after the request")
     print(f"{model}: loaded until {loaded[model]}")
     return 0
+
+
+def cmd_gateway(args) -> int:
+    if args.action == "serve":
+        try:
+            gateway.serve(host=args.host, port=args.port)
+        except gateway.GatewayError as exc:
+            return _fail(str(exc))
+        return 0
+
+    if args.action == "status":
+        st = gateway.status()
+        if args.json:
+            print(json.dumps(st, indent=2, default=str))
+            return 0
+        service = st["service"]
+        print(f"Ollama gateway: {'healthy' if service['health'] else 'UNAVAILABLE'} "
+              f"({service['launchd_state']}, bind {service['bind']}, accepting={st['accepting_requests']})")
+        print("OMP profiles: " + (", ".join(f"{name}={url}" for name, url in st["profiles"].items()) or "none"))
+        print(f"requests in flight: {st['active_requests']}")
+        for lease in st["leases"]:
+            expiry = max((value for value in (lease["idle_expires_at"], lease["manual_expires_at"])
+                          if value is not None), default=None)
+            when = _when(expiry) if expiry is not None else "none"
+            completed = _when(lease["last_completed_at"]) if lease["last_completed_at"] is not None else "never"
+            print(f"lease {lease['model']}: profiles={','.join(lease['profiles']) or 'unknown'} "
+                  f"active={lease['active_requests']} last_completed={completed} expires={when} "
+                  f"outcome={lease['last_outcome'] or 'active'}")
+            if lease["last_error"]:
+                print(f"  unresolved: {lease['last_error']}")
+        print(f"Ollama residency API: {st['ollama_state']}")
+        print("unowned residents: " +
+              ("unknown" if st["unowned_residents"] is None else ", ".join(st["unowned_residents"]) or "none"))
+        if gateway.database_path().is_file():
+            for f in gateway.GatewayStore(gateway.database_path()).fences():
+                print(f"fence {f['fence_id']}: {f['model']} since {_when(f['created_at'])}")
+        return 0
+
+    if args.action in ("fence", "unfence"):
+        return _gateway_fence(args)
+
+    from . import omp_profiles
+
+    mutation = _mut(args)
+    service = gateway.service_status()
+    refuse = service["plist_error"]
+    noop = None
+    steps = []
+    profile_names = []
+    try:
+        if args.action == "install":
+            manager = omp_profiles.ProfileManager.current(gateway.state_dir())
+            profile_names = sorted(manager.dirs)
+            manager.plan(args.port)
+            manifest_path = gateway.state_dir() / omp_profiles.MANIFEST_NAME
+            if manifest_path.exists():
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                if set(manifest.get("profiles", {})) != set(manager.dirs):
+                    refuse = "OMP profile set changed since gateway installation; reconcile before reinstalling"
+                elif service["plist_installed"] and service["launchd_loaded"] and service["health"]:
+                    noop = "gateway and OMP profile routes are already installed and healthy"
+            if not refuse and not noop and _run_alive():
+                refuse = "a localbench measurement is alive; install the gateway after it ends"
+            if not refuse and not noop and not service["health"]:
+                gateway.ensure_port_free(port=args.port)
+            steps = [Step(f"route {len(profile_names)} OMP profiles through the loopback Ollama gateway",
+                          "OMP provider changes are marker-owned and reversible; the gateway fails closed")]
+        elif args.action == "start":
+            if not service["plist_installed"]:
+                refuse = "gateway LaunchAgent is not installed"
+            elif service["launchd_loaded"] and service["health"]:
+                service = gateway.service_status()
+                if service["launchd_loaded"] and service["health"]:
+                    noop = "gateway LaunchAgent is already healthy"
+            steps = [Step("start the managed Ollama gateway LaunchAgent",
+                          "the user-level service resumes profile-routed local Ollama requests")]
+        elif args.action == "stop":
+            if not service["plist_installed"]:
+                noop = "gateway LaunchAgent is not installed"
+            elif gateway.active_request_count():
+                refuse = "gateway has in-flight requests; stop refused"
+            steps = [Step("drain and stop the managed Ollama gateway LaunchAgent",
+                          "new inference requests are rejected before launchd stops the process")]
+        elif args.action == "remove":
+            manifest_path = gateway.state_dir() / omp_profiles.MANIFEST_NAME
+            if not manifest_path.exists() and not service["plist_installed"]:
+                noop = "gateway is not installed"
+            elif not manifest_path.exists():
+                refuse = "gateway LaunchAgent exists without a reversible OMP profile manifest"
+            else:
+                profile_names = gateway.plan_remove()
+                if gateway.active_request_count():
+                    refuse = "gateway has in-flight requests; remove refused"
+                elif _run_alive():
+                    refuse = "a localbench measurement is alive; remove the gateway after it ends"
+            steps = [Step("drain the gateway, restore original OMP routing, and remove its LaunchAgent",
+                          "only the exact localbench-owned provider block is removed; later profile edits are preserved")]
+    except (gateway.GatewayError, omp_profiles.ProfileConflict, OSError, ValueError) as exc:
+        refuse = str(exc)
+
+    if (rc := mutation.gate(steps, refuse=refuse, noop=noop)) is not None:
+        return rc
+    try:
+        if args.action == "install":
+            result = gateway.install(port=args.port)
+            mutation.detail.update({"profiles": result["profiles"], "port": result["port"]})
+            mutation.detail["omp_catalog_readback"] = result["readback"]
+            print(f"installed gateway for {len(result['profiles'])} OMP profiles on "
+                  f"{gateway.HOST}:{result['port']}; restart existing OMP sessions to load updated profiles")
+        elif args.action == "start":
+            gateway.start()
+            print("Ollama gateway started")
+        elif args.action == "stop":
+            gateway.stop()
+            print("Ollama gateway stopped; OMP requests fail closed until it starts")
+        else:
+            removed = gateway.remove()
+            mutation.detail["profiles_reverted"] = removed
+            print(f"removed gateway; restored OMP routing for {len(removed)} profiles")
+    except (gateway.GatewayError, omp_profiles.ProfileConflict, OSError, ValueError) as exc:
+        return _fail(str(exc))
+    return 0
+
+def _park_fence_ids() -> set[str]:
+    """Fence ids that belong to `localbench park` (released only by unpark)."""
+    ids = set()
+    for entry in park.parked_now():
+        ids.update(v for k, v in entry.items() if k in ("_park_fence_id", "_unpark_alias_fence_id") and v)
+    return ids
+
+
+def _gateway_fence(args) -> int:
+    """`gateway fence --model M...`: the gateway refuses inference requests for M at once (a fast 503, so a client
+    can fall back) until `gateway unfence --id`. For windows a local-route consumer asked for (proj-b 2026-10-01: its
+    nimble gate falls back to paid decision service on a gateway error). Uses park's admission fence; it never unloads anything
+    and never touches a fence that park holds."""
+    m = _mut(args)
+    store = gateway.GatewayStore(gateway.database_path())
+    active = store.fences()
+    if args.action == "fence":
+        models = sorted(set(args.model))
+        refuse = None if models else "name at least one --model to fence"
+        already = sorted({f["model"] for f in active} & set(models))
+        if already and not refuse:
+            refuse = f"already fenced: {', '.join(already)}"
+        steps = [Step(f"fence {', '.join(models)} at the gateway: their inference requests get an immediate error",
+                      "until `localbench gateway unfence --id <id>`; nothing is unloaded")]
+        if (rc := m.gate(steps, refuse=refuse)) is not None:
+            return rc
+        fence_id = f"manual-{uuid.uuid4().hex[:12]}"
+        deadline = time.monotonic() + max(0.0, args.wait)
+        while (refusal := store.acquire_park_fence(models, fence_id)) is not None:
+            if "in flight" not in refusal or time.monotonic() >= deadline:
+                m.outcome = "refused"
+                return _fail(f"gateway fence: {refusal}")
+            time.sleep(0.2)
+        m.detail.update(fence_id=fence_id, models=models)
+        print(f"fenced {', '.join(models)}; fence id {fence_id}; release: localbench gateway unfence --id {fence_id}")
+        return 0
+    fence_id = args.fence_id or ""
+    held = [f["model"] for f in active if f["fence_id"] == fence_id]
+    refuse = ("name the fence with --id" if not fence_id
+              else "that fence belongs to localbench park; release it with localbench unpark"
+              if fence_id in _park_fence_ids() else None)
+    noop = None if refuse or held else f"no active fence {fence_id}"
+    steps = [Step(f"release fence {fence_id} ({', '.join(held)})", "the gateway admits those models' requests again")]
+    if (rc := m.gate(steps, refuse=refuse, noop=noop)) is not None:
+        return rc
+    store.release_park_fence(fence_id)
+    m.detail.update(fence_id=fence_id, models=held)
+    print(f"released fence {fence_id} ({', '.join(held)})")
+    return 0
+
 
 
 def cmd_quiet(args) -> int:
@@ -1320,11 +2481,366 @@ def judge(s: dict, as_json: bool = False) -> int:
     return 1 if bad else 0
 
 
+E2E_PROFILE = "omp-e2e.v1"
+
+
+def _evaluation_case_inputs(model: str) -> dict[str, str]:
+    from .evaluation import canonical_sha256
+    from .workloads import E2E_TASKS, child_flags
+
+    return {
+        name: canonical_sha256({"profile": E2E_PROFILE, "case": name, "prompt": prompt,
+                                "fixture": {"answer.txt": "4817\n"} if name == "tool_read" else {},
+                                "child_flags": child_flags(model)})
+        for name, prompt, _ in E2E_TASKS
+    }
+
+
+def _localbench_source_hashes() -> dict[str, str]:
+    from .evaluation import file_sha256
+
+    return {source.name: file_sha256(source)
+            for source in sorted(Path(__file__).resolve().parent.glob("*.py"))}
+
+
+def _evaluation_scorer_sha256() -> str:
+    from .evaluation import canonical_sha256
+
+    return canonical_sha256(_localbench_source_hashes())
+
+
+def _evaluation_path(value: str) -> Path:
+    from .evaluation import CampaignError
+
+    path = Path(value).expanduser()
+    path = (ROOT / path).resolve() if not path.is_absolute() else path.resolve()
+    try:
+        path.relative_to(RUNS.resolve())
+    except ValueError as exc:
+        raise CampaignError("campaign directory must be inside runs/") from exc
+    return path
+
+
+def _evaluation_score(campaign):
+    from .evaluation import CampaignError
+    from .workloads import score_e2e_case
+
+    case_inputs = campaign.case_inputs
+    cases = []
+    for case_id in campaign.case_ids:
+        row = campaign.completed_case(case_id)
+        if row is None:
+            cases.append({"case_id": case_id, "input_sha256": case_inputs[case_id], "status": "INCOMPLETE"})
+            continue
+        if row["status"] in ("VOID", "ERROR"):
+            cases.append({"case_id": case_id, "input_sha256": row["input_sha256"], "status": row["status"]})
+            continue
+        run_dir = campaign.root / row["run_dir"]
+        attempts = []
+        try:
+            for attempt in ("first", "repeat"):
+                result = json.loads((run_dir / f"e2e.{case_id}.{attempt}.result.json").read_text(encoding="utf-8"))
+                stdout = (run_dir / f"e2e.{case_id}.{attempt}.omp.jsonl").read_text(encoding="utf-8")
+                if not isinstance(result, dict) or result.get("task") != case_id or result.get("attempt") != attempt:
+                    raise CampaignError(f"case {case_id!r} has mismatched {attempt} result metadata")
+                attempts.append({"stdout": stdout, "returncode": result.get("returncode")})
+            scored = score_e2e_case(case_id, attempts)
+        except CampaignError:
+            raise
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+            raise CampaignError(f"case {case_id!r} cannot be re-scored: {exc}") from exc
+        cases.append({"case_id": case_id, "input_sha256": row["input_sha256"], **scored})
+    statuses = [case["status"] for case in cases]
+    status = ("INCOMPLETE" if "INCOMPLETE" in statuses else "FAIL" if "FAIL" in statuses or "ERROR" in statuses
+              else "VOID" if "VOID" in statuses else "PASS")
+    document = {"identity_sha256": campaign.identity_sha256, "profile": campaign.manifest["profile"],
+                "status": status, "expected": len(cases),
+                "completed": sum(case["status"] not in ("INCOMPLETE",) for case in cases), "cases": cases}
+    score_path = campaign.write_scores(_evaluation_scorer_sha256(), document)
+    return document, score_path
+
+
+VARIED_PROFILE = "omp-varied.v1"
+
+
+def _evaluation_score_varied(campaign):
+    """Rejudge saved trial exits, tool trajectories and final files without opening a backend."""
+    from .evaluation import GRADER_VERSION, CampaignError, canonical_sha256, score_varied_trial, workspace_text
+    from .workloads import _wilson
+
+    specs = campaign.manifest["identity"].get("varied_specs")
+    if not isinstance(specs, dict) or set(specs) != set(campaign.case_ids):
+        raise CampaignError("varied campaign spec identity is incomplete")
+    versions = {(s.get("grader_version") if isinstance(s, dict) else None) for s in specs.values()}
+    stale = sorted(str(v) for v in versions if v != GRADER_VERSION)
+    if stale:
+        # Checked before any scoring, so write_scores never puts new-grader ERROR rows into an old campaign.
+        raise CampaignError(f"specs carry grader_version {', '.join(stale)} but this localbench grades "
+                            f"{GRADER_VERSION}; a fixed grader is a new campaign identity: run a new "
+                            "`localbench eval varied` campaign instead of rescoring this one")
+    cases = []
+    for case_id in campaign.case_ids:
+        spec = specs[case_id]
+        if canonical_sha256(spec) != campaign.case_inputs[case_id]:
+            raise CampaignError(f"case {case_id!r} spec differs from preregistered input hash")
+        row = campaign.completed_case(case_id)
+        if row is None:
+            cases.append({"case_id": case_id, "status": "INCOMPLETE"})
+            continue
+        if row["status"] in ("VOID", "ERROR"):
+            cases.append({"case_id": case_id, "status": row["status"]})
+            continue
+        attempt_dir = campaign.root / row["run_dir"] / "attempt"
+        try:
+            result = json.loads((attempt_dir / "result.json").read_text(encoding="utf-8"))
+            stdout = (attempt_dir / "trajectory.jsonl").read_text(encoding="utf-8")
+            final_files = json.loads((attempt_dir / "final_state.json").read_text(encoding="utf-8"))
+            if not isinstance(final_files, dict):
+                raise CampaignError(f"case {case_id!r} has no valid final file snapshot")
+            if result.get("timed_out") is not True:
+                for filename in ("target.txt", "decoy.txt"):
+                    workspace_file = attempt_dir / "workspace" / filename
+                    content = workspace_text(workspace_file)
+                    if content is None or content != final_files.get(filename):
+                        raise CampaignError(f"case {case_id!r} final snapshot differs from workspace: {filename}")
+            score = score_varied_trial(spec, stdout=stdout, returncode=result["returncode"],
+                                       timed_out=result["timed_out"], final_files=final_files,
+                                       cwd=(attempt_dir / "workspace").resolve(), wall_s=result["wall_s"])
+        except (OSError, UnicodeError, ValueError, KeyError, TypeError) as exc:
+            raise CampaignError(f"case {case_id!r} cannot be re-scored: {exc}") from exc
+        cases.append({"case_id": case_id, "family": spec["family"], "phase": spec["phase"],
+                      "seed": spec["seed"], **score})
+    statuses = [case["status"] for case in cases]
+    success_walls = [case["wall_s"] for case in cases if case["status"] == "PASS"]
+    graded = statuses.count("PASS") + statuses.count("FAIL")
+    status = ("INCOMPLETE" if "INCOMPLETE" in statuses else "FAIL" if "FAIL" in statuses or "ERROR" in statuses
+              else "VOID" if "VOID" in statuses else "PASS")
+    document = {"identity_sha256": campaign.identity_sha256, "profile": VARIED_PROFILE,
+                "status": status, "expected": len(cases),
+                "completed": sum(value != "INCOMPLETE" for value in statuses),
+                "passed": statuses.count("PASS"), "failed": statuses.count("FAIL"),
+                "void": statuses.count("VOID"), "error": statuses.count("ERROR"),
+                "success": {"passed": statuses.count("PASS"), "graded": graded,
+                            "wilson95": _wilson(statuses.count("PASS"), graded) if graded else None,
+                            "wall_s_on_success": {"median": statistics.median(success_walls),
+                                                  "range": [min(success_walls), max(success_walls)]}
+                            if success_walls else None},
+                "cases": cases}
+    score_path = campaign.write_scores(_evaluation_scorer_sha256(), document)
+    return document, score_path
+
+
+def cmd_eval_rescore(args) -> int:
+    """Re-score stored omp traces offline; this command never opens a backend."""
+    from .evaluation import CampaignError, EvaluationCampaign
+
+    try:
+        path = _evaluation_path(args.campaign)
+        campaign = EvaluationCampaign.open(path, root=ROOT)
+        profile = campaign.manifest.get("profile")
+        if profile == VARIED_PROFILE:
+            document, score_path = _evaluation_score_varied(campaign)
+        elif profile == E2E_PROFILE:
+            document, score_path = _evaluation_score(campaign)
+        else:
+            raise CampaignError(f"unsupported campaign profile {profile!r}")
+    except (CampaignError, OSError) as exc:
+        print(f"localbench eval rescore: campaign: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps({"campaign": str(path.relative_to(ROOT)), "status": document["status"],
+                      "score": str(score_path.relative_to(ROOT))}, sort_keys=True))
+    return 0 if document["status"] == "PASS" else 1
+
+
+def cmd_eval_varied(args) -> int:
+    """Run preregistered changing-value read/edit trials; never bank performance goldens."""
+    from .evaluation import CampaignError, EvaluationCampaign, canonical_sha256, make_varied_spec, score_varied_trial
+    from .proxy import Proxy
+    from .varied import run_trial
+    from .workloads import child_flags
+
+    if args.trials < 2 or args.seed < 0:
+        _usage("eval varied: --trials must be at least 2 and --seed nonnegative")
+    specs = {f"{family}-{args.seed + index}":
+             make_varied_spec(family=family, seed=args.seed + index, phase=args.phase)
+             for index in range(args.trials) for family in ("read", "edit")}
+    case_inputs = {case_id: canonical_sha256(spec) for case_id, spec in specs.items()}
+    steps = [Step(f"trial {case_id} input_sha256={case_inputs[case_id]}",
+                  "fresh workspace, real omp tool trace, final file state, and immutable case record")
+             for case_id in specs]
+    if args.resume:
+        steps.insert(0, Step(f"resume {_evaluation_path(args.resume)}",
+                             "refuse if any backend, omp, child overlay, prompt, grader or fixture pin moved"))
+    refused = None if park.parked_now() else "localbench eval varied: park omp's managed smol model first"
+    gated = _mut(args).gate(steps, refuse=refused)
+    if gated is not None:
+        return gated
+
+    try:
+        pre = preflight(False, args.wait_idle)
+        server_args = tuple(args.server_arg or ())
+        with open_backend(args.backend, server_args) as (backend, model):
+            if backend.name != "ollama":
+                unload_ollama()
+            before = sysstats.snapshot()
+            fingerprint = backend.fingerprint(model)
+            if not fingerprint.get("loaded_context"):
+                return _fail("localbench eval varied: backend did not report its loaded context")
+            pins = run_pins(backend, model, before["host"], args.mem_config)
+            identity = {"profile": VARIED_PROFILE, "backend": backend.name, "model": model,
+                        "pins": pins, "fingerprint": fingerprint, "server_args": list(server_args),
+                        "source_sha256": _localbench_source_hashes(), "localbench_rev": _rev(),
+                        "child_flags": child_flags(model, config=args.mem_config), "varied_specs": specs}
+            if args.resume:
+                path = _evaluation_path(args.resume)
+                campaign = EvaluationCampaign.open(path, root=ROOT, expected_identity=identity)
+                if campaign.manifest["profile"] != VARIED_PROFILE or campaign.case_inputs != case_inputs:
+                    raise CampaignError("varied trial identities changed; refusing resume")
+            else:
+                path = RUNS / f"eval-varied-{time.time_ns()}-{golden.slug(model)}"
+                campaign = EvaluationCampaign.create(path, root=ROOT, identity=identity, cases=case_inputs,
+                                                     profile=VARIED_PROFILE)
+            for case_id, spec in specs.items():
+                if campaign.completed_case(case_id, input_sha256=case_inputs[case_id]) is not None:
+                    continue
+                run_dir = path / "trials" / case_id
+                if run_dir.exists():
+                    raise CampaignError(f"unrecorded attempt exists at {run_dir}; refusing to overwrite its evidence")
+                run_dir.mkdir(parents=True)
+                try:
+                    backend.isolate(model)
+                    calls = run_dir / "omp_calls.jsonl"
+                    with sysstats.Sampler(1.0, target=(backend.name, model),
+                                          gpu_foreign_max_pct=GPU_BUSY_MAX_PCT) as sampler, \
+                            Proxy(backend.base_url, calls, save_dir=run_dir / "bodies", label="eval-varied"):
+                        ensure_localbench_model(model, fingerprint["loaded_context"])
+                        attempt, traces = run_trial(spec, model, run_dir / "attempt", config=args.mem_config)
+                    after = sysstats.snapshot()
+                    moved = golden.pin_diff(pins, run_pins(backend, model, after["host"], args.mem_config))
+                    during = sampler.summary()
+                    grade = score_varied_trial(spec, stdout=attempt["stdout"],
+                                               returncode=attempt["returncode"], timed_out=attempt["timed_out"],
+                                               final_files=attempt["final_files"], cwd=attempt["cwd"],
+                                               wall_s=attempt["wall_s"])
+                    no_model_call = not calls.is_file() or not calls.stat().st_size
+                    nonproof = bool(sampler.contention or during.get("resident_unknown_samples") or moved)
+                    status = "ERROR" if no_model_call else "VOID" if nonproof else grade["status"]
+                    system = run_dir / "system.json"
+                    system.write_text(json.dumps({"before": before, "after": after, "preflight": pre,
+                                                  "during": during, "contention": sampler.contention,
+                                                  "pins_changed": moved, "no_model_call": no_model_call,
+                                                  "scorer": grade, "status": status}, default=str, sort_keys=True)
+                                      + "\n")
+                    samples = run_dir / "sampler.jsonl"
+                    samples.write_text("".join(json.dumps(row, default=str) + "\n" for row in sampler.series))
+                    traces += [system, samples]
+                    if calls.is_file():
+                        traces.append(calls)
+                    bodies = run_dir / "bodies"
+                    if bodies.is_dir():
+                        traces.extend(p for p in bodies.iterdir() if p.is_file())
+                except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
+                    failure = run_dir / "infrastructure-error.json"
+                    failure.write_text(json.dumps({"error": f"{type(exc).__name__}: {exc}"}) + "\n")
+                    evidence_root = run_dir.resolve()
+                    traces = [p for p in sorted(run_dir.rglob("*"))
+                              if p.is_file() and not p.is_symlink() and p.resolve().is_relative_to(evidence_root)]
+                    status = "ERROR"
+                campaign.record_case(case_id, input_sha256=case_inputs[case_id], status=status,
+                                     run_dir=run_dir, trace_files=traces)
+            document, score_path = _evaluation_score_varied(campaign)
+    except (CampaignError, OSError) as exc:
+        return _fail(f"localbench eval varied: {exc}")
+    print(json.dumps({"campaign": str(path.relative_to(ROOT)), "status": document["status"],
+                      "score": str(score_path.relative_to(ROOT)), "success": document["success"]}, sort_keys=True))
+    return 0 if document["status"] == "PASS" else 1
+
+
+def _e2e_case_status(summary: dict, case_id: str) -> str:
+    verdicts = summary["verdicts"]
+    voided = bool(verdicts["contended"] or verdicts["preflight_problems"] or verdicts["pins_changed"]
+                  or _resident_unknown(summary) != 0)
+    correctness = summary["conformance"].get(f"e2e.{case_id}.correct", {})
+    return "VOID" if voided else correctness.get("verdict", "ERROR")
+
+
+def cmd_eval_run(args) -> int:
+    """Run missing, identity-matched omp cases; no prior timings are reused."""
+    from .evaluation import CampaignError, EvaluationCampaign
+
+    if not park.parked_now():
+        print("localbench eval run: park omp's managed smol model first with `localbench park`", file=sys.stderr)
+        return 1
+    server_args = tuple(args.server_arg or ())
+    try:
+        with open_backend(args.backend, server_args) as (backend, model):
+            host = sysstats.snapshot()["host"]
+            fingerprint = backend.fingerprint(model)
+            pins = run_pins(backend, model, host)
+            cases = _evaluation_case_inputs(model)
+            source_sha256 = _localbench_source_hashes()
+            identity = {
+                "profile": E2E_PROFILE, "backend": backend.name, "model": model, "pins": pins,
+                "fingerprint": fingerprint, "server_args": list(server_args), "localbench_rev": _rev(),
+                "source_sha256": source_sha256,
+            }
+            if args.resume:
+                path = _evaluation_path(args.resume)
+                campaign = EvaluationCampaign.open(path, root=ROOT, expected_identity=identity)
+                recorded_cases = {row["case_id"]: row["input_sha256"] for row in campaign.manifest["cases"]}
+                if campaign.manifest.get("profile") != E2E_PROFILE or recorded_cases != cases:
+                    raise CampaignError("campaign profile or test inputs changed; refusing resume")
+            else:
+                path = RUNS / f"eval-{time.time_ns()}-{golden.slug(model)}"
+                campaign = EvaluationCampaign.create(path, root=ROOT, identity=identity, cases=cases,
+                                                     profile=E2E_PROFILE)
+            for case_id, input_sha256 in cases.items():
+                if campaign.completed_case(case_id, input_sha256=input_sha256) is not None:
+                    continue
+                marker = {"profile": E2E_PROFILE, "campaign": path.relative_to(ROOT).as_posix(),
+                          "case_id": case_id, "identity_sha256": campaign.identity_sha256}
+                summary = execute(backend, model, tiers=["e2e"], repeats=1, allow_busy=False, purge=False,
+                                  label=f"eval-{case_id}-{time.time_ns()}", wait_idle_s=args.wait_idle,
+                                  e2e_case=case_id, evaluation_campaign=marker)
+                run_dir = ROOT / summary["run_dir"]
+                status = _e2e_case_status(summary, case_id)
+
+                traces = [run_dir / name for name in ("summary.json", "progress.jsonl", "samples.jsonl",
+                                                       "sampler.jsonl", "omp_calls.jsonl",
+                                                       f"e2e.{case_id}.first.omp.jsonl",
+                                                       f"e2e.{case_id}.repeat.omp.jsonl",
+                                                       f"e2e.{case_id}.first.result.json",
+                                                       f"e2e.{case_id}.repeat.result.json")]
+                traces = [trace for trace in traces if trace.is_file()]
+                bodies = run_dir / "bodies"
+                if bodies.is_dir():
+                    traces.extend(trace for trace in bodies.iterdir() if trace.is_file())
+                campaign.record_case(case_id, input_sha256=input_sha256, status=status, run_dir=run_dir,
+                                     trace_files=traces)
+            document, score_path = _evaluation_score(campaign)
+    except (CampaignError, OSError) as exc:
+        print(f"localbench eval run: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps({"campaign": str(path.relative_to(ROOT)), "status": document["status"],
+                      "score": str(score_path.relative_to(ROOT))}, sort_keys=True))
+    return 0 if document["status"] == "PASS" else 1
+
+
+def cmd_eval(args) -> int:
+    if args.eval_action == "run":
+        return cmd_eval_run(args)
+    if args.eval_action == "varied":
+        return cmd_eval_varied(args)
+    return cmd_eval_rescore(args)
+
+
 def cmd_run(args) -> int:
+    if getattr(args, "omp_frozen", False):
+        return _with_frozen_omp(cmd_run, args)
     with open_backend(args.backend, tuple(args.server_arg or ())) as (backend, model):
         s = execute(backend, model, tiers=args.tiers.split(","), repeats=args.repeats, allow_busy=args.allow_busy,
                     purge=args.purge, wait_idle_s=args.wait_idle, mem_config=args.mem_config,
-                    mem_rounds=args.mem_rounds)
+                    mem_rounds=args.mem_rounds, smol_model=args.smol_model)
     return judge(s)
 
 
@@ -1351,8 +2867,8 @@ def cmd_compare(args) -> int:
 
 
 def cmd_bank(args) -> int:
-    """Bank an existing run's receipt view under docs/evidence/receipts/<name>.json (summary.json is immutable, so
-    banking after the fact records the same evidence). Refuses to bank without printing why the run is unsound.
+    """Bank an existing run's receipt view under docs/evidence/receipts/<name>.json (summary.json is immutable).
+    Unknown residency cannot produce a banked receipt; other unsound runs retain diagnostic receipts with exit 1.
     Banking the same run under the same name again is a no-op."""
     s = _run_summary("bank", args.run_dir)
     problems = unsound(s)
@@ -1362,10 +2878,15 @@ def cmd_bank(args) -> int:
     same = path.is_file() and path.read_text() == _receipt_text(payload)
     step = Step(f"{'replace' if path.exists() else 'write'} {rel} (receipt of {s['run_dir']}"
                 f"{f', UNSOUND: {len(problems)} problem(s)' if problems else ''})",
-                "a banked receipt is the evidence a claim cites; it keeps everything but the raw samples")
+                "bank the receipt view (pins, verdicts, metrics and selected diagnostics); raw samples stay in runs/")
     m = _mut(args)
     m.detail["unsound"] = problems
-    rc = m.gate([] if same else [step], noop=f"already banked: {rel} holds this receipt" if same else None)
+    unknown = _resident_unknown(s)
+    refuse = (None if unknown == 0 else
+              "bank: residency sampling incomplete (no resident_unknown_samples); cannot bank an unproven run"
+              if unknown is None else "bank: resident model state unknown during sampling; cannot bank an unproven run")
+    rc = m.gate([] if same else [step], refuse=refuse,
+                noop=f"already banked: {rel} holds this receipt" if same else None)
     if rc is not None and (args.dry_run or rc):
         return rc
     if not same:
@@ -1405,17 +2926,22 @@ def cmd_show(args) -> int:
 
 
 def cmd_aa(args) -> int:
-    """Run one config twice; bank the pair as a receipt and (with --write-golden) derive the golden from it."""
+    """Run one config twice; bank the pair as a receipt and (with --write-golden) derive the golden from it. An unsound
+    pair banks its receipt (verdict UNSOUND, with its problems) but leaves the golden unwritten and exits 1; a pair
+    with unknown resident-model state is non-proof and is not banked at all."""
     tiers = args.tiers.split(",")
     m = _mut(args)
     refuse = None
-    if args.write_golden and (args.server_arg or args.mem_config != MEM_CONFIG or args.mem_rounds != MEM_ROUNDS):
-        refuse = ("refusing --write-golden with --server-arg, --mem-config, or --mem-rounds: the golden for a spec "
-                  "is its default launch; measure a variant as the B leg of `localbench ab`")
+    if args.write_golden and (args.server_arg or args.mem_config != MEM_CONFIG or args.mem_rounds != MEM_ROUNDS
+                              or args.smol_model):
+        refuse = ("refusing --write-golden with --server-arg, --mem-config, --mem-rounds or --smol-model: the golden "
+                  "for a spec is its default launch; measure a variant (a separate smol model is a study leg) as the "
+                  "B leg of `localbench ab`")
     steps = [Step(f"measure {args.backend} twice (aa1, aa2): tiers {args.tiers}, {args.repeats} repeat(s), each after "
                   "preflight", "the A/A pair is the null: its spread sets the band a later run is judged against"),
-             Step("bank the pair as docs/evidence/receipts/aa__<backend>__<model>__<created>.json",
-                  "the receipt is the evidence the golden cites")]
+             Step("bank the pair as docs/evidence/receipts/aa__<backend>__<model>__<created>.json (an unsound pair "
+                  "too, marked UNSOUND with its problems)",
+                  "the receipt is the evidence the golden cites; an unsound receipt is diagnostic evidence only")]
     if args.write_golden:
         steps.append(Step(f"write the golden for {args.backend} under {golden.GOLDENS.relative_to(ROOT)}/<host_id>/ "
                           f"(tiers {args.tiers} re-banked, other tiers kept) unless the pair is unsound",
@@ -1426,10 +2952,10 @@ def cmd_aa(args) -> int:
     with open_backend(args.backend, tuple(args.server_arg or ())) as (backend, model):
         s1 = execute(backend, model, tiers=tiers, repeats=args.repeats, allow_busy=args.allow_busy,
                      purge=args.purge, label="aa1", wait_idle_s=args.wait_idle, mem_config=args.mem_config,
-                     mem_rounds=args.mem_rounds)
+                     mem_rounds=args.mem_rounds, smol_model=args.smol_model)
         s2 = execute(backend, model, tiers=tiers, repeats=args.repeats, allow_busy=args.allow_busy,
                      purge=args.purge, label="aa2", wait_idle_s=args.wait_idle, mem_config=args.mem_config,
-                     mem_rounds=args.mem_rounds)
+                     mem_rounds=args.mem_rounds, smol_model=args.smol_model)
     pins = s1["provenance"]["pins"]
     problems = unsound(s1) + unsound(s2)
     if golden.pin_diff(pins, s2["provenance"]["pins"]):
@@ -1437,15 +2963,20 @@ def cmd_aa(args) -> int:
     if args.allow_busy:
         problems.append("--allow-busy: an A/A pair from a busy machine cannot derive a band")
     name = f"aa__{pins['backend']}__{pins['model']}__{s1['provenance']['created']}"
-    receipt = _bank(name, {"kind": "aa", "runs": [_receipt_view(s1), _receipt_view(s2)], "problems": problems})
+    for p in problems:
+        print(f"UNSOUND  {p}", file=sys.stderr)
+    if _unknown_residency(s1, s2):
+        m.outcome, m.detail["unsound"] = "refused", problems
+        return 1
+    receipt = _bank(name, {"kind": "aa", "verdict": "UNSOUND" if problems else "SOUND",
+                           "runs": [_receipt_view(s1), _receipt_view(s2)], "problems": problems})
     rel = str(receipt.relative_to(ROOT))
     m.detail["receipt"] = rel
     print(f"\nbanked A/A receipt {rel}\n")
     print(render.show(json.loads(receipt.read_text()), rel))
     if problems:
-        for p in problems:
-            print(f"UNSOUND  {p}", file=sys.stderr)
-        m.outcome, m.detail["unsound"] = "refused", problems
+        print("golden left unwritten: an unsound pair is a diagnostic receipt, never a golden", file=sys.stderr)
+        m.outcome, m.detail["unsound"] = "done", problems   # banked as cmd_bank does; exit 1 says it is unsound
         return 1
     g, refusals = golden.from_aa(s1["results"], s2["results"], pins, rel, tiers)
     if refusals:
@@ -1478,19 +3009,37 @@ def cmd_ab(args) -> int:
     legs. On a machine in use, more pairs spread bursts of activity across both arms."""
     tiers = args.tiers.split(",")
     order = ab_order(args.pairs)
+    if args.side_regime:
+        # The side-model regime is pre-registered for memory-route proofs only (bead kit-memory-study-vce DECISION).
+        if not set(tiers) <= {"mem", "sess"}:
+            _usage(f"ab --side-regime: only the mem and sess tiers run under the side-model regime, not {tiers}")
+        if any(spec.partition(":")[0] != "ollama" for spec in (args.a, args.b)):
+            _usage("ab --side-regime: both arms must be ollama: specs (models shared on one ollama server)")
+    for arm, spec, smol_model in (("A", args.a, args.smol_model), ("B", args.b, args.b_smol_model or args.smol_model)):
+        # Checked before the first leg: execute would refuse it only when that leg starts, after A legs ran.
+        if smol_model and spec.partition(":")[0] != "ollama":
+            _usage(f"ab: arm {arm} ({spec}) with smol model {smol_model}: a separate smol model needs an ollama: spec")
+    if getattr(args, "omp_frozen", False):   # after the usage checks: a bad flag must not wait for a copy
+        return _with_frozen_omp(cmd_ab, args)
     legs = []
     for arm, label in order:
         spec = args.a if arm == "A" else args.b
         extra = () if arm == "A" else tuple(args.b_server_arg or ())
         mem_config = args.mem_config if arm == "A" else (args.b_mem_config or args.mem_config)
-        binaries = {"LOCALBENCH_OMP": args.b_omp, "LOCALBENCH_MLX_SERVE": args.b_mlx_serve} if arm == "B" else {}
+        smol_model = args.smol_model if arm == "A" else (args.b_smol_model or args.smol_model)
+        binaries = ({"LOCALBENCH_OMP": args.b_omp, "LOCALBENCH_MLX_SERVE": args.b_mlx_serve,
+                     "LOCALBENCH_MLXFAST": args.b_mlxfast} if arm == "B" else {})
         with _binaries_for_leg(binaries), open_backend(spec, tuple(args.server_arg or ()) + extra) as (backend, model):
             legs.append(execute(backend, model, tiers=tiers, repeats=args.repeats, allow_busy=args.allow_busy,
                                 purge=args.purge, label=label, wait_idle_s=args.wait_idle, mem_config=mem_config,
-                                mem_rounds=args.mem_rounds))
+                                mem_rounds=args.mem_rounds, smol_model=smol_model, side_regime=args.side_regime))
     a_legs = [leg for leg, (arm, _) in zip(legs, order) if arm == "A"]
     b_legs = [leg for leg, (arm, _) in zip(legs, order) if arm == "B"]
     problems = [f"{leg['provenance']['label']}: {p}" for leg in legs for p in unsound(leg)]
+    for p in problems:
+        print(f"UNSOUND  {p}", file=sys.stderr)
+    if _unknown_residency(*legs):
+        return 1
     drift = golden.arm_pin_drift([leg["provenance"]["pins"] for leg in a_legs],
                                  [leg["provenance"]["pins"] for leg in b_legs], tiers)
     def busy(leg):
@@ -1499,7 +3048,8 @@ def cmd_ab(args) -> int:
     table = golden.ab_table([leg["metrics"] for leg in a_legs], [leg["metrics"] for leg in b_legs], void_tiers=drift,
                             load_favours=balance["favours"])
     a1, b = a_legs[0], b_legs[0]
-    receipt = {"kind": "ab", "a": args.a, "b": args.b, "order": [arm for arm, _ in order], "problems": problems,
+    receipt = {"kind": "ab", "verdict": "UNSOUND" if problems else "SOUND", "a": args.a, "b": args.b,
+               "order": [arm for arm, _ in order], "problems": problems,
                "pin_drift": drift, "load_balance": balance, "table": table,
                "legs": [_receipt_view(x) for x in legs]}
     name = args.bank or f"ab__{a1['provenance']['pins']['model']}__vs__{b['provenance']['pins']['model']}__{a1['provenance']['created']}"
@@ -1507,14 +3057,19 @@ def cmd_ab(args) -> int:
     rel = str(path.relative_to(ROOT))
     print(f"\nbanked A/B receipt {rel}\n")
     print(render.show(json.loads(path.read_text()), rel))
-    for p in problems:
-        print(f"UNSOUND  {p}", file=sys.stderr)
     return 1 if problems else 0
 
 
+def _unknown_residency(*summaries: dict) -> bool:
+    """A leg sampled while the resident-model state was unreadable, or whose sampling count is missing, is non-proof
+    (bead kit-unknown-residency-fail-closed-qqj): it is excluded from banking, unlike other unsound legs, which bank
+    as diagnostic receipts."""
+    return any(_resident_unknown(s) != 0 for s in summaries if not workloads.side_regime(s))
+
+
 def cmd_record(args) -> int:
-    """Capture the first chat request omp sends for a flag set as fixtures/omp/<label>.json plus its
-    generation sidecar <label>.meta.json (omp pins, prompt tokens, profile, provider path, backend pins)."""
+    """Capture omp's first chat request plus its sidecar (omp pins, prompt tokens, profile, provider path, backend pins,
+    and tokenizer identity when the backend reports the actual GGML vocabulary)."""
     from .proxy import Proxy
 
     save = FIXTURES / "omp" / ".capture"
@@ -1525,8 +3080,9 @@ def cmd_record(args) -> int:
              Step(f"start {args.backend}, run omp once (flags: {' '.join(omp_flags) or '-'}) through the timing proxy",
                   "the fixture is the first chat request omp itself sends for this flag set, not a hand-built body"),
              Step(f"{'replace' if dest.exists() else 'write'} {rel} and {dest.with_suffix('.meta.json').name}",
-                  "replay binds to the body's hash; the sidecar pins the omp, profile and backend it was recorded "
-                  "under, so a changed fixture is a new generation for the replay tier")]
+                  "replay binds to the body's hash; the sidecar records omp, profile, backend/model and tokenizer "
+                  "identity when the backend reports the full vocabulary; older or unsupported pins use backend-only "
+                  "prompt-token comparison")]
     if (rc := _mut(args).gate(steps)) is not None:
         return rc
     save.mkdir(parents=True, exist_ok=True)
@@ -1547,6 +3103,9 @@ def cmd_record(args) -> int:
                                   cwd="/tmp", capture_output=True, text=True, timeout=1800, env=child_env(),
                                   stdin=subprocess.DEVNULL, check=False)
         pins = backend.pins(model)
+        tok_identity = backend.tokenizer_identity(model)
+        if tok_identity:
+            pins["tokenizer_identity"] = tok_identity
     (save / f"{args.label}.omp-stdout.jsonl").write_text(proc.stdout)
     # Main-agent requests carry tools; smol (memory) calls routed through the proxy do not.
     captured = [c for c in sorted(save.glob(f"{args.label}-*.json")) if json.loads(c.read_bytes()).get("tools")]
@@ -1653,6 +3212,14 @@ def validate_doc(doc) -> list[str]:
                 reasons.append(f"{where}: no provenance")
                 continue
             reasons += [f"{where} provenance: no {k}" for k in ("tiers", "created") if not prov.get(k)]
+            if not isinstance(prov.get("localbench_rev"), str) or not prov["localbench_rev"]:
+                reasons.append(f"{where} provenance: no localbench_rev")
+            fingerprint = prov.get("fingerprint")
+            if not isinstance(fingerprint, dict) or not fingerprint:
+                reasons.append(f"{where} provenance: no fingerprint")
+            else:
+                reasons += [f"{where} provenance: no fingerprint.{k}"
+                            for k in ("backend", "model") if not fingerprint.get(k)]
             reasons += [f"{where}: no {k}" for k in ("metrics", "verdicts") if not isinstance(leg.get(k), dict)]
             sets.append((f"{where} provenance.pins", prov.get("pins")))
     for where, pins in sets:
@@ -1688,6 +3255,84 @@ def cmd_validate(args) -> int:
             print(f"  {r}", file=sys.stderr)
         return 1
     print(f"valid {render.kind_of(doc)}: {path}")
+    return 0
+
+
+def cmd_ollama_app(args) -> int:
+    """Ollama.app, the supervisor of `ollama serve` (localbench/ollama_app.py): `status` says whether it runs from
+    /Applications and its server is up; `restart` quits it (SIGKILL when it refuses), stops its server, reopens it and
+    waits until both are back. Refused while a run is alive or anything is parked: the restart unloads every model.
+    `auto-update on|off|status` sets or shows the app's own updater switch (see cmd_ollama_auto_update)."""
+    if args.action != "auto-update" and args.state is not None:
+        _usage(f"ollama-app {args.action} takes no argument; `{args.state}` belongs to `ollama-app auto-update`")
+    if args.action == "auto-update":
+        return cmd_ollama_auto_update(args)
+    st = ollama_app.state()
+    if args.action == "status":
+        view = {"app_pid": st.app_pid, "app_image": st.app_image, "serve_pid": st.serve_pid, "aligned": st.aligned}
+        if args.json:
+            print(json.dumps(view))
+        else:
+            print(f"Ollama.app pid {st.app_pid} image {st.app_image}; ollama serve pid {st.serve_pid}; "
+                  + ("aligned" if st.aligned else "NOT aligned: `localbench ollama-app restart` relaunches it"))
+        return 0 if st.aligned else 1
+    refuse = ("a localbench run is alive; restart Ollama after it ends" if _run_alive() else
+              "models are parked; `localbench unpark` first (a restart would drop the parked copies' residency)"
+              if park.parked_now() else None)
+    steps = [Step(a, w) for a, w in ollama_app.plan_restart(st)]
+    if (rc := _mut(args).gate(steps, refuse=refuse)) is not None:
+        return rc
+
+    def up() -> bool:
+        try:
+            backends._get(Ollama().root + "/api/tags", timeout=5)
+            return True
+        except OSError:
+            return False
+
+    new = ollama_app.restart(up)
+    print(f"Ollama.app back: pid {new.app_pid} from {new.app_image}; ollama serve pid {new.serve_pid}. Residency "
+          "reset: re-lease models with a finite `localbench keep ollama:<m> <duration>` (e.g. 30m), or let the gateway "
+          "(`localbench gateway start`) lease them per request")
+    return 0
+
+
+def cmd_ollama_auto_update(args) -> int:
+    """`ollama-app auto-update on|off|status`: Ollama.app's settings.auto_update_enabled in its db.sqlite
+    (LOCALBENCH_OLLAMA_APP_DB overrides the path). `on`/`off` copy the db to ~/.localbench/rollback/ollama-db-<UTC>.sqlite
+    first, then write and read back; already in that state is a no-op. Manual upgrades are the policy (2026-09-30):
+    an auto-installed ollama moves the pins under every golden. `status` also reports a staged update, which installs
+    at the next app start whatever the switch says."""
+    db = ollama_app.app_db()
+    now = sysstats.ollama_auto_update(db)
+    staged = ollama_app.staged_update()
+    if args.state in (None, "status"):
+        if args.json:
+            print(json.dumps({"db": str(db), "auto_update": now, "staged_update": staged}))
+        else:
+            word = f"unknown (no Ollama.app settings in {db})" if now is None else "ON" if now else "OFF"
+            print(f"auto-update: {word}")
+            print("staged update: " + (f"{', '.join(staged)} in {ollama_app.UPDATES} (installs at the next app start "
+                                       "regardless of the setting)" if staged else "none"))
+        return 0 if now is False else 1
+    want = args.state == "on"
+    rollback = ollama_app.ROLLBACK
+    steps = [Step(f"copy {db} to {rollback}/ollama-db-<UTC>.sqlite",
+                  "the whole settings db as it was; copy it back with the app quit to undo"),
+             Step(f"set settings.auto_update_enabled = {int(want)} in {db} and read it back",
+                  "the app's updater re-reads this switch before every hourly download")]
+    refuse = (f"no Ollama.app settings row with auto_update_enabled in {db} (no app, or an app older than that "
+              "setting)") if now is None else None
+    noop = f"auto-update already {args.state.upper()} in {db}" if now is want else None
+    m = _mut(args)
+    if (rc := m.gate(steps, refuse=refuse, noop=noop)) is not None:
+        return rc
+    backup = ollama_app.set_auto_update(want, db, rollback)
+    m.detail.update(db=str(db), backup=str(backup), auto_update=want)
+    print(f"auto-update: {args.state.upper()} (backup {backup})")
+    if staged and not want:
+        print(f"staged update still present: {', '.join(staged)} in {ollama_app.UPDATES} installs at the next app "
+              "start regardless of the setting", file=sys.stderr)
     return 0
 
 
@@ -1735,11 +3380,111 @@ def main(argv: list[str] | None = None) -> int:
     rp = sub.add_parser("report", help="what used local models over a window (from `localbench watch`)")
     rp.add_argument("--since", type=_since, default="24h", help="window: 90m, 24h, 7d (or seconds)")
     rp.add_argument("--json", action="store_true")
+    rp.add_argument("--by-purpose", action="store_true",
+                    help="gateway request counts and busy seconds per purpose (no request content)")
+    rp.add_argument("--by-profile", action="store_true",
+                    help="the same per omp profile; with --by-purpose, per profile and purpose")
+    dec = sub.add_parser("decision", help="side-model decision suites on Ollama's /v1/systemone: run (banks a receipt)")
+    dec_sub = dec.add_subparsers(dest="decision_action", required=True)
+    dec_run = dec_sub.add_parser("run", help="run a decision suite against a local model; bank the receipt")
+    dec_run.add_argument("spec", help="ollama:<model>, e.g. ollama:nimble:latest")
+    dec_run.add_argument("--suite", required=True, help="a suite manifest/dir path, or a name under ~/.localbench/corpora")
+    dec_run.add_argument("--feature", metavar="ID",
+                         help="the registries/features.tsv row this run proves; stamps its installed omp_module_sha")
+    dec_run.add_argument("--hosted-arm", action="store_true",
+                         help="also run hosted decision service on the same items (needs TYPESAFE_API_KEY; never a fallback)")
+    dec_run.add_argument("--repeats", type=int, default=1, help="passes over the suite (default 1)")
+    dec_run.add_argument("--wait-idle", type=float, default=0, metavar="SECONDS",
+                         help="wait up to this long for an idle machine; still-busy load is recorded, not refused")
+    dec_run.add_argument("--allow-evict", action="store_true", dest="allow_evict",
+                         help="load even when Ollama's loaded-model cap would evict an in-use resident (recorded; "
+                              "the eviction is still a problem)")
+    dec_derive = dec_sub.add_parser("derive", help="a model FROM an ollama decision model with num_ctx N (audited)")
+    dec_derive.add_argument("spec", help="ollama:<base model>, e.g. ollama:tev1:latest (never modified)")
+    dec_derive.add_argument("--num-ctx", type=int, required=True, help="the context the derived model ships")
+    dec_derive.add_argument("--name", help="the derived model's name (default <model>-ctx<N>)")
+    dec_paired = dec_sub.add_parser("paired", help="paired local-vs-hosted scoring of a banked decision receipt")
+    dec_paired.add_argument("receipt", help="banked decision receipt path")
+    dec_paired.add_argument("--alpha", type=float, default=0.05, help="significance level (default 0.05)")
+    dec_paired.add_argument("--seed", type=int, default=20261001, help="bootstrap seed (default 20261001)")
+    dec_paired.add_argument("--json", action="store_true", help="the per-type table as one JSON document")
+    feat = sub.add_parser("features", help="omp features that can route local, per profile, and the receipt proving each")
+    feat.add_argument("--json", action="store_true")
+    feat.add_argument("--queue", action="store_true",
+                      help="file or update one open proof bead per unproven local route (audited)")
+    wr = sub.add_parser("watch-releases", help="upstream release watch: queued screens; --once a pass; --install-agent")
+    wr.add_argument("--once", action="store_true", help="one watch pass now (files beads, queues screens; audited)")
+    wr.add_argument("--install-agent", action="store_true", help="install the daily LaunchAgent (audited)")
+    wr.add_argument("--json", action="store_true", help="the queue or the pass report as JSON; with --dry-run the plan")
+    pv = sub.add_parser("prove", help="run declarative proof specs (no orchestrator one-offs)")
+    pv.add_argument("spec", nargs="?", help="registries/proofs/<feature>__<slug>.json")
+    pv.add_argument("--due", action="store_true", help="run every spec with an open bead whose regime allows it")
+    pv.add_argument("--json", action="store_true", help="the report as one JSON document")
+    pre = sub.add_parser("preset", help="omp config presets: list, show, plan, apply, rollback, drift")
+    pre_sub = pre.add_subparsers(dest="preset_action", required=True)
+    pre_list = pre_sub.add_parser("list", help="the presets in registries/presets.json")
+    pre_list.add_argument("--json", action="store_true")
+    pre_show = pre_sub.add_parser("show", help="one preset's ops")
+    pre_show.add_argument("name")
+    pre_plan = pre_sub.add_parser("plan", help="what apply would change, read from omp now (writes nothing)")
+    pre_apply = pre_sub.add_parser("apply", help="apply a preset: backed up, read back, restored on mismatch (audited)")
+    for p in (pre_plan, pre_apply):
+        p.add_argument("name")
+        p.add_argument("--profiles", type=_profiles_arg, required=True, help="comma-separated omp profiles")
+        p.add_argument("--target", choices=["test", "live"], required=True,
+                       help="test: only the registry's test profiles; live: a local preset needs a PROVEN receipt")
+        p.add_argument("--force", action="store_true", help="live: proceed past a missing proof (recorded as forced)")
+    pre_plan.add_argument("--json", action="store_true")
+    pre_rb = pre_sub.add_parser("rollback", help="restore the files one apply backed up (audited)")
+    pre_rb.add_argument("id", help="the rollback id apply printed")
+    pre_rb.add_argument("--force", action="store_true", help="restore even files changed after that apply")
+    pre_drift = pre_sub.add_parser("drift", help="applied presets live config no longer matches (exit 1 if any)")
+    pre_drift.add_argument("--profiles", type=_profiles_arg, help="only these profiles (default: every applied one)")
+    pre_drift.add_argument("--json", action="store_true")
+    cp = sub.add_parser("corpus", help="private decision corpora under ~/.localbench/corpora: import, proj-b-build, list, "
+                                       "stats")
+    cp_sub = cp.add_subparsers(dest="corpus_action", required=True)
+    cp_import = cp_sub.add_parser("import", help="one omp profile's hosted judgments as a decision suite")
+    cp_import.add_argument("--profile", required=True, help="omp profile whose cache/judgment-cache.db is read")
+    cp_import.add_argument("--role", required=True, choices=["decision.noul", "decision.choice"])
+    cp_import.add_argument("--model", help="pin the answering hosted model when the cache holds several")
+    cp_jev = cp_sub.add_parser("proj-b-build", help="build a named suite from the proj-b checkout")
+    cp_jev.add_argument("name")
+    for p in (cp_import, cp_jev):
+        p.add_argument("--gate", type=_gate_arg, action="append", required=True, metavar="METRIC=OP:VALUE",
+                       help="the suite's pass bar, e.g. decision.noul.accuracy=min:0.8 (required; repeatable)")
+    cp_capture = cp_sub.add_parser("capture", help="opt-in, capped, expiring capture of request bodies by purpose")
+    cp_capture.add_argument("capture_state", choices=["on", "off", "status"])
+    cp_capture.add_argument("--purpose", action="append", metavar="P", help="on: a request purpose (repeatable)")
+    cp_capture.add_argument("--max-items", type=int, metavar="N", help="on: stop after N captured bodies")
+    cp_capture.add_argument("--minutes", type=float, metavar="M", help="on: expire after M minutes")
+    for p in (cp_import, cp_jev, cp_capture, cp_sub.add_parser("list", help="every suite under the corpora root"),
+              cp_sub.add_parser("stats", help="suite and item counts by role")):
+        p.add_argument("--json", action="store_true")
+    mv = sub.add_parser("memory-verdict", help="bank a memory proof receipt: candidate vs baseline mem+sess legs")
+    mv.add_argument("--candidate", nargs="+", required=True, metavar="RUN",
+                    help="candidate legs: run dirs, summary.json files or run/aa/ab receipts (>= 2 legs)")
+    mv.add_argument("--baseline", nargs="+", required=True, metavar="RUN",
+                    help="baseline-route legs, same forms (>= 2 legs)")
+    mv.add_argument("--feature", required=True, metavar="ID", help="the registries/features.tsv row it proves, "
+                                                                  "e.g. mnemopi-extraction")
+    mv.add_argument("--bank", required=True, metavar="NAME", help="receipt name under docs/evidence/receipts/")
+    omp = sub.add_parser("omp", help="after an omp update: refresh (carry or STALE each proof); watch the package")
+    omp_sub = omp.add_subparsers(dest="omp_action", required=True)
+    omp_refresh = omp_sub.add_parser("refresh", help="capture, diff against the baseline, carry forward or STALE")
+    omp_refresh.add_argument("--json", action="store_true", help="the report as JSON; with --dry-run the plan")
+    omp_watch = omp_sub.add_parser("watch", help="the LaunchAgent that runs `omp refresh` on an omp update")
+    omp_watch.add_argument("watch_state", choices=["install", "remove", "status"])
+    omp_watch.add_argument("--json", action="store_true", help="status as JSON; with --dry-run the plan")
+    omp_freeze = omp_sub.add_parser("freeze", help="copy the current omp (package, its dependencies, bun) to "
+                                                   "~/.localbench/omp-frozen/<version>-<sha16>/; print LOCALBENCH_OMP=")
+    omp_freeze.add_argument("--json", action="store_true", help="the snapshot manifest as JSON; with --dry-run the plan")
 
     def measured(p, *specs):
         for s in specs:
-            p.add_argument(s, help="backend spec: ollama:<model> | mlx-serve:<model dir> | omlx:<model dir>")
-        p.add_argument("--tiers", default="conf,micro,replay,e2e")
+            p.add_argument(s, help="backend spec: ollama:<model> | mlx-serve:<model dir> | omlx:<model dir> | "
+                                   "mlxfast:<model dir>")
+        p.add_argument("--tiers", type=_unique_tiers, default="conf,micro,replay,e2e")
         p.add_argument("--repeats", type=int, default=3)
         p.add_argument("--allow-busy", action="store_true", help="measure anyway; the run is non-proof")
         p.add_argument("--purge", action="store_true", help="drop the file cache first (needs sudoers grant)")
@@ -1750,9 +3495,33 @@ def main(argv: list[str] | None = None) -> int:
                        help="omp config overlay for the mem tier's children (default fixtures/omp/child-config-mem.yml)")
         p.add_argument("--mem-rounds", type=_mem_rounds, default=MEM_ROUNDS, metavar="N",
                        help=f"mem-tier rounds (default {MEM_ROUNDS}); each round plants three fresh facts")
+        p.add_argument("--smol-model", metavar="MODEL",
+                       help="a separate ollama memory (smol-role) model for the mem/sess tiers' omp children, on the "
+                            "same server; pinned as smol_model/smol_digest (study legs only: no golden)")
         return p
 
     measured(sub.add_parser("run", help="measure one model and compare to its golden"), "backend")
+    ev = sub.add_parser("eval", help="run or offline re-score a versioned omp behavioral campaign")
+    evs = ev.add_subparsers(dest="eval_action", required=True)
+    ev_run = evs.add_parser("run", help="run missing exact-identity cases on the real omp local path")
+    ev_run.add_argument("backend", help="backend spec: ollama:<model> | mlx-serve:<model dir> | omlx:<model dir>")
+    ev_run.add_argument("--resume", metavar="CAMPAIGN", help="resume only cases with matching runtime and input pins")
+    ev_run.add_argument("--server-arg", action="append", help="extra backend server flag (repeatable)")
+    ev_run.add_argument("--wait-idle", type=float, default=1800, metavar="SECONDS",
+                        help="wait for local model conditions before refusing (default 1800)")
+    ev_varied = evs.add_parser("varied", help="changing-value read/edit campaign; not performance-golden evidence")
+    ev_varied.add_argument("backend", help="one local backend spec, held fixed within this campaign")
+    ev_varied.add_argument("--phase", choices=("exploratory", "heldout"), required=True)
+    ev_varied.add_argument("--seed", type=int, required=True, help="preregister the first trial seed")
+    ev_varied.add_argument("--trials", type=int, default=2, help="independent seeds per read/edit family (minimum 2)")
+    ev_varied.add_argument("--mem-config", type=_overlay, default=CHILD_CONFIG, metavar="OVERLAY",
+                           help="pinned omp child overlay (default: memory off)")
+    ev_varied.add_argument("--resume", metavar="CAMPAIGN", help="never replace a recorded trial")
+    ev_varied.add_argument("--server-arg", action="append", help="extra backend server flag (repeatable)")
+    ev_varied.add_argument("--wait-idle", type=float, default=1800, metavar="SECONDS")
+    ev_score = evs.add_parser("rescore", help="offline re-score an existing campaign from its preserved traces")
+    ev_score.add_argument("campaign", help="a runs/eval-* campaign directory")
+
     aa = measured(sub.add_parser("aa", help="A/A pair: banked receipt, optionally the golden"), "backend")
     aa.add_argument("--write-golden", action="store_true")
     ab = measured(sub.add_parser("ab", help="same-invocation interleaved A,B,...,A comparison"), "a", "b")
@@ -1763,12 +3532,24 @@ def main(argv: list[str] | None = None) -> int:
                     help="extra mlx-serve flag for the B leg only (repeatable), e.g. --b-server-arg=--mtp")
     ab.add_argument("--b-mem-config", type=_overlay, metavar="OVERLAY",
                     help="mem-tier omp overlay for the B leg only, e.g. fixtures/omp/child-config-mem-fts.yml")
+    ab.add_argument("--side-regime", action="store_true",
+                    help="mem/sess memory-route proofs under the side-model regime: nothing is unloaded or parked, "
+                         "co-resident models are recorded per leg, never a refusal or a void (ollama arms only)")
+    ab.add_argument("--b-smol-model", metavar="MODEL",
+                    help="separate ollama smol (memory) model for the B leg only (default: --smol-model)")
     ab.add_argument("--b-omp", type=_exe_path, metavar="PATH",
                     help="omp executable for the B legs only (A uses LOCALBENCH_OMP or PATH), e.g. an isolated "
                          "install of an older release to A/B omp itself")
     ab.add_argument("--b-mlx-serve", type=_exe_path, metavar="PATH",
                     help="mlx-serve executable for the B legs only (A uses LOCALBENCH_MLX_SERVE or PATH), e.g. a "
                          "release extracted beside Homebrew's to A/B mlx-serve itself")
+    ab.add_argument("--b-mlxfast", type=_exe_path, metavar="PATH",
+                    help="mlx-server (mlxfast) executable for the B legs only (A uses LOCALBENCH_MLXFAST or PATH), e.g. "
+                         "a build of another engine commit")
+    for p in (sub.choices["run"], ab):
+        p.add_argument("--omp-frozen", action="store_true",
+                       help="freeze the current omp first (`localbench omp freeze`, or reuse its snapshot) and run every "
+                            "leg through it, so an omp update mid-run cannot split the legs across omp versions")
     cmp = sub.add_parser("compare", help="re-judge an existing run dir against its golden (no measurement)")
     cmp.add_argument("run_dir", help="a runs/<dir> holding summary.json, e.g. runs/LATEST")
     cmp.add_argument("--json", action="store_true", help="golden path, compared rows and unsound reasons as JSON")
@@ -1789,9 +3570,21 @@ def main(argv: list[str] | None = None) -> int:
     pk.add_argument("--status", action="store_true", help="print park state as JSON; parks nothing")
     pk.add_argument("--json", action="store_true", help="with --status: accepted (--status always prints JSON)")
     unpk = sub.add_parser("unpark", help="restore models parked by `localbench park`")
-    kp = sub.add_parser("keep", help="set how long ollama keeps a model loaded (forever, 30m, 0 to unload)")
+    kp = sub.add_parser("keep", help="set a finite Ollama residency lease (default 5m; 0 unloads)")
     kp.add_argument("spec", help="ollama:<model>")
-    kp.add_argument("duration", nargs="?", default="forever", help="forever | 30m | 2h | 0 (default forever)")
+    kp.add_argument("duration", nargs="?", type=_finite_keep, default="5m",
+                    help="finite duration such as 5m, 30m, 2h; 0 or unload (default 5m)")
+    gw = sub.add_parser("gateway", help="manage loopback OMP Ollama routing and residency leases")
+    gw.add_argument("action", choices=["serve", "status", "start", "stop", "install", "remove", "fence", "unfence"])
+    gw.add_argument("--model", action="append", default=[],
+                    help="fence: an Ollama model name as clients request it (repeatable); the gateway refuses its "
+                         "inference requests at once until `gateway unfence --id`")
+    gw.add_argument("--id", dest="fence_id", help="unfence: the fence id `gateway fence` printed")
+    gw.add_argument("--wait", type=float, default=120.0,
+                    help="fence: seconds to wait for in-flight requests of the model(s) to finish (default 120)")
+    gw.add_argument("--host", default=gateway.HOST, help="serve only; loopback 127.0.0.1 is required")
+    gw.add_argument("--port", type=int, default=gateway.PORT, help="serve/install port (default 11300)")
+    gw.add_argument("--json", action="store_true", help="status JSON or mutation dry-run plan JSON")
     pl = sub.add_parser("pull", help="download an ollama model (library tag or hf.co/<org>/<repo>:<quant>), or a Hugging "
                                      "Face repo's files (hf:<org>/<repo>; token from HF_TOKEN in the environment)")
     pl.add_argument("spec", help="ollama:<model> | hf:<org>/<repo>")
@@ -1822,11 +3615,21 @@ def main(argv: list[str] | None = None) -> int:
     wh.add_argument("--json", action="store_true")
     va = sub.add_parser("validate", help="check a receipt, golden or run dir: parses, has what `show` needs, pins present")
     va.add_argument("file", help="a receipt or golden .json, or a runs/<dir>")
+    oa = sub.add_parser("ollama-app", help="Ollama.app, the supervisor of ollama serve: status, restart, auto-update")
+    oa.add_argument("action", choices=["status", "restart", "auto-update"])
+    oa.add_argument("state", nargs="?", choices=["on", "off", "status"],
+                    help="auto-update only: turn Ollama.app's own updater on or off, or show it (default status)")
+    oa.add_argument("--json", action="store_true",
+                    help="status, auto-update status: one JSON object; restart/auto-update --dry-run: the plan")
     dr = sub.add_parser("doctor", help="PASS/WARN/FAIL per subsystem with the command that fixes each")
     dr.add_argument("--fix", action="store_true", help="perform the safe, reversible repairs (each is audited)")
     dr.add_argument("--json", action="store_true", help="the rows as one JSON array")
-    for p, has_json in ((pk, True), (unpk, False), (kp, False), (pl, False), (cr, False), (sm, True), (qt, False),
-                        (mem, True), (bk, False), (aa, False), (rec, False)):
+    for p, has_json in ((pk, True), (unpk, False), (kp, False), (gw, True), (pl, False), (cr, False), (sm, True), (qt, False),
+                        (mem, True), (bk, False), (aa, False), (rec, False), (oa, True), (ev_varied, False),
+                        (dec_run, False), (wr, True), (feat, True), (pv, True), (pre_apply, False), (pre_rb, False), (cp_import, True),
+                        (dec_derive, False),
+                        (cp_jev, True), (cp_capture, True), (mv, False), (omp_refresh, True), (omp_watch, True),
+                        (omp_freeze, True)):
         p.add_argument("--dry-run", action="store_true",
                        help="print the planned actions, one per line, and change nothing (exit 1 if it would refuse)")
         p.add_argument("--explain", action="store_true", help="print what each action does and why, then proceed")
@@ -1843,12 +3646,17 @@ def main(argv: list[str] | None = None) -> int:
     mut = args.mutation = None if verb is None else Mutation(
         verb, list(sys.argv[1:] if argv is None else argv), dry_run=args.dry_run, explain=args.explain,
         as_json=args.json, audited=not (args.cmd == "aa" and not args.write_golden))
-    handler = {"stats": cmd_stats, "status": cmd_status, "gpu": cmd_gpu, "run": cmd_run, "aa": cmd_aa, "ab": cmd_ab,
+    handler = {"stats": cmd_stats, "status": cmd_status, "gpu": cmd_gpu, "run": cmd_run, "eval": cmd_eval,
+               "aa": cmd_aa, "ab": cmd_ab,
                "record": cmd_record, "memory": cmd_memory, "models": cmd_models, "watch": cmd_watch,
                "report": cmd_report, "compare": cmd_compare, "bank": cmd_bank, "park": cmd_park, "unpark": cmd_unpark,
                "show": cmd_show, "keep": cmd_keep, "pull": cmd_pull, "create": cmd_create, "smol": cmd_smol,
                "quiet": cmd_quiet, "audit": cmd_audit, "why": cmd_why, "validate": cmd_validate,
-               "doctor": cmd_doctor}[args.cmd]
+               "doctor": cmd_doctor, "ollama-app": cmd_ollama_app, "gateway": cmd_gateway,
+               "decision": cmd_decision, "features": cmd_features, "watch-releases": cmd_watch_releases,
+               "prove": cmd_prove,
+               "preset": cmd_preset, "corpus": cmd_corpus, "memory-verdict": cmd_memory_verdict,
+               "omp": cmd_omp}[args.cmd]
     try:
         rc = handler(args)
         sys.stdout.flush()
@@ -1859,6 +3667,15 @@ def main(argv: list[str] | None = None) -> int:
         # the interpreter's own exit-time flush does not raise again.
         os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
         return 141
+    except RuntimeError as exc:
+        if mut:
+            mut.finish(None, exc)
+        if type(exc) is not RuntimeError:   # RecursionError, NotImplementedError: bugs keep their traceback
+            raise
+        # The code raises plain RuntimeError for refusals it can explain (a resolver that cannot run, a server that
+        # exited, a digest that moved); the user gets the reason, not a stack (exit-code contract: 1 = refused).
+        print(f"localbench {args.cmd}: {exc}", file=sys.stderr)
+        return 1
     except BaseException as exc:
         if mut:
             mut.finish(None, exc)
@@ -1871,8 +3688,37 @@ def main(argv: list[str] | None = None) -> int:
 def _mutation_verb(args) -> str | None:
     """The audit verb of an invocation that changes state (`smol revert`, `memory --prune`, ...); None for a read."""
     c = args.cmd
+    if c == "eval":
+        return "eval varied" if args.eval_action == "varied" else None
+    if c == "gateway":
+        return None if args.action in {"serve", "status"} else f"gateway {args.action}"
+
+    if c == "watch-releases":
+        return c if args.once or args.install_agent else None
+    if c == "corpus":
+        if args.corpus_action == "capture":
+            return None if args.capture_state == "status" else f"corpus capture {args.capture_state}"
+        return f"corpus {args.corpus_action}" if args.corpus_action in ("import", "proj-b-build") else None
+    if c == "omp":
+        if args.omp_action == "freeze":
+            return "omp freeze"
+        if args.omp_action == "watch":
+            return None if args.watch_state == "status" else f"omp watch {args.watch_state}"
+        return "omp refresh"
+    if c == "memory-verdict":
+        return c
+    if c == "preset":
+        return f"preset {args.preset_action}" if args.preset_action in ("apply", "rollback") else None
+    if c == "features":
+        return "features --queue" if getattr(args, "queue", False) else None
+    if c == "decision":
+        return None if args.decision_action == "paired" else f"decision {args.decision_action}"
     if c == "park":
         return None if args.status else c
+    if c == "ollama-app":
+        if args.action == "auto-update":
+            return None if args.state in (None, "status") else "ollama-app auto-update"
+        return None if args.action == "status" else "ollama-app restart"
     if c == "smol":
         return None if args.action == "status" else f"smol {args.action}"
     if c == "memory":
@@ -1881,6 +3727,8 @@ def _mutation_verb(args) -> str | None:
         return "quiet --resume" if args.resume else c
     if c == "aa":
         return "aa --write-golden" if args.write_golden else c
+    if c == "prove":
+        return "prove"
     return c if c in ("unpark", "keep", "pull", "create", "bank", "record") else None
 
 

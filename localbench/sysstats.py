@@ -26,6 +26,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Self
 
+from .backends import owned_stop_events
+
 
 def _run(*cmd: str, timeout: float = 10) -> str:
     try:
@@ -129,22 +131,28 @@ def proc_label(r: dict) -> str:
     return f"{r['name']} pid {r['pid']}" + (f" ({r['model']})" if r.get("model") else "") + f" {r['pct']}%"
 
 
-def gpu_is_ours(row: dict, backend: str, model: str) -> bool:
-    """The backend's own GPU work: `ollama serve`, or an ollama runner serving `model` — `ollama runner` for MLX
-    models, Ollama.app's `llama-server` for GGUF ones (named via `ollama_blob_names`); or the mlx-serve process."""
+# A harness server's process, by backend name, as its executable (the mlxfast backend runs Layr-Labs' `mlx-server`).
+SERVER_EXES = {"mlxfast": "mlx-server"}
+
+
+def gpu_is_ours(row: dict, backend: str, model: str, also: tuple[str, ...] = ()) -> bool:
+    """The backend's own GPU work; `also` names additional models declared as part of the measured workload."""
     if backend == "ollama":
         if row["name"] == "ollama" and row["cmd"].endswith(" serve"):
             return True
-        return row["name"] in ("ollama", "llama-server") and model in (row.get("model_names") or [row.get("model")])
-    return backend in row["cmd"]
+        return row["name"] in ("ollama", "llama-server") and bool(
+            {model, *also} & set(row.get("model_names") or [row.get("model")]))
+    if backend == "omlx" and re.search(r"(?:^|/)omlx-server(?:\s|$)", row["cmd"]):
+        return True
+    exe = re.escape(SERVER_EXES.get(backend, backend))
+    return bool(re.search(rf"(?:^|/){exe}(?:\s|$)", row["cmd"]))
 
 
-# Local inference servers on this host: ollama, mlx-serve (localbench starts it), the localbench proxy, and Inco Splash
-# (Homebrew `splash`, incoai/Qwen3.8-27B-Splash, started by hand; ~/.agents/skills/splash).
-# 11235: the dedicated smol server (localbench smol, since 2026-09-25): omp's smol work, not the model under test.
+# Local inference servers on this host: Ollama, the loopback residency gateway, MLX servers, and localbench proxy.
 SMOL_PORT = 11235
-INFERENCE_PORTS = {11434: "ollama", 11234: "mlx-serve", SMOL_PORT: "mlx-smol", 11236: "omlx", 11299: "localbench-proxy",
-                   8000: "splash"}
+OLLAMA_GATEWAY_PORT = 11300
+INFERENCE_PORTS = {11434: "ollama", OLLAMA_GATEWAY_PORT: "ollama-gateway", 11234: "mlx-serve",
+                   SMOL_PORT: "mlx-smol", 11236: "omlx", 11237: "mlxfast", 11299: "localbench-proxy", 8000: "splash"}
 
 
 def omp_client_identity(cmd: str, env_cmd: str) -> dict:
@@ -278,36 +286,100 @@ def memory() -> dict:
     }
 
 
-def _json(url: str, timeout: float = 2.0) -> dict | None:
-    """Parsed JSON, {} when nothing listens (connection refused), None when the server did not answer in time.
-    An ollama scheduler that is loading a model can stall /api/ps for seconds; that is 'unknown', not 'empty'."""
+def _probe_error_class(exc: BaseException) -> str:
+    return "timeout" if isinstance(exc, TimeoutError) else type(exc).__name__
+
+
+def _json(url: str, timeout: float = 2.0, *, probe: dict | None = None) -> dict | None:
+    """Parsed JSON, {} when nothing listens, None when a responding server is unreadable or too slow.
+
+    An ollama scheduler loading a model can stall /api/ps; that remains unknown, not empty.
+    """
+    started = time.monotonic() if probe is not None else None
+    status = None
+    error_class = None
     try:
         with urllib.request.urlopen(url, timeout=timeout) as r:
-            return json.load(r)
+            status = getattr(r, "status", None)
+            result = json.load(r)
+    except urllib.error.HTTPError as exc:
+        status = exc.code
+        error_class = "HTTPError"
+        result = None
     except urllib.error.URLError as exc:
-        return {} if isinstance(exc.reason, ConnectionRefusedError) else None
-    except (OSError, ValueError):
-        return None
+        error_class = (_probe_error_class(exc.reason) if isinstance(exc.reason, BaseException)
+                       else type(exc).__name__)
+        result = {} if isinstance(exc.reason, ConnectionRefusedError) else None
+    except ValueError:
+        error_class = "invalid_json"
+        result = None
+    except OSError as exc:
+        error_class = _probe_error_class(exc)
+        result = None
+    finally:
+        if probe is not None:
+            probe.update({"probe_start": started, "probe_end": time.monotonic(), "error_class": error_class,
+                          "http_status": status})
+    return result
 
 
-def resident_models() -> dict:
-    """Models loaded on every local inference server we know of. Down server -> []; unresponsive -> None. Splash loads
-    its model at startup, so a listed model is a resident one."""
-    ps = _json("http://127.0.0.1:11434/api/ps")
-    mx = _json("http://127.0.0.1:11234/v1/models")
-    sp = _json("http://127.0.0.1:8000/v1/models")
-    om = _json("http://127.0.0.1:11236/api/status")
-    sm = _json("http://127.0.0.1:11235/v1/models")        # SMOL_PORT; literal like its neighbours (the port map reads it)
-    return {
-        "ollama": None if ps is None else sorted(m["name"] for m in ps.get("models", [])),
-        "mlx-serve": None if mx is None else sorted(m["id"] for m in mx.get("data", [])),
-        "splash": None if sp is None else sorted(m["id"] for m in sp.get("data", [])),
-        # oMLX lists every model it could serve on /v1/models and loads on demand: residency is /api/status.
-        "omlx": None if om is None else sorted(m if isinstance(m, str) else (m.get("id") or m.get("model_id"))
-                                              for m in om.get("loaded_models", [])),
-        # The smol server loads its one model at start, like Splash: listed means resident.
-        "mlx-smol": None if sm is None else sorted(m["id"] for m in sm.get("data", [])),
+_RESIDENCY_SERVERS = (
+    ("ollama", 11434, "http://127.0.0.1:11434/api/ps", "models", "name"),
+    ("mlx-serve", 11234, "http://127.0.0.1:11234/v1/models", "data", "id"),
+    # oMLX /v1/models inventories available models; /api/status reports the IDs actually resident.
+    ("omlx", 11236, "http://127.0.0.1:11236/api/status", "loaded_models", None),
+    ("mlx-smol", 11235, "http://127.0.0.1:11235/v1/models", "data", "id"),
+    ("mlxfast", 11237, "http://127.0.0.1:11237/v1/models", "data", "id"),
+)
+
+
+def resident_models(probes: dict | None = None) -> dict:
+    """Models loaded on every local inference server we know of. Down server -> []; unreadable or malformed -> None."""
+
+    def fetch(server: str, port: int, url: str, field: str, item_field: str | None) -> list[str] | None:
+        probe = {"server": server, "port": port}
+        try:
+            result = _json(url, probe=probe)
+        except Exception as exc:
+            probe.update({"probe_start": time.monotonic(), "probe_end": time.monotonic(),
+                          "error_class": _probe_error_class(exc), "http_status": None})
+            result = None
+        if probes is not None:
+            probes[server] = probe
+        if result is None:
+            return None
+        # Connection refusal is the established down-server signal; unlike an HTTP 200 response, it has no schema.
+        if result == {} and probe.get("http_status") is None and probe.get("error_class"):
+            return []
+        if not isinstance(result, dict) or not isinstance(result.get(field), list):
+            probe["error_class"] = "schema"
+            return None
+        names = []
+        for model in result[field]:
+            if item_field is not None:
+                name = model.get(item_field) if isinstance(model, dict) else None
+            else:
+                name = model if isinstance(model, str) else None
+            if not isinstance(name, str) or not name:
+                probe["error_class"] = "schema"
+                return None
+            names.append(name)
+        return sorted(names)
+
+    return {server: fetch(server, port, url, field, item_field)
+            for server, port, url, field, item_field in _RESIDENCY_SERVERS}
+
+
+def _unknown_residency_sample(exc: Exception) -> dict:
+    error_class = _probe_error_class(exc)
+    now = time.monotonic()
+    probes = {
+        server: {"server": server, "error_class": error_class, "probe_start": now, "probe_end": now,
+                 "http_status": None}
+        for server, *_ in _RESIDENCY_SERVERS
     }
+    return {"t": time.time(), "resident": {server: None for server in probes}, "resident_probes": probes,
+            "sampler_error_class": error_class}
 
 
 def keep_until(expires_at: str | None) -> str:
@@ -382,17 +454,20 @@ def user_idle_s() -> float | None:
 
 
 def live() -> dict:
-    """Cheap signals, safe to poll at 1 Hz."""
+    """Cheap signals, safe to poll at 1 Hz; residency probes carry per-server monotonic timing and failure class."""
     gpu = {f"gpu_{k}": v for k, v in gpu_utilization().items()}
-    return {"t": time.time(), "load1": round(os.getloadavg()[0], 2), **memory(), **gpu, "resident": resident_models(),
-            "user_idle_s": user_idle_s()}
+    probes: dict = {}
+    resident = resident_models(probes)
+    return {"t": time.time(), "load1": round(os.getloadavg()[0], 2), **memory(), **gpu, "resident": resident,
+            "resident_probes": probes, "user_idle_s": user_idle_s()}
 
 
-def foreign_models(resident: dict, backend: str, model: str) -> dict:
-    """Everything resident that is not the model under test on its own backend (unknown servers are skipped)."""
-    return {srv: [m for m in names if not (srv == backend and m == model)]
+def foreign_models(resident: dict, backend: str, model: str, also: tuple[str, ...] = ()) -> dict:
+    """Everything resident outside the declared workload (unknown servers are skipped)."""
+    ours = {model, *also}
+    return {srv: [m for m in names if m not in ours]
             for srv, names in resident.items()
-            if names and any(not (srv == backend and m == model) for m in names)}
+            if names and any(m not in ours for m in names)}
 
 
 def top_processes(n: int = 8) -> list[dict]:
@@ -448,35 +523,38 @@ def snapshot() -> dict:
     return {"host": host(), "power": power(), "live": live(), "top": top_processes(), "disk_free_gb": disk_free_gb()}
 
 
-INFERENCE_NAMES = ("ollama", "llama-server", "mlx-serve")
+INFERENCE_NAMES = ("ollama", "llama-server", "mlx-serve", "mlx-server", "omlx-server")
 USER_ACTIVE_S = 10.0
 
 
 def is_inference(row: dict) -> bool:
     """A GPU row that is a model server or runner (it carries the model it serves, or is one by name)."""
     return (bool(row.get("model")) or row.get("name") in INFERENCE_NAMES
-            or bool(re.search(r"\b(omlx|splash) serve\b", row.get("cmd") or "")))
+            or bool(re.search(r"\b(omlx|splash) serve\b|(?:^|/)omlx-server(?:\s|$)", row.get("cmd") or "")))
 
 
-def classify(gpu_procs: list[dict], resident: dict, target: tuple[str, str], max_pct: float) -> tuple[dict, list, list]:
+def classify(gpu_procs: list[dict], resident: dict, target: tuple[str, ...], max_pct: float) -> tuple[dict, list, list]:
     """One sample -> (foreign resident models, other models' runners above max_pct, apps above max_pct).
 
     Only the first two void a run: another model competes for the GPU and `localbench park` controls it. Apps and the
-    person at the keyboard are the condition the measurement is taken under (the owner, 2026-09-24: 'my machine is never
-    going to be fully quiet - we need our testing to be while our system is working'); they are recorded as load."""
-    foreign = {k: v for k, v in foreign_models(resident, *target).items() if v}
-    busy = [r for r in gpu_procs if r["pct"] > max_pct and not gpu_is_ours(r, *target)]
+    person at the keyboard are the condition the measurement is taken under; declared auxiliary models also belong to
+    the workload rather than counting as contention."""
+    backend, model, *also = target
+    also = tuple(also)
+    foreign = {k: v for k, v in foreign_models(resident, backend, model, also).items() if v}
+    busy = [r for r in gpu_procs if r["pct"] > max_pct and not gpu_is_ours(r, backend, model, also)]
     return foreign, [r for r in busy if is_inference(r)], [r for r in busy if not is_inference(r)]
 
 
-def load_summary(series: list[dict], target: tuple[str, str] | None, max_pct: float) -> dict:
+def load_summary(series: list[dict], target: tuple[str, ...] | None, max_pct: float) -> dict:
     """What else ran while a model was measured, per 1 Hz sample: GPU % of every non-model process summed (mean, p95),
     seconds in which one such process passed max_pct, and the share of samples with keyboard or mouse input within
     USER_ACTIVE_S. The app-GPU figures are inflated by the model's own saturation, so compare them only between legs
     that load the GPU alike; user_active_pct does not depend on the model."""
     app, spikes, active, seen = [], 0, 0, 0
     for s in series:
-        rows = [r for r in s.get("gpu_procs") or [] if not is_inference(r) and not (target and gpu_is_ours(r, *target))]
+        rows = [r for r in s.get("gpu_procs") or [] if not is_inference(r) and not (
+            target and gpu_is_ours(r, target[0], target[1], tuple(target[2:])))]
         app.append(sum(r["pct"] for r in rows))
         spikes += any(r["pct"] > max_pct for r in rows)
         if s.get("user_idle_s") is not None:
@@ -490,17 +568,54 @@ def load_summary(series: list[dict], target: tuple[str, str] | None, max_pct: fl
             "user_active_pct": round(100 * active / seen, 1) if seen else None}
 
 
+def _owned_stop_for_sample(sample: dict, target: tuple[str, ...] | None, stops: list[dict]) -> dict | None:
+    unknown = [server for server, models in sample["resident"].items() if models is None]
+    if not unknown or target is None or any(server != target[0] for server in unknown):
+        return None
+    probes = sample.get("resident_probes")
+    if not isinstance(probes, dict):
+        return None
+    evidence = None
+    for server in unknown:
+        probe = probes.get(server)
+        if not isinstance(probe, dict) or probe.get("server") != server or not probe.get("error_class"):
+            return None
+        probe_start, probe_end, port = probe.get("probe_start"), probe.get("probe_end"), probe.get("port")
+        if (not isinstance(probe_start, int | float) or not isinstance(probe_end, int | float)
+                or probe_start > probe_end):
+            return None
+        match = None
+        for stop in stops:
+            if not isinstance(stop, dict) or stop.get("server") != server or stop.get("port") != port:
+                continue
+            start, end = stop.get("t_term"), stop.get("t_exit")
+            if not isinstance(start, int | float) or not isinstance(end, int | float):
+                continue
+            if not start <= probe_start <= probe_end <= end:
+                continue
+            if stop.get("pre") != sorted({target[1], *target[2:]}):
+                continue
+            if stop.get("rc") is None or stop.get("killed"):
+                continue
+            match = stop
+            break
+        if match is None:
+            return None
+        evidence = match
+    return evidence
+
+
 class Sampler:
     """Polls `live()` on a background thread for the duration of a `with` block, plus which processes used the GPU
     in each interval (`gpu_procs`) and over the whole block (`summary()["gpu_by_process"]`).
 
-    With `target=(backend, model)` every sample is checked for foreign resident models and, with
+    With `target=(backend, model[, auxiliary_model, ...])` every sample is checked for foreign resident models and, with
     `gpu_foreign_max_pct`, for any process other than the backend's own using more GPU than that in the interval
     (the device-wide % cannot see this: the model under test saturates it). The first sample of each contention
     episode goes to `on_contention` (live monitors see it).
     """
 
-    def __init__(self, interval: float = 1.0, target: tuple[str, str] | None = None,
+    def __init__(self, interval: float = 1.0, target: tuple[str, ...] | None = None,
                  on_contention: Callable[[dict], None] | None = None, gpu_foreign_max_pct: float | None = None):
         self.interval = interval
         self.target = target
@@ -522,27 +637,37 @@ class Sampler:
         # sample); at least one sample is taken however short the block.
         self._stop.wait(self.interval)
         while True:
-            s = live()
-            now = (gpu_time_by_pid(), time.time())
-            # Windows shorter than half an interval stay open: a 0.1 s window turns one frame into a large %.
-            if now[1] - prev[1] >= self.interval / 2:
-                s["gpu_procs"] = gpu_share(prev[0], now[0], now[1] - prev[1], self._commands)
-                prev = now
+            try:
+                s = live()
+                now = (gpu_time_by_pid(), time.time())
+                # Windows shorter than half an interval stay open: a 0.1 s window turns one frame into a large %.
+                if now[1] - prev[1] >= self.interval / 2:
+                    s["gpu_procs"] = gpu_share(prev[0], now[0], now[1] - prev[1], self._commands)
+                    prev = now
+                if self.target:
+                    limit = self.gpu_foreign_max_pct if self.gpu_foreign_max_pct is not None else float("inf")
+                    foreign, foreign_gpu, apps = classify(s.get("gpu_procs", []), s["resident"], self.target, limit)
+                    if (foreign or foreign_gpu) and not in_episode:
+                        ev = {"t": round(s["t"], 3), "foreign": foreign, "foreign_gpu": foreign_gpu,
+                              "resident": s["resident"], "gpu_device_pct": s.get("gpu_device_pct")}
+                        self.contention.append(ev)
+                        if self.on_contention:
+                            self.on_contention(ev)
+                    in_episode = bool(foreign or foreign_gpu)
+                    if apps and not in_spike:
+                        self.load_spikes.append(
+                            {"t": round(s["t"], 3), "apps": apps, "user_idle_s": s.get("user_idle_s")})
+                    in_spike = bool(apps)
+            except Exception as exc:
+                s = _unknown_residency_sample(exc)
+                try:
+                    now = (gpu_time_by_pid(), time.time())
+                    prev = now
+                except Exception:
+                    now = (prev[0], time.time())
+                in_episode = in_spike = False
             self._gpu_span[1] = now
             self.series.append(s)
-            if self.target:
-                limit = self.gpu_foreign_max_pct if self.gpu_foreign_max_pct is not None else float("inf")
-                foreign, foreign_gpu, apps = classify(s.get("gpu_procs", []), s["resident"], self.target, limit)
-                if (foreign or foreign_gpu) and not in_episode:
-                    ev = {"t": round(s["t"], 3), "foreign": foreign, "foreign_gpu": foreign_gpu,
-                          "resident": s["resident"], "gpu_device_pct": s.get("gpu_device_pct")}
-                    self.contention.append(ev)
-                    if self.on_contention:
-                        self.on_contention(ev)
-                in_episode = bool(foreign or foreign_gpu)
-                if apps and not in_spike:
-                    self.load_spikes.append({"t": round(s["t"], 3), "apps": apps, "user_idle_s": s.get("user_idle_s")})
-                in_spike = bool(apps)
             if self._stop.wait(self.interval):
                 break
 
@@ -562,7 +687,20 @@ class Sampler:
                 out[key] = {"mean": round(statistics.fmean(vals), 1), "max": max(vals), "min": min(vals)}
         levels = {s.get("pressure_level") for s in self.series} - {None}
         out["pressure_levels"] = sorted(levels)
-        out["resident_unknown_samples"] = sum(1 for s in self.series if None in s["resident"].values())
+        stops = owned_stop_events()
+        unknown = owned = 0
+        for sample in self.series:
+            sample.pop("resident_owned_stop", None)
+            if None not in sample["resident"].values():
+                continue
+            evidence = _owned_stop_for_sample(sample, self.target, stops)
+            if evidence is None:
+                unknown += 1
+            else:
+                owned += 1
+                sample["resident_owned_stop"] = evidence
+        out["resident_unknown_samples"] = unknown
+        out["resident_owned_stop_samples"] = owned
         (first, t0), (last, t1) = self._gpu_span or [({}, 0.0), ({}, 0.0)]
         if t1 > t0:
             out["gpu_by_process"] = gpu_share(first, last, t1 - t0, self._commands, min_pct=1.0)[:8]

@@ -1,0 +1,33 @@
+[
+  {
+    "label": "pre-warmed first call voids E2E timing metrics",
+    "file": "localbench/workloads.py",
+    "old": "void(\"lower\", not_cold) if cached else metric([walls[0]], \"lower\")",
+    "new": "metric([walls[0]], \"lower\")",
+    "tests": ["tests.test_workloads.AnswerReachesTheVerdict.test_pre_warmed_first_call_voids_first_timing_metrics"]
+  },
+  {
+    "label": "empty SSE deltas do not stamp TTFT",
+    "file": "localbench/proxy.py",
+    "old": "if t_first is None and _has_token(ev):",
+    "new": "if t_first is None:",
+    "tests": ["tests.test_proxy.ResponseTrace.test_empty_deltas_do_not_set_ttft"]
+  },
+  {
+    "label": "content, reasoning, and tool deltas count for TTFT",
+    "file": "localbench/proxy.py",
+    "old": "if any(delta.get(k) for k in (\"content\", \"reasoning_content\", \"reasoning\")) or delta.get(\"tool_calls\"):",
+    "new": "if any(delta.get(k) for k in (\"content\",)):",
+    "tests": [
+      "tests.test_proxy.ResponseTrace.test_proxy_persists_the_exact_response_stream_for_offline_scoring",
+      "tests.test_proxy.ResponseTrace.test_nonempty_content_reasoning_and_tool_deltas_are_tokens"
+    ]
+  },
+  {
+    "label": "wrong E2E expected answer rejects the correct reply",
+    "file": "localbench/workloads.py",
+    "old": "return text.strip().rstrip(\".\") == \"OK\"",
+    "new": "return text.strip().rstrip(\".\") == \"WRONG\"",
+    "tests": ["tests.test_workloads.AnswerReachesTheVerdict.test_wrong_expected_answer_rejects_correct_e2e_output"]
+  }
+]

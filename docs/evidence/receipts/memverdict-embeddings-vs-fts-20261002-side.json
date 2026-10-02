@@ -1,0 +1,452 @@
+{
+  "kind": "run",
+  "feature": "recall-embeddings",
+  "omp_module_sha": "0388ba185495e32df42bcca3660be6b52198b0aed37d6a7919509521e24b30f9",
+  "problems": [
+    "not better than fixed true: NOT_BETTER"
+  ],
+  "verdict": {
+    "compare": "NOT_BETTER",
+    "baseline": {
+      "kind": "fixed",
+      "id": "true"
+    }
+  },
+  "run": {
+    "label": "memory",
+    "provenance": {
+      "pins": {
+        "backend": "ollama",
+        "backend_version": "0.35.0",
+        "backend_sha": "add45eb02df0252f",
+        "model": "local/fast-bge-base-en-v1.5",
+        "model_digest": "d7176de16bfe",
+        "backend_args": "",
+        "omp_version": "18.4.10",
+        "omp_sha": "479729e68fe4d401",
+        "omp_path": "~/.bun/bin/omp",
+        "omp_child_config": "62eed267e219ddde",
+        "omp_mem_config": "019eef862b65ed03",
+        "omp_agent_config": "38b87e2b63396937",
+        "omp_mem_tools": "memory_edit,recall,reflect,retain",
+        "embedder": "local/fast-bge-base-en-v1.5",
+        "embedder_digest": "d7176de16bfe",
+        "fixtures_sha": "41ff309f03a98aa5",
+        "macos_build": "25F84",
+        "host_id": "mac-studio-apple-m3-ultra-512gb",
+        "smol_model": "qwen3.8:27b-mlx",
+        "smol_digest": "5642e97495e1",
+        "regime": "side",
+        "main_model": "qwen3.6:35b-mlx",
+        "main_model_digest": "e92a3e94bbca",
+        "embeddings": "on",
+        "memory_model": "qwen3.8:27b-mlx",
+        "memory_model_digest": "5642e97495e1"
+      },
+      "label": "memory",
+      "tiers": [
+        "mem",
+        "sess"
+      ],
+      "llm_mode": "smol",
+      "created": "20261002T053124Z",
+      "localbench_rev": "1f01ff8",
+      "fingerprint": {
+        "backend": "ollama",
+        "backend_version": "0.35.0",
+        "backend_sha": "add45eb02df0252f",
+        "model": "qwen3.6:35b-mlx",
+        "model_digest": "e92a3e94bbca",
+        "backend_args": "",
+        "omp_version": "18.4.10",
+        "omp_sha": "479729e68fe4d401",
+        "omp_path": "~/.bun/bin/omp",
+        "omp_child_config": "62eed267e219ddde",
+        "omp_mem_config": "019eef862b65ed03",
+        "omp_agent_config": "38b87e2b63396937",
+        "omp_mem_tools": "memory_edit,recall,reflect,retain",
+        "embedder": "local/fast-bge-base-en-v1.5",
+        "embedder_digest": "d7176de16bfe",
+        "fixtures_sha": "41ff309f03a98aa5",
+        "macos_build": "25F84",
+        "host_id": "mac-studio-apple-m3-ultra-512gb",
+        "smol_model": "qwen3.8:27b-mlx",
+        "smol_digest": "5642e97495e1",
+        "regime": "side",
+        "legs": [
+          {
+            "arm": "candidate",
+            "label": "ab_a1",
+            "run_dir": "runs/20261002T044502Z__ab_a1__ollama__qwen3.6_35b-mlx",
+            "created": "20261002T044502Z",
+            "localbench_rev": "1f01ff8"
+          },
+          {
+            "arm": "candidate",
+            "label": "ab_a2",
+            "run_dir": "runs/20261002T050222Z__ab_a2__ollama__qwen3.6_35b-mlx",
+            "created": "20261002T050222Z",
+            "localbench_rev": "1f01ff8"
+          },
+          {
+            "arm": "candidate",
+            "label": "ab_a3",
+            "run_dir": "runs/20261002T052021Z__ab_a3__ollama__qwen3.6_35b-mlx",
+            "created": "20261002T052021Z",
+            "localbench_rev": "1f01ff8"
+          },
+          {
+            "arm": "baseline",
+            "label": "ab_b1",
+            "run_dir": "runs/20261002T045607Z__ab_b1__ollama__qwen3.6_35b-mlx",
+            "created": "20261002T045607Z",
+            "localbench_rev": "1f01ff8"
+          },
+          {
+            "arm": "baseline",
+            "label": "ab_b2",
+            "run_dir": "runs/20261002T051322Z__ab_b2__ollama__qwen3.6_35b-mlx",
+            "created": "20261002T051322Z",
+            "localbench_rev": "1f01ff8"
+          }
+        ]
+      },
+      "legs": {
+        "candidate": [
+          "ab_a1",
+          "ab_a2",
+          "ab_a3"
+        ],
+        "baseline": [
+          "ab_b1",
+          "ab_b2"
+        ]
+      }
+    },
+    "verdicts": {
+      "must_fail": [],
+      "baseline_must_fail": [],
+      "contended": [
+        "ab_a1",
+        "ab_a2",
+        "ab_a3",
+        "ab_b1",
+        "ab_b2"
+      ]
+    },
+    "metrics": {
+      "mem.recall.hit_rate": {
+        "value": 1.0,
+        "better": "higher",
+        "n": 3
+      },
+      "mem.no_leak": {
+        "value": 1.0,
+        "better": "higher",
+        "n": 3
+      },
+      "mem.derail.ok_rate": {
+        "value": 1.0,
+        "better": "higher",
+        "n": 3
+      },
+      "sess.memory_calls_ok": {
+        "value": 0.0,
+        "better": "higher",
+        "n": 3
+      },
+      "mem.recall.pre_main_s": {
+        "value": 18.6556,
+        "better": "lower",
+        "n": 3
+      },
+      "sess.turn.post_retain_wall_s": {
+        "value": 5.1635,
+        "better": "lower",
+        "n": 3
+      },
+      "sess.memory.extract_s": {
+        "value": 2.1525,
+        "better": "lower",
+        "n": 3
+      },
+      "system.during.gpu_device_pct": {
+        "value": 72.8,
+        "better": "lower",
+        "n": 3
+      }
+    },
+    "conformance": {
+      "memory.baseline_route": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "baseline": "true",
+        "digest": null,
+        "off_route": [],
+        "problems": []
+      },
+      "memory.served_model": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "problems": []
+      },
+      "memory.comparison_valid": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "void": []
+      },
+      "memory.loop_gate": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "factor": 3,
+        "failures": [],
+        "unmeasured": []
+      },
+      "memory.llm_mode": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "candidate": "smol",
+        "problems": []
+      },
+      "memory.main_ack_slips": {
+        "level": "SHOULD",
+        "verdict": "PASS",
+        "slips": {
+          "candidate": {
+            "ab_a1": 0,
+            "ab_a2": 0,
+            "ab_a3": 0
+          },
+          "baseline": {
+            "ab_b1": 0,
+            "ab_b2": 0
+          }
+        }
+      },
+      "memory.co_resident": {
+        "level": "SHOULD",
+        "verdict": "FAIL",
+        "legs": {
+          "candidate": {
+            "ab_a1": {
+              "models": [
+                "ollama/nimble:latest"
+              ],
+              "episodes": 1,
+              "foreign_gpu_mean_pct": null,
+              "resident_unknown_samples": 0
+            },
+            "ab_a2": {
+              "models": [
+                "ollama/nimble:latest"
+              ],
+              "episodes": 1,
+              "foreign_gpu_mean_pct": null,
+              "resident_unknown_samples": 0
+            },
+            "ab_a3": {
+              "models": [
+                "ollama/nimble:latest"
+              ],
+              "episodes": 1,
+              "foreign_gpu_mean_pct": null,
+              "resident_unknown_samples": 0
+            }
+          },
+          "baseline": {
+            "ab_b1": {
+              "models": [
+                "ollama/nimble:latest"
+              ],
+              "episodes": 1,
+              "foreign_gpu_mean_pct": null,
+              "resident_unknown_samples": 0
+            },
+            "ab_b2": {
+              "models": [
+                "ollama/nimble:latest"
+              ],
+              "episodes": 1,
+              "foreign_gpu_mean_pct": null,
+              "resident_unknown_samples": 0
+            }
+          }
+        },
+        "regimes": {
+          "ab_a1": "side",
+          "ab_a2": "side",
+          "ab_a3": "side",
+          "ab_b1": "side",
+          "ab_b2": "side"
+        }
+      }
+    },
+    "run_dir": null,
+    "memory": {
+      "compare": {
+        "verdict": "NOT_BETTER",
+        "computed": "NOT_BETTER",
+        "void": [],
+        "quality_losses": [],
+        "wins": [],
+        "baseline": {
+          "kind": "fixed",
+          "id": "true",
+          "preset": "embeddings:fts",
+          "leg": [
+            "embeddings",
+            "off"
+          ]
+        },
+        "unmeasured_quality": [],
+        "noise": "aa_spread_over_legs",
+        "deltas": {
+          "mem.recall.hit_rate": {
+            "class": "quality",
+            "candidate_legs": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "baseline_legs": [
+              1.0,
+              1.0
+            ],
+            "better": "higher",
+            "judgement": "within_noise",
+            "candidate": 1.0,
+            "baseline": 1.0,
+            "delta": 0.0,
+            "band": 0.0
+          },
+          "mem.no_leak": {
+            "class": "quality",
+            "candidate_legs": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "baseline_legs": [
+              1.0,
+              1.0
+            ],
+            "better": "higher",
+            "judgement": "within_noise",
+            "candidate": 1.0,
+            "baseline": 1.0,
+            "delta": 0.0,
+            "band": 0.0
+          },
+          "mem.derail.ok_rate": {
+            "class": "quality",
+            "candidate_legs": [
+              0.6667,
+              1.0,
+              1.0
+            ],
+            "baseline_legs": [
+              0.6667,
+              1.0
+            ],
+            "better": "higher",
+            "judgement": "within_noise",
+            "candidate": 1.0,
+            "baseline": 0.83335,
+            "delta": 0.16664999999999996,
+            "band": 0.33330000000000004
+          },
+          "sess.memory_calls_ok": {
+            "class": "quality",
+            "candidate_legs": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "baseline_legs": [
+              0.0,
+              0.0
+            ],
+            "better": "higher",
+            "judgement": "within_noise",
+            "candidate": 0.0,
+            "baseline": 0.0,
+            "delta": 0.0,
+            "band": 0.0
+          },
+          "mem.recall.pre_main_s": {
+            "class": "win",
+            "candidate_legs": [
+              14.0611,
+              21.8846,
+              18.6556
+            ],
+            "baseline_legs": [
+              9.2449,
+              11.002
+            ],
+            "better": "lower",
+            "judgement": "loss",
+            "candidate": 18.6556,
+            "baseline": 10.12345,
+            "delta": 8.53215,
+            "band": 7.823499999999999
+          },
+          "sess.turn.post_retain_wall_s": {
+            "class": "win",
+            "candidate_legs": [
+              6.3943,
+              5.1635,
+              5.1357
+            ],
+            "baseline_legs": [
+              5.8473,
+              5.055
+            ],
+            "better": "lower",
+            "judgement": "within_noise",
+            "candidate": 5.1635,
+            "baseline": 5.45115,
+            "delta": -0.2876500000000002,
+            "band": 1.2586000000000004
+          },
+          "sess.memory.extract_s": {
+            "class": "win",
+            "candidate_legs": [
+              2.283,
+              2.059,
+              2.1525
+            ],
+            "baseline_legs": [
+              2.7985,
+              2.1825
+            ],
+            "better": "lower",
+            "judgement": "within_noise",
+            "candidate": 2.1525,
+            "baseline": 2.4905,
+            "delta": -0.3380000000000001,
+            "band": 0.6160000000000001
+          },
+          "system.during.gpu_device_pct": {
+            "class": "win",
+            "candidate_legs": [
+              75.2,
+              56.2,
+              72.8
+            ],
+            "baseline_legs": [
+              79.6,
+              77.4
+            ],
+            "better": "lower",
+            "judgement": "within_noise",
+            "candidate": 72.8,
+            "baseline": 78.5,
+            "delta": -5.700000000000003,
+            "band": 19.0
+          }
+        }
+      }
+    }
+  }
+}

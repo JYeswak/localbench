@@ -1,0 +1,3911 @@
+{
+  "kind": "ab",
+  "a": "mlx-serve:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit",
+  "b": "omlx:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit",
+  "order": [
+    "A",
+    "B",
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [],
+  "pin_drift": {},
+  "load_balance": {
+    "a": [
+      19.2,
+      17.9,
+      18.7
+    ],
+    "b": [
+      19.3,
+      19.3
+    ],
+    "tol_pct": 5.0,
+    "favours": null
+  },
+  "table": {
+    "micro.decode.decode_tps": {
+      "a_legs": [
+        161.2723,
+        156.7533,
+        159.6788
+      ],
+      "b_legs": [
+        106.3068,
+        104.3636
+      ],
+      "a_median": 159.6788,
+      "b_median": 105.3352,
+      "better": "higher",
+      "aa_rel_spread": 0.0283,
+      "bb_rel_spread": 0.0184,
+      "band": 0.0849,
+      "b_over_a": 0.66,
+      "verdict": "B-WORSE"
+    },
+    "micro.decode.ttft_s": {
+      "a_legs": [
+        0.0787,
+        0.0803,
+        0.0766
+      ],
+      "b_legs": [
+        0.1116,
+        0.1127
+      ],
+      "a_median": 0.0787,
+      "b_median": 0.11215,
+      "better": "lower",
+      "aa_rel_spread": 0.047,
+      "bb_rel_spread": 0.0098,
+      "band": 0.141,
+      "b_over_a": 1.425,
+      "verdict": "B-WORSE"
+    },
+    "micro.prefill_1k.prefill_tps": {
+      "a_legs": [
+        2632.7752,
+        2568.5323,
+        2611.6369
+      ],
+      "b_legs": [
+        2695.1866,
+        2664.4383
+      ],
+      "a_median": 2611.6369,
+      "b_median": 2679.81245,
+      "better": "higher",
+      "aa_rel_spread": 0.0246,
+      "bb_rel_spread": 0.0115,
+      "band": 0.0738,
+      "b_over_a": 1.026,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_1k.ttft_s": {
+      "a_legs": [
+        0.4186,
+        0.429,
+        0.422
+      ],
+      "b_legs": [
+        0.4081,
+        0.4129
+      ],
+      "a_median": 0.422,
+      "b_median": 0.4105,
+      "better": "lower",
+      "aa_rel_spread": 0.0246,
+      "bb_rel_spread": 0.0117,
+      "band": 0.1,
+      "b_over_a": 0.973,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_8k.prefill_tps": {
+      "a_legs": [
+        2934.2044,
+        2683.8269,
+        2781.9927
+      ],
+      "b_legs": [
+        2990.653,
+        2892.374
+      ],
+      "a_median": 2781.9927,
+      "b_median": 2941.5135,
+      "better": "higher",
+      "aa_rel_spread": 0.09,
+      "bb_rel_spread": 0.0334,
+      "band": 0.27,
+      "b_over_a": 1.057,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_8k.ttft_s": {
+      "a_legs": [
+        2.9688,
+        3.2461,
+        3.1308
+      ],
+      "b_legs": [
+        2.9117,
+        3.0103
+      ],
+      "a_median": 3.1308,
+      "b_median": 2.9610000000000003,
+      "better": "lower",
+      "aa_rel_spread": 0.0886,
+      "bb_rel_spread": 0.0333,
+      "band": 0.2657,
+      "b_over_a": 0.946,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_32k.prefill_tps": {
+      "a_legs": [
+        2177.1523,
+        1977.1305,
+        2039.4511
+      ],
+      "b_legs": [
+        2244.1387,
+        2205.6039
+      ],
+      "a_median": 2039.4511,
+      "b_median": 2224.8713,
+      "better": "higher",
+      "aa_rel_spread": 0.0981,
+      "bb_rel_spread": 0.0173,
+      "band": 0.2942,
+      "b_over_a": 1.091,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.prefill_32k.ttft_s": {
+      "a_legs": [
+        16.0852,
+        17.713,
+        17.1708
+      ],
+      "b_legs": [
+        15.602,
+        15.8764
+      ],
+      "a_median": 17.1708,
+      "b_median": 15.7392,
+      "better": "lower",
+      "aa_rel_spread": 0.0948,
+      "bb_rel_spread": 0.0174,
+      "band": 0.2844,
+      "b_over_a": 0.917,
+      "verdict": "WITHIN-NOISE"
+    },
+    "micro.cache_hit_8k.warm_ttft_s": {
+      "a_legs": [
+        0.0937,
+        0.096,
+        0.0944
+      ],
+      "b_legs": [
+        0.1493,
+        0.1361
+      ],
+      "a_median": 0.0944,
+      "b_median": 0.1427,
+      "better": "lower",
+      "aa_rel_spread": 0.0244,
+      "bb_rel_spread": 0.0925,
+      "band": 0.2775,
+      "b_over_a": 1.512,
+      "verdict": "B-WORSE"
+    },
+    "micro.cache_hit_8k.speedup_x": {
+      "a_legs": [
+        31.6802,
+        33.6879,
+        32.978
+      ],
+      "b_legs": [
+        20.4175,
+        22.712
+      ],
+      "a_median": 32.978,
+      "b_median": 21.56475,
+      "better": "higher",
+      "aa_rel_spread": 0.0609,
+      "bb_rel_spread": 0.1064,
+      "band": 0.3192,
+      "b_over_a": 0.654,
+      "verdict": "B-WORSE"
+    },
+    "micro.eviction_probe_8k.a_again_ttft_s": {
+      "a_legs": [
+        0.0282,
+        0.0255,
+        0.0267
+      ],
+      "b_legs": [
+        0.1085,
+        0.1094
+      ],
+      "a_median": 0.0267,
+      "b_median": 0.10894999999999999,
+      "better": "lower",
+      "aa_rel_spread": 0.1011,
+      "bb_rel_spread": 0.0083,
+      "band": 0.3034,
+      "b_over_a": 4.081,
+      "verdict": "B-WORSE"
+    },
+    "replay.full.cold_ttft_s": {
+      "a_legs": [
+        45.363,
+        50.6717,
+        48.7526
+      ],
+      "b_legs": [
+        45.4982,
+        45.3145
+      ],
+      "a_median": 48.7526,
+      "b_median": 45.40635,
+      "better": "lower",
+      "aa_rel_spread": 0.1089,
+      "bb_rel_spread": 0.004,
+      "band": 0.3267,
+      "b_over_a": 0.931,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.full.warm_ttft_s": {
+      "a_legs": [
+        0.3481,
+        0.3473,
+        0.3471
+      ],
+      "b_legs": [
+        0.5655,
+        0.5635
+      ],
+      "a_median": 0.3473,
+      "b_median": 0.5645,
+      "better": "lower",
+      "aa_rel_spread": 0.0029,
+      "bb_rel_spread": 0.0035,
+      "band": 0.1,
+      "b_over_a": 1.625,
+      "verdict": "B-WORSE"
+    },
+    "replay.full.turn2_ttft_s": {
+      "a_legs": [
+        0.7103,
+        0.7094,
+        0.7102
+      ],
+      "b_legs": [
+        0.7134,
+        0.7122
+      ],
+      "a_median": 0.7102,
+      "b_median": 0.7128000000000001,
+      "better": "lower",
+      "aa_rel_spread": 0.0013,
+      "bb_rel_spread": 0.0017,
+      "band": 0.1,
+      "b_over_a": 1.004,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.lean.cold_ttft_s": {
+      "a_legs": [
+        3.9018,
+        3.9216,
+        3.8261
+      ],
+      "b_legs": [
+        3.5262,
+        3.5165
+      ],
+      "a_median": 3.9018,
+      "b_median": 3.52135,
+      "better": "lower",
+      "aa_rel_spread": 0.0245,
+      "bb_rel_spread": 0.0028,
+      "band": 0.1,
+      "b_over_a": 0.902,
+      "verdict": "WITHIN-NOISE"
+    },
+    "replay.lean.warm_ttft_s": {
+      "a_legs": [
+        0.1019,
+        0.1016,
+        0.1012
+      ],
+      "b_legs": [
+        0.1592,
+        0.1547
+      ],
+      "a_median": 0.1016,
+      "b_median": 0.15695,
+      "better": "lower",
+      "aa_rel_spread": 0.0069,
+      "bb_rel_spread": 0.0287,
+      "band": 0.1,
+      "b_over_a": 1.545,
+      "verdict": "B-WORSE"
+    },
+    "replay.lean.turn2_ttft_s": {
+      "a_legs": [
+        0.1628,
+        0.1615,
+        0.1611
+      ],
+      "b_legs": [
+        0.1688,
+        0.1616
+      ],
+      "a_median": 0.1615,
+      "b_median": 0.1652,
+      "better": "lower",
+      "aa_rel_spread": 0.0105,
+      "bb_rel_spread": 0.0436,
+      "band": 0.1308,
+      "b_over_a": 1.023,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.first_wall_s": {
+      "a_legs": [
+        3.6778,
+        4.3798,
+        3.9787
+      ],
+      "b_legs": [
+        3.9512,
+        3.8396
+      ],
+      "a_median": 3.9787,
+      "b_median": 3.8954,
+      "better": "lower",
+      "aa_rel_spread": 0.1764,
+      "bb_rel_spread": 0.0286,
+      "band": 0.5293,
+      "b_over_a": 0.979,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.first_llm_s": {
+      "a_legs": [
+        2.599,
+        2.83,
+        2.706
+      ],
+      "b_legs": [
+        2.809,
+        2.788
+      ],
+      "a_median": 2.706,
+      "b_median": 2.7984999999999998,
+      "better": "lower",
+      "aa_rel_spread": 0.0854,
+      "bb_rel_spread": 0.0075,
+      "band": 0.2561,
+      "b_over_a": 1.034,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.repeat_wall_s": {
+      "a_legs": [
+        1.8772,
+        2.5677,
+        2.1455
+      ],
+      "b_legs": [
+        2.0656,
+        2.1551
+      ],
+      "a_median": 2.1455,
+      "b_median": 2.11035,
+      "better": "lower",
+      "aa_rel_spread": 0.3218,
+      "bb_rel_spread": 0.0424,
+      "band": 0.9655,
+      "b_over_a": 0.984,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.repeat_llm_s": {
+      "a_legs": [
+        0.999,
+        1.044,
+        1.009
+      ],
+      "b_legs": [
+        1.062,
+        1.089
+      ],
+      "a_median": 1.009,
+      "b_median": 1.0755,
+      "better": "lower",
+      "aa_rel_spread": 0.0446,
+      "bb_rel_spread": 0.0251,
+      "band": 0.1338,
+      "b_over_a": 1.066,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.first_startup_s": {
+      "a_legs": [
+        0.764,
+        1.228,
+        0.97
+      ],
+      "b_legs": [
+        0.784,
+        0.691
+      ],
+      "a_median": 0.97,
+      "b_median": 0.7375,
+      "better": "lower",
+      "aa_rel_spread": 0.4784,
+      "bb_rel_spread": 0.1261,
+      "band": 1.4351,
+      "b_over_a": 0.76,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.tool_read.repeat_startup_s": {
+      "a_legs": [
+        0.71,
+        1.221,
+        0.957
+      ],
+      "b_legs": [
+        0.786,
+        0.874
+      ],
+      "a_median": 0.957,
+      "b_median": 0.8300000000000001,
+      "better": "lower",
+      "aa_rel_spread": 0.534,
+      "bb_rel_spread": 0.106,
+      "band": 1.6019,
+      "b_over_a": 0.867,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.first_wall_s": {
+      "a_legs": [
+        2.7786,
+        3.7194,
+        3.1362
+      ],
+      "b_legs": [
+        3.382,
+        4.3624
+      ],
+      "a_median": 3.1362,
+      "b_median": 3.8722000000000003,
+      "better": "lower",
+      "aa_rel_spread": 0.3,
+      "bb_rel_spread": 0.2532,
+      "band": 0.8999,
+      "b_over_a": 1.235,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.first_llm_s": {
+      "a_legs": [
+        1.842,
+        1.966,
+        1.783
+      ],
+      "b_legs": [
+        1.884,
+        1.867
+      ],
+      "a_median": 1.842,
+      "b_median": 1.8755,
+      "better": "lower",
+      "aa_rel_spread": 0.0993,
+      "bb_rel_spread": 0.0091,
+      "band": 0.298,
+      "b_over_a": 1.018,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.repeat_wall_s": {
+      "a_legs": [
+        0.9816,
+        2.1985,
+        1.0846
+      ],
+      "b_legs": [
+        1.5368,
+        1.1749
+      ],
+      "a_median": 1.0846,
+      "b_median": 1.35585,
+      "better": "lower",
+      "aa_rel_spread": 1.122,
+      "bb_rel_spread": 0.2669,
+      "band": 3.3659,
+      "b_over_a": 1.25,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.repeat_llm_s": {
+      "a_legs": [
+        0.195,
+        0.2,
+        0.21
+      ],
+      "b_legs": [
+        0.246,
+        0.233
+      ],
+      "a_median": 0.2,
+      "b_median": 0.2395,
+      "better": "lower",
+      "aa_rel_spread": 0.075,
+      "bb_rel_spread": 0.0543,
+      "band": 0.225,
+      "b_over_a": 1.197,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.first_startup_s": {
+      "a_legs": [
+        0.659,
+        1.401,
+        1.052
+      ],
+      "b_legs": [
+        1.169,
+        2.146
+      ],
+      "a_median": 1.052,
+      "b_median": 1.6575,
+      "better": "lower",
+      "aa_rel_spread": 0.7053,
+      "bb_rel_spread": 0.5894,
+      "band": 2.116,
+      "b_over_a": 1.576,
+      "verdict": "WITHIN-NOISE"
+    },
+    "e2e.ok.repeat_startup_s": {
+      "a_legs": [
+        0.65,
+        1.854,
+        0.735
+      ],
+      "b_legs": [
+        1.133,
+        0.782
+      ],
+      "a_median": 0.735,
+      "b_median": 0.9575,
+      "better": "lower",
+      "aa_rel_spread": 1.6381,
+      "bb_rel_spread": 0.3666,
+      "band": 4.9143,
+      "b_over_a": 1.303,
+      "verdict": "WITHIN-NOISE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.4.3",
+          "omp_sha": "b72ee39b7feb2d59",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "4-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "9230b9d-dirty",
+        "created": "20260929T090453Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 161.2723,
+          "better": "higher",
+          "spread": [
+            161.2427,
+            161.2996
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.0787,
+          "better": "lower",
+          "spread": [
+            0.0767,
+            0.0795
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2632.7752,
+          "better": "higher",
+          "spread": [
+            2629.5941,
+            2637.5845
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.4186,
+          "better": "lower",
+          "spread": [
+            0.4174,
+            0.4191
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2934.2044,
+          "better": "higher",
+          "spread": [
+            2933.3284,
+            2936.4339
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 2.9688,
+          "better": "lower",
+          "spread": [
+            2.9662,
+            2.97
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 2177.1523,
+          "better": "higher",
+          "spread": [
+            2176.723,
+            2180.4397
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 16.0852,
+          "better": "lower",
+          "spread": [
+            16.0601,
+            16.087
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.0937,
+          "better": "lower",
+          "spread": [
+            0.0937,
+            0.0937
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 31.6802,
+          "better": "higher",
+          "spread": [
+            31.6802,
+            31.6802
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.0282,
+          "better": "lower",
+          "spread": [
+            0.0282,
+            0.0282
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 45.363,
+          "better": "lower",
+          "spread": [
+            45.363,
+            45.363
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.3481,
+          "better": "lower",
+          "spread": [
+            0.3481,
+            0.3481
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.7103,
+          "better": "lower",
+          "spread": [
+            0.7103,
+            0.7103
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 3.9018,
+          "better": "lower",
+          "spread": [
+            3.9018,
+            3.9018
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1019,
+          "better": "lower",
+          "spread": [
+            0.1019,
+            0.1019
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.1628,
+          "better": "lower",
+          "spread": [
+            0.1628,
+            0.1628
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 3.6778,
+          "better": "lower",
+          "spread": [
+            3.6778,
+            3.6778
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 2.599,
+          "better": "lower",
+          "spread": [
+            2.599,
+            2.599
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 1.8772,
+          "better": "lower",
+          "spread": [
+            1.8772,
+            1.8772
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 0.999,
+          "better": "lower",
+          "spread": [
+            0.999,
+            0.999
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_startup_s": {
+          "value": 0.764,
+          "better": "lower",
+          "spread": [
+            0.764,
+            0.764
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_startup_s": {
+          "value": 0.71,
+          "better": "lower",
+          "spread": [
+            0.71,
+            0.71
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 2.7786,
+          "better": "lower",
+          "spread": [
+            2.7786,
+            2.7786
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 1.842,
+          "better": "lower",
+          "spread": [
+            1.842,
+            1.842
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 0.9816,
+          "better": "lower",
+          "spread": [
+            0.9816,
+            0.9816
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.195,
+          "better": "lower",
+          "spread": [
+            0.195,
+            0.195
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_startup_s": {
+          "value": 0.659,
+          "better": "lower",
+          "spread": [
+            0.659,
+            0.659
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_startup_s": {
+          "value": 0.65,
+          "better": "lower",
+          "spread": [
+            0.65,
+            0.65
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260929T090453Z__ab_a1__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "replay.full": {
+          "prompt_tokens": 72469,
+          "fixture_prompt_tokens": 73779,
+          "fixture_generation": [
+            "18.2.11",
+            "ce797fb3ed92e768",
+            "62eed267e219ddde"
+          ],
+          "fixture_fresh": false,
+          "tools": 11,
+          "cached_warm": 72438,
+          "cached_turn2": 72438
+        },
+        "replay.full.prompt_tokens": {
+          "replayed": 72469,
+          "recorded": 73779,
+          "recorded_by": "ollama",
+          "run_backend": "mlx-serve",
+          "recorded_tokenizer_identity": null,
+          "run_tokenizer_identity": null,
+          "reason": "recorded by ollama; this run is mlx-serve"
+        },
+        "replay.lean": {
+          "prompt_tokens": 10757,
+          "fixture_prompt_tokens": 11433,
+          "fixture_generation": [
+            "18.2.11",
+            "ce797fb3ed92e768",
+            "62eed267e219ddde"
+          ],
+          "fixture_fresh": false,
+          "tools": 7,
+          "cached_warm": 10726,
+          "cached_turn2": 10726
+        },
+        "replay.lean.prompt_tokens": {
+          "replayed": 10757,
+          "recorded": 11433,
+          "recorded_by": "ollama",
+          "run_backend": "mlx-serve",
+          "recorded_tokenizer_identity": null,
+          "run_tokenizer_identity": null,
+          "reason": "recorded by ollama; this run is mlx-serve"
+        },
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 0.764,
+            "llm_s": 2.599,
+            "aux_s": 0.2,
+            "side": {
+              "judge": {
+                "calls": 1,
+                "busy_s": 0.2,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 135,
+          "output": 90,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "attempts": [
+            {
+              "answer": "4817",
+              "returncode": 0,
+              "ok": true
+            },
+            {
+              "answer": "4817",
+              "returncode": 0,
+              "ok": true
+            }
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 0.659,
+            "llm_s": 1.842,
+            "aux_s": 0.193,
+            "side": {
+              "judge": {
+                "calls": 1,
+                "busy_s": 0.193,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 31,
+          "output": 15,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "attempts": [
+            {
+              "answer": "OK",
+              "returncode": 0,
+              "ok": true
+            },
+            {
+              "answer": "OK",
+              "returncode": 0,
+              "ok": true
+            }
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 14,
+            "load1": {
+              "mean": 7.9,
+              "max": 8.04,
+              "min": 7.87
+            },
+            "gpu_device_pct": {
+              "mean": 2.1,
+              "max": 8,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 95.8,
+              "max": 96,
+              "min": 93
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 7.6,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.6,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.1,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 14,
+              "app_gpu_mean_pct": 12.5,
+              "app_gpu_p95_pct": 14.2,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 17.7,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 11.8
+        },
+        "during": {
+          "samples": 142,
+          "load1": {
+            "mean": 7.8,
+            "max": 8.84,
+            "min": 6.7
+          },
+          "gpu_device_pct": {
+            "mean": 96.9,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 91.5,
+            "max": 96,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 2,
+          "gpu_by_process": [
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 19.3,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 5.3,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 9392,
+              "name": "Terminal",
+              "pct": 2.6,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 98737,
+              "name": "mlx-serve",
+              "pct": 1.0,
+              "cmd": "/opt/homebrew/bin/mlx-serve --model ~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit --serve --host 127.0.0.1 --port 11234 --metrics",
+              "model": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            }
+          ],
+          "load": {
+            "samples": 142,
+            "app_gpu_mean_pct": 27.6,
+            "app_gpu_p95_pct": 40.9,
+            "app_spike_seconds": 32,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 46,
+          "busy_pct": {
+            "mean": 19.2,
+            "max": 24.2,
+            "min": 16.5
+          }
+        },
+        "before_live": {
+          "t": 1790672694.319926,
+          "load1": 7.94,
+          "free_pct": 93,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 22802726912,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            ],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 20184.2
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "omlx",
+          "backend_version": "0.7.0rc1",
+          "backend_sha": "0765dade2ba118f5",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.4.3",
+          "omp_sha": "b72ee39b7feb2d59",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "omlx",
+          "backend_version": "0.7.0rc1",
+          "backend_sha": "0765dade2ba118f5",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe_text",
+          "quantization": "4-bit",
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "9230b9d-dirty",
+        "created": "20260929T090823Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "ab_b1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 106.3068,
+          "better": "higher",
+          "spread": [
+            105.4662,
+            107.7264
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.1116,
+          "better": "lower",
+          "spread": [
+            0.1038,
+            0.1146
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2695.1866,
+          "better": "higher",
+          "spread": [
+            2685.1185,
+            2706.3466
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.4081,
+          "better": "lower",
+          "spread": [
+            0.4065,
+            0.4093
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2990.653,
+          "better": "higher",
+          "spread": [
+            2946.2178,
+            3004.0393
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 2.9117,
+          "better": "lower",
+          "spread": [
+            2.8988,
+            2.9567
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 2244.1387,
+          "better": "higher",
+          "spread": [
+            2233.0155,
+            2278.2759
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 15.602,
+          "better": "lower",
+          "spread": [
+            15.3691,
+            15.6815
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.1493,
+          "better": "lower",
+          "spread": [
+            0.1493,
+            0.1493
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 20.4175,
+          "better": "higher",
+          "spread": [
+            20.4175,
+            20.4175
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.1085,
+          "better": "lower",
+          "spread": [
+            0.1085,
+            0.1085
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 45.4982,
+          "better": "lower",
+          "spread": [
+            45.4982,
+            45.4982
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.5655,
+          "better": "lower",
+          "spread": [
+            0.5655,
+            0.5655
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.7134,
+          "better": "lower",
+          "spread": [
+            0.7134,
+            0.7134
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 3.5262,
+          "better": "lower",
+          "spread": [
+            3.5262,
+            3.5262
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1592,
+          "better": "lower",
+          "spread": [
+            0.1592,
+            0.1592
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.1688,
+          "better": "lower",
+          "spread": [
+            0.1688,
+            0.1688
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 3.9512,
+          "better": "lower",
+          "spread": [
+            3.9512,
+            3.9512
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 2.809,
+          "better": "lower",
+          "spread": [
+            2.809,
+            2.809
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 2.0656,
+          "better": "lower",
+          "spread": [
+            2.0656,
+            2.0656
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.062,
+          "better": "lower",
+          "spread": [
+            1.062,
+            1.062
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_startup_s": {
+          "value": 0.784,
+          "better": "lower",
+          "spread": [
+            0.784,
+            0.784
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_startup_s": {
+          "value": 0.786,
+          "better": "lower",
+          "spread": [
+            0.786,
+            0.786
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 3.382,
+          "better": "lower",
+          "spread": [
+            3.382,
+            3.382
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 1.884,
+          "better": "lower",
+          "spread": [
+            1.884,
+            1.884
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 1.5368,
+          "better": "lower",
+          "spread": [
+            1.5368,
+            1.5368
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.246,
+          "better": "lower",
+          "spread": [
+            0.246,
+            0.246
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_startup_s": {
+          "value": 1.169,
+          "better": "lower",
+          "spread": [
+            1.169,
+            1.169
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_startup_s": {
+          "value": 1.133,
+          "better": "lower",
+          "spread": [
+            1.133,
+            1.133
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260929T090823Z__ab_b1__omlx__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "replay.full": {
+          "prompt_tokens": 72612,
+          "fixture_prompt_tokens": 73779,
+          "fixture_generation": [
+            "18.2.11",
+            "ce797fb3ed92e768",
+            "62eed267e219ddde"
+          ],
+          "fixture_fresh": false,
+          "tools": 11,
+          "cached_warm": 72607,
+          "cached_turn2": 72607
+        },
+        "replay.full.prompt_tokens": {
+          "replayed": 72612,
+          "recorded": 73779,
+          "recorded_by": "ollama",
+          "run_backend": "omlx",
+          "recorded_tokenizer_identity": null,
+          "run_tokenizer_identity": null,
+          "reason": "recorded by ollama; this run is omlx"
+        },
+        "replay.lean": {
+          "prompt_tokens": 10779,
+          "fixture_prompt_tokens": 11433,
+          "fixture_generation": [
+            "18.2.11",
+            "ce797fb3ed92e768",
+            "62eed267e219ddde"
+          ],
+          "fixture_fresh": false,
+          "tools": 7,
+          "cached_warm": 10774,
+          "cached_turn2": 10774
+        },
+        "replay.lean.prompt_tokens": {
+          "replayed": 10779,
+          "recorded": 11433,
+          "recorded_by": "ollama",
+          "run_backend": "omlx",
+          "recorded_tokenizer_identity": null,
+          "run_tokenizer_identity": null,
+          "reason": "recorded by ollama; this run is omlx"
+        },
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "\n\n4817",
+            "\n\n4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 1,
+            "first_call_cached_tokens": 0,
+            "startup_s": 0.784,
+            "llm_s": 2.809,
+            "aux_s": 0.224,
+            "side": {
+              "judge": {
+                "calls": 1,
+                "busy_s": 0.224,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 10,
+          "output": 88,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "\n\n4817",
+            "\n\n4817"
+          ],
+          "attempts": [
+            {
+              "answer": "\n\n4817",
+              "returncode": 0,
+              "ok": true
+            },
+            {
+              "answer": "\n\n4817",
+              "returncode": 0,
+              "ok": true
+            }
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "\n\nOK",
+            "\n\nOK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 1.169,
+            "llm_s": 1.884,
+            "aux_s": 0.232,
+            "side": {
+              "judge": {
+                "calls": 1,
+                "busy_s": 0.232,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 5,
+          "output": 15,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "\n\nOK",
+            "\n\nOK"
+          ],
+          "attempts": [
+            {
+              "answer": "\n\nOK",
+              "returncode": 0,
+              "ok": true
+            },
+            {
+              "answer": "\n\nOK",
+              "returncode": 0,
+              "ok": true
+            }
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 13,
+            "load1": {
+              "mean": 7.5,
+              "max": 7.53,
+              "min": 7.4
+            },
+            "gpu_device_pct": {
+              "mean": 7.2,
+              "max": 10,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.0,
+              "max": 96,
+              "min": 96
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 8.9,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.7,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.1,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 13,
+              "app_gpu_mean_pct": 13.7,
+              "app_gpu_p95_pct": 16.3,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 16.9,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 10.6
+        },
+        "during": {
+          "samples": 152,
+          "load1": {
+            "mean": 6.7,
+            "max": 7.46,
+            "min": 6.11
+          },
+          "gpu_device_pct": {
+            "mean": 92.8,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 92.3,
+            "max": 96,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 16.0,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 3.4,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 9392,
+              "name": "Terminal",
+              "pct": 2.7,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 6774,
+              "name": "python3.13",
+              "pct": 1.0,
+              "cmd": "omlx-server"
+            }
+          ],
+          "load": {
+            "samples": 152,
+            "app_gpu_mean_pct": 88.9,
+            "app_gpu_p95_pct": 104.6,
+            "app_spike_seconds": 140,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 47,
+          "busy_pct": {
+            "mean": 19.3,
+            "max": 24.7,
+            "min": 16.3
+          }
+        },
+        "before_live": {
+          "t": 1790672903.947961,
+          "load1": 7.4,
+          "free_pct": 96,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 8,
+          "gpu_renderer_pct": 8,
+          "gpu_tiler_pct": 8,
+          "gpu_in_use_mem_bytes": 2198257664,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 20394.0
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.4.3",
+          "omp_sha": "b72ee39b7feb2d59",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "4-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "9230b9d-dirty",
+        "created": "20260929T091207Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 156.7533,
+          "better": "higher",
+          "spread": [
+            156.7113,
+            157.372
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.0803,
+          "better": "lower",
+          "spread": [
+            0.078,
+            0.0808
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2568.5323,
+          "better": "higher",
+          "spread": [
+            2537.3786,
+            2595.3738
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.429,
+          "better": "lower",
+          "spread": [
+            0.425,
+            0.4351
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2683.8269,
+          "better": "higher",
+          "spread": [
+            2618.862,
+            2685.8919
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 3.2461,
+          "better": "lower",
+          "spread": [
+            3.2436,
+            3.3259
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 1977.1305,
+          "better": "higher",
+          "spread": [
+            1966.0275,
+            1982.6029
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 17.713,
+          "better": "lower",
+          "spread": [
+            17.6621,
+            17.8116
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.096,
+          "better": "lower",
+          "spread": [
+            0.096,
+            0.096
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 33.6879,
+          "better": "higher",
+          "spread": [
+            33.6879,
+            33.6879
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.0255,
+          "better": "lower",
+          "spread": [
+            0.0255,
+            0.0255
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 50.6717,
+          "better": "lower",
+          "spread": [
+            50.6717,
+            50.6717
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.3473,
+          "better": "lower",
+          "spread": [
+            0.3473,
+            0.3473
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.7094,
+          "better": "lower",
+          "spread": [
+            0.7094,
+            0.7094
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 3.9216,
+          "better": "lower",
+          "spread": [
+            3.9216,
+            3.9216
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1016,
+          "better": "lower",
+          "spread": [
+            0.1016,
+            0.1016
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.1615,
+          "better": "lower",
+          "spread": [
+            0.1615,
+            0.1615
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 4.3798,
+          "better": "lower",
+          "spread": [
+            4.3798,
+            4.3798
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 2.83,
+          "better": "lower",
+          "spread": [
+            2.83,
+            2.83
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 2.5677,
+          "better": "lower",
+          "spread": [
+            2.5677,
+            2.5677
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.044,
+          "better": "lower",
+          "spread": [
+            1.044,
+            1.044
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_startup_s": {
+          "value": 1.228,
+          "better": "lower",
+          "spread": [
+            1.228,
+            1.228
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_startup_s": {
+          "value": 1.221,
+          "better": "lower",
+          "spread": [
+            1.221,
+            1.221
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 3.7194,
+          "better": "lower",
+          "spread": [
+            3.7194,
+            3.7194
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 1.966,
+          "better": "lower",
+          "spread": [
+            1.966,
+            1.966
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 2.1985,
+          "better": "lower",
+          "spread": [
+            2.1985,
+            2.1985
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.2,
+          "better": "lower",
+          "spread": [
+            0.2,
+            0.2
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_startup_s": {
+          "value": 1.401,
+          "better": "lower",
+          "spread": [
+            1.401,
+            1.401
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_startup_s": {
+          "value": 1.854,
+          "better": "lower",
+          "spread": [
+            1.854,
+            1.854
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260929T091207Z__ab_a2__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "replay.full": {
+          "prompt_tokens": 72475,
+          "fixture_prompt_tokens": 73779,
+          "fixture_generation": [
+            "18.2.11",
+            "ce797fb3ed92e768",
+            "62eed267e219ddde"
+          ],
+          "fixture_fresh": false,
+          "tools": 11,
+          "cached_warm": 72444,
+          "cached_turn2": 72444
+        },
+        "replay.full.prompt_tokens": {
+          "replayed": 72475,
+          "recorded": 73779,
+          "recorded_by": "ollama",
+          "run_backend": "mlx-serve",
+          "recorded_tokenizer_identity": null,
+          "run_tokenizer_identity": null,
+          "reason": "recorded by ollama; this run is mlx-serve"
+        },
+        "replay.lean": {
+          "prompt_tokens": 10756,
+          "fixture_prompt_tokens": 11433,
+          "fixture_generation": [
+            "18.2.11",
+            "ce797fb3ed92e768",
+            "62eed267e219ddde"
+          ],
+          "fixture_fresh": false,
+          "tools": 7,
+          "cached_warm": 10725,
+          "cached_turn2": 10725
+        },
+        "replay.lean.prompt_tokens": {
+          "replayed": 10756,
+          "recorded": 11433,
+          "recorded_by": "ollama",
+          "run_backend": "mlx-serve",
+          "recorded_tokenizer_identity": null,
+          "run_tokenizer_identity": null,
+          "reason": "recorded by ollama; this run is mlx-serve"
+        },
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 1.228,
+            "llm_s": 2.83,
+            "aux_s": 0.206,
+            "side": {
+              "judge": {
+                "calls": 1,
+                "busy_s": 0.206,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 137,
+          "output": 92,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "attempts": [
+            {
+              "answer": "4817",
+              "returncode": 0,
+              "ok": true
+            },
+            {
+              "answer": "4817",
+              "returncode": 0,
+              "ok": true
+            }
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 1.401,
+            "llm_s": 1.966,
+            "aux_s": 0.208,
+            "side": {
+              "judge": {
+                "calls": 1,
+                "busy_s": 0.208,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 31,
+          "output": 15,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "attempts": [
+            {
+              "answer": "OK",
+              "returncode": 0,
+              "ok": true
+            },
+            {
+              "answer": "OK",
+              "returncode": 0,
+              "ok": true
+            }
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 15,
+            "load1": {
+              "mean": 6.4,
+              "max": 6.48,
+              "min": 6.28
+            },
+            "gpu_device_pct": {
+              "mean": 5.6,
+              "max": 9,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.0,
+              "max": 96,
+              "min": 96
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 8.5,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.6,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.1,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 15,
+              "app_gpu_mean_pct": 13.3,
+              "app_gpu_p95_pct": 14.5,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 18.5,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 12.7
+        },
+        "during": {
+          "samples": 157,
+          "load1": {
+            "mean": 7.3,
+            "max": 9.12,
+            "min": 5.59
+          },
+          "gpu_device_pct": {
+            "mean": 95.6,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 91.5,
+            "max": 96,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 2,
+          "gpu_by_process": [
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 20.7,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 5.4,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 9392,
+              "name": "Terminal",
+              "pct": 2.7,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 14406,
+              "name": "mlx-serve",
+              "pct": 1.0,
+              "cmd": "/opt/homebrew/bin/mlx-serve --model ~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit --serve --host 127.0.0.1 --port 11234 --metrics",
+              "model": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            }
+          ],
+          "load": {
+            "samples": 157,
+            "app_gpu_mean_pct": 29.3,
+            "app_gpu_p95_pct": 43.9,
+            "app_spike_seconds": 56,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 51,
+          "busy_pct": {
+            "mean": 17.9,
+            "max": 24.4,
+            "min": 16.2
+          }
+        },
+        "before_live": {
+          "t": 1790673127.934533,
+          "load1": 6.65,
+          "free_pct": 93,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 8,
+          "gpu_renderer_pct": 8,
+          "gpu_tiler_pct": 8,
+          "gpu_in_use_mem_bytes": 22401744896,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            ],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 20617.9
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "omlx",
+          "backend_version": "0.7.0rc1",
+          "backend_sha": "0765dade2ba118f5",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.4.3",
+          "omp_sha": "b72ee39b7feb2d59",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "omlx",
+          "backend_version": "0.7.0rc1",
+          "backend_sha": "0765dade2ba118f5",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe_text",
+          "quantization": "4-bit",
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "9230b9d-dirty",
+        "created": "20260929T091556Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "ab_b2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 104.3636,
+          "better": "higher",
+          "spread": [
+            104.2728,
+            105.4998
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.1127,
+          "better": "lower",
+          "spread": [
+            0.1007,
+            0.1188
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2664.4383,
+          "better": "higher",
+          "spread": [
+            2663.8414,
+            2665.5735
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.4129,
+          "better": "lower",
+          "spread": [
+            0.4127,
+            0.4143
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2892.374,
+          "better": "higher",
+          "spread": [
+            2861.4749,
+            2910.8448
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 3.0103,
+          "better": "lower",
+          "spread": [
+            2.9902,
+            3.0439
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 2205.6039,
+          "better": "higher",
+          "spread": [
+            2192.2052,
+            2229.2393
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 15.8764,
+          "better": "lower",
+          "spread": [
+            15.708,
+            15.9725
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.1361,
+          "better": "lower",
+          "spread": [
+            0.1361,
+            0.1361
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 22.712,
+          "better": "higher",
+          "spread": [
+            22.712,
+            22.712
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.1094,
+          "better": "lower",
+          "spread": [
+            0.1094,
+            0.1094
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 45.3145,
+          "better": "lower",
+          "spread": [
+            45.3145,
+            45.3145
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.5635,
+          "better": "lower",
+          "spread": [
+            0.5635,
+            0.5635
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.7122,
+          "better": "lower",
+          "spread": [
+            0.7122,
+            0.7122
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 3.5165,
+          "better": "lower",
+          "spread": [
+            3.5165,
+            3.5165
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1547,
+          "better": "lower",
+          "spread": [
+            0.1547,
+            0.1547
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.1616,
+          "better": "lower",
+          "spread": [
+            0.1616,
+            0.1616
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 3.8396,
+          "better": "lower",
+          "spread": [
+            3.8396,
+            3.8396
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 2.788,
+          "better": "lower",
+          "spread": [
+            2.788,
+            2.788
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 2.1551,
+          "better": "lower",
+          "spread": [
+            2.1551,
+            2.1551
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.089,
+          "better": "lower",
+          "spread": [
+            1.089,
+            1.089
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_startup_s": {
+          "value": 0.691,
+          "better": "lower",
+          "spread": [
+            0.691,
+            0.691
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_startup_s": {
+          "value": 0.874,
+          "better": "lower",
+          "spread": [
+            0.874,
+            0.874
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 4.3624,
+          "better": "lower",
+          "spread": [
+            4.3624,
+            4.3624
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 1.867,
+          "better": "lower",
+          "spread": [
+            1.867,
+            1.867
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 1.1749,
+          "better": "lower",
+          "spread": [
+            1.1749,
+            1.1749
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.233,
+          "better": "lower",
+          "spread": [
+            0.233,
+            0.233
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_startup_s": {
+          "value": 2.146,
+          "better": "lower",
+          "spread": [
+            2.146,
+            2.146
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_startup_s": {
+          "value": 0.782,
+          "better": "lower",
+          "spread": [
+            0.782,
+            0.782
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260929T091556Z__ab_b2__omlx__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "replay.full": {
+          "prompt_tokens": 72609,
+          "fixture_prompt_tokens": 73779,
+          "fixture_generation": [
+            "18.2.11",
+            "ce797fb3ed92e768",
+            "62eed267e219ddde"
+          ],
+          "fixture_fresh": false,
+          "tools": 11,
+          "cached_warm": 72604,
+          "cached_turn2": 72604
+        },
+        "replay.full.prompt_tokens": {
+          "replayed": 72609,
+          "recorded": 73779,
+          "recorded_by": "ollama",
+          "run_backend": "omlx",
+          "recorded_tokenizer_identity": null,
+          "run_tokenizer_identity": null,
+          "reason": "recorded by ollama; this run is omlx"
+        },
+        "replay.lean": {
+          "prompt_tokens": 10780,
+          "fixture_prompt_tokens": 11433,
+          "fixture_generation": [
+            "18.2.11",
+            "ce797fb3ed92e768",
+            "62eed267e219ddde"
+          ],
+          "fixture_fresh": false,
+          "tools": 7,
+          "cached_warm": 10775,
+          "cached_turn2": 10775
+        },
+        "replay.lean.prompt_tokens": {
+          "replayed": 10780,
+          "recorded": 11433,
+          "recorded_by": "ollama",
+          "run_backend": "omlx",
+          "recorded_tokenizer_identity": null,
+          "run_tokenizer_identity": null,
+          "reason": "recorded by ollama; this run is omlx"
+        },
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "\n\n4817",
+            "\n\n4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 1,
+            "first_call_cached_tokens": 0,
+            "startup_s": 0.691,
+            "llm_s": 2.788,
+            "aux_s": 0.222,
+            "side": {
+              "judge": {
+                "calls": 1,
+                "busy_s": 0.222,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 105,
+          "output": 82,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "\n\n4817",
+            "\n\n4817"
+          ],
+          "attempts": [
+            {
+              "answer": "\n\n4817",
+              "returncode": 0,
+              "ok": true
+            },
+            {
+              "answer": "\n\n4817",
+              "returncode": 0,
+              "ok": true
+            }
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "\n\nOK",
+            "\n\nOK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 2.146,
+            "llm_s": 1.867,
+            "aux_s": 0.241,
+            "side": {
+              "judge": {
+                "calls": 1,
+                "busy_s": 0.241,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 5,
+          "output": 14,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "\n\nOK",
+            "\n\nOK"
+          ],
+          "attempts": [
+            {
+              "answer": "\n\nOK",
+              "returncode": 0,
+              "ok": true
+            },
+            {
+              "answer": "\n\nOK",
+              "returncode": 0,
+              "ok": true
+            }
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 16,
+            "load1": {
+              "mean": 6.7,
+              "max": 6.93,
+              "min": 6.62
+            },
+            "gpu_device_pct": {
+              "mean": 3.8,
+              "max": 9,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.0,
+              "max": 96,
+              "min": 96
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 7.4,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.6,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.1,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 16,
+              "app_gpu_mean_pct": 12.2,
+              "app_gpu_p95_pct": 14.2,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 19.1,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 15.0
+        },
+        "during": {
+          "samples": 158,
+          "load1": {
+            "mean": 7.1,
+            "max": 7.85,
+            "min": 6.17
+          },
+          "gpu_device_pct": {
+            "mean": 92.4,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 92.3,
+            "max": 96,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 15.8,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 3.5,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 9392,
+              "name": "Terminal",
+              "pct": 2.7,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ],
+          "load": {
+            "samples": 158,
+            "app_gpu_mean_pct": 89.2,
+            "app_gpu_p95_pct": 105.6,
+            "app_spike_seconds": 146,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 53,
+          "busy_pct": {
+            "mean": 19.3,
+            "max": 23.7,
+            "min": 16.5
+          }
+        },
+        "before_live": {
+          "t": 1790673357.9275699,
+          "load1": 6.93,
+          "free_pct": 96,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 8,
+          "gpu_renderer_pct": 8,
+          "gpu_tiler_pct": 8,
+          "gpu_in_use_mem_bytes": 2169405440,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 20847.9
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.4.3",
+          "omp_sha": "b72ee39b7feb2d59",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "4-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "9230b9d-dirty",
+        "created": "20260929T091951Z",
+        "tiers": [
+          "conf",
+          "micro",
+          "replay",
+          "e2e"
+        ],
+        "repeats": 3,
+        "label": "ab_a3"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "micro.decode.decode_tps": {
+          "value": 159.6788,
+          "better": "higher",
+          "spread": [
+            158.3757,
+            160.2347
+          ],
+          "n": 3
+        },
+        "micro.decode.ttft_s": {
+          "value": 0.0766,
+          "better": "lower",
+          "spread": [
+            0.0718,
+            0.0775
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.prefill_tps": {
+          "value": 2611.6369,
+          "better": "higher",
+          "spread": [
+            2610.8405,
+            2626.1246
+          ],
+          "n": 3
+        },
+        "micro.prefill_1k.ttft_s": {
+          "value": 0.422,
+          "better": "lower",
+          "spread": [
+            0.42,
+            0.4221
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.prefill_tps": {
+          "value": 2781.9927,
+          "better": "higher",
+          "spread": [
+            2717.5607,
+            2782.472
+          ],
+          "n": 3
+        },
+        "micro.prefill_8k.ttft_s": {
+          "value": 3.1308,
+          "better": "lower",
+          "spread": [
+            3.1307,
+            3.2036
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.prefill_tps": {
+          "value": 2039.4511,
+          "better": "higher",
+          "spread": [
+            2036.3885,
+            2041.6224
+          ],
+          "n": 3
+        },
+        "micro.prefill_32k.ttft_s": {
+          "value": 17.1708,
+          "better": "lower",
+          "spread": [
+            17.154,
+            17.1947
+          ],
+          "n": 3
+        },
+        "micro.cache_hit_8k.warm_ttft_s": {
+          "value": 0.0944,
+          "better": "lower",
+          "spread": [
+            0.0944,
+            0.0944
+          ],
+          "n": 1
+        },
+        "micro.cache_hit_8k.speedup_x": {
+          "value": 32.978,
+          "better": "higher",
+          "spread": [
+            32.978,
+            32.978
+          ],
+          "n": 1
+        },
+        "micro.eviction_probe_8k.a_again_ttft_s": {
+          "value": 0.0267,
+          "better": "lower",
+          "spread": [
+            0.0267,
+            0.0267
+          ],
+          "n": 1
+        },
+        "replay.full.cold_ttft_s": {
+          "value": 48.7526,
+          "better": "lower",
+          "spread": [
+            48.7526,
+            48.7526
+          ],
+          "n": 1
+        },
+        "replay.full.warm_ttft_s": {
+          "value": 0.3471,
+          "better": "lower",
+          "spread": [
+            0.3471,
+            0.3471
+          ],
+          "n": 1
+        },
+        "replay.full.turn2_ttft_s": {
+          "value": 0.7102,
+          "better": "lower",
+          "spread": [
+            0.7102,
+            0.7102
+          ],
+          "n": 1
+        },
+        "replay.lean.cold_ttft_s": {
+          "value": 3.8261,
+          "better": "lower",
+          "spread": [
+            3.8261,
+            3.8261
+          ],
+          "n": 1
+        },
+        "replay.lean.warm_ttft_s": {
+          "value": 0.1012,
+          "better": "lower",
+          "spread": [
+            0.1012,
+            0.1012
+          ],
+          "n": 1
+        },
+        "replay.lean.turn2_ttft_s": {
+          "value": 0.1611,
+          "better": "lower",
+          "spread": [
+            0.1611,
+            0.1611
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_wall_s": {
+          "value": 3.9787,
+          "better": "lower",
+          "spread": [
+            3.9787,
+            3.9787
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_llm_s": {
+          "value": 2.706,
+          "better": "lower",
+          "spread": [
+            2.706,
+            2.706
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_wall_s": {
+          "value": 2.1455,
+          "better": "lower",
+          "spread": [
+            2.1455,
+            2.1455
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_llm_s": {
+          "value": 1.009,
+          "better": "lower",
+          "spread": [
+            1.009,
+            1.009
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.first_startup_s": {
+          "value": 0.97,
+          "better": "lower",
+          "spread": [
+            0.97,
+            0.97
+          ],
+          "n": 1
+        },
+        "e2e.tool_read.repeat_startup_s": {
+          "value": 0.957,
+          "better": "lower",
+          "spread": [
+            0.957,
+            0.957
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_wall_s": {
+          "value": 3.1362,
+          "better": "lower",
+          "spread": [
+            3.1362,
+            3.1362
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_llm_s": {
+          "value": 1.783,
+          "better": "lower",
+          "spread": [
+            1.783,
+            1.783
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_wall_s": {
+          "value": 1.0846,
+          "better": "lower",
+          "spread": [
+            1.0846,
+            1.0846
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_llm_s": {
+          "value": 0.21,
+          "better": "lower",
+          "spread": [
+            0.21,
+            0.21
+          ],
+          "n": 1
+        },
+        "e2e.ok.first_startup_s": {
+          "value": 1.052,
+          "better": "lower",
+          "spread": [
+            1.052,
+            1.052
+          ],
+          "n": 1
+        },
+        "e2e.ok.repeat_startup_s": {
+          "value": 0.735,
+          "better": "lower",
+          "spread": [
+            0.735,
+            0.735
+          ],
+          "n": 1
+        }
+      },
+      "conformance": {
+        "conf.tool_call": {
+          "level": "MUST",
+          "verdict": "PASS",
+          "shape": {
+            "name": "read_file",
+            "arg_keys": [
+              "path"
+            ]
+          }
+        },
+        "conf.usage_reported": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.no_truncation_64k": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.streams_incrementally": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "conf.greedy_deterministic": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "replay.full.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "replay.lean.prompt_tokens": {
+          "level": "SHOULD",
+          "verdict": "VOID"
+        },
+        "e2e.tool_read.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "e2e.ok.correct": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260929T091951Z__ab_a3__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "replay.full": {
+          "prompt_tokens": 72470,
+          "fixture_prompt_tokens": 73779,
+          "fixture_generation": [
+            "18.2.11",
+            "ce797fb3ed92e768",
+            "62eed267e219ddde"
+          ],
+          "fixture_fresh": false,
+          "tools": 11,
+          "cached_warm": 72439,
+          "cached_turn2": 72439
+        },
+        "replay.full.prompt_tokens": {
+          "replayed": 72470,
+          "recorded": 73779,
+          "recorded_by": "ollama",
+          "run_backend": "mlx-serve",
+          "recorded_tokenizer_identity": null,
+          "run_tokenizer_identity": null,
+          "reason": "recorded by ollama; this run is mlx-serve"
+        },
+        "replay.lean": {
+          "prompt_tokens": 10754,
+          "fixture_prompt_tokens": 11433,
+          "fixture_generation": [
+            "18.2.11",
+            "ce797fb3ed92e768",
+            "62eed267e219ddde"
+          ],
+          "fixture_fresh": false,
+          "tools": 7,
+          "cached_warm": 10723,
+          "cached_turn2": 10723
+        },
+        "replay.lean.prompt_tokens": {
+          "replayed": 10754,
+          "recorded": 11433,
+          "recorded_by": "ollama",
+          "run_backend": "mlx-serve",
+          "recorded_tokenizer_identity": null,
+          "run_tokenizer_identity": null,
+          "reason": "recorded by ollama; this run is mlx-serve"
+        },
+        "e2e.tool_read": {
+          "answer_ok": true,
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "first": {
+            "calls": 3,
+            "main_calls": 2,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 0.97,
+            "llm_s": 2.706,
+            "aux_s": 0.195,
+            "side": {
+              "judge": {
+                "calls": 1,
+                "busy_s": 0.195,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 133,
+          "output": 88,
+          "llm_calls": 2
+        },
+        "e2e.tool_read.correct": {
+          "answers": [
+            "4817",
+            "4817"
+          ],
+          "attempts": [
+            {
+              "answer": "4817",
+              "returncode": 0,
+              "ok": true
+            },
+            {
+              "answer": "4817",
+              "returncode": 0,
+              "ok": true
+            }
+          ]
+        },
+        "e2e.ok": {
+          "answer_ok": true,
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "first": {
+            "calls": 2,
+            "main_calls": 1,
+            "aux_calls": 1,
+            "aborted": 0,
+            "first_call_cached_tokens": 0,
+            "startup_s": 1.052,
+            "llm_s": 1.783,
+            "aux_s": 0.197,
+            "side": {
+              "judge": {
+                "calls": 1,
+                "busy_s": 0.197,
+                "aborted": 0,
+                "completion_tokens": 1
+              }
+            }
+          },
+          "input": 31,
+          "output": 15,
+          "llm_calls": 1
+        },
+        "e2e.ok.correct": {
+          "answers": [
+            "OK",
+            "OK"
+          ],
+          "attempts": [
+            {
+              "answer": "OK",
+              "returncode": 0,
+              "ok": true
+            },
+            {
+              "answer": "OK",
+              "returncode": 0,
+              "ok": true
+            }
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 14,
+            "load1": {
+              "mean": 7.2,
+              "max": 7.26,
+              "min": 7.22
+            },
+            "gpu_device_pct": {
+              "mean": 4.7,
+              "max": 10,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.0,
+              "max": 96,
+              "min": 96
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 8.2,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.6,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.1,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 14,
+              "app_gpu_mean_pct": 13.4,
+              "app_gpu_p95_pct": 18.3,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 17.3,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 11.0
+        },
+        "during": {
+          "samples": 149,
+          "load1": {
+            "mean": 7.3,
+            "max": 10.25,
+            "min": 6.19
+          },
+          "gpu_device_pct": {
+            "mean": 95.8,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 91.5,
+            "max": 96,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 2,
+          "gpu_by_process": [
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 19.5,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 5.5,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 9392,
+              "name": "Terminal",
+              "pct": 3.0,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ],
+          "load": {
+            "samples": 149,
+            "app_gpu_mean_pct": 28.5,
+            "app_gpu_p95_pct": 42.3,
+            "app_spike_seconds": 44,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 47,
+          "busy_pct": {
+            "mean": 18.7,
+            "max": 22.8,
+            "min": 16.3
+          }
+        },
+        "before_live": {
+          "t": 1790673592.204778,
+          "load1": 7.26,
+          "free_pct": 93,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 9,
+          "gpu_renderer_pct": 8,
+          "gpu_tiler_pct": 9,
+          "gpu_in_use_mem_bytes": 22397255680,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            ],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 21082.1
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

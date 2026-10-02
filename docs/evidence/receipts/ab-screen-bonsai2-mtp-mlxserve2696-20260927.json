@@ -1,0 +1,2687 @@
+{
+  "kind": "ab",
+  "a": "ollama:localbench-parked:5642e97495e1",
+  "b": "mlx-serve:/Volumes/Models/model-offload-20260609/model-stores/fk-cjv3-20260612T171151Z/models/huggingface/hub/models--prism-ml--Ternary-Bonsai-2-27B-mlx-2bit/snapshots/3f926b415992eaa2ae9dd7b573706494d6bbf787",
+  "order": [
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [],
+  "pin_drift": {},
+  "load_balance": {
+    "a": [
+      28.8,
+      24.5
+    ],
+    "b": [
+      26.0
+    ],
+    "tol_pct": 5.0,
+    "favours": null
+  },
+  "table": {
+    "think.reasoning_chars": {
+      "b": null,
+      "a1": 1966,
+      "a2": 1966,
+      "b_legs": [
+        null
+      ],
+      "a_legs": [
+        1966,
+        1966
+      ],
+      "verdict": "VOID",
+      "void": "no reasoning streamed"
+    },
+    "think.completion_tokens": {
+      "b": 1491,
+      "a1": 1530,
+      "a2": 1524,
+      "b_legs": [
+        1491
+      ],
+      "a_legs": [
+        1530,
+        1524
+      ],
+      "a_median": 1527.0,
+      "b_median": 1491,
+      "better": "lower",
+      "aa_rel_spread": 0.0039,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 0.976,
+      "verdict": "WITHIN-NOISE"
+    },
+    "think.wall_s": {
+      "b": 18.77,
+      "a1": 18.98,
+      "a2": 18.8,
+      "b_legs": [
+        18.77
+      ],
+      "a_legs": [
+        18.98,
+        18.8
+      ],
+      "a_median": 18.89,
+      "b_median": 18.77,
+      "better": "lower",
+      "aa_rel_spread": 0.0095,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 0.994,
+      "verdict": "WITHIN-NOISE"
+    },
+    "think.accuracy": {
+      "b": 1.0,
+      "a1": 1.0,
+      "a2": 1.0,
+      "b_legs": [
+        1.0
+      ],
+      "a_legs": [
+        1.0,
+        1.0
+      ],
+      "a_median": 1.0,
+      "b_median": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.wall_s": {
+      "b": 4.1081,
+      "a1": 6.0018,
+      "a2": 3.1168,
+      "b_legs": [
+        4.1081
+      ],
+      "a_legs": [
+        6.0018,
+        3.1168
+      ],
+      "a_median": 4.5593,
+      "b_median": 4.1081,
+      "better": "lower",
+      "aa_rel_spread": 0.6328,
+      "bb_rel_spread": 0.0,
+      "band": 1.8983,
+      "b_over_a": 0.901,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.post_retain_wall_s": {
+      "b": 3.8011,
+      "a1": 8.601,
+      "a2": 5.8427,
+      "b_legs": [
+        3.8011
+      ],
+      "a_legs": [
+        8.601,
+        5.8427
+      ],
+      "a_median": 7.22185,
+      "b_median": 3.8011,
+      "better": "lower",
+      "aa_rel_spread": 0.3819,
+      "bb_rel_spread": 0.0,
+      "band": 1.1458,
+      "b_over_a": 0.526,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.pre_main_s": {
+      "b": 0.8277,
+      "a1": 1.9951,
+      "a2": 1.9122,
+      "b_legs": [
+        0.8277
+      ],
+      "a_legs": [
+        1.9951,
+        1.9122
+      ],
+      "a_median": 1.95365,
+      "b_median": 0.8277,
+      "better": "lower",
+      "aa_rel_spread": 0.0424,
+      "bb_rel_spread": 0.0,
+      "band": 0.1273,
+      "b_over_a": 0.424,
+      "verdict": "B-BETTER"
+    },
+    "sess.turn.post_retain_pre_main_s": {
+      "b": 2.252,
+      "a1": 4.0292,
+      "a2": 4.0407,
+      "b_legs": [
+        2.252
+      ],
+      "a_legs": [
+        4.0292,
+        4.0407
+      ],
+      "a_median": 4.03495,
+      "b_median": 2.252,
+      "better": "lower",
+      "aa_rel_spread": 0.0029,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 0.558,
+      "verdict": "B-BETTER"
+    },
+    "sess.turn.ack_rate": {
+      "b": 1.0,
+      "a1": 0.9167,
+      "a2": 1.0,
+      "b_legs": [
+        1.0
+      ],
+      "a_legs": [
+        0.9167,
+        1.0
+      ],
+      "a_median": 0.95835,
+      "b_median": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.0869,
+      "bb_rel_spread": 0.0,
+      "band": 0.2608,
+      "b_over_a": 1.043,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.memory.extract_s": {
+      "b": 3.397,
+      "a1": 2.324,
+      "a2": 2.227,
+      "b_legs": [
+        3.397
+      ],
+      "a_legs": [
+        2.324,
+        2.227
+      ],
+      "a_median": 2.2755,
+      "b_median": 3.397,
+      "better": "lower",
+      "aa_rel_spread": 0.0426,
+      "bb_rel_spread": 0.0,
+      "band": 0.1279,
+      "b_over_a": 1.493,
+      "verdict": "B-WORSE"
+    },
+    "mem.recall.hit_rate": {
+      "b": 1.0,
+      "a1": 1.0,
+      "a2": 1.0,
+      "b_legs": [
+        1.0
+      ],
+      "a_legs": [
+        1.0,
+        1.0
+      ],
+      "a_median": 1.0,
+      "b_median": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.pre_main_s": {
+      "b": 6.264,
+      "a1": 8.4261,
+      "a2": 6.8481,
+      "b_legs": [
+        6.264
+      ],
+      "a_legs": [
+        8.4261,
+        6.8481
+      ],
+      "a_median": 7.6371,
+      "b_median": 6.264,
+      "better": "lower",
+      "aa_rel_spread": 0.2066,
+      "bb_rel_spread": 0.0,
+      "band": 0.6199,
+      "b_over_a": 0.82,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.wall_s": {
+      "b": 17.8435,
+      "a1": 11.6442,
+      "a2": 10.0753,
+      "b_legs": [
+        17.8435
+      ],
+      "a_legs": [
+        11.6442,
+        10.0753
+      ],
+      "a_median": 10.85975,
+      "b_median": 17.8435,
+      "better": "lower",
+      "aa_rel_spread": 0.1445,
+      "bb_rel_spread": 0.0,
+      "band": 0.4334,
+      "b_over_a": 1.643,
+      "verdict": "B-WORSE"
+    },
+    "mem.plant.wall_s": {
+      "b": 21.4149,
+      "a1": 14.7289,
+      "a2": 12.6052,
+      "b_legs": [
+        21.4149
+      ],
+      "a_legs": [
+        14.7289,
+        12.6052
+      ],
+      "a_median": 13.66705,
+      "b_median": 21.4149,
+      "better": "lower",
+      "aa_rel_spread": 0.1554,
+      "bb_rel_spread": 0.0,
+      "band": 0.4662,
+      "b_over_a": 1.567,
+      "verdict": "B-WORSE"
+    },
+    "mem.derail.ok_rate": {
+      "b": 1.0,
+      "a1": 1.0,
+      "a2": 1.0,
+      "b_legs": [
+        1.0
+      ],
+      "a_legs": [
+        1.0,
+        1.0
+      ],
+      "a_median": 1.0,
+      "b_median": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.34.4",
+          "backend_sha": "bba8b79eac84ab09",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "omp_version": "18.3.1",
+          "omp_sha": "82a2c096c24653ee",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.34.4",
+          "backend_sha": "bba8b79eac84ab09",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "a59de17",
+        "created": "20260927T034239Z",
+        "tiers": [
+          "think",
+          "sess",
+          "mem"
+        ],
+        "repeats": 1,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "think.reasoning_chars": {
+          "value": 1966,
+          "better": "lower",
+          "spread": [
+            1966,
+            1966
+          ],
+          "n": 1
+        },
+        "think.completion_tokens": {
+          "value": 1530,
+          "better": "lower",
+          "spread": [
+            1530,
+            1530
+          ],
+          "n": 1
+        },
+        "think.wall_s": {
+          "value": 18.98,
+          "better": "lower",
+          "spread": [
+            18.98,
+            18.98
+          ],
+          "n": 1
+        },
+        "think.accuracy": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 6
+        },
+        "sess.turn.wall_s": {
+          "value": 6.0018,
+          "better": "lower",
+          "spread": [
+            3.4208,
+            7.9339
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 8.601,
+          "better": "lower",
+          "spread": [
+            7.386,
+            9.816
+          ],
+          "n": 2
+        },
+        "sess.turn.pre_main_s": {
+          "value": 1.9951,
+          "better": "lower",
+          "spread": [
+            1.4312,
+            2.6333
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0292,
+          "better": "lower",
+          "spread": [
+            4.0052,
+            4.0531
+          ],
+          "n": 2
+        },
+        "sess.turn.ack_rate": {
+          "value": 0.9167,
+          "better": "higher",
+          "spread": [
+            0.9167,
+            0.9167
+          ],
+          "n": 12
+        },
+        "sess.memory.extract_s": {
+          "value": 2.324,
+          "better": "lower",
+          "spread": [
+            1.98,
+            2.396
+          ],
+          "n": 3
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 9
+        },
+        "mem.recall.pre_main_s": {
+          "value": 8.4261,
+          "better": "lower",
+          "spread": [
+            7.0497,
+            9.9241
+          ],
+          "n": 9
+        },
+        "mem.recall.wall_s": {
+          "value": 11.6442,
+          "better": "lower",
+          "spread": [
+            10.445,
+            21.5035
+          ],
+          "n": 9
+        },
+        "mem.plant.wall_s": {
+          "value": 14.7289,
+          "better": "lower",
+          "spread": [
+            11.4713,
+            22.1704
+          ],
+          "n": 9
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260927T034239Z__ab_a1__ollama__localbench-parked_5642e97495e1",
+      "details": {
+        "think": {
+          "hits": 6,
+          "attempts": 6,
+          "ci95": [
+            0.6097,
+            1.0
+          ],
+          "cut_off": 0,
+          "rounds": [
+            {
+              "task": "minutes",
+              "round": 0,
+              "expected": "157",
+              "answer": "157",
+              "hit": true,
+              "reasoning_chars": 403,
+              "completion_tokens": 354,
+              "wall_s": 4.27,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 0,
+              "expected": "1572",
+              "answer": "1572",
+              "hit": true,
+              "reasoning_chars": 246,
+              "completion_tokens": 266,
+              "wall_s": 3.24,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 0,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 226,
+              "completion_tokens": 159,
+              "wall_s": 2.05,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 0,
+              "expected": "bob",
+              "answer": "bob",
+              "hit": true,
+              "reasoning_chars": 333,
+              "completion_tokens": 148,
+              "wall_s": 1.9,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 0,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 547,
+              "completion_tokens": 416,
+              "wall_s": 5.19,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 0,
+              "expected": "26",
+              "answer": "26",
+              "hit": true,
+              "reasoning_chars": 211,
+              "completion_tokens": 187,
+              "wall_s": 2.33,
+              "finish": "stop",
+              "error": null
+            }
+          ]
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 3.504,
+            "min": 1.196,
+            "max": 5.813,
+            "n": 2
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 23.205,
+              "t_send": 1790480643.0491211,
+              "t_end": 1790480666.2544682,
+              "ok": false,
+              "post_retain": false,
+              "reply": "NOTED\n\n\nNOTED",
+              "pre_main": 6.994,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 7.934,
+              "t_send": 1790480666.256719,
+              "t_end": 1790480674.1906428,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.633,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 6.191,
+              "t_send": 1790480674.196497,
+              "t_end": 1790480680.387167,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.876,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 7.352,
+              "t_send": 1790480680.3918028,
+              "t_end": 1790480687.7440362,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.916,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 7.386,
+              "t_send": 1790480687.757899,
+              "t_end": 1790480695.1439402,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.053,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 5.029,
+              "t_send": 1790480695.1487901,
+              "t_end": 1790480700.17763,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.431,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 3.528,
+              "t_send": 1790480700.183969,
+              "t_end": 1790480703.712409,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.059,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 4.585,
+              "t_send": 1790480703.71489,
+              "t_end": 1790480708.3001301,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.995,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 9.816,
+              "t_send": 1790480708.3067908,
+              "t_end": 1790480718.122798,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.005,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 3.421,
+              "t_send": 1790480718.133354,
+              "t_end": 1790480721.554166,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.102,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 6.002,
+              "t_send": 1790480721.555496,
+              "t_end": 1790480727.5573041,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.434,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 6.999,
+              "t_send": 1790480727.562295,
+              "t_end": 1790480734.56128,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.179,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 3,
+              "busy_s": 6.699,
+              "not_ok": 0,
+              "completion_tokens": 442
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "exit_s": [
+            2.057
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790480641.228696,
+              "ended": 1790480736.626053,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.057,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 12,
+          "expected": 12
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 3,
+          "not_ok": []
+        },
+        "mem.recall": {
+          "hits": 9,
+          "attempts": 9,
+          "ci95": [
+            0.7008,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-7208",
+              "hit": true,
+              "recall_answer": "ZEBRA-7208",
+              "plant_answer": "NOTED",
+              "control_answer": "No deploy code for \"Falcon\" is available to me.\n\n- `recall` (\u00d72) found no matchi",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "32732",
+              "hit": true,
+              "recall_answer": "32732",
+              "plant_answer": "NOTED",
+              "control_answer": "I have no record of a project Falcon, its staging database, or any assigned port",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "I have no record of who owns on-call for project Falcon this week. My memory sto",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-1164",
+              "hit": true,
+              "recall_answer": "ZEBRA-1164",
+              "plant_answer": "NOTED",
+              "control_answer": "I have no record of a \"Falcon\" deploy code. I checked long-term memory (`recall`",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "51653",
+              "hit": true,
+              "recall_answer": "51653",
+              "plant_answer": "NOTED",
+              "control_answer": "No such fact is in memory, and no FS/config access is available here to ground i",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Adeyemi",
+              "hit": true,
+              "recall_answer": "Adeyemi",
+              "plant_answer": "NOTED",
+              "control_answer": "I have no record of project Falcon's on-call rotation \u2014 no memories reference it",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-3934",
+              "hit": true,
+              "recall_answer": "ZEBRA-3934",
+              "plant_answer": "NOTED\n\n\nThe user wants me to remember that the deploy code for project Falcon is",
+              "control_answer": "I have no record of a \"Falcon\" project deploy script in memory, and no filesyste",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "47370",
+              "hit": true,
+              "recall_answer": "47370",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have this in memory. No record of a \"Falcon\" project or its staging data",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Adeyemi",
+              "hit": true,
+              "recall_answer": "Adeyemi",
+              "plant_answer": "NOTED",
+              "control_answer": "No record of a Falcon on-call owner is in memory or accessible context, and I wo",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "injected_tokens": {
+            "median": 148,
+            "min": 126,
+            "max": 200
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 9,
+            "load1": {
+              "mean": 22.2,
+              "max": 22.57,
+              "min": 21.73
+            },
+            "gpu_device_pct": {
+              "mean": 8.9,
+              "max": 9,
+              "min": 8
+            },
+            "free_pct": {
+              "mean": 97.0,
+              "max": 97,
+              "min": 97
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 7.9,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.8,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.7,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 9,
+              "app_gpu_mean_pct": 13.5,
+              "app_gpu_p95_pct": 14.3,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 20.2,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 8.0
+        },
+        "during": {
+          "samples": 480,
+          "load1": {
+            "mean": 33.9,
+            "max": 56.58,
+            "min": 13.33
+          },
+          "gpu_device_pct": {
+            "mean": 68.5,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 94.6,
+            "max": 97,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 42698,
+              "name": "ollama",
+              "pct": 46.7,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model localbench-parked:5642e97495e1 --port 52009",
+              "model": "localbench-parked:5642e97495e1"
+            },
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 6.5,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 2.0,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 480,
+            "app_gpu_mean_pct": 9.3,
+            "app_gpu_p95_pct": 14.8,
+            "app_spike_seconds": 17,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 214,
+          "busy_pct": {
+            "mean": 28.8,
+            "max": 35.4,
+            "min": 21.5
+          }
+        },
+        "before_live": {
+          "t": 1790480560.549994,
+          "load1": 22.57,
+          "free_pct": 97,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 8,
+          "gpu_renderer_pct": 8,
+          "gpu_tiler_pct": 8,
+          "gpu_in_use_mem_bytes": 2230009856,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1"
+            ],
+            "mlx-serve": [],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 6210.9
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.6",
+          "backend_sha": "bee44c092b454598",
+          "model": "3f926b415992eaa2ae9dd7b573706494d6bbf787",
+          "model_digest": "files:bb946a61ffcd",
+          "backend_args": "--mtp",
+          "omp_version": "18.3.1",
+          "omp_sha": "82a2c096c24653ee",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.6",
+          "backend_sha": "bee44c092b454598",
+          "model": "3f926b415992eaa2ae9dd7b573706494d6bbf787",
+          "model_digest": "files:bb946a61ffcd",
+          "backend_args": "--mtp",
+          "architecture": "qwen3_5_moe",
+          "quantization": "2-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "/Volumes/Models/model-offload-20260609/model-stores/fk-cjv3-20260612T171151Z/models/huggingface/hub/models--prism-ml--Ternary-Bonsai-2-27B-mlx-2bit/snapshots/3f926b415992eaa2ae9dd7b573706494d6bbf787"
+        },
+        "localbench_rev": "a59de17",
+        "created": "20260927T035650Z",
+        "tiers": [
+          "think",
+          "sess",
+          "mem"
+        ],
+        "repeats": 1,
+        "label": "ab_b"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "think.reasoning_chars": {
+          "value": null,
+          "better": "lower",
+          "void": "no reasoning streamed"
+        },
+        "think.completion_tokens": {
+          "value": 1491,
+          "better": "lower",
+          "spread": [
+            1491,
+            1491
+          ],
+          "n": 1
+        },
+        "think.wall_s": {
+          "value": 18.77,
+          "better": "lower",
+          "spread": [
+            18.77,
+            18.77
+          ],
+          "n": 1
+        },
+        "think.accuracy": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 6
+        },
+        "sess.turn.wall_s": {
+          "value": 4.1081,
+          "better": "lower",
+          "spread": [
+            1.5863,
+            14.5878
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 3.8011,
+          "better": "lower",
+          "spread": [
+            3.4041,
+            4.1982
+          ],
+          "n": 2
+        },
+        "sess.turn.pre_main_s": {
+          "value": 0.8277,
+          "better": "lower",
+          "spread": [
+            0.8187,
+            0.8617
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 2.252,
+          "better": "lower",
+          "spread": [
+            2.2159,
+            2.2882
+          ],
+          "n": 2
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 12
+        },
+        "sess.memory.extract_s": {
+          "value": 3.397,
+          "better": "lower",
+          "spread": [
+            1.708,
+            4.295
+          ],
+          "n": 3
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 9
+        },
+        "mem.recall.pre_main_s": {
+          "value": 6.264,
+          "better": "lower",
+          "spread": [
+            5.4255,
+            6.5286
+          ],
+          "n": 9
+        },
+        "mem.recall.wall_s": {
+          "value": 17.8435,
+          "better": "lower",
+          "spread": [
+            15.3208,
+            39.1338
+          ],
+          "n": 9
+        },
+        "mem.plant.wall_s": {
+          "value": 21.4149,
+          "better": "lower",
+          "spread": [
+            19.4862,
+            27.0176
+          ],
+          "n": 9
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260927T035650Z__ab_b__mlx-serve__3f926b415992eaa2ae9dd7b573706494d6bbf787",
+      "details": {
+        "think": {
+          "hits": 6,
+          "attempts": 6,
+          "ci95": [
+            0.6097,
+            1.0
+          ],
+          "cut_off": 0,
+          "rounds": [
+            {
+              "task": "minutes",
+              "round": 0,
+              "expected": "157",
+              "answer": "157",
+              "hit": true,
+              "reasoning_chars": 0,
+              "completion_tokens": 297,
+              "wall_s": 3.72,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 0,
+              "expected": "1572",
+              "answer": "1572",
+              "hit": true,
+              "reasoning_chars": 0,
+              "completion_tokens": 225,
+              "wall_s": 2.91,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 0,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 0,
+              "completion_tokens": 134,
+              "wall_s": 1.68,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 0,
+              "expected": "bob",
+              "answer": "bob",
+              "hit": true,
+              "reasoning_chars": 0,
+              "completion_tokens": 135,
+              "wall_s": 1.78,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 0,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 0,
+              "completion_tokens": 223,
+              "wall_s": 2.78,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 0,
+              "expected": "26",
+              "answer": "26",
+              "hit": true,
+              "reasoning_chars": 0,
+              "completion_tokens": 477,
+              "wall_s": 5.9,
+              "finish": "stop",
+              "error": null
+            }
+          ]
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.044,
+            "min": -2.309,
+            "max": 2.396,
+            "n": 2
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 20.843,
+              "t_send": 1790481444.2820768,
+              "t_end": 1790481465.12489,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 4.282,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 6.748,
+              "t_send": 1790481465.130502,
+              "t_end": 1790481471.878634,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.827,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 4.108,
+              "t_send": 1790481471.887743,
+              "t_end": 1790481475.995796,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.825,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 6.093,
+              "t_send": 1790481475.9984498,
+              "t_end": 1790481482.091137,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.82,
+              "overlap_s": 0.005
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 3.404,
+              "t_send": 1790481482.096798,
+              "t_end": 1790481485.5008671,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 2.288,
+              "overlap_s": 1.136
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 5.333,
+              "t_send": 1790481485.501333,
+              "t_end": 1790481490.834662,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.862,
+              "overlap_s": 0.031
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 1.714,
+              "t_send": 1790481490.840617,
+              "t_end": 1790481492.554712,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.853,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 1.586,
+              "t_send": 1790481492.5552619,
+              "t_end": 1790481494.1416059,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.828,
+              "overlap_s": 0.013
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 4.198,
+              "t_send": 1790481494.142143,
+              "t_end": 1790481498.3402822,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 2.216,
+              "overlap_s": 1.184
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 2.018,
+              "t_send": 1790481498.341625,
+              "t_end": 1790481500.359593,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.835,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 14.588,
+              "t_send": 1790481500.360477,
+              "t_end": 1790481514.948268,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.858,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 1.78,
+              "t_send": 1790481514.949255,
+              "t_end": 1790481516.729148,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 0.819,
+              "overlap_s": 0.011
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 3,
+              "busy_s": 9.401,
+              "not_ok": 0,
+              "completion_tokens": 132
+            }
+          },
+          "overlap_with_main_s": 2.379,
+          "exit_s": [
+            1.889
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790481442.61798,
+              "ended": 1790481518.618848,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 1.889,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 12,
+          "expected": 12
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 3,
+          "not_ok": []
+        },
+        "mem.recall": {
+          "hits": 9,
+          "attempts": 9,
+          "ci95": [
+            0.7008,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-5730",
+              "hit": true,
+              "recall_answer": "ZEBRA-5730",
+              "plant_answer": "NOTED",
+              "control_answer": "No memory of a project \"Falcon\" or any of its deploy code exists in my long-term",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "38161",
+              "hit": true,
+              "recall_answer": "38161",
+              "plant_answer": "NOTED",
+              "control_answer": "65535",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Takahashi",
+              "hit": true,
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "I can't confirm a surname. I searched long-term memory for project Falcon's on-c",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-7155",
+              "hit": true,
+              "recall_answer": "ZEBRA-7155",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any memory of project Falcon or its deploy code. No recalled memori",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "38591",
+              "hit": true,
+              "recall_answer": "38591",
+              "plant_answer": "NOTED",
+              "control_answer": "I can't determine this. I only have memory tools available in this session, and ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Moreau",
+              "hit": true,
+              "recall_answer": "Moreau",
+              "plant_answer": "NOTED",
+              "control_answer": "I have no record of the on-call owner for project Falcon, and no accessible file",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-5532",
+              "hit": true,
+              "recall_answer": "ZEBRA-5532",
+              "plant_answer": "NOTED",
+              "control_answer": "No record of a \"Falcon\" deploy code exists in my memory or current session conte",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "52951",
+              "hit": true,
+              "recall_answer": "52951",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have the Falcon staging database port in my long-term memory \u2014 no releva",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Okafor",
+              "hit": true,
+              "recall_answer": "Okafor",
+              "plant_answer": "NOTED",
+              "control_answer": "No record of a Falcon on-call owner is stored in long-term memory \u2014 multiple sea",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "injected_tokens": {
+            "median": 159,
+            "min": 148,
+            "max": 210
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 9,
+            "load1": {
+              "mean": 11.1,
+              "max": 11.14,
+              "min": 11.13
+            },
+            "gpu_device_pct": {
+              "mean": 6.2,
+              "max": 8,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.9,
+              "max": 97,
+              "min": 96
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 8.6,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.6,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 1.6,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 9,
+              "app_gpu_mean_pct": 12.8,
+              "app_gpu_p95_pct": 13.7,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 22.5,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 8.1
+        },
+        "during": {
+          "samples": 982,
+          "load1": {
+            "mean": 19.7,
+            "max": 46.44,
+            "min": 10.61
+          },
+          "gpu_device_pct": {
+            "mean": 78.0,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 95.2,
+            "max": 97,
+            "min": 94
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 28726,
+              "name": "mlx-serve",
+              "pct": 51.3,
+              "cmd": "~/.localbench/mlx-serve-26.9.6/mlx-serve-macos-arm64/mlx-serve --model /Volumes/Models/model-offload-20260609/model-stores/fk-cjv3-20260612T171",
+              "model": "/Volumes/Models/model-offload-20260609/model-stores/fk-cjv3-20260612T171151Z/models/huggingface/hub/models--prism-ml--Ternary-Bonsai-2-27B-mlx-2bit/snapshots/3f926b415992eaa2ae9dd7b573706494d6bbf787"
+            },
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 12.7,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 3.1,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 9392,
+              "name": "Terminal",
+              "pct": 2.4,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ],
+          "load": {
+            "samples": 982,
+            "app_gpu_mean_pct": 18.8,
+            "app_gpu_p95_pct": 49.1,
+            "app_spike_seconds": 232,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 448,
+          "busy_pct": {
+            "mean": 26.0,
+            "max": 38.7,
+            "min": 17.6
+          }
+        },
+        "before_live": {
+          "t": 1790481411.0644119,
+          "load1": 11.14,
+          "free_pct": 96,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 8,
+          "gpu_renderer_pct": 8,
+          "gpu_tiler_pct": 8,
+          "gpu_in_use_mem_bytes": 10313007104,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "3f926b415992eaa2ae9dd7b573706494d6bbf787"
+            ],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 7061.4
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.34.4",
+          "backend_sha": "bba8b79eac84ab09",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "omp_version": "18.3.1",
+          "omp_sha": "82a2c096c24653ee",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.34.4",
+          "backend_sha": "bba8b79eac84ab09",
+          "model": "localbench-parked:5642e97495e1",
+          "model_digest": "5642e97495e1",
+          "backend_args": "",
+          "architecture": "qwen3_5",
+          "quantization": "nvfp4",
+          "parameters": "27.8B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "a59de17",
+        "created": "20260927T041933Z",
+        "tiers": [
+          "think",
+          "sess",
+          "mem"
+        ],
+        "repeats": 1,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "think.reasoning_chars": {
+          "value": 1966,
+          "better": "lower",
+          "spread": [
+            1966,
+            1966
+          ],
+          "n": 1
+        },
+        "think.completion_tokens": {
+          "value": 1524,
+          "better": "lower",
+          "spread": [
+            1524,
+            1524
+          ],
+          "n": 1
+        },
+        "think.wall_s": {
+          "value": 18.8,
+          "better": "lower",
+          "spread": [
+            18.8,
+            18.8
+          ],
+          "n": 1
+        },
+        "think.accuracy": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 6
+        },
+        "sess.turn.wall_s": {
+          "value": 3.1168,
+          "better": "lower",
+          "spread": [
+            2.6156,
+            3.9174
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 5.8427,
+          "better": "lower",
+          "spread": [
+            4.9745,
+            6.7109
+          ],
+          "n": 2
+        },
+        "sess.turn.pre_main_s": {
+          "value": 1.9122,
+          "better": "lower",
+          "spread": [
+            1.7159,
+            2.7119
+          ],
+          "n": 9
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0407,
+          "better": "lower",
+          "spread": [
+            4.0404,
+            4.041
+          ],
+          "n": 2
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 12
+        },
+        "sess.memory.extract_s": {
+          "value": 2.227,
+          "better": "lower",
+          "spread": [
+            2.038,
+            2.45
+          ],
+          "n": 3
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 9
+        },
+        "mem.recall.pre_main_s": {
+          "value": 6.8481,
+          "better": "lower",
+          "spread": [
+            6.3844,
+            7.5796
+          ],
+          "n": 9
+        },
+        "mem.recall.wall_s": {
+          "value": 10.0753,
+          "better": "lower",
+          "spread": [
+            8.6653,
+            17.6698
+          ],
+          "n": 9
+        },
+        "mem.plant.wall_s": {
+          "value": 12.6052,
+          "better": "lower",
+          "spread": [
+            11.5628,
+            20.166
+          ],
+          "n": 9
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        },
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260927T041933Z__ab_a2__ollama__localbench-parked_5642e97495e1",
+      "details": {
+        "think": {
+          "hits": 6,
+          "attempts": 6,
+          "ci95": [
+            0.6097,
+            1.0
+          ],
+          "cut_off": 0,
+          "rounds": [
+            {
+              "task": "minutes",
+              "round": 0,
+              "expected": "157",
+              "answer": "157",
+              "hit": true,
+              "reasoning_chars": 403,
+              "completion_tokens": 354,
+              "wall_s": 4.26,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "arith",
+              "round": 0,
+              "expected": "1572",
+              "answer": "1572",
+              "hit": true,
+              "reasoning_chars": 246,
+              "completion_tokens": 266,
+              "wall_s": 3.18,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "pens",
+              "round": 0,
+              "expected": "18",
+              "answer": "18",
+              "hit": true,
+              "reasoning_chars": 226,
+              "completion_tokens": 153,
+              "wall_s": 1.89,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "order",
+              "round": 0,
+              "expected": "bob",
+              "answer": "bob",
+              "hit": true,
+              "reasoning_chars": 333,
+              "completion_tokens": 148,
+              "wall_s": 1.95,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "code",
+              "round": 0,
+              "expected": "14",
+              "answer": "14",
+              "hit": true,
+              "reasoning_chars": 547,
+              "completion_tokens": 416,
+              "wall_s": 5.2,
+              "finish": "stop",
+              "error": null
+            },
+            {
+              "task": "digits",
+              "round": 0,
+              "expected": "26",
+              "answer": "26",
+              "hit": true,
+              "reasoning_chars": 211,
+              "completion_tokens": 187,
+              "wall_s": 2.32,
+              "finish": "stop",
+              "error": null
+            }
+          ]
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 2.718,
+            "min": 1.785,
+            "max": 3.651,
+            "n": 2
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 22.343,
+              "t_send": 1790482837.46282,
+              "t_end": 1790482859.805367,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 5.053,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 3.841,
+              "t_send": 1790482859.81007,
+              "t_end": 1790482863.651168,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.712,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 3.917,
+              "t_send": 1790482863.652312,
+              "t_end": 1790482867.5697348,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.905,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 3.496,
+              "t_send": 1790482867.5717561,
+              "t_end": 1790482871.067637,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.912,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 6.711,
+              "t_send": 1790482871.069025,
+              "t_end": 1790482877.779901,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.041,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 2.623,
+              "t_send": 1790482877.781764,
+              "t_end": 1790482880.4046888,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.796,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 2.92,
+              "t_send": 1790482880.405349,
+              "t_end": 1790482883.32527,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.781,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 3.117,
+              "t_send": 1790482883.326835,
+              "t_end": 1790482886.4436102,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.178,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 4.975,
+              "t_send": 1790482886.4445682,
+              "t_end": 1790482891.419086,
+              "ok": true,
+              "post_retain": true,
+              "pre_main": 4.04,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 3.263,
+              "t_send": 1790482891.419992,
+              "t_end": 1790482894.683222,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.267,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 3.09,
+              "t_send": 1790482894.684107,
+              "t_end": 1790482897.774355,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 2.094,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 2.616,
+              "t_send": 1790482897.775127,
+              "t_end": 1790482900.3907042,
+              "ok": true,
+              "post_retain": false,
+              "pre_main": 1.716,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 3,
+              "busy_s": 6.715,
+              "not_ok": 0,
+              "completion_tokens": 442
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "exit_s": [
+            2.163
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790482836.138552,
+              "ended": 1790482902.554142,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.163,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 12,
+          "expected": 12
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 3,
+          "not_ok": []
+        },
+        "mem.recall": {
+          "hits": 9,
+          "attempts": 9,
+          "ci95": [
+            0.7008,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-5337",
+              "hit": true,
+              "recall_answer": "ZEBRA-5337",
+              "plant_answer": "NOTED",
+              "control_answer": "I have no record of a \"project Falcon\" or its deploy code \u2014 not in memory, and I",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "54152",
+              "hit": true,
+              "recall_answer": "54152",
+              "plant_answer": "NOTED",
+              "control_answer": "I have no record of this fact. I checked long-term memory (`recall`/`reflect`) f",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Moreau",
+              "hit": true,
+              "recall_answer": "Moreau",
+              "plant_answer": "NOTED",
+              "control_answer": "I have no stored recall on a Falcon on-call owner, and no file/shell tools are a",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 1,
+              "expected": "ZEBRA-9705",
+              "hit": true,
+              "recall_answer": "ZEBRA-9705",
+              "plant_answer": "NOTED",
+              "control_answer": "No deploy code for \"project Falcon\" exists in my memory. It's also not present i",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 1,
+              "expected": "46590",
+              "hit": true,
+              "recall_answer": "46590",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have a grounded answer \u2014 my memory has no record of a Falcon staging dat",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 1,
+              "expected": "Moreau",
+              "hit": true,
+              "recall_answer": "Moreau",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any record of an on-call owner for project Falcon \u2014 no memory entry",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "code",
+              "round": 2,
+              "expected": "ZEBRA-3456",
+              "hit": true,
+              "recall_answer": "ZEBRA-3456",
+              "plant_answer": "NOTED",
+              "control_answer": "I can't provide that \u2014 I have no record of a \"Falcon\" deploy code.\n\nWhat I check",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "port",
+              "round": 2,
+              "expected": "39008",
+              "hit": true,
+              "recall_answer": "39008",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have a stored record of project Falcon's staging database port, and no s",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "fact": "owner",
+              "round": 2,
+              "expected": "Lindqvist",
+              "hit": true,
+              "recall_answer": "Lindqvist",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any record of Project Falcon's on-call owner in memory, and no file",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "injected_tokens": {
+            "median": 149,
+            "min": 111,
+            "max": 171
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 9,
+            "load1": {
+              "mean": 29.0,
+              "max": 30.22,
+              "min": 28.6
+            },
+            "gpu_device_pct": {
+              "mean": 9.1,
+              "max": 10,
+              "min": 9
+            },
+            "free_pct": {
+              "mean": 97.0,
+              "max": 97,
+              "min": 97
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 9.8,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.8,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.1,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 9,
+              "app_gpu_mean_pct": 14.9,
+              "app_gpu_p95_pct": 15.8,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 22.6,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 7.9
+        },
+        "during": {
+          "samples": 431,
+          "load1": {
+            "mean": 19.2,
+            "max": 29.41,
+            "min": 12.72
+          },
+          "gpu_device_pct": {
+            "mean": 69.2,
+            "max": 100,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 94.4,
+            "max": 97,
+            "min": 93
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 58220,
+              "name": "ollama",
+              "pct": 47.5,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model localbench-parked:5642e97495e1 --port 50726",
+              "model": "localbench-parked:5642e97495e1"
+            },
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 6.9,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 2.0,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 431,
+            "app_gpu_mean_pct": 9.9,
+            "app_gpu_p95_pct": 19.9,
+            "app_spike_seconds": 18,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 196,
+          "busy_pct": {
+            "mean": 24.5,
+            "max": 36.0,
+            "min": 17.3
+          }
+        },
+        "before_live": {
+          "t": 1790482773.7260249,
+          "load1": 30.22,
+          "free_pct": 97,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 9,
+          "gpu_renderer_pct": 9,
+          "gpu_tiler_pct": 9,
+          "gpu_in_use_mem_bytes": 2198765568,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 8424.1
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

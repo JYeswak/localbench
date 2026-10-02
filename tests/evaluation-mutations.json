@@ -1,0 +1,156 @@
+[
+  {
+    "label": "resume must refuse changed runtime identity",
+    "file": "localbench/evaluation.py",
+    "old": "identity != expected_identity",
+    "new": "identity == expected_identity",
+    "tests": [
+      "tests.test_evaluation.CampaignIdentity.test_resume_refuses_a_changed_model_pin_before_reusing_a_pass"
+    ]
+  },
+  {
+    "label": "completed failure cannot be overwritten",
+    "file": "localbench/evaluation.py",
+    "old": "if path.exists():\n            raise CampaignError(f\"case {case_id!r} already recorded; completed outcomes are immutable\")",
+    "new": "if False:\n            raise CampaignError(f\"case {case_id!r} already recorded; completed outcomes are immutable\")",
+    "tests": [
+      "tests.test_evaluation.CampaignIdentity.test_a_recorded_failure_cannot_be_overwritten_by_a_retry_pass"
+    ]
+  },
+  {
+    "label": "scoring includes subprocess exit status",
+    "file": "localbench/workloads.py",
+    "old": "returncode == 0 and check(answer)",
+    "new": "check(answer)",
+    "tests": [
+      "tests.test_evaluation.E2EScoring.test_both_attempts_must_pass_the_expected_answer_and_process_exit"
+    ]
+  },
+  {
+    "label": "agent claiming the file value without reading it fails the outcome gate",
+    "file": "localbench/workloads.py",
+    "old": "read_ok = task != \"tool_read\"",
+    "new": "read_ok = True",
+    "tests": [
+      "tests.test_evaluation.E2EScoring.test_tool_read_requires_the_file_to_be_read_successfully_not_just_named_in_an_answer"
+    ]
+  },
+  {
+    "label": "timed-out OMP tool descendants cannot mutate the recorded workspace",
+    "file": "localbench/varied.py",
+    "old": "os.killpg(proc.pid, signal.SIGKILL)",
+    "new": "os.kill(proc.pid, signal.SIGKILL)",
+    "tests": [
+      "tests.test_varied.VariedTrialRunner.test_timeout_stops_child_before_final_workspace_state_is_recorded"
+    ]
+  },
+  {
+    "label": "varied re-score compares immutable snapshot against actual workspace",
+    "file": "localbench/__main__.py",
+    "old": "if content is None or content != final_files.get(filename):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_varied.VariedTrialRunner.test_rescore_refuses_a_hashed_snapshot_that_disagrees_with_the_actual_workspace"
+    ]
+  },
+  {
+    "label": "boolean wall duration is invalid trial metadata",
+    "file": "localbench/evaluation.py",
+    "old": "type(wall_s) not in (int, float) or not math.isfinite(wall_s)",
+    "new": "not math.isfinite(wall_s)",
+    "tests": [
+      "tests.test_evaluation.VariedTrialScoring.test_failed_process_and_broken_infrastructure_never_pass"
+    ]
+  },
+  {
+    "label": "missing process exit is not a model failure",
+    "file": "localbench/evaluation.py",
+    "old": "if type(returncode) is not int:",
+    "new": "if returncode is not None and type(returncode) is not int:",
+    "tests": [
+      "tests.test_evaluation.VariedTrialScoring.test_failed_process_and_broken_infrastructure_never_pass"
+    ]
+  },
+  {
+    "label": "workspace symlink cannot be read after a stale path check",
+    "file": "localbench/evaluation.py",
+    "old": "os.O_RDONLY | os.O_NOFOLLOW, dir_fd=parent_fd",
+    "new": "os.O_RDONLY, dir_fd=parent_fd",
+    "tests": [
+      "tests.test_varied.VariedTrialRunner.test_snapshot_does_not_read_a_symlink_when_path_metadata_is_stale",
+      "tests.test_varied.VariedTrialRunner.test_rescore_refuses_an_internal_symlink_even_if_path_metadata_is_stale"
+    ]
+  },
+  {
+    "label": "timed-out detached child cannot invalidate model failure receipt",
+    "file": "localbench/varied.py",
+    "old": "if not timed_out:\n        traces.extend(workspace / filename for filename in final_files)",
+    "new": "if True:\n        traces.extend(workspace / filename for filename in final_files)",
+    "tests": [
+      "tests.test_varied.VariedTrialRunner.test_detached_late_writer_cannot_turn_a_timeout_into_unscorable_evidence"
+    ]
+  },
+  {
+    "label": "detached tool keeping output pipes open cannot prevent timeout verdict",
+    "file": "localbench/varied.py",
+    "old": "except subprocess.TimeoutExpired as exc:",
+    "new": "except ValueError as exc:",
+    "tests": [
+      "tests.test_varied.VariedTrialRunner.test_timeout_records_fail_when_detached_tool_keeps_output_pipes_open"
+    ]
+  },
+  {
+    "label": "hashline edit file comes from its [PATH#TAG] header",
+    "file": "localbench/evaluation.py",
+    "old": "path = headers.pop() if len(headers) == 1 else None",
+    "new": "path = \"target.txt\"",
+    "tests": [
+      "tests.test_evaluation.VariedTrialScoring.test_hashline_edit_is_graded_by_its_header_and_result_path"
+    ]
+  },
+  {
+    "label": "hashline edit whose result reports the decoy does not count",
+    "file": "localbench/evaluation.py",
+    "old": "if not isinstance(reported, str) or not reported or _tool_path(cwd, reported) != file_path:",
+    "new": "if not isinstance(reported, str) or not reported:",
+    "tests": [
+      "tests.test_evaluation.VariedTrialScoring.test_hashline_edit_is_graded_by_its_header_and_result_path"
+    ]
+  },
+  {
+    "label": "hashline header traversal is rejected",
+    "file": "localbench/evaluation.py",
+    "old": "    if \"..\" in path.parts:\n        return None",
+    "new": "    if False:\n        return None",
+    "tests": [
+      "tests.test_evaluation.VariedTrialScoring.test_hashline_edit_is_graded_by_its_header_and_result_path"
+    ]
+  },
+  {
+    "label": "fixed grader refuses old-campaign specs",
+    "file": "localbench/evaluation.py",
+    "old": "spec.get(\"grader_version\") != GRADER_VERSION",
+    "new": "spec.get(\"grader_version\") not in (GRADER_VERSION, \"varied.v1\")",
+    "tests": [
+      "tests.test_evaluation.VariedTrialScoring.test_hashline_edit_is_graded_by_its_header_and_result_path"
+    ]
+  },
+  {
+    "label": "hashline edit without a reported result path does not count",
+    "file": "localbench/evaluation.py",
+    "old": "if not isinstance(reported, str) or not reported or _tool_path(cwd, reported) != file_path:",
+    "new": "if isinstance(reported, str) and _tool_path(cwd, reported) != file_path:",
+    "tests": [
+      "tests.test_evaluation.VariedTrialScoring.test_hashline_edit_is_graded_by_its_header_and_result_path"
+    ]
+  },
+  {
+    "label": "hashline result path check is not skipped",
+    "file": "localbench/evaluation.py",
+    "old": "if hashline and file_path is not None:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_evaluation.VariedTrialScoring.test_hashline_edit_is_graded_by_its_header_and_result_path"
+    ]
+  }
+]

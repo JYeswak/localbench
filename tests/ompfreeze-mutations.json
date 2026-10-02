@@ -1,0 +1,101 @@
+[
+  {
+    "label": "a dependency resolves from the requiring package's nested node_modules before the hoisted one",
+    "file": "localbench/ompfreeze.py",
+    "old": "    for anc in (frm, *frm.parents):",
+    "new": "    for anc in (install.parent,):",
+    "tests": ["tests.test_ompfreeze.Freeze.test_snapshot_holds_the_dependency_closure_and_nothing_points_back_into_the_install"]
+  },
+  {
+    "label": "the copy follows symlinks so nothing in a snapshot points back into the live install",
+    "file": "localbench/ompfreeze.py",
+    "old": "symlinks=False, ignore_dangling_symlinks=True,",
+    "new": "symlinks=True, ignore_dangling_symlinks=True,",
+    "tests": ["tests.test_ompfreeze.Freeze.test_snapshot_holds_the_dependency_closure_and_nothing_points_back_into_the_install"]
+  },
+  {
+    "label": "an existing snapshot of the same omp is reused, not copied again",
+    "file": "localbench/ompfreeze.py",
+    "old": "    if p.exists:\n        return {**(_manifest(p.target) or {}), \"created\": False}",
+    "new": "    if False:\n        return {**(_manifest(p.target) or {}), \"created\": False}",
+    "tests": ["tests.test_ompfreeze.Freeze.test_a_second_freeze_of_the_same_omp_reuses_the_snapshot_without_copying"]
+  },
+  {
+    "label": "an omp update landing during the copy is refused, never filed under the planned id",
+    "file": "localbench/ompfreeze.py",
+    "old": "if f\"{copied_version}-{sha16(str(copied))}\" != p.snapshot_id:",
+    "new": "if False:",
+    "tests": ["tests.test_ompfreeze.Freeze.test_an_update_during_the_copy_is_refused_and_leaves_no_snapshot"]
+  },
+  {
+    "label": "a snapshot whose entry does not report the frozen version is removed",
+    "file": "localbench/ompfreeze.py",
+    "old": "    if got != p.version:",
+    "new": "    if False:",
+    "tests": ["tests.test_ompfreeze.Freeze.test_an_entry_that_does_not_report_the_frozen_version_is_removed"]
+  },
+  {
+    "label": "a snapshot is read-only after the copy",
+    "file": "localbench/ompfreeze.py",
+    "old": "        _read_only(tmp)\n",
+    "new": "",
+    "tests": ["tests.test_ompfreeze.Freeze.test_snapshot_is_read_only_and_resolves_to_its_frozen_package"]
+  },
+  {
+    "label": "a directory at the target without localbench's marker is refused",
+    "file": "localbench/ompfreeze.py",
+    "old": "    if exists and (target.is_symlink() or not target.is_dir() or _manifest(target) is None):",
+    "new": "    if False:",
+    "tests": ["tests.test_ompfreeze.Freeze.test_a_foreign_directory_at_the_target_is_refused_and_left_alone"]
+  },
+  {
+    "label": "retention keeps three snapshots in total, not three besides the current one",
+    "file": "localbench/ompfreeze.py",
+    "old": "    return others[max(keep - 1, 0):]",
+    "new": "    return others[keep:]",
+    "tests": ["tests.test_ompfreeze.Retention.test_keeps_the_newest_three_snapshots_and_never_touches_other_directories"]
+  },
+  {
+    "label": "only a marker naming its own directory makes a directory prunable",
+    "file": "localbench/ompfreeze.py",
+    "old": "    return doc if isinstance(doc, dict) and doc.get(\"snapshot_id\") == target.name else None",
+    "new": "    return doc if isinstance(doc, dict) else None",
+    "tests": ["tests.test_ompfreeze.Retention.test_keeps_the_newest_three_snapshots_and_never_touches_other_directories"]
+  },
+  {
+    "label": "a snapshot a run holds is skipped by retention",
+    "file": "localbench/ompfreeze.py",
+    "old": "                fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)",
+    "new": "                pass",
+    "tests": ["tests.test_ompfreeze.Retention.test_a_snapshot_a_run_holds_is_not_pruned"]
+  },
+  {
+    "label": "the snapshot being kept is never a retention candidate, even when oldest",
+    "file": "localbench/ompfreeze.py",
+    "old": "    others = [d for d, _ in snapshots() if d.name != keep_id]",
+    "new": "    others = [d for d, _ in snapshots()]",
+    "tests": ["tests.test_ompfreeze.Retention.test_the_snapshot_being_reused_is_kept_even_when_it_is_the_oldest"]
+  },
+  {
+    "label": "run|ab --omp-frozen point LOCALBENCH_OMP at the frozen entry for every leg",
+    "file": "localbench/__main__.py",
+    "old": "_binaries_for_leg({\"LOCALBENCH_OMP\": entry}):",
+    "new": "_binaries_for_leg({}):",
+    "tests": ["tests.test_ompfreeze.Cli.test_ab_omp_frozen_pins_one_omp_across_legs_while_the_live_install_updates",
+              "tests.test_ompfreeze.Cli.test_run_omp_frozen_runs_its_leg_through_the_snapshot"]
+  },
+  {
+    "label": "ab --omp-frozen freezes before its legs",
+    "file": "localbench/__main__.py",
+    "old": "        return _with_frozen_omp(cmd_ab, args)",
+    "new": "        pass",
+    "tests": ["tests.test_ompfreeze.Cli.test_ab_omp_frozen_pins_one_omp_across_legs_while_the_live_install_updates"]
+  },
+  {
+    "label": "a reused snapshot prints only LOCALBENCH_OMP= on stdout",
+    "file": "localbench/__main__.py",
+    "old": "noop=noop if m.dry_run else None)",
+    "new": "noop=noop)",
+    "tests": ["tests.test_ompfreeze.Cli.test_omp_freeze_prints_the_entry_and_writes_an_audit_row"]
+  }
+]

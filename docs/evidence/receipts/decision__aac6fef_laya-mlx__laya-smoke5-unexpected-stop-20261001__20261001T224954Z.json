@@ -1,0 +1,914 @@
+{
+  "kind": "run",
+  "problems": [
+    "MUST FAIL: gate:decision.noul.accuracy, gate:decision.noul.macro_f1"
+  ],
+  "verdict": {
+    "compare": "NONE",
+    "baseline": {
+      "kind": "none",
+      "id": null
+    }
+  },
+  "run": {
+    "label": "decision",
+    "provenance": {
+      "pins": {
+        "backend": "laya-mlx",
+        "backend_version": "0.1.0",
+        "backend_sha": "fc1df62828a3fedf4d8229fdac1cbd85f1cdf337",
+        "model": "aac6fef/laya-mlx",
+        "model_digest": "20aed815fc6acde75733882e7ec0e3f28aeb9717",
+        "backend_args": "dtype=float16 batch_size=16",
+        "laya_source": "~/Developer/laya-mlx/laya_mlx/__init__.py",
+        "model_dir": "/Volumes/Models/model-offload-20260609/model-stores/fk-cjv3-20260612T171151Z/models/huggingface/hub/models--aac6fef--laya-mlx/snapshots/20aed815fc6acde75733882e7ec0e3f28aeb9717",
+        "mlx_version": "0.32.2",
+        "loaded_context": 512,
+        "model_num_ctx": 512,
+        "macos_build": "25F84",
+        "host_id": "mac-studio-apple-m3-ultra-512gb",
+        "suite_manifest_sha256": "fc7002ea713a47a4dd424010470b5c61fb9c92f76daab91ed17953539faa7771",
+        "suite_items_sha256": "6a67e73c685ab56c3b3186759a4521e6d1288ea8364b6e6c44dadd3054eb3c2a"
+      },
+      "fingerprint": {
+        "backend": "laya-mlx",
+        "backend_version": "0.1.0",
+        "backend_sha": "fc1df62828a3fedf4d8229fdac1cbd85f1cdf337",
+        "model": "aac6fef/laya-mlx",
+        "model_digest": "20aed815fc6acde75733882e7ec0e3f28aeb9717",
+        "backend_args": "dtype=float16 batch_size=16",
+        "laya_source": "~/Developer/laya-mlx/laya_mlx/__init__.py",
+        "model_dir": "/Volumes/Models/model-offload-20260609/model-stores/fk-cjv3-20260612T171151Z/models/huggingface/hub/models--aac6fef--laya-mlx/snapshots/20aed815fc6acde75733882e7ec0e3f28aeb9717",
+        "mlx_version": "0.32.2",
+        "endpoint": "http://127.0.0.1:60696/v1/systemone"
+      },
+      "localbench_rev": "9a8ae48-dirty",
+      "created": "20261001T224954Z",
+      "tiers": [
+        "decision.noul"
+      ],
+      "repeats": 2,
+      "label": "decision",
+      "suite": {
+        "name": "laya-smoke5-unexpected-stop-20261001",
+        "role": "decision.noul",
+        "manifest": "~/.localbench/corpora/decision.noul/laya-smoke5-unexpected-stop-20261001/manifest.json",
+        "manifest_sha256": "fc7002ea713a47a4dd424010470b5c61fb9c92f76daab91ed17953539faa7771",
+        "items_sha256": "6a67e73c685ab56c3b3186759a4521e6d1288ea8364b6e6c44dadd3054eb3c2a",
+        "sources": [
+          {
+            "path": "~/.localbench/corpora/decision.noul/unexpected-stop-jevlatest-20261001/manifest.json",
+            "sha256": "8454c80d2ee7cc3a8be3bc66f14edc6522c28810c09705be4ce825a41aacbcc8"
+          },
+          {
+            "path": "~/.localbench/corpora/decision.noul/unexpected-stop-jevlatest-20261001/items.jsonl",
+            "sha256": "cdfa4d9ab696370ca75a4bd12ef92b1b6ee6cd937e4f7f26d3278b3afaaa843a"
+          }
+        ],
+        "n_items": 5,
+        "has_reference": true
+      },
+      "hosted": null
+    },
+    "verdicts": {
+      "contended": false,
+      "must_fail": [
+        "gate:decision.noul.accuracy",
+        "gate:decision.noul.macro_f1"
+      ],
+      "preflight_problems": [],
+      "allow_busy": false,
+      "pins_changed": {}
+    },
+    "metrics": {
+      "decision.noul.accuracy": {
+        "value": 0.6,
+        "better": "higher",
+        "n": 5,
+        "spread": [
+          0.6,
+          0.6
+        ]
+      },
+      "decision.noul.macro_f1": {
+        "value": 0.375,
+        "better": "higher",
+        "n": 5,
+        "spread": [
+          0.375,
+          0.375
+        ]
+      },
+      "decision.noul.ece": {
+        "value": 0.285308637835162,
+        "better": "lower",
+        "n": 5,
+        "spread": [
+          0.285308637835162,
+          0.285308637835162
+        ]
+      },
+      "decision.noul.error_rate": {
+        "value": 0.0,
+        "better": "lower",
+        "n": 5,
+        "spread": [
+          0.0,
+          0.0
+        ]
+      },
+      "decision.noul.brier": {
+        "value": 0.27806248254647037,
+        "better": "lower",
+        "n": 5,
+        "spread": [
+          0.27806248254647037,
+          0.27806248254647037
+        ]
+      },
+      "decision.noul.mean_abs_dp": {
+        "value": 0.39076219532988465,
+        "better": "lower",
+        "n": 5,
+        "spread": [
+          0.39076219532988465,
+          0.39076219532988465
+        ]
+      },
+      "decision.noul.agreement": {
+        "value": 0.6,
+        "better": "higher",
+        "n": 5,
+        "spread": [
+          0.6,
+          0.6
+        ]
+      },
+      "decision.error_rate": {
+        "value": 0.0,
+        "better": "lower",
+        "n": 10,
+        "spread": [
+          0.0,
+          0.0
+        ]
+      },
+      "decision.latency.cold_s": {
+        "value": 0.177288,
+        "better": "lower",
+        "n": 1
+      },
+      "decision.latency.warm_p50_s": {
+        "value": 0.064746,
+        "better": "lower",
+        "n": 9
+      },
+      "decision.latency.warm_p95_s": {
+        "value": 0.174724,
+        "better": "lower",
+        "n": 9,
+        "spread": [
+          0.094937,
+          0.174724
+        ]
+      },
+      "decision.latency.q1.warm_p50_s": {
+        "value": 0.064746,
+        "better": "lower",
+        "n": 9
+      },
+      "decision.latency.q1.warm_p95_s": {
+        "value": 0.174724,
+        "better": "lower",
+        "n": 9
+      },
+      "decision.usage.input_tokens_mean": {
+        "value": 348.8,
+        "better": "lower",
+        "n": 10
+      },
+      "decision.usage.output_tokens_mean": {
+        "value": 0.0,
+        "better": "lower",
+        "n": 10
+      },
+      "decision.usage.input_tokens_total": {
+        "value": 3488,
+        "better": "lower",
+        "n": 10
+      },
+      "decision.laya.truncated_items": {
+        "value": 2,
+        "better": "lower",
+        "n": 5
+      }
+    },
+    "conformance": {
+      "gate:decision.noul.accuracy": {
+        "level": "MUST",
+        "verdict": "FAIL",
+        "value": 0.6,
+        "min": 0.9
+      },
+      "gate:decision.noul.macro_f1": {
+        "level": "MUST",
+        "verdict": "FAIL",
+        "value": 0.375,
+        "min": 0.8
+      },
+      "decision.responses_valid": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "invalid": 0,
+        "requests": 10
+      },
+      "decision.deterministic": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "differs": [],
+        "n_differs": 0
+      },
+      "decision.context_fits": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "context_errors": 0,
+        "loaded_context": 512,
+        "required_tokens": null
+      }
+    },
+    "run_dir": "runs/20261001T224946Z__decision__aac6fef_laya-mlx",
+    "details": {
+      "decision.suite": {
+        "name": "laya-smoke5-unexpected-stop-20261001",
+        "role": "decision.noul",
+        "manifest": "~/.localbench/corpora/decision.noul/laya-smoke5-unexpected-stop-20261001/manifest.json",
+        "manifest_sha256": "fc7002ea713a47a4dd424010470b5c61fb9c92f76daab91ed17953539faa7771",
+        "items_sha256": "6a67e73c685ab56c3b3186759a4521e6d1288ea8364b6e6c44dadd3054eb3c2a",
+        "n_items": 5,
+        "has_reference": true
+      },
+      "decision.context": {
+        "action": "n/a",
+        "max_len": 512,
+        "head_max_len": 192,
+        "loaded_context": 512,
+        "model_num_ctx": 512,
+        "required_tokens": null,
+        "evicted": [],
+        "items_over_max_len": 2,
+        "items_truncated": 2,
+        "items_head_truncated": 5,
+        "items_unreported": 0,
+        "items_answered": 5,
+        "items": 5,
+        "shim_alive_after_run": true
+      }
+    },
+    "system": {
+      "during": {
+        "samples": 1,
+        "load1": {
+          "mean": 74.7,
+          "max": 74.69,
+          "min": 74.69
+        },
+        "gpu_device_pct": {
+          "mean": 58.0,
+          "max": 58,
+          "min": 58
+        },
+        "free_pct": {
+          "mean": 89.0,
+          "max": 89,
+          "min": 89
+        },
+        "swap_used_mb": {
+          "mean": 9.4,
+          "max": 9.44,
+          "min": 9.44
+        },
+        "pressure_levels": [
+          "normal"
+        ],
+        "resident_unknown_samples": 0,
+        "resident_owned_stop_samples": 0,
+        "gpu_by_process": [
+          {
+            "pid": 57230,
+            "name": "Python",
+            "pct": 17.5,
+            "cmd": "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python ~/Developer/localbench",
+            "model": "aac6fef/laya-mlx"
+          },
+          {
+            "pid": 179,
+            "name": "WindowServer",
+            "pct": 2.5,
+            "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+          }
+        ],
+        "load": {
+          "samples": 1,
+          "app_gpu_mean_pct": 2.5,
+          "app_gpu_p95_pct": 2.5,
+          "app_spike_seconds": 0,
+          "user_active_pct": 0.0
+        }
+      },
+      "contention": [
+        {
+          "t": 1790894996.07,
+          "foreign": {
+            "ollama": [
+              "nimble:latest",
+              "qwen3.8:27b-mlx"
+            ]
+          },
+          "foreign_gpu": [],
+          "resident": {
+            "ollama": [
+              "nimble:latest",
+              "qwen3.8:27b-mlx"
+            ],
+            "mlx-serve": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "gpu_device_pct": 58
+        }
+      ],
+      "load_spikes": [],
+      "host": {
+        "hostname": "mac-studio",
+        "model": "Mac15,14",
+        "chip": "Apple M3 Ultra",
+        "p_cores": 24,
+        "e_cores": 8,
+        "gpu_cores": 80,
+        "mem_gb": 512,
+        "macos": "26.5.2",
+        "macos_build": "25F84",
+        "gpu_wired_limit_mb": null,
+        "host_id": "mac-studio-apple-m3-ultra-512gb"
+      },
+      "wait_idle": null
+    },
+    "decision": {
+      "wall_s": 2.605,
+      "context": {
+        "action": "n/a",
+        "max_len": 512,
+        "head_max_len": 192,
+        "loaded_context": 512,
+        "model_num_ctx": 512,
+        "required_tokens": null,
+        "evicted": [],
+        "items_over_max_len": 2,
+        "items_truncated": 2,
+        "items_head_truncated": 5,
+        "items_unreported": 0,
+        "items_answered": 5,
+        "items": 5,
+        "shim_alive_after_run": true
+      },
+      "local": {
+        "arm": "local",
+        "model": "aac6fef/laya-mlx",
+        "endpoint": "http://127.0.0.1:60696/v1/systemone",
+        "suite": {
+          "name": "laya-smoke5-unexpected-stop-20261001",
+          "role": "decision.noul",
+          "manifest": "~/.localbench/corpora/decision.noul/laya-smoke5-unexpected-stop-20261001/manifest.json",
+          "manifest_sha256": "fc7002ea713a47a4dd424010470b5c61fb9c92f76daab91ed17953539faa7771",
+          "items_sha256": "6a67e73c685ab56c3b3186759a4521e6d1288ea8364b6e6c44dadd3054eb3c2a",
+          "sources": [
+            {
+              "path": "~/.localbench/corpora/decision.noul/unexpected-stop-jevlatest-20261001/manifest.json",
+              "sha256": "8454c80d2ee7cc3a8be3bc66f14edc6522c28810c09705be4ce825a41aacbcc8"
+            },
+            {
+              "path": "~/.localbench/corpora/decision.noul/unexpected-stop-jevlatest-20261001/items.jsonl",
+              "sha256": "cdfa4d9ab696370ca75a4bd12ef92b1b6ee6cd937e4f7f26d3278b3afaaa843a"
+            }
+          ],
+          "n_items": 5,
+          "has_reference": true
+        },
+        "repeats": 2,
+        "has_reference": true,
+        "usd_per_input_token": null,
+        "items": [
+          {
+            "id": "01432843a9a35af018fa496b39800b9d3c77bf13c2a51ba9b94254f879fc475e",
+            "questions": {
+              "stopped": {
+                "type": "noul",
+                "options": [
+                  "false",
+                  "true"
+                ]
+              }
+            },
+            "labels": {
+              "stopped": false
+            },
+            "state_bytes": 1675,
+            "prompt_bytes": 2348,
+            "reference": {
+              "stopped": 0.07
+            }
+          },
+          {
+            "id": "016343518abc1321aea1b45d643517f71a35029cdc051ff068d66e8014e1f3b0",
+            "questions": {
+              "stopped": {
+                "type": "noul",
+                "options": [
+                  "false",
+                  "true"
+                ]
+              }
+            },
+            "labels": {
+              "stopped": false
+            },
+            "state_bytes": 2034,
+            "prompt_bytes": 2722,
+            "reference": {
+              "stopped": 0.04
+            }
+          },
+          {
+            "id": "016f282d9dde54601671b9f8b50f806a26ac8fd01392dbe18bcee9eb2cca777b",
+            "questions": {
+              "stopped": {
+                "type": "noul",
+                "options": [
+                  "false",
+                  "true"
+                ]
+              }
+            },
+            "labels": {
+              "stopped": false
+            },
+            "state_bytes": 346,
+            "prompt_bytes": 1004,
+            "reference": {
+              "stopped": 0.16
+            }
+          },
+          {
+            "id": "01a12d63d46212306a873bab033bc252d0c70cc27338334819d568dcab532fef",
+            "questions": {
+              "stopped": {
+                "type": "noul",
+                "options": [
+                  "false",
+                  "true"
+                ]
+              }
+            },
+            "labels": {
+              "stopped": false
+            },
+            "state_bytes": 771,
+            "prompt_bytes": 1431,
+            "reference": {
+              "stopped": 0.04
+            }
+          },
+          {
+            "id": "0266224c901539199d55763b5678d183b22bf3c54a861aab42bc975da7d975e6",
+            "questions": {
+              "stopped": {
+                "type": "noul",
+                "options": [
+                  "false",
+                  "true"
+                ]
+              }
+            },
+            "labels": {
+              "stopped": true
+            },
+            "state_bytes": 22,
+            "prompt_bytes": 678,
+            "reference": {
+              "stopped": 0.66
+            }
+          }
+        ],
+        "outcomes": [
+          {
+            "id": "01432843a9a35af018fa496b39800b9d3c77bf13c2a51ba9b94254f879fc475e",
+            "repeat": 0,
+            "cold": true,
+            "n_questions": 1,
+            "ok": true,
+            "latency_s": 0.177288,
+            "model": "aac6fef/laya-mlx",
+            "answers": {
+              "stopped": {
+                "type": "noul",
+                "noul": 0.4662625850889747
+              }
+            },
+            "usage": {
+              "input_tokens": 512,
+              "output_tokens": 0
+            },
+            "laya": {
+              "truncated": [
+                "stopped"
+              ],
+              "head_truncated": [
+                "stopped"
+              ],
+              "over_max_len": [
+                "stopped"
+              ],
+              "unreported": []
+            }
+          },
+          {
+            "id": "016343518abc1321aea1b45d643517f71a35029cdc051ff068d66e8014e1f3b0",
+            "repeat": 0,
+            "cold": false,
+            "n_questions": 1,
+            "ok": true,
+            "latency_s": 0.064746,
+            "model": "aac6fef/laya-mlx",
+            "answers": {
+              "stopped": {
+                "type": "noul",
+                "noul": 0.41036052565590037
+              }
+            },
+            "usage": {
+              "input_tokens": 512,
+              "output_tokens": 0
+            },
+            "laya": {
+              "truncated": [
+                "stopped"
+              ],
+              "head_truncated": [
+                "stopped"
+              ],
+              "over_max_len": [
+                "stopped"
+              ],
+              "unreported": []
+            }
+          },
+          {
+            "id": "016f282d9dde54601671b9f8b50f806a26ac8fd01392dbe18bcee9eb2cca777b",
+            "repeat": 0,
+            "cold": false,
+            "n_questions": 1,
+            "ok": true,
+            "latency_s": 0.025075,
+            "model": "aac6fef/laya-mlx",
+            "answers": {
+              "stopped": {
+                "type": "noul",
+                "noul": 0.49901526522291395
+              }
+            },
+            "usage": {
+              "input_tokens": 223,
+              "output_tokens": 0
+            },
+            "laya": {
+              "truncated": [],
+              "head_truncated": [
+                "stopped"
+              ],
+              "over_max_len": [],
+              "unreported": []
+            }
+          },
+          {
+            "id": "01a12d63d46212306a873bab033bc252d0c70cc27338334819d568dcab532fef",
+            "repeat": 0,
+            "cold": false,
+            "n_questions": 1,
+            "ok": true,
+            "latency_s": 0.084989,
+            "model": "aac6fef/laya-mlx",
+            "answers": {
+              "stopped": {
+                "type": "noul",
+                "noul": 0.6395387069448275
+              }
+            },
+            "usage": {
+              "input_tokens": 361,
+              "output_tokens": 0
+            },
+            "laya": {
+              "truncated": [],
+              "head_truncated": [
+                "stopped"
+              ],
+              "over_max_len": [],
+              "unreported": []
+            }
+          },
+          {
+            "id": "0266224c901539199d55763b5678d183b22bf3c54a861aab42bc975da7d975e6",
+            "repeat": 0,
+            "cold": false,
+            "n_questions": 1,
+            "ok": true,
+            "latency_s": 0.174724,
+            "model": "aac6fef/laya-mlx",
+            "answers": {
+              "stopped": {
+                "type": "noul",
+                "noul": 0.41136610626319314
+              }
+            },
+            "usage": {
+              "input_tokens": 136,
+              "output_tokens": 0
+            },
+            "laya": {
+              "truncated": [],
+              "head_truncated": [
+                "stopped"
+              ],
+              "over_max_len": [],
+              "unreported": []
+            }
+          },
+          {
+            "id": "01432843a9a35af018fa496b39800b9d3c77bf13c2a51ba9b94254f879fc475e",
+            "repeat": 1,
+            "cold": false,
+            "n_questions": 1,
+            "ok": true,
+            "latency_s": 0.094937,
+            "model": "aac6fef/laya-mlx",
+            "answers": {
+              "stopped": {
+                "type": "noul",
+                "noul": 0.4662625850889747
+              }
+            },
+            "usage": {
+              "input_tokens": 512,
+              "output_tokens": 0
+            },
+            "laya": {
+              "truncated": [
+                "stopped"
+              ],
+              "head_truncated": [
+                "stopped"
+              ],
+              "over_max_len": [
+                "stopped"
+              ],
+              "unreported": []
+            }
+          },
+          {
+            "id": "016343518abc1321aea1b45d643517f71a35029cdc051ff068d66e8014e1f3b0",
+            "repeat": 1,
+            "cold": false,
+            "n_questions": 1,
+            "ok": true,
+            "latency_s": 0.072916,
+            "model": "aac6fef/laya-mlx",
+            "answers": {
+              "stopped": {
+                "type": "noul",
+                "noul": 0.41036052565590037
+              }
+            },
+            "usage": {
+              "input_tokens": 512,
+              "output_tokens": 0
+            },
+            "laya": {
+              "truncated": [
+                "stopped"
+              ],
+              "head_truncated": [
+                "stopped"
+              ],
+              "over_max_len": [
+                "stopped"
+              ],
+              "unreported": []
+            }
+          },
+          {
+            "id": "016f282d9dde54601671b9f8b50f806a26ac8fd01392dbe18bcee9eb2cca777b",
+            "repeat": 1,
+            "cold": false,
+            "n_questions": 1,
+            "ok": true,
+            "latency_s": 0.062916,
+            "model": "aac6fef/laya-mlx",
+            "answers": {
+              "stopped": {
+                "type": "noul",
+                "noul": 0.49901526522291395
+              }
+            },
+            "usage": {
+              "input_tokens": 223,
+              "output_tokens": 0
+            },
+            "laya": {
+              "truncated": [],
+              "head_truncated": [
+                "stopped"
+              ],
+              "over_max_len": [],
+              "unreported": []
+            }
+          },
+          {
+            "id": "01a12d63d46212306a873bab033bc252d0c70cc27338334819d568dcab532fef",
+            "repeat": 1,
+            "cold": false,
+            "n_questions": 1,
+            "ok": true,
+            "latency_s": 0.049369,
+            "model": "aac6fef/laya-mlx",
+            "answers": {
+              "stopped": {
+                "type": "noul",
+                "noul": 0.6395387069448275
+              }
+            },
+            "usage": {
+              "input_tokens": 361,
+              "output_tokens": 0
+            },
+            "laya": {
+              "truncated": [],
+              "head_truncated": [
+                "stopped"
+              ],
+              "over_max_len": [],
+              "unreported": []
+            }
+          },
+          {
+            "id": "0266224c901539199d55763b5678d183b22bf3c54a861aab42bc975da7d975e6",
+            "repeat": 1,
+            "cold": false,
+            "n_questions": 1,
+            "ok": true,
+            "latency_s": 0.015135,
+            "model": "aac6fef/laya-mlx",
+            "answers": {
+              "stopped": {
+                "type": "noul",
+                "noul": 0.41136610626319314
+              }
+            },
+            "usage": {
+              "input_tokens": 136,
+              "output_tokens": 0
+            },
+            "laya": {
+              "truncated": [],
+              "head_truncated": [
+                "stopped"
+              ],
+              "over_max_len": [],
+              "unreported": []
+            }
+          }
+        ],
+        "metrics": {
+          "decision.noul.accuracy": {
+            "value": 0.6,
+            "better": "higher",
+            "n": 5,
+            "spread": [
+              0.6,
+              0.6
+            ]
+          },
+          "decision.noul.macro_f1": {
+            "value": 0.375,
+            "better": "higher",
+            "n": 5,
+            "spread": [
+              0.375,
+              0.375
+            ]
+          },
+          "decision.noul.ece": {
+            "value": 0.285308637835162,
+            "better": "lower",
+            "n": 5,
+            "spread": [
+              0.285308637835162,
+              0.285308637835162
+            ]
+          },
+          "decision.noul.error_rate": {
+            "value": 0.0,
+            "better": "lower",
+            "n": 5,
+            "spread": [
+              0.0,
+              0.0
+            ]
+          },
+          "decision.noul.brier": {
+            "value": 0.27806248254647037,
+            "better": "lower",
+            "n": 5,
+            "spread": [
+              0.27806248254647037,
+              0.27806248254647037
+            ]
+          },
+          "decision.noul.mean_abs_dp": {
+            "value": 0.39076219532988465,
+            "better": "lower",
+            "n": 5,
+            "spread": [
+              0.39076219532988465,
+              0.39076219532988465
+            ]
+          },
+          "decision.noul.agreement": {
+            "value": 0.6,
+            "better": "higher",
+            "n": 5,
+            "spread": [
+              0.6,
+              0.6
+            ]
+          },
+          "decision.error_rate": {
+            "value": 0.0,
+            "better": "lower",
+            "n": 10,
+            "spread": [
+              0.0,
+              0.0
+            ]
+          },
+          "decision.latency.cold_s": {
+            "value": 0.177288,
+            "better": "lower",
+            "n": 1
+          },
+          "decision.latency.warm_p50_s": {
+            "value": 0.064746,
+            "better": "lower",
+            "n": 9
+          },
+          "decision.latency.warm_p95_s": {
+            "value": 0.174724,
+            "better": "lower",
+            "n": 9,
+            "spread": [
+              0.094937,
+              0.174724
+            ]
+          },
+          "decision.latency.q1.warm_p50_s": {
+            "value": 0.064746,
+            "better": "lower",
+            "n": 9
+          },
+          "decision.latency.q1.warm_p95_s": {
+            "value": 0.174724,
+            "better": "lower",
+            "n": 9
+          },
+          "decision.usage.input_tokens_mean": {
+            "value": 348.8,
+            "better": "lower",
+            "n": 10
+          },
+          "decision.usage.output_tokens_mean": {
+            "value": 0.0,
+            "better": "lower",
+            "n": 10
+          },
+          "decision.usage.input_tokens_total": {
+            "value": 3488,
+            "better": "lower",
+            "n": 10
+          }
+        }
+      },
+      "hosted": null,
+      "compare": null
+    }
+  }
+}

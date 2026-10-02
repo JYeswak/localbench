@@ -590,6 +590,7 @@ docs/LEDGER_RESURRECTION.md.
 - **Bead:** kit-omlx-backend-survey-9e8
 - **Surface:** the local main-model engine. A `mlx-serve:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit` (mlx-serve 26.9.2, the CURRENT mlx-serve golden's config), B `omlx:` the same directory (oMLX 0.7.0rc1 wheel, backend 90006b2: fresh one-model dir and SSD cache per start). Same weights, so only the engine differs. oMLX detects this pack as a VLM (engine vlm, text-only 19.08 GB); that is how it would serve it, so it is measured that way and recorded in the fingerprint.
 - **Hypothesis:** the release notes (github.com/jundot/omlx/releases/tag/v0.7.0rc1): partial block caching on a 13.4K-token Qwen3.6-35B-A3B conversation cut next-turn prefill from 1,174 to 37 tokens and TTFT from 0.83 to 0.42 s; faster Qwen prefill and decode (M5 Max figures, not this host). omp's turns re-send a growing prefix, so next-turn prefill is its cost.
+- **Vendor-only figures, surveyed 2026-09-29:** [oMLX 0.7.0rc1 release notes](https://github.com/jundot/omlx/releases/tag/v0.7.0rc1) report Qwen3.8-Flash-Next oQ4e 16K prefill **1,522 → 2,007 tok/s** (one request); Qwen3.8-27B oQ4e four-request decode **56.9 → 131.5 tok/s** with DFlash2 and **88.9 → 136.9 tok/s** with Lightning MTP, each against its own pre-PR baseline; and a 13.4K-token Qwen3.6-35B-A3B conversation with partial-block caching **1,174 → 37** reprocessed tokens, TTFT **0.83 → 0.42 s**. The vendor's speed tests used an **M5 Max with 128 GB**; this host is an M3 Ultra, omp's side calls are predominantly single-stream, and the locally measured Qwen3.6 4-bit pack is not the oQ4e Qwen3.8 pack. The GDN prefill kernels originated in mlx-serve, the incumbent engine in this same-weights A/B. None of the vendor ratios is a localbench speed claim, a transfer factor, or evidence that oMLX beats mlx-serve here.
 - **A/B:** not yet measured. Command, after `localbench park`: `localbench ab mlx-serve:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit omlx:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit --tiers conf,micro,replay,e2e --repeats 3 --pairs 1 --bank ab-mlxserve-vs-omlx-qwen36-20260925 --wait-idle 1800`.
 - **A/A null:** A1 vs A2 of the same invocation.
 - **Verdict:** SURVEY
@@ -806,3 +807,334 @@ docs/LEDGER_RESURRECTION.md.
 - **Action:** `localbench smol revert` at ~22:58Z (the owner's decision): every profile's smol back to `ollama/qwen3.8:27b-mlx`, server stopped, LaunchAgent removed. Running omp sessions keep mlx-serve until restarted and until then their smol calls fail (server down).
 - **Retry predicate:** a same-day A/B in which B's legs show zero raw `<tool_call>` answer strings over the mem and sess tiers (an mlx-serve release above 26.9.5, or a server flag that parses Qwen3.8's XML tool calls), then the full smol gate on a SOUND receipt before any go-live.
 - **Lesson:** an adoption that skips the tier exercising tool calls ships a model that cannot use tools; a screen of think and sess has no tool-calling job and cannot see it.
+- **Correction (2026-09-27, from the Bonsai 2 mlxfast run's proxy bodies):** every raw `<tool_call>` counted above came from the mem tier, which runs omp with `--no-tools`: the requests declared no tools. Under that condition ollama converts the model's tool-call text into structured calls anyway (omp answers "Tool X not found"; the incumbent used up to 12 such rounds in one turn, then answered), while mlx-serve 26.9.5 returned the text as the answer. The REJECT stands for the tier as designed (its Q3 misses are real there), but the Action's reasoning that recall, retain and scouts are broken in real sessions (which do declare tools) is unmeasured inference. mlx-serve 26.9.6 (2026-09-26) lists "a request without tools gets the model's reply exactly as written" and "Qwen3.8 agents stop going in circles". Retry: the mem tier with omp's memory tools declared (owner's decision 2026-09-27), then this pack on 26.9.6.
+
+## 2026-09-26 — REJECT: the MLX.FAST Bonsai 2 engine at its accepted-submissions HEAD runs correctly on this M3 Ultra
+- **Bead:** none (probe for the owner's MLX.FAST lead)
+- **Surface:** Layr-Labs/mlxfast-bonsai2-27b-engine, built locally with Xcode 26.6 / Swift 6.3.3 on /Volumes/Models/ollama-models/src/. Target prism-ml/Ternary-Bonsai-2-27B-mlx-2bit @ 3f926b4 (19 reference file hashes verified by setup.sh).
+- **Hypothesis:** the leaderboard's engine (record "297.5%", 237 decode / 1,758.7 prefill tok/s, hardware not stated) produces correct output here.
+- **A/B:** at HEAD f616f65 ("Accept submission 6e19fe12…"), `./benchmark.sh --local-iterate` fails correctness at step 0 (`local-iterate teacher-forced token mismatch`, expected token 71093); the vendored `mlx-server` built from the same tree answers "What is 17*23?" with multilingual gibberish, on the transformed `weights/` and on the untransformed checkpoint alike; its log says `qwen35: table-driven attention prework disagrees with the op chain on this device (float32)`. At the track's `baseline_reference_commit` 88cf569 (worktree mlxfast-baseline), the same server on the same checkpoint answers "391" with separate `reasoning_content`, and a tool request returns a structured `tool_calls` entry (`read`, `{"path":"secret.txt"}`).
+- **A/A null:** the same prompt, checkpoint and binary layout on both commits; only the tree differs.
+- **Verdict:** REJECT (HEAD on this device). The baseline tree is usable and is what localbench measures.
+- **Retry predicate:** a HEAD after f616f65 whose `./benchmark.sh --local-iterate` passes correctness on this M3 Ultra; then its mlx-server gets the same screen as the baseline.
+- **Lesson:** a speed leaderboard whose scoring is not armed ranks submissions on the organizer's hardware; correctness on another chip generation is not implied.
+
+## 2026-09-26 — SURVEY: Ternary Bonsai 2 27B on the MLX.FAST baseline mlx-server is a faster smol model than qwen3.8:27b-mlx without losing smol quality (screen with the mem tier; gate fixed before data)
+- **Bead:** none
+- **Surface:** stage 1 screen, `localbench ab ollama:localbench-parked:5642e97495e1 mlxfast:<Bonsai 2 checkpoint dir @ 3f926b4> --tiers think,sess,mem --repeats 1 --pairs 1 --bank ab-screen-bonsai2-mlxfast-baseline-20260926 --wait-idle 1800` after `localbench park` and a `localbench gpu --seconds 5` showing no foreign client. B = mlx-server from mlxfast-bonsai2-27b-engine @ 88cf569, `--tool-call-parser xml_function --reasoning-parser qwen3`.
+- **First launch, void (2026-09-26 22:51–00:39Z):** A1 and B ran CONTENDED: an `ollama run qwen3.6:35b-mlx` from an omp session in another project (cwd ~/Developer/proj-b) held the GPU at 71–90%; A2 waited in preflight until the tool timeout ended the invocation. Nothing banked. B's mem and sess tiers also MUST-failed on a harness gap (mlxfast reported no loaded context), fixed in e6dabb5 (loaded_context from config.max_position_embeddings; the server applies no cap). Contended B read, not evidence: think accuracy 6/6, zero raw `<tool_call>` strings, think.wall_s 169.8 s against A1's 21.3 s. Relaunch unchanged once `localbench gpu` shows no foreign client.
+- **Second launch, void (2026-09-27 ~00:10Z):** after the owner authorized killing the foreign run, the proj-b session started new one-shot `ollama run` calls (thinkingcap, then qwen3.6). A1 crashed in its fingerprint: ollama's /api/ps did not answer within 120 s while it loaded that session's model. Nothing banked; unpark hit the same stall and is fixed in 583005d. Retry predicate unchanged: the screen needs a window with no other ollama client.
+- **Third launch, no receipt (2026-09-27 00:45–01:50Z, proj-b held off by its own guard):** A1 SOUND (contended=no, MUST fail 0). B: think 6/6; sess 12/12 turns but the session took 100.4 s to exit against A1's 3.6 s; mem's first three recalls hit (ZEBRA-8759, 22755, Okafor) with no raw `<tool_call>`, then one control turn ("What is the deploy code for project Falcon?") never ended: omp's 1800 s turn timeout raised and the traceback ended the whole A/B before A2. Nothing banked, so no gate verdict. The harness now records a timed-out mem turn as a miss (rc "timeout") instead of crashing (this commit). Relaunch unchanged.
+- **Hypothesis:** the MLX.FAST engine's prefill (the leaderboard claims 1,758.7 tok/s) fixes what dropped Bonsai 2 on mlx-serve 26.9.5 (sess.memory.extract_s B-WORSE, 3.43 vs 2.56–2.74 s), and its tool-call parser returns structured calls.
+- **A/B gate:** the standing SCREEN gate unchanged, plus, fixed here before data because the 2026-09-25 REJECT showed the screen could not see it: DROP if any mem or sess answer string on B contains a raw `<tool_call>`, or if mem.recall.hit_rate or mem.derail.ok_rate is B-WORSE. The load-balance rule applies.
+- **A/A null:** A1/A2 of the same invocation.
+- **Verdict:** SURVEY
+- **Retry predicate:** the command above banks a SOUND receipt; apply this gate. On ADVANCE, the full smol gate (Q1–Q4, S1–S2, `--pairs 2`) before any profile change.
+- **Lesson:** add the tier that exposed the last failure to the screen before the next candidate, not after.
+
+## 2026-09-27 — UNKNOWN: the MLX.FAST repo's public mlx-server is not its fast engine (screen not rerun, owner's decision)
+- **Bead:** none
+- **Surface:** the SURVEY row above; evidence from its third launch (runs/20260927T003754Z__ab_b__mlxfast__…, unbanked) and the source of mlxfast-bonsai2-27b-engine @ 88cf569.
+- **Hypothesis:** the SURVEY row above.
+- **A/B:** not banked. Two causes read from the run's own logs. (1) The 30 min hang: one `--no-tools` mem control turn made 60 calls to tools that do not exist (`agent`, `proc`, `ssh`, `mcp`, each answered "Tool X not found"), prompts growing 2,238 → 12,473 tokens, never answering. (2) No prompt-prefix reuse: B's proxy log shows cached_tokens on 0 of 131 mem calls and 0 of 27 sess calls (A1 on ollama: 101 of 102 and 26 of 29); median ttft 17.8 s mem / 46.0 s sess against A1's 0.38 / 0.29 s; a 12,350-token prompt took 45.3 s to first token (~270 tok/s). The source says why: `mlx-server` serves through `MLXModelContainerEngine`, "single-request … batched concurrent serving lives downstream in the Darkbloom provider's ContinuousBatchingV2 bridge, not in this CLI engine" (MLXLMServer/Runtime/MLXModelContainerEngine.swift; CLI/MLXServerRunner.swift). The leaderboard's MTP, paged KV and prefix cache run only inside `bench-worker`, which speaks the benchmark's Engine Protocol v1, not a chat API.
+- **A/A null:** A1 of the same invocation.
+- **Verdict:** UNKNOWN
+- **Retry predicate:** a public server on the ContinuousBatchingV2 engine (prefix cache, MTP) for this track, or an mlx-serve release whose Bonsai 2 path passes the mem tier with memory tools declared; then the SCREEN gate of the SURVEY row above.
+- **Lesson:** a leaderboard engine and the repo's convenience server are different programs; check which one serves chat before measuring it.
+
+## 2026-09-27 — SURVEY: on mlx-serve 26.9.6, the Qwen3.8-27B MLX-Serve 4-bit pack (MTP) and Ternary Bonsai 2 27B (MTP) are faster smol models than qwen3.8:27b-mlx without losing smol quality, with the mem tier on memory tools (two screens; gate fixed before data)
+- **Bead:** none
+- **Surface:** one invocation after `localbench park` and a `localbench gpu --seconds 5` showing no foreign client (proj-b's scripts/local-model-guard.sh waits while anything is parked), then `localbench unpark`:
+  (a) `localbench ab ollama:localbench-parked:5642e97495e1 mlx-serve:/Volumes/Models/ollama-models/hf-sources/ddalcu/Qwen3.8-27B-MLX-Serve-4bit --b-mlx-serve ~/.localbench/mlx-serve-26.9.6/mlx-serve-macos-arm64/mlx-serve --b-server-arg=--mtp --tiers think,sess,mem --repeats 1 --pairs 1 --bank ab-screen-qwen38-4bit-mtp-mlxserve2696-20260927 --wait-idle 1800`;
+  (b) the same with B `mlx-serve:<prism-ml/Ternary-Bonsai-2-27B-mlx-2bit snapshot 3f926b4>` and `--bank ab-screen-bonsai2-mtp-mlxserve2696-20260927`.
+  mlx-serve 26.9.6 from the GitHub release tarball (sha256 bb4ec3f6…, binary sha16 bee44c092b454598, `--version` "mlx-serve 26.9.6"). mem tier as of 5975462 (`--tools=memory_edit,recall,reflect,retain`, pinned omp_mem_tools).
+- **Hypothesis:** 26.9.6's changes ("a request without tools gets the model's reply exactly as written", "Qwen3.8 agents stop going in circles", Bonsai 2 decode up to 20% faster) and the realistic mem tier remove the failures of the 2026-09-25 screens and REJECT, while keeping mlx-serve's session-wait gains (4-bit pack screen: post_retain_wall_s 5.37/5.17 → 3.07 s).
+- **A/B gate (each screen separately):** the standing SCREEN gate unchanged, plus the mem conditions fixed in the 2026-09-26 mlxfast SURVEY row: DROP if any mem or sess answer string on B contains a raw `<tool_call>`, or if mem.recall.hit_rate or mem.derail.ok_rate is B-WORSE. The load-balance rule applies. ADVANCE / HOLD as the standing gate.
+- **A/A null:** A1/A2 of each invocation.
+- **Verdict:** SURVEY
+- **Retry predicate:** each command banks a SOUND receipt; apply the gate above to each. On ADVANCE, the full smol gate (Q1–Q4, S1–S2, `--pairs 2`, mem tier on memory tools) before any profile change.
+- **Lesson:** re-screen a rejected configuration only after the cause is fixed on both sides: the server release and the harness condition.
+
+## 2026-09-27 — KEEP (SCREEN, advances to stage 2 only): Qwen3.8-27B MLX-Serve 4-bit with MTP on mlx-serve 26.9.6 as smol — but one memory-tool turn looped to the timeout
+- **Bead:** none
+- **Surface:** screen (a) of the SURVEY row above: receipts/ab-screen-qwen38-4bit-mtp-mlxserve2696-20260927.json, SOUND (A1,B,A2 02:29–03:42Z, rev a59de17, contended=no on all legs, conformance 3/3 each; load balance within 5 points).
+- **Hypothesis:** the SURVEY row above, pack (a).
+- **A/B:** the gate as registered. No DROP: think.accuracy 1 → 1; think.wall_s 19.11 / 18.92 → 20.25, WITHIN-NOISE; sess.memory.extract_s 2.322 / 2.358 → 1.984, **B-BETTER** (B/A 0.848, band 0.1); sess checks PASS; raw `<tool_call>` strings 0 / 0 / 0; mem.recall.hit_rate 1 → 1; mem.derail.ok_rate 1 → 1. ADVANCE on extract_s. Also B-BETTER: sess.turn.pre_main_s 1.94 / 1.95 → 0.83 s, post_retain_pre_main_s 4.06 / 4.04 → 2.00 s, mem.recall.pre_main_s 7.17 / 7.07 → 5.51 s. Also B-WORSE (not gate rows): mem.recall.wall_s 11.75 / 12.25 → 18.5 s and mem.plant.wall_s 14.57 / 13.21 → 19.64 s; think.completion_tokens 1.28x. **Blind spot, found in the run's proxy bodies:** on B, one control turn ("What is the deploy code for project Falcon?", no fact planted) called `recall` 356 times with 19 distinct queries, every result "No relevant memories found.", and ended only at the 1800 s turn timeout (rcs `[0, 0, "timeout", 0]`); B made 535 main calls in the mem tier against A1's 86 (completion tokens 49,905 vs 11,469); A's worst turn made 8 tool calls. The gate has no row for a looping turn, so ADVANCE stands as registered.
+- **A/A null:** A1/A2 of the same invocation.
+- **Verdict:** KEEP
+- **Retry predicate:** this row changes no profile. Stage 2, gate fixed now before its data: Q1–Q4, S1–S2 as registered for the smol gate, `--pairs 2`, mem tier on memory tools, plus DROP if any B turn in mem or sess ends at the turn timeout or makes more than 3x the largest per-turn tool-call count of any A leg. A blind re-judge before any profile change.
+- **Lesson:** "no failure verdict" is not "no failure": read the tool-call counts per turn before trusting a pass.
+
+## 2026-09-27 — REJECT (SCREEN): Ternary Bonsai 2 27B with MTP on mlx-serve 26.9.6 as smol — memory extraction 49% slower
+- **Bead:** none
+- **Surface:** screen (b) of the SURVEY row above: receipts/ab-screen-bonsai2-mtp-mlxserve2696-20260927.json, SOUND (A1,B,A2 03:42–04:32Z, rev a59de17, contended=no, conformance 3/3 each).
+- **Hypothesis:** the SURVEY row above, pack (b).
+- **A/B:** DROP on **sess.memory.extract_s 2.324 / 2.227 → 3.397, B/A 1.493, band 0.128, B-WORSE**, the same failure as the 26.9.5 screen (1.293 there). The rest held: think.accuracy 1 → 1; think.wall_s WITHIN-NOISE (18.98 / 18.80 → 18.77); raw `<tool_call>` 0; mem.recall.hit_rate 1 → 1; derail 1 → 1; no turn timed out (B's worst turn 21 tool calls). B-BETTER: sess.turn.pre_main_s 0.83 s, post_retain_pre_main_s 2.25 s. B-WORSE besides extract: mem.recall.wall_s 1.64x, mem.plant.wall_s 1.57x.
+- **A/A null:** A1/A2 of the same invocation.
+- **Verdict:** REJECT
+- **Retry predicate:** screen again when an mlx-serve release above 26.9.6 or a Bonsai revision after 3f926b4 reports faster prefill for dense Qwen3.8 packs; the same gate as the SURVEY row above.
+- **Lesson:** two releases of decode gains have not moved Bonsai's prefill-bound extraction; its ternary weights save memory, not this machine's time.
+
+## 2026-09-28 — DROP (STAGE 2): Qwen3.8-27B MLX-Serve 4-bit with MTP on mlx-serve 26.9.6 — memory-tool loop exceeds registered gate
+- **Bead:** none
+- **Surface:** `localbench ab ollama:localbench-parked:5642e97495e1 mlx-serve:/Volumes/Models/ollama-models/hf-sources/ddalcu/Qwen3.8-27B-MLX-Serve-4bit --b-mlx-serve ~/.localbench/mlx-serve-26.9.6/mlx-serve-macos-arm64/mlx-serve --b-server-arg=--mtp --tiers conf,micro,e2e,think,mem,sess --repeats 2 --pairs 2 --bank ab-smol-qwen38-ollama-vs-mlxserve-4bit-mtp-2696-20260928 --wait-idle 1800`, after `localbench park`, `localbench gpu --seconds 5` showed no foreign inference client; UCA was booted out and restored after unpark. The first invocation hit the tool's one-hour deadline and is not scored; the no-outer-deadline rerun banked SOUND receipt `docs/evidence/receipts/ab-smol-qwen38-ollama-vs-mlxserve-4bit-mtp-2696-20260928.json` (A1/B1/A2/B2/A3, all contended=no, preflight=ok), using harness commit `5a15afb` and omp 18.4.0. Memory-tools tier from `5975462`.
+- **Hypothesis:** the KEEP (SCREEN) row of 2026-09-27 holds under the full gate.
+- **A/B gate (fixed in that row before any data, restated):** Q1–Q4 and S1–S2 of the smol gate (qwen3.6 SURVEY row, as amended), with Q3 read on the memory-tools mem tier; plus DROP if any B turn in mem or sess ends at the turn timeout (mem.turn.timeouts or sess.turn.timeouts > 0 on B) or B's mem.turn.max_tool_calls or sess.turn.max_tool_calls exceeds 3x the largest value of any A leg for that tier. A VOID loop metric on B is not a pass: the row stays UNKNOWN until it is measured.
+- **A/A null:** A1/A2/A3 of the same invocation.
+- **Verdict:** DROP — B mem.turn.max_tool_calls 65/27 (median 46) against A 9/7/11 (median 9); a B turn reached 65 calls, above 3× the largest A leg (33). B mem.turn.timeouts=0. The explicit loop gate fails even though recall hit rate is 1 and no B mem/sess timeout was recorded.
+- **Retry predicate:** rerun the same registered stage-2 gate only after a newer mlx-serve release or a model/config change measurably lowers the B memory-turn call maximum to at most 33, with SOUND receipt and all other gates still passing.
+- **Lesson:** zero timeouts do not excuse a call loop whose tool count exceeds the registered bound.
+
+## 2026-09-29 — UNKNOWN: the 6.4–6.6x prefill speedup applies to the current Ollama generation
+- **Bead:** kit-b3
+- **Surface:** README speed claim `moe_prefill_ratio`, registries/claims.tsv, Ollama on this Mac
+- **Hypothesis:** the historical Qwen3.6-versus-qwen3.8 prefill ratio remains a supported current-generation claim.
+- **A/B:** historical `docs/evidence/receipts/ab-incumbent-vs-moe.json`: micro.prefill_1k 6.407x and prefill_8k 6.572x, measured with Ollama 0.32.15 (sha eee609f0a6da58b9). The incumbent pin is now Ollama 0.34.4 (sha bba8b79eac84ab09, docs/evidence/incumbents.md); no current-generation A/B was run while another Ollama client was active.
+- **A/A null:** VOID-GENERATION — the old receipt's A/B null cannot establish the ratio under 0.34.4.
+- **Verdict:** UNKNOWN
+- **Retry predicate:** after the foreign Ollama client becomes idle, `localbench park` and run a same-invocation, uncontended `localbench ab` of the pinned dense incumbent and Qwen3.6 with at least two pairs under Ollama 0.34.4; bank and inspect its A/A bands and both 1k/8k ratios before re-enforcing the public claim.
+- **Lesson:** D6 expires a speed proof when its backend pin changes; the old result remains historical, not current evidence.
+
+## 2026-09-29 — UNKNOWN: the 6.1 s cold tool-task wall applies to the current omp generation
+- **Bead:** kit-b3
+- **Surface:** README speed claim `first_turn_under_10s`, registries/claims.tsv, omp with mlx-serve
+- **Hypothesis:** the historical 6.0838 s cold first turn remains a supported current-generation claim.
+- **A/B:** historical `docs/evidence/receipts/aa__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit__20260923T072527Z.json`: 6.0838 / 5.9463 s on an A/A under omp 18.2.11 (sha ce797fb3ed92e768), mlx-serve 26.9.2. `localbench status` now reports omp 18.4.3 (sha b72ee39b7feb2d59); no current-generation cold e2e turn was measured during active foreign inference.
+- **A/A null:** VOID-GENERATION — that A/A used the older omp pin.
+- **Verdict:** UNKNOWN
+- **Retry predicate:** with the foreign local-model client idle, `localbench park` and run the answer-checked cold e2e tool task in an uncontended A/A on the current omp and mlx-serve pins; bank the receipt and confirm first-call cached_tokens=0 and both sound legs before re-enforcing a current first-turn claim.
+- **Lesson:** a historically correct cold answer and wall time do not certify latency after an omp binary upgrade.
+
+## 2026-09-29 — VOID-PROOF-CLASS: an omp 18.2.11 prompt fixture sidecar cannot enforce a banked same-generation README claim
+- **Bead:** kit-b6, kit-b3
+- **Surface:** `registries/claims.tsv:lean_prompt_tokens`, `fixtures/omp/lean.meta.json`, `scripts/check-claim-discipline.sh`
+- **Hypothesis:** the recorded historical lean-prompt sidecar satisfies the registry's banked same-generation requirement for `enforce=yes`.
+- **A/B:** the sidecar records `prompt_tokens: 11433` under omp 18.2.11, and `fixtures/omp/full.meta.json` records 73,779; neither is a banked harness receipt for current omp 18.4.3. Before demotion the claim checker printed `1 passed, 0 failed, 6 skipped` because it checked only README text and proof-file content. After `enforce=no`, `sh scripts/check-claim-discipline.sh` exits 1 with `0 passed, 1 failed, 11 skipped` and names zero enforced claims. The detector's independent valid-claim fixture still passes all 4 gate tests and catches all 6 planted gate mutations.
+- **A/A null:** not a model-performance comparison; fixture and receipt are different proof classes.
+- **Verdict:** VOID-PROOF-CLASS as enforced proof; no model-quality verdict follows. The dated 73,779-to-11,433 observation remains documented historical fixture provenance; current prompt shape is UNKNOWN.
+- **Retry predicate:** a banked, reviewed receipt of a real README claim matches the current omp/backend/model and host pins, carries its worker and revision provenance, and passes the published claim's relevant soundness gate; only then may that row be set `enforce=yes` and kit-b6 be closed.
+- **Lesson:** a checker accepting a matching substring does not promote a sidecar to a banked receipt. D4 demotion can correctly turn a gate red; do not fabricate another enforced row or weaken its zero-enforced refusal.
+
+## 2026-09-29 — VOID-NO-A/A: the current-generation Ollama MoE cold e2e run fails its pinned golden
+- **Bead:** lb-05
+- **Surface:** `localbench run ollama:qwen3.6:35b-mlx --tiers e2e --wait-idle 1800` after `localbench park`; run `runs/20260929T073157Z__run__ollama__qwen3.6_35b-mlx`
+- **Hypothesis:** answer-checked cold OMP turns remain sound against the CURRENT per-tier golden on this host.
+- **A/B:** single run versus `goldens/mac-studio-apple-m3-ultra-512gb/ollama__qwen3.6_35b-mlx.json`, with Ollama 0.34.4, qwen3.6 digest e92a3e94bbca, omp 18.4.3; contended=no, must_fail=[], first_call_cached_tokens=0 on both tasks. `tool_read` first/repeat answered 4817 in 4.883/2.737 s; `ok` first/repeat answered OK in 4.751/1.511 s. Despite the correct answers and faster wall times, `e2e.ok.first_llm_s` was 3.222 s versus golden 1.909 s, +68.8% outside tolerance 0.1: overall UNSOUND, exit 1. Both parked tags were restored by `localbench unpark`.
+- **A/A null:** no new A/A in this invocation; the pinned golden's tolerance 0.1 is the registered comparator, not a new spread estimate.
+- **Verdict:** VOID-NO-A/A for a model/configuration verdict. The measured invocation was UNSOUND (exit 1); two correct tasks do not override its failing timing gate.
+- **Retry predicate:** with foreign local-model inference absent, run a same-pins, uncontended A/A diagnostic retaining this golden to determine whether the cold `e2e.ok.first_llm_s` regression repeats; on a repeat failure, diagnose/fix the backend or OMP prompt path before attempting a new sound e2e proof. Do not re-bank the golden merely to absorb this loss.
+- **Lesson:** cold cached-token checks and correct short answers are necessary, but an independent pinned latency row can still reject the run.
+
+## 2026-09-29 — UNKNOWN: the single cold e2e first-LLM regression is persistent
+- **Bead:** lb-05 (tier mechanics closed), kit-mission-gate-ad7 (release claim open)
+- **Surface:** prior `runs/20260929T073157Z__run__ollama__qwen3.6_35b-mlx` versus new `docs/evidence/receipts/aa__ollama__qwen3.6_35b-mlx__20260929T082037Z.json`
+- **Hypothesis:** the prior `e2e.ok.first_llm_s` 3.222 s reading against golden 1.909 s reflects a stable same-generation regression.
+- **A/B:** not a candidate comparison. The diagnostic `localbench aa ollama:qwen3.6:35b-mlx --tiers e2e --wait-idle 1800` used the same Ollama 0.34.4, qwen3.6 digest e92a3e94bbca and omp 18.4.3 pins, with no golden write. Both legs were SOUND, uncontended and answered both tasks correctly with cold cached_tokens=0. The first OK LLM calls took 2.068 and 1.927 s (A/A spread 7.1%), not the previous 3.222 s; first OK wall times were 4.319 and 3.454 s (spread 22.2%). The earlier individual run remains UNSOUND under its unchanged golden. `localbench unpark` restored both parked tags after the A/A.
+- **A/A null:** the two legs of the banked same-invocation receipt above; no repeat of the 68.8% first-LLM excursion in this pair.
+- **Verdict:** UNKNOWN whether the tail recurs; the diagnostic does not erase the failing run or certify a general speedup. lb-05's narrow cold-turn measurement and negative detectors are satisfied, not the mission release gate.
+- **Retry predicate:** if another same-pins, uncontended `localbench run ... --tiers e2e` fails its current golden on `e2e.ok.first_llm_s`, collect an interleaved A/A with at least two pairs and compare cold cache and load before changing any model claim, golden, or tolerance.
+- **Lesson:** two clean A/A legs distinguish a one-off failed invocation from a demonstrated persistent regression, but do not prove the tail cannot recur.
+
+## 2026-09-29 — REJECT: oMLX 0.7.0rc1 loses same-model decode to mlx-serve on omp's path
+- **Bead:** kit-omlx-backend-survey-9e8
+- **Surface:** `docs/evidence/receipts/ab-mlxserve-vs-omlx-qwen36-20260929-pairs2.json`; mlx-serve 26.9.2 versus oMLX 0.7.0rc1 on the same Qwen3.6-35B-A3B-MLX-Serve-4bit files (`files:68dedceb5da0`).
+- **Hypothesis:** oMLX's advertised caching and inference improvements make it a faster omp engine than mlx-serve for these weights on this host.
+- **A/B:** SOUND, order A,B,A,B,A; all five legs uncontended, preflight OK, MUST failures 0, and pins unchanged per leg. Current omp 18.4.3 / `b72ee39b7feb2d59`, mlx-serve 26.9.2 / `4d09a3beb8d4c9be`, oMLX 0.7.0rc1 / `0765dade2ba118f5`. `micro.decode.decode_tps`: A median 159.7 tok/s (161.3/156.8/159.7), B median 105.3 tok/s (106.3/104.4), B/A 0.66, band 0.0849, B-WORSE. The three A legs span 4.5 tok/s (2.8% of the median), below the retry's 10% A/A limit. CPU busy was 17.9–19.2% on A and 19.3% on B, so the load-balance rule withheld no verdict. Both replay turn-2 rows and every e2e wall row were WITHIN-NOISE; answers were correct; conformance was 7/9 PASS on every leg with the same two SHOULD VOIDs and no MUST failures.
+- **A/A null:** same-invocation mlx-serve legs above; decode spread 2.8%, not the 2025 wide-null failure.
+- **Verdict:** REJECT under the unchanged pre-registered gate: `micro.decode.decode_tps` is B-WORSE. Per the owner, the newly identified OMLX process-classifier issue does not retroactively invalidate this decode finding. The result is limited to this host, model pack, and oMLX 0.7.0rc1 pin; it does not evaluate a later oMLX release or justify changing omp routes.
+- **Retry predicate:** only after a new oMLX binary/version or controlled decode-path change, pre-register and run a same-model A/B with at least two pairs; require a SOUND receipt, a same-invocation mlx-serve A/A decode spread under 10%, and apply the gate unchanged. Do not repeat the unchanged 0.7.0rc1/model pins as a retry.
+- **Lesson:** identical weights and balanced CPU load isolate an engine result; here oMLX's decode and cache rows lose despite the vendor's cross-machine claims.
+
+## 2026-09-29 — SURVEY: oMLX session-side memory calls fail despite complete turns
+- **Bead:** kit-omlx-backend-survey-9e8
+- **Surface:** descriptive `sess` A/B on omp 18.4.3, mlx-serve 26.9.2 versus oMLX 0.7.0rc1, identical Qwen3.6-35B-A3B-MLX-Serve-4bit files (`files:68dedceb5da0`), memory-enabled child config.
+- **Hypothesis:** survey whether oMLX preserves the mlx-serve session's memory-call success and post-retention turn behavior; this was not a registered adoption gate.
+- **A/B:** Receipt verdict SOUND at `docs/evidence/receipts/ab-mlxserve-vs-omlx-qwen36-sess-descriptive-20260929.json`, order A,B,A,B,A, two pairs, three 12-turn sessions per leg; it reports all legs uncontended, preflight OK, zero MUST failures, and all 180 turns complete. `sess.turn.wall_s`: A median 0.7121 s, B 0.7831 s, B/A 1.10, WITHIN-NOISE. `sess.turn.post_retain_pre_main_s`: A 0.4166 s, B 0.5593 s, B/A 1.342, B-WORSE. `sess.memory_calls_ok`: A not_ok 0/9 in each leg; B not_ok 5/9 and 4/9, SHOULD FAIL in both B legs; each listed memory-extract call had HTTP 200 but `aborted: true`. Historical attribution caveat: B `gpu_by_process` records identify the OMLX worker as `name=python3.13`, `cmd=omlx-server` at 63.9%/68.3%; the old classifier treated this own worker as app GPU. The receipt's app-GPU values are not retroactively corrected, and its historical absence-of-foreign-OMLX claim remains UNVERIFIED. The classifier fix is now complete (bead comment 75; `docs/evidence/break-tests.md`): future samples classify this worker as the model worker, not app GPU, and block a foreign `omlx-server` as inference. No sess KEEP/REJECT threshold applied.
+- **A/A null:** three mlx-serve legs in the same receipt; `post_retain_pre_main_s` 0.4166/0.4152/0.4172 s. The receipt's sess-turn wall A/A spread yields a broad 0.3598 s noise band; do not treat the isolated B-WORSE side metric as an adoption decision.
+- **Verdict:** SURVEY only. The fixed 2026-09-25 oMLX gate did not include `sess`, although the bead acceptance criterion says single-stream `e2e/sess` are gated. That registered-gate gap is unresolved; this supplemental observation cannot satisfy it or alter the 2026-09-29 REJECT on `micro.decode.decode_tps`.
+- **Retry predicate:** use the corrected classifier for any future app-GPU or foreign-OMLX inference. Do not rerun the existing REJECT or unchanged pins; any future adoption comparison requires a changed oMLX binary/version or controlled decode path and an authorized, prospectively registered same-model gate that explicitly covers the required single-stream tiers. Do not infer a post-hoc sess threshold.
+- **Lesson:** complete user turns do not imply successful memory side calls; keep descriptive session evidence separate from the registered engine-adoption gate.
+
+## 2026-10-01 — REJECT (SCREEN): nimble:latest for omp find-judgments (local System One vs hosted decision service)
+- **Bead:** kit-decision-tier-j4y (feature find-judgments)
+- **Surface:** `localbench decision run ollama:nimble:latest --suite ~/.localbench/corpora/decision.noul/screen-muse-find-100-seed20261001 --feature find-judgments`. The suite holds 100 items (1,880 noul questions) sampled with seed 20261001 from muse's omp judgment cache, with hosted proj-b-latest decisions as labels. Pre-registered on the bead at 00:45 MDT, before data. Ollama 0.35.0 (add45eb02df0252f), nimble digest 24e550a16a70, omp 18.4.6. Receipt `docs/evidence/receipts/decision__nimble_latest__screen-muse-find-100-seed20261001__20261001T065100Z.json`.
+- **Hypothesis:** local nimble agrees with hosted decision service on find relevance judgments well enough (>= 0.9) to advance to a stage-2 A/B.
+- **A/B:** a screen against recorded hosted answers; no hosted arm was run. decision.noul.accuracy 0.2548 over all 1,880 questions (gate MUST FAIL). 23 of 100 items returned HTTP 400 "prompt has N tokens; expected 1–8194": the resident nimble runner was loaded with an 8K context, and System One takes no context option. On the 609 answered questions alone, agreement was 0.7865 (TP 86, FP 80, FN 50, TN 393). Local said "relevant" 27.3% of the time, hosted 22.3%. Warm latency p50 2.85 s, p95 9.72 s under live load (GPU mean 94%): descriptive only.
+- **A/A null:** not needed: answers are deterministic label log-probs. The verdict stands even if every errored item had been answered at the answered-item rate (< 0.9).
+- **Verdict:** REJECT (SCREEN) for find-judgments. Hosted decision service stays on that route in claude/codex/grok/muse. No profile changed.
+- **Retry predicate:** a newer nimble digest or another System One model on the Ollama library (the release watch files it); rerun this exact screen suite after loading the model with a context of at least 16K, and advance only at >= 0.9 accuracy.
+- **Lesson:** a 9B decision model that matches hosted decision service on short auto-thinking prompts (0.66) still disagrees on about 1 in 5 long-file relevance judgments. The runner's loaded context is part of the route: without it, a third of long items fail outright.
+
+## 2026-10-01 — REJECT (SCREEN), confounded: tev1:latest for omp find-judgments
+- **Bead:** kit-decision-tier-j4y (feature find-judgments)
+- **Surface:** the same screen suite and command with `ollama:tev1:latest` (digest cef45ef93cf6). Receipt `docs/evidence/receipts/decision__tev1_latest__screen-muse-find-100-seed20261001__20261001T065640Z.json`.
+- **Hypothesis:** local tev1 (4B) reaches >= 0.9 agreement with hosted decision service on find judgments.
+- **A/B:** decision.noul.accuracy 0.0181 (gate MUST FAIL). 76 of 100 items returned HTTP 400 "expected 1–2050": the resident tev1 runner, loaded earlier by another client, had a 2K context. Agreement on the 48 answered questions was 0.708.
+- **A/A null:** deterministic; not needed.
+- **Verdict:** REJECT (SCREEN), but CONFOUNDED by the 2K loaded context. The answered-only agreement (0.708, n=48) is below the gate, but too small to be the reason by itself.
+- **Retry predicate:** after kit-decision-context-pin-a27 lands (decision run records the runner's loaded context and refuses or reloads when the suite's longest prompt exceeds it), rerun this exact screen with tev1 loaded at >= 16K context.
+- **Lesson:** a System One request cannot set num_ctx, so whatever loaded the runner first decides which items can be answered. The harness must pin and record the loaded context.
+
+## 2026-10-01 — UNKNOWN (VOID, operator error): memory smol qwen3.8 vs qwen3.6, contrast 1 interrupted
+- **Bead:** kit-memory-study-vce
+- **Surface:** the command pre-registered on the bead at 01:05 MDT (`localbench ab ollama:qwen3.6:35b-mlx ollama:qwen3.6:35b-mlx --tiers mem,sess --pairs 2 --smol-model localbench-parked:5642e97495e1 --b-smol-model qwen3.6:35b-mlx ...`), after `localbench park`. Legs `runs/20261001T070059Z__ab_a1__…` and `runs/20261001T072733Z__ab_b1__…` completed with contended=no and must_fail=[]. All 9 B1 mem recalls hit. Leg A2 (`runs/20261001T075545Z__ab_a2__…`) never ran: the orchestrator launched the A/B in a foreground tool call with a 3,600 s limit, and that limit killed it ("error: interrupted"). Nothing was banked. qwen3.8 stayed parked until a manual `localbench unpark` at about 02:04 MDT, about 56 minutes during which every omp profile's smol/memory calls failed closed.
+- **Hypothesis:** qwen3.6 as the memory (smol) model is no worse than qwen3.8 on the g73 oracle, and faster.
+- **A/B:** incomplete: 2 of 5 legs. Each mem+sess leg took about 28 min (3 mem rounds of 3 facts each, plus 3 sessions of 12 turns), so the full 5 legs need about 140 min, more than the 60-minute standing window.
+- **A/A null:** none (only one A leg).
+- **Verdict:** UNKNOWN. Two legs cannot support a verdict, and the partial legs are not cited as evidence.
+- **Retry predicate:** rerun inside one standing window (<= 60 min) with `--mem-rounds 1 --repeats 2 --pairs 2` (estimated 55 min), launched asynchronously with no tool deadline from a wrapper that always runs `localbench unpark` on exit; then `localbench memory-verdict` over the five legs.
+- **Lesson:** size a live window from measured leg times before parking. Never let a tool deadline own a parked state: unpark must not depend on the measurement finishing.
+
+## 2026-10-01 — UNKNOWN (VOID): memory smol qwen3.6 vs qwen3.8, contrast 1 r2
+- **Bead:** kit-memory-study-vce (feature mnemopi-extraction)
+- **Surface:** the r2 command pre-registered on the bead at 02:15 and 02:57 MDT (wrapper `memory-contrast1.sh`; window 03:47-04:32 MDT, auto-unparked). Main model qwen3.6:35b-mlx in both arms. A = smol qwen3.8 (`localbench-parked:5642e97495e1`), B = smol qwen3.6 (e92a3e94bbca). `--mem-rounds 1 --repeats 2 --pairs 2`, omp 18.4.8, Ollama 0.35.0. Receipts: `docs/evidence/receipts/ab-memory-smol-qwen38-vs-qwen36-20261001-r2.json` (all 5 legs uncontended, preflight ok) and `docs/evidence/receipts/memverdict-smol-qwen36-vs-qwen38-20261001-r2.json`.
+- **Hypothesis:** qwen3.6 as the memory model is no worse than qwen3.8, and faster.
+- **A/B:** recall hit rate 1/1 in every leg, no leaks, derail ok 1. Diagnostics, not a verdict: B extraction took 7.95 s vs A 2.09 s (B/A 3.80, band 0.69, B-WORSE); sess.turn.wall_s 2.36 vs 3.49 s (B-BETTER); post-retain wall 8.95 vs 4.79 s (WITHIN-NOISE, wide band). Every A leg FAILed the SHOULD `sess.memory_calls_ok` because qwen3.8's extraction never overlaps a main call (overlap 0.0 s), the overlap rule flagged on g73 as an open design question.
+- **A/A null:** three A legs; baseline leg ab_a3 FAILed MUST `sess.turns_complete` (22/24 acknowledgements correct; the main model qwen3.6 answered two turns wrongly), which voids the comparison under the pre-registered rule. Separately, the first banking (17ae2b5) rejected the A legs as "not ollama/qwen3.8:27b-mlx", because memory_verdict compared names and the parked alias of the same digest failed. That receipt also lacked provenance and was INVALID. It was re-banked from the same five legs once memory_verdict matched by digest and validated before banking; the alias problem is gone, and the verdict stays void.
+- **Verdict:** UNKNOWN (void). Even unvoided, B would not be BETTER: its extraction latency is a loss on a win metric and no other win clears the band. No profile changed.
+- **Retry predicate:** after memory_verdict matches the incumbent by digest 5642e97495e1 (parked alias accepted), rerun the same r2 command once. If a baseline main-model ack failure voids it again, rerun with `--repeats 3` in a window sized from these leg times (~9-10 min per leg).
+- **Lesson:** with main = qwen3.6 in both arms, qwen3.6 as smol is a faster turn but a 3.8x slower extractor than qwen3.8 on this host. Of the memory candidates, only `llmMode none` (contrast 2) can win on extraction.
+
+## 2026-10-01 — REJECT (route-limited): tev1:latest for omp find-judgments, rescreen with the context pin
+- **Bead:** kit-decision-tier-j4y (feature find-judgments)
+- **Surface:** pre-registered on the bead at 04:45 MDT. `localbench decision run ollama:tev1:latest --suite ~/.localbench/corpora/decision.noul/screen-muse-find-100-seed20261001 --feature find-judgments`, run from a clean worktree at main 17ae2b5; GPU idle, no resident models, no clients beforehand. Receipt `docs/evidence/receipts/decision__tev1_latest__screen-muse-find-100-seed20261001__20261001T104441Z.json`.
+- **Hypothesis:** with the runner warm-loaded at the suite's required 21,507 tokens, tev1 reaches >= 0.9 agreement with hosted decision service.
+- **A/B:** the harness loaded tev1 with num_ctx 21507 (`/api/ps` read it back). The first System One request (item 0) already failed with "expected 1–2050", and 76 of 100 items failed the same way, exactly as on the first screen. After the run, the runner's context read 2050: PINS CHANGED, MUST FAIL `decision.context_fits` and the accuracy gate (0.018). Cause, read from the model store (`/Volumes/Models/ollama-models`, params layer of each manifest): tev1:latest and tev1:0.8b ship `{"num_ctx":2050}`, nimble:latest ships `{"num_ctx":8194}`. A `/v1/systemone` request loads the runner with the model's own params, so it reloads over any warm-load.
+- **A/A null:** deterministic; not needed.
+- **Verdict:** REJECT for find-judgments on the route as published. Through Ollama 0.35's System One, tev1 judges at most 2,050 tokens, and most find items are longer. This corrects the two earlier rows: the 8194/2050 limits were the models' shipped params, not "whatever loaded the runner first". The a27 warm-load cannot pin a System One context; its MUST gate correctly refused to count the run.
+- **Retry predicate:** a derived model created FROM the same weights with a larger `num_ctx` parameter (Ollama /api/create, through a localbench verb), if System One accepts it. Rescreen tev1 and nimble on this suite under that model's digest; the receipt must show loaded_context unchanged across the run. Or: a tev1/nimble release that ships a larger num_ctx (release watch).
+- **Lesson:** a decision model's context is part of its published Modelfile, so read the params layer before a run. The harness should refuse up front when the model's shipped num_ctx is below the suite's requirement, instead of spending 100 requests to find out.
+
+## 2026-10-01 — UNKNOWN (VOID, promising): mnemopi llmMode none vs smol qwen3.8, contrast 2
+- **Bead:** kit-memory-study-vce (feature mnemopi-extraction)
+- **Surface:** pre-registered on the bead at 05:12 MDT. The window ran 04:56-05:44 MDT, auto-unparked, from a clean runner worktree at 17ae2b5 (dirty=1: one untracked receipt). Main model qwen3.6:35b-mlx in both arms. A = smol qwen3.8 (`localbench-parked:5642e97495e1`); B = `fixtures/omp/child-config-mem-nollm.yml` (llmMode none: the transcript is stored, with no extraction call). `--mem-rounds 1 --repeats 2 --pairs 2`, omp 18.4.8, Ollama 0.35.0. All 5 legs uncontended. Receipts: `docs/evidence/receipts/ab-memory-nollm-vs-qwen38-20261001.json` and `docs/evidence/receipts/memverdict-nollm-vs-qwen38-20261001.json`.
+- **Hypothesis:** no-LLM retention keeps recall quality and wins on post-retain latency and memory GPU cost.
+- **A/B:**
+  - Quality: recall hit rate 1 in every leg, derail ok 1, no leaks; ack rate 0.938 vs 1 (band 0.133, WITHIN-NOISE).
+  - Latency wins: sess.turn.post_retain_wall_s 3.15 vs 4.79 s (B/A 0.658, band 0.169, B-BETTER); post_retain_pre_main_s 2.55 vs 4.03 s (B-BETTER).
+  - Neutral or worse: everything else WITHIN-NOISE except sess.turn.max_tool_calls (B 1/8 vs A 3/0/0, B-WORSE; the loop gate passed). memory_verdict computed BETTER.
+- **A/A null:** three A legs. But both B legs FAILed MUST `sess.turns_complete` (22/24, 23/24): qwen3.6 wrote a chatty reply where the exact acknowledgement was expected, mostly on turn 7. The same slip failed qwen3.8 leg r2 a3 (22/24, turns 7 and 8), so it is the main model's noise, not the memory mode. Pooled ack slips: llmMode none 3/48 turns, qwen3.8 2/144 turns; too few turns to separate the two.
+- **Verdict:** UNKNOWN (void). Under the pre-registered rules a candidate MUST failure makes the receipt non-proof, and the rules are not edited after the data. Second blocker: features.grade binds proof to `pins.model_digest`, and llmMode none has no memory model, so the contract cannot yet express this route even if it were proven. No profile changed.
+- **Retry predicate:** both decisions are the owner's (asked 2026-10-01): (a) whether a route with no extraction (raw transcripts stored, no synthesized memories) is acceptable, so the proof contract can name a no-model route; (b) whether the sess tier's main-model acknowledgement check should stay a void-the-comparison MUST for memory studies, given that local models no longer run as main agents here. After those, rerun this exact command once.
+- **Lesson:** the mem/sess harness measures memory through a local main model that the mission has retired. Its acknowledgement noise (about 2-6% of turns) now voids memory comparisons more often than memory behaviour moves them.
+
+## 2026-10-01 — REJECT (SCREEN), unconfounded: tev1 and nimble for omp find-judgments at a 21,507-token context
+- **Bead:** kit-pcp (feature find-judgments)
+- **Surface:** pre-registered on kit-pcp at ~05:50 MDT, as the retry predicate of the tev1 route-limited row. `localbench decision derive ollama:<m> --num-ctx 21507` created tev1-ctx21507 (dd4fa2a85c9e, same weights 35f9281a3df5) and nimble-ctx21507 (b76fe2950a1c, same weights bbf1d6fc03bb). Then `localbench decision run ollama:<derived> --suite ~/.localbench/corpora/decision.noul/screen-muse-find-100-seed20261001 --feature find-judgments` ran from a clean worktree at 372b9ac. Receipts: `docs/evidence/receipts/decision__tev1-ctx21507__screen-muse-find-100-seed20261001__20261001T114552Z.json` and `docs/evidence/receipts/decision__nimble-ctx21507__screen-muse-find-100-seed20261001__20261001T115209Z.json`.
+- **Hypothesis:** with every find item answerable, a local System One model agrees >= 0.9 with hosted decision service.
+- **A/B:**
+  - Context: System One honored the derived num_ctx. loaded_context was 21507 before and after each run, all 100 items were answered, error rate 0, and context_fits PASSed.
+  - Agreement with the recorded hosted labels over 1,880 questions: tev1 0.639 (macro F1 0.50); nimble 0.845 (macro F1 0.73).
+  - Warm latency, p50/p95: tev1 2.66/8.56 s; nimble 5.44/15.05 s.
+- **A/A null:** deterministic; not needed.
+- **Verdict:** REJECT (SCREEN) for both on find-judgments, now unconfounded. Hosted decision service stays on find in every profile. The derive mechanism works: a decision model's context is raised by deriving it, not by warm-loading it.
+- **Retry predicate:** a new nimble or tev1 digest, or another System One model, filed by the release watch; rescreen on this suite at a derived context >= 21507.
+- **Lesson:** at full context nimble is close (0.845) but still disagrees on about 1 in 6 relevance judgments, and its p95 of 15 s is slower than a hosted call would need to be to win on latency.
+
+## 2026-10-01 — REJECT (SCREEN): nimble:latest for omp auto-thinking levels (local System One vs recorded hosted choices)
+  - **Bead:** kit-auto-thinking-route-kmt (feature auto-thinking). Pre-registered on the bead before data: command, gate, BETTER criterion, and the per-profile incumbent baselines (default/claude/codex/grok/muse route ON to typesafe/proj-b-latest -> {hosted, proj-b-latest}; other profiles DISABLED at defaultThinkingLevel=high -> {fixed, high}; lab DISABLED at xhigh -> {fixed, xhigh}).
+  - **Surface:** `localbench decision run ollama:nimble:latest --suite decision.choice/auto-thinking-level-jev174-20261001 --feature auto-thinking --wait-idle 1800`. The suite holds 174 items built from proj-b work/native-judge-replay/auto-thinking-level-rows.jsonl (commit 5011499a): 200 real user prompts passed through omp 18.4.9's own preprocessTinyMessage + rendered level template + LEVEL_CRITERIA, of which 174 rebuilt request bodies sha-match the recorded request_sha256 byte-for-byte (Python sorted-key {model,state,questions}); 23 omp-drifted rows and 3 empty prompts excluded. Labels are the recorded hosted proj-b-1.13.0 level choices. Suite lives under ~/.localbench/corpora (never git). Ollama 0.35.0 (add45eb02df0252f), nimble digest 24e550a16a70, omp 18.4.9, receipt stamps omp_module_sha 6d975cf30c89 (classifier.ts unchanged since the 18.4.8 baseline pin; the STALE marking came from the request shape, which this suite already matches). Receipt `docs/evidence/receipts/decision__nimble_latest__auto-thinking-level-jev174-20261001__20261001T161628Z.json`.
+  - **Hypothesis:** local nimble agrees >= 0.9 with the recorded hosted level choices, advancing to a stage-2 live hosted-arm A/B.
+  - **Screen:** no live hosted arm was run (TYPESAFE_API_KEY absent from the shell), so verdict.compare is NONE; the screen gate decides. decision.choice.accuracy 0.6724 over 174 items (macro F1 0.5298, ECE 0.057, Brier 0.4792), gate min 0.9 MUST FAIL. error_rate 0, context_fits PASS (required 1794 tokens, resident nimble at 8194, no reload, no eviction). Warm latency p50 0.82 s, p95 2.69 s under recorded load (GPU mean 99.3%, user-active 0%), descriptive only: inside omp's 4 s classifier cap but not a proof leg.
+  - **A/A null:** deterministic label log-probs; not needed.
+  - **Verdict:** REJECT (SCREEN) for auto-thinking. Hosted proj-b-latest stays the judge on default/claude/codex/grok/muse; fixed levels stay everywhere else. No profile changed.
+  - **Retry predicate:** a new nimble digest, tev1's 200 rows built the same way, or another System One model filed by the release watch; rescreen on this suite and advance only at >= 0.9 agreement, then a stage-2 live hosted-arm A/B (needs TYPESAFE_API_KEY) for the BETTER verdict the contract requires.
+  - **Lesson:** exact agreement 0.6724 with within-one-level 0.7701 reproduces the proj-b parity (0.66/0.77) on the sha-verified subset, which cross-checks suite fidelity. The confusion is systematic under-estimation: nimble predicts low on 112/174 items, getting only 16/35 hosted-high and 9/34 hosted-xhigh right. A local auto-thinking judge would under-think the hard turns, exactly the failure the 4 s cap hides. Excluding the 23 drifted rows was load-bearing: their recorded hosted labels belong to different request bodies.
+  - **Scope (IcyBarn %55):** agreement with hosted choices tests replacing the hosted judge. It does not test the separate question for the profiles whose incumbent is fixed high/xhigh: whether nimble-chosen levels lose answer quality against always-high while saving latency or tokens. Answering that needs a through-omp outcome comparison, not label agreement (fixed high agrees 0.205 with hosted, yet it is that incumbent's quality bar). Open, not refuted.
+
+## 2026-10-01 — UNKNOWN (VOID, contended): mnemopi llmMode none vs smol qwen3.8, contrast 2 rerun
+- **Bead:** kit-memory-study-vce (feature mnemopi-extraction)
+- **Surface:** the command pre-registered at 05:12 MDT, under the rules landed in ea9a067. The window ran 16:52-17:53Z from runner 9a8ae48, after pid 98179 was stopped (an orphaned skill-library-growth self-test that had held a direct Ollama socket with 0 CPU for 1 h 43 min; the owner approved). Receipt `docs/evidence/receipts/ab-memory-nollm-vs-qwen38-20261001-r2.json`.
+- **Hypothesis:** as in the contrast 2 row.
+- **A/B:** not read. All five legs are CONTENDED (system.contention): nimble:latest was resident and running at 37% GPU in each leg, held by proj-b's gate cascade through the gateway (~150 System One screens/h at the time; kit-8gh).
+- **A/A null:** n/a.
+- **Verdict:** UNKNOWN (void) under the one-model rule for chat-model runs. No profile changed.
+- **Retry predicate:** rerun the same command in a window proj-b confirms its gate falls back to paid decision service (requested 18:30-19:30Z), with `localbench gpu --seconds 5` showing no nimble client before launch.
+- **Lesson:** a production local decision route (proj-b's nimble gate) now runs continuously on this GPU, so chat-model studies need a negotiated window with every local-route consumer, not just a park.
+
+## 2026-10-01 — REJECT (SCREEN): tev1:latest for omp auto-thinking levels
+- **Bead:** kit-auto-thinking-route-kmt (feature auto-thinking); pre-registered on the bead before data, as the retry predicate of the nimble row.
+- **Surface:** `localbench decision run ollama:tev1:latest --suite decision.choice/auto-thinking-level-jev174-20261001 --feature auto-thinking`, from runner 9a8ae48. tev1 digest cef45ef93cf6, shipped num_ctx 2050 >= required 1794; loaded and after-run context 2050. Receipt `docs/evidence/receipts/decision__tev1_latest__auto-thinking-level-jev174-20261001__20261001T180140Z.json`.
+- **Hypothesis:** tev1 agrees >= 0.9 with the recorded hosted level choices.
+- **Screen:** decision.choice.accuracy 0.569 (macro F1 0.367), MUST FAIL against the 0.9 gate; error rate 0. Warm latency p50 0.33 s, p95 0.66 s (descriptive). tev1 picks low on 80 of 174 items; of 34 hosted-xhigh turns it chose xhigh on 2, high on 18, medium on 10 and low on 4. It under-thinks hard turns, like nimble, but disagrees more often overall (nimble 0.672).
+- **Side effect (a problem on the receipt):** loading tev1 evicted resident nimble:latest (proj-b's gate) and qwen3.8:27b-mlx (every profile's smol). Ollama's default loaded-model cap was reached with three models resident (OLLAMA_MAX_LOADED_MODELS unset). Bead kit-80r.
+- **A/A null:** deterministic; not needed.
+- **Verdict:** REJECT (SCREEN). Neither local System One model can replace the hosted auto-thinking judge. Fixed levels stay where they are. No profile changed.
+- **Retry predicate:** a new tev1 or nimble digest, or another System One model, from the release watch; rescreen on this suite.
+- **Lesson:** both local decision models are biased toward low thinking on hard turns. The fixed-high profiles' question (does a local judge cost answer quality against always-high?) stays open as stated in the nimble row.
+
+## 2026-10-01 — UNKNOWN (VOID, instrument race): mnemopi llmMode none vs smol qwen3.8, contrast 2 r3
+- **Bead:** kit-memory-study-vce (feature mnemopi-extraction)
+- **Surface:** pre-registered r3. proj-b-confirmed window 18:30-19:30Z: nimble fenced at the gateway with `localbench gateway fence` (proj-b logged 225 paid-fallback screens and no nimble screens; nimble resumed 19:19Z), qwen3.8 parked 18:31-19:19Z. Runner 9a8ae48. Receipt `docs/evidence/receipts/ab-memory-nollm-vs-qwen38-20261001-r3.json`. No leg CONTENDED.
+- **Hypothesis:** as in the contrast 2 row.
+- **A/B (diagnostic, not proof):** recall hit rate 1 in all five legs; ack rate 1 (24/24 in every leg); post-retain turn wall 3.36 s (B) vs 4.79 s (A), B/A 0.70, band 0.30, B-BETTER; turn wall and pre-main WITHIN-NOISE; derail ok 0.83 vs 1 (WITHIN-NOISE, band 1.2). This replicates the first contrast 2 run.
+- **A/A null:** three A legs; but legs a2, b2 and a3 have MUST `sess.turns_complete` VOID ("main call trace missing or incomplete").
+- **Verdict:** UNKNOWN (void). Cause: an instrument race, not omp behaviour. In each void leg exactly one turn's proxy completion row was logged 8-39 ms after omp's agent_end (r.t - t_end = +9.9, +8.2, +39.1 ms; a1/b1 max -1.4/-0.6 ms), and sess() requires r.t <= t_end. The rule is being fixed: a call belongs to the turn it started in and must complete before the next turn's send. The data is not re-scored after the fact.
+- **Retry predicate:** after the race fix lands, rerun the same command once in another proj-b-confirmed fenced window.
+- **Lesson:** a timing rule between two processes' clocks needs a bound tied to the protocol (next send), not to the other process's event timestamp.
+
+## 2026-10-01 — REJECT (SCREEN): Laya-MLX 421M (aac6fef/laya-mlx) for local decision routes
+- **Bead:** kit-8rp (pre-registered before data). the owner: keep decision work local and find a better local model; Laya-MLX was installed.
+- **Surface:** `localbench decision run laya:aac6fef/laya-mlx --suite <suite> --repeats 2`, 22:51-22:54Z, run from the live tree (rev dirty: the laya backend was not yet committed; stage 2 would need committed code). Pins: laya-mlx 0.1.0 at commit fc1df62, HF snapshot 20aed815fc6a. Receipts `docs/evidence/receipts/decision__aac6fef_laya-mlx__{proj-b-bash-gate-1lim,proj-b-sst5,auto-thinking-level-jev174-20261001,unexpected-stop-jevlatest-20261001}__20261001T225*.json`.
+- **Hypothesis:** a 421M typed-decision model at ~13 ms matches hosted decision service's quality on short decisions, and wins latency against nimble (whose gate screens time out at 5 s, kit-8gh).
+- **Instrument check:** the shim and Laya's own `agent.predict` agree to 1e-4 on 41 items (20 bash-gate, 20 auto-thinking, Laya's README example); instructions and criteria reach the model intact and in order (LayaBackend). On its README example Laya is confident (billing 0.96). Every answer was valid and deterministic across repeats.
+- **Screens:** latency was excellent: warm p50 34-67 ms, p95 88-138 ms, shim and HTTP included, under co-resident load. Quality, per the pre-registered rules:
+  - bash gate (0 of 396 items truncated): per-question accuracy 0.531 vs hosted 0.994, -46.3 pp, McNemar b/c 4/833, p 4e-242. WORSE. It answers true 48% of the time at a 2.6% base rate, near-flat.
+  - SST-5 (0 of 500 truncated): 0.364 vs hosted 0.544 by clamp-round of the expected score (the receipt's argmax metric reads 0.392), -18.0 pp, b/c 52/142, p 8e-11. WORSE.
+  - auto-thinking (19 of 174 truncated): 0.172 vs the 0.9 gate, below 4-way chance; level probabilities near-flat (confidence ~0.01).
+  - unexpected-stop (101 of 540 truncated): accuracy 0.596 and macro-F1 0.451 vs gates 0.9 and 0.8.
+- **A/A null:** deterministic; not needed.
+- **Verdict:** REJECT (SCREEN) for every screened route. No route or profile changed.
+- **Retry predicate:** the multilingual 322M checkpoint once `localbench pull` can place it in the hub cache (kit-mdi), screened on the same four suites; or a Laya release (new HF snapshot) via the release watch.
+- **Lesson:** fast is not enough. Laya decides confidently on its own easy examples but is near-uniform on these real omp and proj-b decisions, even with full, untruncated input on the gate and SST-5.
+
+## 2026-10-01 — UNKNOWN (VOID, contended): mnemopi llmMode none vs smol qwen3.8, contrast 2 r4
+- **Bead:** kit-memory-study-vce (feature mnemopi-extraction); pre-registered r4.
+- **Surface:** proj-b-confirmed window 23:50Z-00:50Z: nimble fenced at the gateway 23:50:23Z, qwen3.8 parked 23:54Z, runner 453a795 clean (with the sess attribution fix). Legs `~/.localbench/tmp/wt-runner/runs/20261001T235439Z__ab_a1__…` through `runs/20261002T00*__ab_{b1,a2,b2,a3}__…`; the unsound A/B banked no receipt (log `runs/ab-memory-nollm-vs-qwen38-20261001-r4.log`).
+- **A/B:** not read.
+- **Verdict:** UNKNOWN (void).
+  - Legs a2, b2 and a3 are CONTENDED: `nomic-embed-text:latest` was resident on Ollama from 00:28Z, loaded by a direct client (not through the gateway; owner not identified).
+  - Baseline leg a1 also VOIDed MUST mem.no_leak: qwen3.6 did not acknowledge one plant. a1 and b1 each had one ack slip (23/24), which memory_verdict's ack rule treats as diagnostics.
+  - The A/B ran 7 min past the window. The nimble fence lifted at 00:50Z by timer.
+  - Unpark was then blocked until 01:06Z by omp-test's fresh-HOME e2e ladder, whose `omp -p` children held direct Ollama sockets. qwen3.8 stayed fenced at the gateway from 23:54Z to 01:06Z, so every OMP session's smol and memory calls failed for 72 min. omp-test is filing a kit bug: isolated-HOME tests must not reach local Ollama.
+- **Retry predicate:** decided by the owner 2026-10-02 ~01:15Z: memory proofs run under the side-model regime (no park, no fence, co-resident load recorded, not voided; `ab --side-regime`, rule in force for legs created at or after 20261002T013149Z). Rerun the same contrast under that regime.
+- **Lesson:** four memory windows today produced no verdict. The gateway fence cannot stop direct Ollama clients (an embeddings model, test harnesses), and each park cost every session its smol for an hour or more. Chat-model one-model windows do not scale on a shared machine.
+
+## 2026-10-02 — REJECT (SCREEN): nimble and tev1 for omp unexpected-stop detection
+- **Bead:** kit-icy (pre-registered on 2026-10-01 before data: gates decision.noul.accuracy >= 0.9 and macro-F1 >= 0.8; macro-F1 added because always-false scores 0.922 accuracy).
+- **Surface:** suite `decision.noul/unexpected-stop-jevlatest-20261001`: 540 omp-faithful items from the omp judgment caches of five profiles, labels from recorded typesafe/proj-b-latest (42 stops, 498 not). Runs from the clean runner at 453a795, under co-resident load (proj-b's gate replay was running nimble through the gateway). Receipts `docs/evidence/receipts/decision__nimble_latest__unexpected-stop-jevlatest-20261001__20261002T013215Z.json` and `docs/evidence/receipts/decision__tev1-ctx4608__unexpected-stop-jevlatest-20261001__20261002T013901Z.json`. tev1 was derived at num_ctx 4608 (digest 753c46513fd6); the context held at 4608, nothing was evicted.
+- **Hypothesis:** a local System One model matches hosted proj-b-latest's stop judgments.
+- **Screen:**
+  - nimble: accuracy 0.674, macro-F1 0.550. It catches 40 of 42 stops but false-alarms on 174 of 498 normal turns (35%). Warm p50 0.57 s, p95 1.54 s.
+  - tev1 (4608): accuracy 0.724, macro-F1 0.541. It misses 17 of 42 stops and false-alarms on 132 of 498. Warm p50 0.34 s, p95 0.89 s.
+  - Both MUST FAIL both gates. Laya-421M already failed this suite (0.596 / 0.451).
+- **A/A null:** deterministic; not needed.
+- **Verdict:** REJECT (SCREEN) for unexpected-stop on nimble and tev1. The route stays hosted proj-b-latest where it is on (smart), and mechanical elsewhere. No profile changed.
+- **Retry predicate:** a new nimble or tev1 digest, or another System One model, from the release watch; rescreen this suite with the same gates.
+- **Lesson:** both models over-call stops on omp turns. A local unexpected-stop judge would trigger false nudges on a third of normal turns.
+
+## 2026-10-02 — UNKNOWN (VOID, omp changed mid-run): mnemopi llmMode none vs qwen3.8, side regime, both directions
+- **Bead:** kit-memory-study-vce (feature mnemopi-extraction); pre-registered (r4 command, side regime per the owner 2026-10-02).
+- **Surface:** `localbench ab ... --side-regime --smol-model qwen3.8:27b-mlx --b-mem-config fixtures/omp/child-config-mem-nollm.yml`, run from runner 1f01ff8 with no park and no fence. Run by subagent MemoryHarness. Receipts `docs/evidence/receipts/ab-memory-nollm-vs-qwen38-20261002-side.json`, `docs/evidence/receipts/memverdict-nollm-vs-qwen38-20261002-side.json`, `docs/evidence/receipts/memverdict-qwen38-vs-nollm-20261002-side.json`.
+- **Hypothesis:** as in the contrast 2 row, scored in both directions on the same legs.
+- **A/B:** UNSOUND.
+  - uca updated omp from 18.4.9 to 18.4.10 between legs a2 and b2; the drift check VOIDs every mem and sess row.
+  - b1 mem.no_leak VOID: the plant reply echoed the fact ("Stored: ... port 33308") instead of NOTED; fresh-process recall still returned it.
+  - a2 sess.turns_complete FAIL: a 600 s timeout at session 1 turn 4, so 16 of 24 turns ran. This is a timeout, not an ack slip.
+  - Co-resident: nimble in every leg; thinkingcap-qwen3.8 and nomic-embed-text in a2 and b2 (foreign GPU up to 69%).
+- **Verdict:** both directions NONE (void). The qwen3.8 direction also fails the loop gate (a1 sess max tool calls 9 > 3 x 3).
+- **Retry predicate:** rerun the same command once with `--omp-frozen` (kit-hm3), so every leg pins one omp.
+- **Lesson:** on this machine omp updates about every 3 h, so a 50-min study must pin its own omp snapshot.
+
+## 2026-10-02 — NOT_BETTER: recall-embeddings (fastembed bge-base) vs FTS-only recall, side regime
+- **Bead:** kit-memory-study-vce (feature recall-embeddings; pre-registered 2026-10-01).
+- **Surface:** `localbench ab ... --side-regime --b-mem-config fixtures/omp/child-config-mem-fts.yml`, runner 1f01ff8, omp 18.4.10 in every leg, embedder `local/fast-bge-base-en-v1.5` digest d7176de16bfe. Receipts `docs/evidence/receipts/ab-memory-embeddings-vs-fts-20261002-side.json` and `docs/evidence/receipts/memverdict-embeddings-vs-fts-20261002-side.json`.
+- **Hypothesis:** embedding recall beats FTS-only recall without a latency loss.
+- **A/B:** SOUND; load balanced (CPU 39.5/37.9/38.3 vs 38.4/38.5%); nimble co-resident in every leg with no foreign GPU over threshold.
+  - Quality: recall 3/3 in all five legs; derail and no-leak equal.
+  - Latency: embedding legs start the recall turn's main call about 8.5 s later (pre-main medians 18.7 vs 10.1 s, beyond the 7.8 s band). Post-retain wall, extraction and GPU are within noise.
+  - `sess.memory_calls_ok` FAILed equally in both arms on its overlap clause (the open design question on g73); it does not separate the arms.
+- **A/A null:** three A legs; the band comes from them.
+- **Verdict:** NOT_BETTER: the embeddings route stays UNPROVEN. FTS-only matched its quality and reached the main call faster. That is evidence for `embeddings:fts` (local:false), not yet a proof of it: only 3 facts per leg.
+- **Retry predicate:** more recall rounds (`--mem-rounds` >= 3), or a recall set where FTS-only misses a fact that embeddings find; the profile choice is the owner's (asked 2026-10-02).
+- **Lesson:** on these fact-recall probes, semantic recall bought nothing and cost several seconds before the main call.

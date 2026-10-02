@@ -1,9 +1,11 @@
 """The model cleanup must never offer to delete a model something still uses, and must delete only what it is told."""
 
 import contextlib
+import fcntl
 import importlib.util
 import io
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -61,6 +63,20 @@ class Keep(unittest.TestCase):
         self.assertEqual((p[NEMOTRON["name"]]["keep"], p[NEMOTRON["name"]]["last_seen"]), ([], 100.0))
         self.assertEqual((p[SIBLING["name"]]["keep"], p[SIBLING["name"]]["last_seen"]), ([], 200.0))
 
+    def test_a_journaled_parked_alias_is_kept_with_unpark_guidance(self):
+        keep = pm.plan([SIBLING], [], {}, {}, {}, journaled={SIBLING["name"]})[0]["keep"]
+        self.assertEqual(keep, ["journaled parked alias; run `localbench unpark` first"])
+
+    def test_a_journaled_parked_alias_lists_under_kept_not_candidates(self):
+        planned = pm.plan([SIBLING, NEMOTRON], [], {}, {}, {}, journaled={SIBLING["name"]})
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            pm.show(planned)
+        text = out.getvalue()
+        self.assertLess(text.index("KEPT"), text.index(SIBLING["name"]))
+        self.assertLess(text.index(SIBLING["name"]), text.index("CANDIDATES"))
+        self.assertLess(text.index("CANDIDATES"), text.index(NEMOTRON["name"]))
+
 
 class NamedElsewhere(unittest.TestCase):
     """Models other tools use without omp: Codex embeds with nomic-embed-text; the splash skill requires its model."""
@@ -81,6 +97,44 @@ class NamedElsewhere(unittest.TestCase):
 
     def test_a_longer_name_does_not_keep_a_shorter_one(self):
         self.assertEqual(self.keep(NEMOTRON), [])
+
+class OpenBeads(unittest.TestCase):
+    def keep_for_bead(self, *, status, title="", description="", row=NEMOTRON):
+        bead = {"id": "kit-open-test", "status": status, "title": title, "description": description}
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / ".beads").mkdir()
+            (root / ".beads" / "issues.jsonl").write_text(json.dumps(bead) + "\n")
+            with mock.patch.object(pm, "ROOT", root), \
+                    mock.patch.object(pm.models, "ollama_models", return_value=[row]), \
+                    mock.patch.object(pm.models, "mlx_models", return_value=[]), \
+                    mock.patch.object(pm.models, "profiles", return_value={}), \
+                    mock.patch.object(pm.models, "routes_by_model", return_value={}), \
+                    mock.patch.object(pm, "golden_pins", return_value=[]), \
+                    mock.patch.object(pm.sysstats, "resident_models", return_value={}), \
+                    mock.patch.object(pm, "last_resident", return_value={}), \
+                    mock.patch.object(pm, "config_texts", return_value={}):
+                return pm.gather()[0]["keep"]
+
+    def test_a_description_only_open_bead_keeps_its_model(self):
+        keep = self.keep_for_bead(status="in_progress", description=NEMOTRON["source"])
+        self.assertEqual(keep, ["open bead kit-open-test"])
+
+    def test_a_title_only_open_bead_keeps_its_model(self):
+        keep = self.keep_for_bead(status="open", title=NEMOTRON["source"])
+        self.assertEqual(keep, ["open bead kit-open-test"])
+
+    def test_a_closed_bead_does_not_keep_its_model(self):
+        keep = self.keep_for_bead(status="closed", description=NEMOTRON["source"])
+        self.assertEqual(keep, [])
+
+    def test_a_qwen38_lookalike_does_not_keep_qwen38(self):
+        keep = self.keep_for_bead(status="open", description="qwen3.8-uncensored", row=DENSE)
+        self.assertEqual(keep, [])
+
+    def test_a_checkout_without_a_bead_graph_has_no_open_beads(self):
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(pm, "ROOT", Path(d)):
+            self.assertEqual(pm.open_bead_texts(), {})
 
 
 class RealInputs(unittest.TestCase):
@@ -156,17 +210,36 @@ class CheckDelete(unittest.TestCase):
         self.assertEqual([r.split(": ")[0] for r in refusals], ["qwen3.8:27b-mlx", "minimax-m2.5:cloud", "nope:1"])
 
 
+def journaled_state(tmp, name=SIBLING["name"]):
+    """A PARKED.json journaling `name` as a parked alias with a fence id only the journal knows."""
+    state = Path(tmp) / "PARKED.json"
+    state.write_text(json.dumps([
+        {"name": "qwen3.8-uncensored:latest", "parked_as": name, "digest": "d2",
+         "role": "fallback", "_park_fence_id": "fence-for-prune-test"}]))
+    return state
+
+
+class CheckDelete(unittest.TestCase):
+    def test_a_journaled_parked_alias_is_refused_with_unpark_guidance(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(pm.park, "STATE", journaled_state(tmp)):
+                targets, refusals = pm.check_delete(
+                    [{**SIBLING, "keep": [], "last_seen": None}], [SIBLING["name"]])
+        self.assertEqual(targets, [])
+        self.assertEqual(len(refusals), 1)
+        self.assertIn("localbench unpark", refusals[0])
+
 class Delete(unittest.TestCase):
-    def test_deleting_a_parked_copy_leaves_parked_json_restoring_only_the_rest(self):
+    def test_deleting_an_unjournaled_parked_copy_leaves_the_journal_alone(self):
         with tempfile.TemporaryDirectory() as tmp:
             state = Path(tmp) / "PARKED.json"
             state.write_text(json.dumps([
-                {"name": "qwen3.8:27b-mlx", "parked_as": "localbench-parked:5642e97495e1", "digest": "d1", "role": "smol"},
-                {"name": "qwen3.8-uncensored:latest", "parked_as": SIBLING["name"], "digest": "d2", "role": "fallback"}]))
+                {"name": "qwen3.8:27b-mlx", "parked_as": "localbench-parked:5642e97495e1", "digest": "d1", "role": "smol"}]))
+            journal_before = state.read_bytes()
             with mock.patch.object(pm.park, "_delete") as gone:
                 pm.delete(SIBLING, state)
             gone.assert_called_once_with(SIBLING["name"])
-            self.assertEqual([p["name"] for p in json.loads(state.read_text())], ["qwen3.8:27b-mlx"])
+            self.assertEqual(state.read_bytes(), journal_before)
 
     def test_an_unparked_tag_leaves_parked_json_alone(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -175,6 +248,41 @@ class Delete(unittest.TestCase):
             with mock.patch.object(pm.park, "_delete"):
                 pm.delete(NEMOTRON, state)
             self.assertEqual(state.read_text(), "[]")
+
+    def test_deleting_a_journaled_parked_alias_raises_and_changes_nothing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state = journaled_state(tmp)
+            journal_before = state.read_bytes()
+            with mock.patch.object(pm.park, "_delete") as gone:
+                with self.assertRaisesRegex(RuntimeError, "localbench unpark"):
+                    pm.delete({**SIBLING, "keep": [], "last_seen": None}, state)
+            gone.assert_not_called()
+            self.assertEqual(state.read_bytes(), journal_before)
+
+    def test_delete_holds_the_park_lock_across_journal_check_and_mutation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp) / "PARKED.json"
+            state.write_text("[]")
+            lock_path = state.with_name(state.name + ".lock")
+            held = []
+
+            def probe(name):
+                fd = os.open(lock_path, os.O_CREAT | os.O_RDWR)
+                try:
+                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    held.append(True)
+                else:
+                    held.append(False)
+                    fcntl.flock(fd, fcntl.LOCK_UN)
+                finally:
+                    os.close(fd)
+
+            with mock.patch.object(pm.park, "STATE", state), \
+                    mock.patch.object(pm.park, "_delete", side_effect=probe):
+                pm.delete(dict(NEMOTRON))
+            self.assertEqual(held, [True])
+
 
     def test_a_directory_outside_the_models_root_is_refused(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -216,6 +324,22 @@ class Main(unittest.TestCase):
         rc, delete, _ = self.run_main(["--delete", NEMOTRON["name"], DENSE["name"]])
         self.assertEqual(rc, 1)
         delete.assert_not_called()
+
+    def test_a_journaled_parked_alias_is_refused_on_the_cli(self):
+        out = io.StringIO()
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(pm, "gather",
+                                   return_value=pm.plan([SIBLING], [], {}, {}, {})), \
+                    mock.patch.object(pm, "run_alive", return_value=False), \
+                    mock.patch.object(pm, "delete") as delete, \
+                    mock.patch.object(pm, "LOG", Path(tmp) / "prune-log.jsonl"), \
+                    mock.patch.object(pm.park, "STATE", journaled_state(tmp)), \
+                    contextlib.redirect_stdout(out):
+                rc = pm.main(["--delete", SIBLING["name"]])
+        self.assertEqual(rc, 1)
+        delete.assert_not_called()
+        self.assertIn("localbench unpark", out.getvalue())
+
 
     def test_a_named_candidate_is_deleted(self):
         rc, delete, _ = self.run_main(["--delete", NEMOTRON["name"]])

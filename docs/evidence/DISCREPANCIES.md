@@ -46,3 +46,17 @@ Entry shape:
   count would remove this entry (retry: record the lean fixture's sidecar count on mlx-serve too).
 - Resolved: the case is VOID when the run backend is not the one that recorded the sidecar (14d1452). A VOID run against this golden's FAIL is not a regression. A later FAIL is no longer excused. A per-backend sidecar count is still unrecorded.
 - Review date: 2026-10-22, or on any mlx-serve/model/omp pin change.
+
+## DISC-003: replay.lean.prompt_tokens on ollama/Nemotron-3.5-Lightning-30B-MLX
+- Status: OPEN; tokenizer-binding code is implemented, but the existing lean/full sidecars have no measured tokenizer identity.
+- Observed: `docs/evidence/receipts/ab-qwen36-vs-nemotron-20260924.json` B leg replayed lean 10,853 vs
+  qwen3.6-recorded 11,433 (5.07%, FAIL); full 74,326 vs 73,779 (0.74%, PASS). Its Qwen3.6 A1 lean count was
+  11,467 (0.30%). The Nemotron candidate was rejected on e2e wall time, not this SHOULD-level replay row.
+- Cause under test: tokenizer identity, not a proven prompt regression. A different model on the same Ollama
+  backend previously inherited the recorder's token-count comparator. The new verdict uses Ollama's reported
+  full GGML tokenizer vocabulary hash when both pins exist; it deliberately retains the old backend-only rule
+  when either identity is missing. Both committed fixture sidecars currently lack that pin.
+- Retry predicate: in a model-idle window, use `localbench record` to capture the actual lean and full requests
+  with the Qwen3.6 recorder, review generation/golden changes through the normal A/A bank path, then replay
+  Nemotron and the parked Qwen3.8 against the pinned fixtures. Confirm measured identity differs for Nemotron,
+  matches for Qwen3.8, and each resulting token verdict follows the registered rule. No hand-edited sidecars.

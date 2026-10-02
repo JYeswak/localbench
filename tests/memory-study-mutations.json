@@ -1,0 +1,1083 @@
+[
+  {
+    "label": "a declared smol model must reach omp's --smol flag",
+    "file": "localbench/workloads.py",
+    "old": "\"--smol\", f\"localbench/{smol or model}\"",
+    "new": "\"--smol\", f\"localbench/{model}\"",
+    "tests": [
+      "tests.test_memory_study.SeparateMemoryModel.test_smol_model_flows_into_child_flags_and_models_yml",
+      "tests.test_memory_study.SeparateMemoryModel.test_mem_children_get_the_smol_model"
+    ]
+  },
+  {
+    "label": "the smol model must get a models.yml entry or --smol localbench/<id> cannot resolve",
+    "file": "localbench/workloads.py",
+    "old": "return (ctx.smol_model,) if ctx.smol_model and ctx.smol_model != ctx.model else ()",
+    "new": "return ()",
+    "tests": [
+      "tests.test_memory_study.SeparateMemoryModel.test_smol_model_flows_into_child_flags_and_models_yml",
+      "tests.test_memory_study.SeparateMemoryModel.test_mem_children_get_the_smol_model"
+    ]
+  },
+  {
+    "label": "without a smol model the children stay one artifact (no extra models.yml entry)",
+    "file": "localbench/workloads.py",
+    "old": "return (ctx.smol_model,) if ctx.smol_model and ctx.smol_model != ctx.model else ()",
+    "new": "return (ctx.smol_model or ctx.model,)",
+    "tests": [
+      "tests.test_memory_study.SeparateMemoryModel.test_default_stays_one_artifact"
+    ]
+  },
+  {
+    "label": "a one-model server cannot host a separate smol model",
+    "file": "localbench/workloads.py",
+    "old": "if getattr(backend, \"name\", None) != \"ollama\":",
+    "new": "if False:",
+    "tests": [
+      "tests.test_memory_study.SeparateMemoryModel.test_smol_pins_record_the_smol_digest_and_refuse_a_one_model_server"
+    ]
+  },
+  {
+    "label": "smol_digest is the smol model's digest from the backend pins",
+    "file": "localbench/workloads.py",
+    "old": "\"smol_digest\": backend.pins(smol_model)[\"model_digest\"]",
+    "new": "\"smol_digest\": backend.pins(smol_model).get(\"digest\")",
+    "tests": [
+      "tests.test_memory_study.SeparateMemoryModel.test_smol_pins_record_the_smol_digest_and_refuse_a_one_model_server"
+    ]
+  },
+  {
+    "label": "an unpinned smol model refuses the tier instead of measuring it unlabelled",
+    "file": "localbench/workloads.py",
+    "old": "if ctx.smol_model and not ctx.pins.get(\"smol_digest\"):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_memory_study.SeparateMemoryModel.test_unpinned_smol_model_refuses_before_any_child_runs"
+    ]
+  },
+  {
+    "label": "an extraction served by the main model is not credited to the declared smol model",
+    "file": "localbench/workloads.py",
+    "old": "{str(r.get(\"model\")) for r in mem_rows if r.get(\"model\") != ctx.smol_model}",
+    "new": "{str(r.get(\"model\")) for r in mem_rows if r.get(\"model\") not in (ctx.smol_model, ctx.model)}",
+    "tests": [
+      "tests.test_memory_study.SeparateMemoryModel.test_extraction_served_by_the_main_model_is_not_credited_to_the_declared_smol"
+    ]
+  },
+  {
+    "label": "the overlay's llmMode is read, not assumed to be omp's default",
+    "file": "localbench/workloads.py",
+    "old": "mode = section.get(\"llmMode\", MEM_LLM_MODE_DEFAULT) if isinstance(section, dict) else None",
+    "new": "mode = MEM_LLM_MODE_DEFAULT if isinstance(section, dict) else None",
+    "tests": [
+      "tests.test_memory_study.NoneOverlay.test_none_overlay_differs_from_the_mem_overlay_only_in_llm_mode",
+      "tests.test_memory_study.NoneOverlay.test_sess_under_none_expects_zero_memory_calls_and_says_so"
+    ]
+  },
+  {
+    "label": "a duplicated overlay key is refused, not resolved last-wins",
+    "file": "localbench/workloads.py",
+    "old": "or target is None or key in target",
+    "new": "or target is None",
+    "tests": [
+      "tests.test_memory_study.NoneOverlay.test_an_overlay_the_reader_cannot_parse_is_refused_not_defaulted"
+    ]
+  },
+  {
+    "label": "a memory-LLM call under llmMode none fails the zero-call case",
+    "file": "localbench/workloads.py",
+    "old": "if mem_rows:\n            memory_reason = f\"{len(mem_rows)} memory LLM call(s) under llmMode none",
+    "new": "if False:\n            memory_reason = f\"{len(mem_rows)} memory LLM call(s) under llmMode none",
+    "tests": [
+      "tests.test_memory_study.NoneOverlay.test_a_memory_llm_call_under_none_fails"
+    ]
+  },
+  {
+    "label": "llmMode none is scored by sess.memory_calls_none, never by the extraction oracle",
+    "file": "localbench/workloads.py",
+    "old": "if llm_mode == \"none\" else",
+    "new": "if False else",
+    "tests": [
+      "tests.test_memory_study.NoneOverlay.test_sess_under_none_expects_zero_memory_calls_and_says_so"
+    ]
+  },
+  {
+    "label": "an extraction call in a mem plant under llmMode none invalidates the round",
+    "file": "localbench/workloads.py",
+    "old": "if llm_mode == \"none\" and retention:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_memory_study.NoneOverlay.test_mem_under_none_recalls_by_fresh_process_and_rejects_an_extraction_call"
+    ]
+  },
+  {
+    "label": "the noise band includes the baseline arm's own A/A spread",
+    "file": "localbench/workloads.py",
+    "old": "band = max(max(c_vals) - min(c_vals), max(b_vals) - min(b_vals))",
+    "new": "band = max(c_vals) - min(c_vals)",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_recall_drop_inside_the_baselines_own_spread_is_not_a_loss"
+    ]
+  },
+  {
+    "label": "a quality drop beyond noise is a loss",
+    "file": "localbench/workloads.py",
+    "old": "\"gain\" if gain > band + eps else \"loss\" if gain < -(band + eps) else \"within_noise\"",
+    "new": "\"gain\" if gain > band + eps else \"within_noise\"",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_recall_drop_beyond_noise_is_worse_with_a_problem"
+    ]
+  },
+  {
+    "label": "a delta equal to the band is a tie, not a win",
+    "file": "localbench/workloads.py",
+    "old": "\"judgement\": \"gain\" if gain > band + eps else",
+    "new": "\"judgement\": \"gain\" if gain >= band else",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_tie_is_not_better"
+    ]
+  },
+  {
+    "label": "an unmeasured quality metric keeps the verdict from BETTER",
+    "file": "localbench/workloads.py",
+    "old": "computed = \"WORSE\" if losses else \"BETTER\" if wins and not unmeasured else \"NOT_BETTER\"",
+    "new": "computed = \"WORSE\" if losses else \"BETTER\" if wins else \"NOT_BETTER\"",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_unmeasured_recall_cannot_be_better"
+    ]
+  },
+  {
+    "label": "a hit rate over zero attempts is unmeasured, not 0.0",
+    "file": "localbench/workloads.py",
+    "old": "return None if m.get(\"void\") or m.get(\"n\") == 0 else _real_value(m.get(\"value\"))",
+    "new": "return None if m.get(\"void\") else _real_value(m.get(\"value\"))",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_unmeasured_recall_cannot_be_better"
+    ]
+  },
+  {
+    "label": "a VOID MUST counts as failed",
+    "file": "localbench/workloads.py",
+    "old": "if entry.get(\"level\") == \"MUST\" and entry.get(\"verdict\") != \"PASS\"\n",
+    "new": "if entry.get(\"level\") == \"MUST\" and entry.get(\"verdict\") == \"FAIL\"\n",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_any_must_not_passing_is_a_problem_even_when_faster"
+    ]
+  },
+  {
+    "label": "a failed MUST is a receipt problem",
+    "file": "localbench/workloads.py",
+    "old": "problems.append(f\"MUST FAIL: {', '.join(must_fail)}\")",
+    "new": "pass",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_any_must_not_passing_is_a_problem_even_when_faster"
+    ]
+  },
+  {
+    "label": "a none leg's memory-calls quality is its zero-call case",
+    "file": "localbench/workloads.py",
+    "old": "\"sess.memory_calls_ok\": (\"sess.memory_calls_ok\", \"sess.memory_calls_none\")}",
+    "new": "\"sess.memory_calls_ok\": (\"sess.memory_calls_ok\",)}",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_llm_mode_none_proves_a_no_model_route_pinned_by_zero_model_calls"
+    ]
+  },
+  {
+    "label": "baseline legs must run the baseline route's model",
+    "file": "localbench/workloads.py",
+    "old": "or not same_digest(m[\"digest\"], base_digest)]",
+    "new": "]",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_baseline_legs_must_run_the_baseline_route",
+      "tests.test_memory_study.MemoryVerdict.test_the_route_name_on_another_digest_is_not_the_baseline"
+    ]
+  },
+  {
+    "label": "the receipt pins the candidate memory model's digest, not the main model's",
+    "file": "localbench/workloads.py",
+    "old": "\"model_digest\": first[\"digest\"],",
+    "new": "\"model_digest\": main_pins.get(\"model_digest\"),",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_equal_quality_and_faster_is_better_and_grades_proven"
+    ]
+  },
+  {
+    "label": "the memory model of a leg is its declared smol model",
+    "file": "localbench/workloads.py",
+    "old": "elif pins.get(\"smol_model\"):",
+    "new": "elif False:",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_equal_quality_and_faster_is_better_and_grades_proven"
+    ]
+  },
+  {
+    "label": "candidate legs on different memory builds are not one arm",
+    "file": "localbench/workloads.py",
+    "old": "if len({(m[\"llm_mode\"], m[\"model\"], m[\"digest\"]) for m in cand}) > 1:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_candidate_legs_on_different_memory_builds_are_not_one_arm"
+    ]
+  },
+  {
+    "label": "one leg per arm has no A/A noise and is a problem",
+    "file": "localbench/workloads.py",
+    "old": "if len(candidate_legs) < 2 or len(baseline_legs) < 2:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_one_leg_per_arm_has_no_noise_estimate"
+    ]
+  },
+  {
+    "label": "a contended leg in either arm voids the comparison",
+    "file": "localbench/workloads.py",
+    "old": "        if contended:\n            void.append(",
+    "new": "        if False:\n            void.append(",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_contended_or_residency_unknown_leg_in_either_arm_voids_the_comparison"
+    ]
+  },
+  {
+    "label": "unrecorded resident-model state is unknown, not clean",
+    "file": "localbench/workloads.py",
+    "old": "if _resident_unknown(leg) != 0]",
+    "new": "if _resident_unknown(leg)]",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_contended_or_residency_unknown_leg_in_either_arm_voids_the_comparison"
+    ]
+  },
+  {
+    "label": "a void comparison cannot carry a computed BETTER",
+    "file": "localbench/workloads.py",
+    "old": "verdict = \"NONE\" if void else computed",
+    "new": "verdict = computed",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_contended_or_residency_unknown_leg_in_either_arm_voids_the_comparison",
+      "tests.test_memory_study.MemoryVerdict.test_a_baseline_must_failure_voids_the_comparison"
+    ]
+  },
+  {
+    "label": "baseline MUST failures void the comparison",
+    "file": "localbench/workloads.py",
+    "old": "must_failures(candidate_legs), must_failures(baseline_legs)",
+    "new": "must_failures(candidate_legs), []",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_baseline_must_failure_voids_the_comparison"
+    ]
+  },
+  {
+    "label": "llmMode remote is refused as a local candidate",
+    "file": "localbench/workloads.py",
+    "old": "if first[\"llm_mode\"] == \"remote\":",
+    "new": "if False:",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_remote_memory_llm_is_not_a_local_candidate"
+    ]
+  },
+  {
+    "label": "memory calls served by a model other than the pinned memory model are a problem",
+    "file": "localbench/workloads.py",
+    "old": "    if served - accepted or (accepted and not served):",
+    "new": "    if False:",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_memory_calls_must_be_served_by_the_pinned_memory_model"
+    ]
+  },
+  {
+    "label": "baseline legs' served models are checked too",
+    "file": "localbench/workloads.py",
+    "old": "        served_problems += [p for m in legs\n",
+    "new": "        served_problems += [p for m in legs if side == \"candidate\"\n",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_memory_calls_must_be_served_by_the_pinned_memory_model"
+    ]
+  },
+  {
+    "label": "banked receipt legs keep their details: read them, not only results",
+    "file": "localbench/workloads.py",
+    "old": "    out.update({k: v for k, v in (leg.get(\"details\") or {}).items() if isinstance(v, dict)})\n",
+    "new": "",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_banked_receipt_legs_prove_like_summaries"
+    ]
+  },
+  {
+    "label": "a sess.memory detail without per-purpose models cannot vouch for the memory model",
+    "file": "localbench/workloads.py",
+    "old": "if any(not isinstance(p, dict) or not isinstance(p.get(\"models\"), list) for p in by_purpose.values()):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_memory_calls_must_be_served_by_the_pinned_memory_model"
+    ]
+  },
+  {
+    "label": "a tool-call count above 3x the largest baseline leg is a loop",
+    "file": "localbench/workloads.py",
+    "old": "elif bound is not None and got > bound:",
+    "new": "elif False:",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_tool_call_explosion_or_a_timeout_is_worse"
+    ]
+  },
+  {
+    "label": "the loop bound is 3x the largest baseline leg, not the smallest",
+    "file": "localbench/workloads.py",
+    "old": "bound = LOOP_FACTOR * max(base)",
+    "new": "bound = LOOP_FACTOR * min(base)",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_tool_call_explosion_or_a_timeout_is_worse"
+    ]
+  },
+  {
+    "label": "any candidate turn timeout fails the loop gate",
+    "file": "localbench/workloads.py",
+    "old": "elif timed_out > 0:",
+    "new": "elif timed_out > 1:",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_tool_call_explosion_or_a_timeout_is_worse"
+    ]
+  },
+  {
+    "label": "a failed loop gate makes the verdict WORSE",
+    "file": "localbench/workloads.py",
+    "old": "    if loop_failures:\n        computed = \"WORSE\"\n",
+    "new": "    if loop_failures:\n",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_tool_call_explosion_or_a_timeout_is_worse"
+    ]
+  },
+  {
+    "label": "the loop gate reads the sess tier too",
+    "file": "localbench/workloads.py",
+    "old": "    for tier in (\"mem\", \"sess\"):\n        calls, timeouts",
+    "new": "    for tier in (\"mem\",):\n        calls, timeouts",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_tool_call_explosion_or_a_timeout_is_worse"
+    ]
+  },
+  {
+    "label": "a missing candidate loop metric is a problem, never a pass",
+    "file": "localbench/workloads.py",
+    "old": "            if timed_out is None:\n                unmeasured.append(f\"{timeouts} ({label(leg)})\")",
+    "new": "            if timed_out is None:\n                pass",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_missing_loop_metric_is_a_problem_not_a_pass"
+    ]
+  },
+  {
+    "label": "a missing baseline loop metric is a problem, never a pass",
+    "file": "localbench/workloads.py",
+    "old": "unmeasured.append(f\"{calls} (baseline)\")",
+    "new": "pass",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_missing_loop_metric_is_a_problem_not_a_pass"
+    ]
+  },
+  {
+    "label": "unmeasured loop metrics are listed as a problem",
+    "file": "localbench/workloads.py",
+    "old": "problems.append(f\"tool-call loop gate unmeasured: {', '.join(loop_unmeasured)}\")",
+    "new": "pass",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_missing_loop_metric_is_a_problem_not_a_pass"
+    ]
+  },
+  {
+    "label": "a baseline leg under the park alias of the incumbent's digest is the baseline route",
+    "file": "localbench/workloads.py",
+    "old": "off_route = [m[\"label\"] for m in base if (m[\"backend\"], m[\"llm_mode\"]) != (base_backend, \"smol\")",
+    "new": "off_route = [m[\"label\"] for m in base if (m[\"backend\"], m[\"model\"], m[\"llm_mode\"]) != (base_backend, base_model, \"smol\")",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_baseline_legs_under_the_park_alias_are_the_baseline_route"
+    ]
+  },
+  {
+    "label": "baseline memory calls served under the park alias of the same digest are the pinned build",
+    "file": "localbench/workloads.py",
+    "old": "if (p := _served_problem(side, m, base_names(m) if side == \"baseline\" else frozenset()))]",
+    "new": "if (p := _served_problem(side, m))]",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_baseline_legs_under_the_park_alias_are_the_baseline_route"
+    ]
+  },
+  {
+    "label": "a leg on another digest may not borrow the baseline's names",
+    "file": "localbench/workloads.py",
+    "old": "        if not same_digest(m[\"digest\"], base_digest):\n            return frozenset()\n",
+    "new": "",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_the_route_name_on_another_digest_is_not_the_baseline"
+    ]
+  },
+  {
+    "label": "the receipt records when the verdict was made",
+    "file": "localbench/workloads.py",
+    "old": "\"created\": time.strftime(\"%Y%m%dT%H%M%SZ\", time.gmtime()), \"localbench_rev\": rev,",
+    "new": "\"localbench_rev\": rev,",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_the_receipt_is_valid_and_shows_its_own_checks"
+    ]
+  },
+  {
+    "label": "the receipt names the localbench revision",
+    "file": "localbench/workloads.py",
+    "old": "\"created\": time.strftime(\"%Y%m%dT%H%M%SZ\", time.gmtime()), \"localbench_rev\": rev,",
+    "new": "\"created\": time.strftime(\"%Y%m%dT%H%M%SZ\", time.gmtime()),",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_the_receipt_is_valid_and_shows_its_own_checks"
+    ]
+  },
+  {
+    "label": "the fingerprint carries the candidate legs' shared pins",
+    "file": "localbench/workloads.py",
+    "old": "\"fingerprint\": {**shared, \"legs\":",
+    "new": "\"fingerprint\": {\"legs\":",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_the_receipt_is_valid_and_shows_its_own_checks"
+    ]
+  },
+  {
+    "label": "only pins every candidate leg shares are fingerprinted",
+    "file": "localbench/workloads.py",
+    "old": "if all(p.get(k) == v for p in all_pins[0])}",
+    "new": "}",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_the_receipt_is_valid_and_shows_its_own_checks"
+    ]
+  },
+  {
+    "label": "the run view has a run_dir for show",
+    "file": "localbench/workloads.py",
+    "old": "        \"run_dir\": None,\n        \"memory\":",
+    "new": "        \"memory\":",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_the_receipt_is_valid_and_shows_its_own_checks"
+    ]
+  },
+  {
+    "label": "a failed own check is a FAIL case, not a PASS",
+    "file": "localbench/workloads.py",
+    "old": "\"verdict\": \"FAIL\" if failed else \"PASS\"",
+    "new": "\"verdict\": \"PASS\"",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_each_failed_own_check_is_a_failing_must_case_with_its_values"
+    ]
+  },
+  {
+    "label": "the baseline-route check fails on an off-route baseline leg",
+    "file": "localbench/workloads.py",
+    "old": "check(off_route or route_problems, baseline=",
+    "new": "check(route_problems, baseline=",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_each_failed_own_check_is_a_failing_must_case_with_its_values"
+    ]
+  },
+  {
+    "label": "the served-model check fails on a misserved leg",
+    "file": "localbench/workloads.py",
+    "old": "check(served_problems, problems=served_problems)",
+    "new": "check([], problems=served_problems)",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_each_failed_own_check_is_a_failing_must_case_with_its_values"
+    ]
+  },
+  {
+    "label": "the comparison-valid check fails on a void comparison",
+    "file": "localbench/workloads.py",
+    "old": "check(void, void=void)",
+    "new": "check([], void=void)",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_each_failed_own_check_is_a_failing_must_case_with_its_values"
+    ]
+  },
+  {
+    "label": "the loop-gate check fails on a loop failure",
+    "file": "localbench/workloads.py",
+    "old": "check(loop_failures or loop_unmeasured,",
+    "new": "check(loop_unmeasured,",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_each_failed_own_check_is_a_failing_must_case_with_its_values"
+    ]
+  },
+  {
+    "label": "the llmMode check fails on a remote candidate",
+    "file": "localbench/workloads.py",
+    "old": "check(mode_problems, candidate=",
+    "new": "check([], candidate=",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_each_failed_own_check_is_a_failing_must_case_with_its_values"
+    ]
+  },
+  {
+    "label": "--bank validates before writing",
+    "file": "localbench/__main__.py",
+    "old": "    invalid = validate_doc(receipt)\n",
+    "new": "    invalid = []\n",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_bank_refuses_an_invalid_receipt_and_writes_nothing"
+    ]
+  },
+  {
+    "label": "an ack-only turns_complete FAIL is not a MUST failure",
+    "file": "localbench/workloads.py",
+    "old": "                      and not (case == \"sess.turns_complete\" and _ack_only_slips(leg) is not None))",
+    "new": "                      )",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_an_ack_only_slip_in_either_arm_is_reported_not_voided"
+    ]
+  },
+  {
+    "label": "an ack slip only counts when no session failed",
+    "file": "localbench/workloads.py",
+    "old": " or d.get(\"failures\") != []",
+    "new": "",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_turns_complete_failure_beyond_ack_slips_still_fails_or_voids"
+    ]
+  },
+  {
+    "label": "an ack slip only counts when every turn completed",
+    "file": "localbench/workloads.py",
+    "old": " or d.get(\"turns\") != expected",
+    "new": "",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_turns_complete_failure_beyond_ack_slips_still_fails_or_voids"
+    ]
+  },
+  {
+    "label": "an ack slip only counts with zero sess timeouts",
+    "file": "localbench/workloads.py",
+    "old": " or timeouts != 0):",
+    "new": "):",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_turns_complete_failure_beyond_ack_slips_still_fails_or_voids"
+    ]
+  },
+  {
+    "label": "an ack slip only counts with reason incorrect acknowledgement",
+    "file": "localbench/workloads.py",
+    "old": "entry.get(\"verdict\") != \"FAIL\" or d.get(\"reason\") != ACK_SLIP",
+    "new": "entry.get(\"verdict\") != \"FAIL\"",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_turns_complete_failure_beyond_ack_slips_still_fails_or_voids"
+    ]
+  },
+  {
+    "label": "the slip count is the turns not acknowledged",
+    "file": "localbench/workloads.py",
+    "old": "    return expected - acks\n",
+    "new": "    return 1\n",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_an_ack_only_slip_in_either_arm_is_reported_not_voided"
+    ]
+  },
+  {
+    "label": "the slip diagnostic is SHOULD, not MUST",
+    "file": "localbench/workloads.py",
+    "old": "level=\"SHOULD\",\n",
+    "new": "\n",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_the_receipt_is_valid_and_shows_its_own_checks"
+    ]
+  },
+  {
+    "label": "a memory-calls case failed only by the ack slip counts as passed",
+    "file": "localbench/workloads.py",
+    "old": "            return 1.0\n        return {\"PASS\"",
+    "new": "            return 0.0\n        return {\"PASS\"",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_an_ack_only_slip_in_either_arm_is_reported_not_voided"
+    ]
+  },
+  {
+    "label": "a none receipt pins the no-model route",
+    "file": "localbench/workloads.py",
+    "old": "**({\"route\": {\"kind\": \"fixed\", \"id\": \"none\"}, \"model_calls\": model_calls}",
+    "new": "**({\"model_calls\": model_calls}",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_llm_mode_none_proves_a_no_model_route_pinned_by_zero_model_calls",
+      "tests.test_memory_study.MemoryVerdict.test_a_none_receipt_grades_proven_only_on_a_none_route"
+    ]
+  },
+  {
+    "label": "a none candidate with memory-model calls is a problem",
+    "file": "localbench/workloads.py",
+    "old": "        if model_calls != 0:\n",
+    "new": "        if False:\n",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_none_receipt_with_any_memory_model_call_is_refused"
+    ]
+  },
+  {
+    "label": "a no-model receipt on a model route is BAD",
+    "file": "localbench/features.py",
+    "old": "            return \"BAD\", f\"proves no-model route {route_text}; this profile's route targets model {model}\"",
+    "new": "            pass",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_none_receipt_grades_proven_only_on_a_none_route"
+    ]
+  },
+  {
+    "label": "a no-model receipt must name the setting the route is off at",
+    "file": "localbench/features.py",
+    "old": "if proved.get(\"kind\") != \"fixed\" or not baseline_matches(proved, off):",
+    "new": "if proved.get(\"kind\") != \"fixed\":",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_none_receipt_grades_proven_only_on_a_none_route"
+    ]
+  },
+  {
+    "label": "a no-model receipt must pin zero model calls",
+    "file": "localbench/features.py",
+    "old": "if not isinstance(calls, int) or isinstance(calls, bool) or calls != 0:",
+    "new": "if not isinstance(calls, int):",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_none_receipt_with_any_memory_model_call_is_refused"
+    ]
+  },
+  {
+    "label": "a no-model receipt's baseline must be the incumbent route",
+    "file": "localbench/features.py",
+    "old": "        if not baseline_matches(baseline, inc):\n            inc_text",
+    "new": "        if False:\n            inc_text",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_none_receipt_grades_proven_only_on_a_none_route"
+    ]
+  },
+  {
+    "label": "a model receipt proves nothing about a no-model route",
+    "file": "localbench/features.py",
+    "old": "            return \"UNPROVEN\", f\"this profile's route targets no model (off at {setting}); the receipt proves a model\"",
+    "new": "            pass",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_a_none_receipt_grades_proven_only_on_a_none_route"
+    ]
+  },
+  {
+    "label": "a preset that sets llmMode none is graded as the no-model route",
+    "file": "localbench/presets.py",
+    "old": "            if set(after) & gating and features.route(row, cfg_after, provs)[\"disabled\"]:",
+    "new": "            if False:",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_preset_memory_none_is_graded_as_the_no_model_route_it_sets"
+    ]
+  },
+  {
+    "label": "the routed setting comes from the post-apply settings",
+    "file": "localbench/presets.py",
+    "old": "            cfg_after = {**current[prof][0], **after, \"modelRoles\": roles}",
+    "new": "            cfg_after = {**current[prof][0], \"modelRoles\": roles}",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_preset_memory_none_is_graded_as_the_no_model_route_it_sets"
+    ]
+  },
+  {
+    "label": "the ack-slip exemption never applies to legs created before the decision",
+    "file": "localbench/workloads.py",
+    "old": " or created < ACK_SLIP_RULE_FROM:",
+    "new": ":",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_the_ack_slip_exemption_applies_only_to_legs_created_after_the_decision"
+    ]
+  },
+  {
+    "label": "a leg with no created stamp keeps the old rule",
+    "file": "localbench/workloads.py",
+    "old": "    if not isinstance(created, str) or not _STAMP.fullmatch(created) or created < ACK_SLIP_RULE_FROM:",
+    "new": "    if isinstance(created, str) and created < ACK_SLIP_RULE_FROM:",
+    "tests": [
+      "tests.test_memory_study.MemoryVerdict.test_the_ack_slip_exemption_applies_only_to_legs_created_after_the_decision"
+    ]
+  },
+  {
+    "label": "an already-local route is proven against a declared alternative",
+    "file": "localbench/features.py",
+    "old": "        if alt is None and not baseline_matches(baseline, inc):",
+    "new": "        if not baseline_matches(baseline, inc):",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_an_already_local_route_is_proven_against_a_declared_alternative",
+      "tests.test_features.FeatureMap.test_without_a_local_preset_apply_the_baseline_is_the_current_route_never_the_model_itself"
+    ]
+  },
+  {
+    "label": "a declared alternative baseline is not the routed model itself",
+    "file": "localbench/features.py",
+    "old": "        if alt is None and own:",
+    "new": "        if own:",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_an_already_local_route_is_proven_against_a_declared_alternative"
+    ]
+  },
+  {
+    "label": "grade refuses a local model route offered as an alternative",
+    "file": "localbench/features.py",
+    "old": "if own and not a[\"local\"] and baseline_matches(baseline, a)), None)",
+    "new": "if own and baseline_matches(baseline, a)), None)",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_another_local_model_route_or_the_route_itself_is_not_an_alternative"
+    ]
+  },
+  {
+    "label": "alternatives exclude presets that route a local model",
+    "file": "localbench/features.py",
+    "old": "        if not route(row, c, pv)[\"local\"]:",
+    "new": "        if True:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_without_a_local_preset_apply_the_baseline_is_the_current_route_never_the_model_itself",
+      "tests.test_memory_study.DeclaredAlternatives.test_an_already_local_route_is_proven_against_a_declared_alternative"
+    ]
+  },
+  {
+    "label": "alternatives come from the row's own preset family",
+    "file": "localbench/features.py",
+    "old": "        if presets.family(p[\"name\"]) != row[\"preset\"]:\n            continue\n",
+    "new": "",
+    "tests": [
+      "tests.test_features.FeatureMap.test_without_a_local_preset_apply_the_baseline_is_the_current_route_never_the_model_itself"
+    ]
+  },
+  {
+    "label": "an alternative is the route its preset's ops give",
+    "file": "localbench/features.py",
+    "old": "                c[key] = presets._fold(op, c.get(key))",
+    "new": "                pass",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_an_already_local_route_is_proven_against_a_declared_alternative"
+    ]
+  },
+  {
+    "label": "with a local apply record no alternatives are offered",
+    "file": "localbench/features.py",
+    "old": "if not isinstance(before, str) and before[2] == CURRENT_ROUTE else None)",
+    "new": "if not isinstance(before, str) else None)",
+    "tests": [
+      "tests.test_features.FeatureMap.test_with_a_local_apply_record_the_recorded_route_stays_the_only_baseline"
+    ]
+  },
+  {
+    "label": "the baseline arm is inferred from the baseline legs' recorded configuration",
+    "file": "localbench/workloads.py",
+    "old": "            return bool(legs) and all(m[a[\"leg\"][0]] == a[\"leg\"][1] for m in legs)",
+    "new": "            return False",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_the_same_legs_score_both_directions",
+      "tests.test_memory_study.DeclaredAlternatives.test_embeddings_pin_and_the_fts_alternative"
+    ]
+  },
+  {
+    "label": "a candidate running the alternative's own configuration is a problem",
+    "file": "localbench/workloads.py",
+    "old": "        if own:\n            route_problems.append(",
+    "new": "        if False:\n            route_problems.append(",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_an_alternative_arm_must_differ_only_in_its_own_setting"
+    ]
+  },
+  {
+    "label": "an alternative arm may differ only in its own setting",
+    "file": "localbench/workloads.py",
+    "old": "            if len(seen) > 1 or (None in seen and not (other == \"digest\" and no_model)):\n                route_problems.append(f\"the arms differ in {other}",
+    "new": "            if False:\n                route_problems.append(f\"the arms differ in {other}",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_an_alternative_arm_must_differ_only_in_its_own_setting"
+    ]
+  },
+  {
+    "label": "the fts arm must run the candidate's memory-model digest",
+    "file": "localbench/workloads.py",
+    "old": "(\"embeddings\",) if key == \"llm_mode\" else (\"llm_mode\", \"digest\")",
+    "new": "(\"embeddings\",) if key == \"llm_mode\" else (\"llm_mode\",)",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_embeddings_pin_and_the_fts_alternative"
+    ]
+  },
+  {
+    "label": "against the incumbent route the arms must agree on embeddings",
+    "file": "localbench/workloads.py",
+    "old": "        if None in seen or len(seen) > 1:\n            route_problems.append(f\"the arms differ in embeddings",
+    "new": "        if False:\n            route_problems.append(f\"the arms differ in embeddings",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_an_unverifiable_config_records_no_embeddings"
+    ]
+  },
+  {
+    "label": "embeddings are read only from the config file the leg pinned",
+    "file": "localbench/workloads.py",
+    "old": "        if sha16(path) != pin:\n            return None",
+    "new": "        if False:\n            return None",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_an_unverifiable_config_records_no_embeddings"
+    ]
+  },
+  {
+    "label": "noEmbeddings true means embeddings off",
+    "file": "localbench/workloads.py",
+    "old": "{\"true\": \"off\", \"false\": \"on\"}.get(section.get(\"noEmbeddings\", \"false\"))",
+    "new": "{\"true\": \"on\", \"false\": \"off\"}.get(section.get(\"noEmbeddings\", \"false\"))",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_embeddings_pin_and_the_fts_alternative"
+    ]
+  },
+  {
+    "label": "the receipt pins the candidate legs' embeddings",
+    "file": "localbench/workloads.py",
+    "old": "\"embeddings\": next(iter(e)) if len(e := {m[\"embeddings\"] for m in cand}) == 1 else None,",
+    "new": "\"embeddings\": None,",
+    "tests": [
+      "tests.test_memory_study.DeclaredAlternatives.test_embeddings_pin_and_the_fts_alternative"
+    ]
+  },
+  {
+    "label": "a main call's completion row may land after agent_end and the next send, before the next main call",
+    "file": "localbench/workloads.py",
+    "old": "        until = first_main_start(nxt) if nxt else ended.get(t[\"session\"], t[\"t_end\"])",
+    "new": "        until = nxt[\"t_send\"] if nxt else ended.get(t[\"session\"], t[\"t_end\"])",
+    "tests": [
+      "tests.test_memory_study.SessMainCallAttribution.test_a_row_logged_after_agent_end_and_the_next_send_but_before_the_next_main_call_counts"
+    ]
+  },
+  {
+    "label": "a main call completing after the next turn's first main call started is not the turn's",
+    "file": "localbench/workloads.py",
+    "old": "and (t[\"timeout\"] or r[\"t\"] <= until)]",
+    "new": "and True]",
+    "tests": [
+      "tests.test_memory_study.SessMainCallAttribution.test_a_row_completing_after_the_next_turns_first_main_call_started_is_not_the_turns_main_call"
+    ]
+  },
+  {
+    "label": "the embedder digest hashes every model file",
+    "file": "localbench/workloads.py",
+    "old": "        h.update(rel.encode() + b\"\\0\")\n",
+    "new": "",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_embedding_pins_name_the_model_and_hash_its_files"
+    ]
+  },
+  {
+    "label": "quarantined fastembed files are not part of the digest",
+    "file": "localbench/workloads.py",
+    "old": " and \".corrupt-\" not in p.name)",
+    "new": ")",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_embedding_pins_name_the_model_and_hash_its_files"
+    ]
+  },
+  {
+    "label": "the digest is cached per file mtime and size, not per path",
+    "file": "localbench/workloads.py",
+    "old": "    return _tree_digest(tuple((p.relative_to(d).as_posix(), str(p), st.st_mtime_ns, st.st_size)",
+    "new": "    return _tree_digest(tuple((p.relative_to(d).as_posix(), str(p), 0, 0)",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_embedding_pins_name_the_model_and_hash_its_files"
+    ]
+  },
+  {
+    "label": "an FTS-only overlay pins no embedder",
+    "file": "localbench/workloads.py",
+    "old": " or flat.get(\"mnemopi.noEmbeddings\", \"false\") == \"true\":",
+    "new": ":",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_embedding_pins_name_the_model_and_hash_its_files"
+    ]
+  },
+  {
+    "label": "the run pins carry the embedder",
+    "file": "localbench/__main__.py",
+    "old": ", **embedding_pins(mem_config)}",
+    "new": "}",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_embedding_pins_name_the_model_and_hash_its_files"
+    ]
+  },
+  {
+    "label": "an embeddings receipt pins the embedding model's digest as model_digest",
+    "file": "localbench/workloads.py",
+    "old": "            **({\"model\": embedder[0], \"model_digest\": embedder[1], \"memory_model\": first[\"model\"],",
+    "new": "            **({\"memory_model\": first[\"model\"],",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_an_embeddings_receipt_proves_the_installed_embedding_model"
+    ]
+  },
+  {
+    "label": "an embeddings receipt carries no no-model route pin",
+    "file": "localbench/workloads.py",
+    "old": " and baseline.get(\"preset\") != \"embeddings:fts\" else {}),",
+    "new": " else {}),",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_an_embeddings_receipt_beside_llm_mode_none_pins_the_embedder_not_the_no_model_route"
+    ]
+  },
+  {
+    "label": "embeddings candidates must pin a digest",
+    "file": "localbench/workloads.py",
+    "old": "        if embedder is None or None in embedder:",
+    "new": "        if embedder is None:",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_candidate_legs_without_an_embedder_digest_cannot_prove_embeddings"
+    ]
+  },
+  {
+    "label": "a fastembed route's installed digest is its on-disk digest",
+    "file": "localbench/features.py",
+    "old": "        return digests.get(model) or fastembed_digest(model)",
+    "new": "        return digests.get(model)",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_an_embeddings_receipt_proves_the_installed_embedding_model",
+      "tests.test_memory_study.EmbeddingsProof.test_memory_and_embeddings_presets_gate_only_their_own_feature"
+    ]
+  },
+  {
+    "label": "the preset gate uses the installed digest of fastembed routes",
+    "file": "localbench/presets.py",
+    "old": "            digest = None if model is None else features.installed_digest(row, model, digests)",
+    "new": "            digest = None if model is None else digests.get(model)",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_memory_and_embeddings_presets_gate_only_their_own_feature"
+    ]
+  },
+  {
+    "label": "the inferred alternative is the one only the baseline arm runs",
+    "file": "localbench/workloads.py",
+    "old": " and not any(runs([m], a) for m in cand)),",
+    "new": "),",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_an_embeddings_receipt_beside_llm_mode_none_pins_the_embedder_not_the_no_model_route"
+    ]
+  },
+  {
+    "label": "two llmMode none arms need no memory-model digest",
+    "file": "localbench/workloads.py",
+    "old": " and not (other == \"digest\" and no_model)):",
+    "new": "):",
+    "tests": [
+      "tests.test_memory_study.EmbeddingsProof.test_an_embeddings_receipt_beside_llm_mode_none_pins_the_embedder_not_the_no_model_route"
+    ]
+  },
+  {
+    "label": "contended side legs are not voided",
+    "file": "localbench/workloads.py",
+    "old": "        strict = [leg for leg in legs if not side_regime(leg)]",
+    "new": "        strict = list(legs)",
+    "tests": [
+      "tests.test_memory_study.SideRegime.test_a_contended_side_leg_is_not_voided_and_reports_its_co_residents"
+    ]
+  },
+  {
+    "label": "the side regime covers only legs created at or after the decision",
+    "file": "localbench/workloads.py",
+    "old": " and created >= SIDE_REGIME_FROM)",
+    "new": ")",
+    "tests": [
+      "tests.test_memory_study.SideRegime.test_an_old_or_unflagged_leg_is_still_voided_by_contention"
+    ]
+  },
+  {
+    "label": "the side regime needs the regime pin",
+    "file": "localbench/workloads.py",
+    "old": "    return ((prov.get(\"pins\") or {}).get(\"regime\") == SIDE_REGIME and isinstance(created, str)",
+    "new": "    return (isinstance(created, str)",
+    "tests": [
+      "tests.test_memory_study.SideRegime.test_an_old_or_unflagged_leg_is_still_voided_by_contention"
+    ]
+  },
+  {
+    "label": "co-resident models are reported per side leg",
+    "file": "localbench/workloads.py",
+    "old": "            models.update(f\"{server}/{name}\" for name in names or [])",
+    "new": "            pass",
+    "tests": [
+      "tests.test_memory_study.SideRegime.test_a_contended_side_leg_is_not_voided_and_reports_its_co_residents"
+    ]
+  },
+  {
+    "label": "mixed regimes are a problem",
+    "file": "localbench/workloads.py",
+    "old": "    if len(set(regimes.values())) > 1:\n",
+    "new": "    if False:\n",
+    "tests": [
+      "tests.test_memory_study.SideRegime.test_legs_that_mix_regimes_are_a_problem"
+    ]
+  },
+  {
+    "label": "unsound skips contention only for side legs",
+    "file": "localbench/__main__.py",
+    "old": "    if v[\"contended\"] and not side:",
+    "new": "    if v[\"contended\"] and False:",
+    "tests": [
+      "tests.test_memory_study.SideRegime.test_unsound_and_banking_skip_co_residency_only_for_side_legs"
+    ]
+  },
+  {
+    "label": "banking skips unknown residency only for side legs",
+    "file": "localbench/__main__.py",
+    "old": "    return any(_resident_unknown(s) != 0 for s in summaries if not workloads.side_regime(s))",
+    "new": "    return any(_resident_unknown(s) != 0 for s in summaries)",
+    "tests": [
+      "tests.test_memory_study.SideRegime.test_unsound_and_banking_skip_co_residency_only_for_side_legs"
+    ]
+  },
+  {
+    "label": "a side-regime leg unloads nothing",
+    "file": "localbench/__main__.py",
+    "old": "    if side_regime:\n        evicted = []\n",
+    "new": "    if False:\n        evicted = []\n",
+    "tests": [
+      "tests.test_memory_study.SideRegimeAb.test_side_regime_never_unloads_and_marks_every_leg"
+    ]
+  },
+  {
+    "label": "a side-regime leg runs the side preflight",
+    "file": "localbench/__main__.py",
+    "old": "    pre = preflight(allow_busy, wait_idle_s, emit, side=side_regime)",
+    "new": "    pre = preflight(allow_busy, wait_idle_s, emit)",
+    "tests": [
+      "tests.test_memory_study.SideRegimeAb.test_side_regime_never_unloads_and_marks_every_leg"
+    ]
+  },
+  {
+    "label": "the side preflight does not refuse on another model running",
+    "file": "localbench/__main__.py",
+    "old": "        if busy and not side:",
+    "new": "        if busy:",
+    "tests": [
+      "tests.test_memory_study.SideRegimeAb.test_the_side_preflight_refuses_only_on_unreadable_signals_or_swap"
+    ]
+  },
+  {
+    "label": "side-regime legs carry regime side in their pins",
+    "file": "localbench/__main__.py",
+    "old": "            **({\"regime\": workloads.SIDE_REGIME} if side_regime else {})}\n    emit(",
+    "new": "            }\n    emit(",
+    "tests": [
+      "tests.test_memory_study.SideRegimeAb.test_side_regime_never_unloads_and_marks_every_leg"
+    ]
+  },
+  {
+    "label": "the side regime is refused outside mem and sess",
+    "file": "localbench/__main__.py",
+    "old": "        if not set(tiers) <= {\"mem\", \"sess\"}:",
+    "new": "        if False:",
+    "tests": [
+      "tests.test_memory_study.SideRegimeAb.test_side_regime_is_refused_outside_mem_and_sess"
+    ]
+  },
+  {
+    "label": "the side preflight does not refuse on unknown residency",
+    "file": "localbench/__main__.py",
+    "old": "    if summ.get(\"resident_unknown_samples\", 0) and not side:",
+    "new": "    if summ.get(\"resident_unknown_samples\", 0):",
+    "tests": [
+      "tests.test_memory_study.SideRegimeAb.test_the_side_preflight_refuses_only_on_unreadable_signals_or_swap"
+    ]
+  },
+  {
+    "label": "the side preflight skips the park and stuck-session checks",
+    "file": "localbench/__main__.py",
+    "old": "    if side:\n        return summ, cpu, problems\n",
+    "new": "",
+    "tests": [
+      "tests.test_memory_study.SideRegimeAb.test_the_side_preflight_refuses_only_on_unreadable_signals_or_swap"
+    ]
+  }
+]

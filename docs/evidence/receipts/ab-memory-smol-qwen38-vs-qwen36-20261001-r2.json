@@ -1,0 +1,5740 @@
+{
+  "kind": "ab",
+  "verdict": "UNSOUND",
+  "a": "ollama:qwen3.6:35b-mlx",
+  "b": "ollama:qwen3.6:35b-mlx",
+  "order": [
+    "A",
+    "B",
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [
+    "ab_a3: MUST FAIL: sess.turns_complete"
+  ],
+  "pin_drift": {},
+  "load_balance": {
+    "a": [
+      36.3,
+      36.7,
+      38.1
+    ],
+    "b": [
+      37.0,
+      34.0
+    ],
+    "tol_pct": 5.0,
+    "favours": null
+  },
+  "table": {
+    "mem.turn.max_tool_calls": {
+      "a_legs": [
+        28,
+        15,
+        14
+      ],
+      "b_legs": [
+        20,
+        18
+      ],
+      "a_median": 15,
+      "b_median": 19.0,
+      "better": "lower",
+      "aa_rel_spread": 0.9333,
+      "bb_rel_spread": 0.1053,
+      "band": 2.8,
+      "b_over_a": 1.267,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.turn.timeouts": {
+      "a_legs": [
+        0,
+        0,
+        0
+      ],
+      "b_legs": [
+        0,
+        0
+      ],
+      "a_median": 0,
+      "b_median": 0.0,
+      "better": "lower",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.hit_rate": {
+      "a_legs": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "b_legs": [
+        1.0,
+        1.0
+      ],
+      "a_median": 1.0,
+      "b_median": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.pre_main_s": {
+      "a_legs": [
+        9.7764,
+        9.1539,
+        7.3054
+      ],
+      "b_legs": [
+        8.0157,
+        6.7457
+      ],
+      "a_median": 9.1539,
+      "b_median": 7.380700000000001,
+      "better": "lower",
+      "aa_rel_spread": 0.2699,
+      "bb_rel_spread": 0.1721,
+      "band": 0.8098,
+      "b_over_a": 0.806,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.recall.wall_s": {
+      "a_legs": [
+        12.6808,
+        13.409,
+        11.0974
+      ],
+      "b_legs": [
+        12.0229,
+        10.3317
+      ],
+      "a_median": 12.6808,
+      "b_median": 11.177299999999999,
+      "better": "lower",
+      "aa_rel_spread": 0.1823,
+      "bb_rel_spread": 0.1513,
+      "band": 0.5469,
+      "b_over_a": 0.881,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.plant.wall_s": {
+      "a_legs": [
+        12.455,
+        14.863,
+        11.2319
+      ],
+      "b_legs": [
+        15.332,
+        13.9776
+      ],
+      "a_median": 12.455,
+      "b_median": 14.654800000000002,
+      "better": "lower",
+      "aa_rel_spread": 0.2915,
+      "bb_rel_spread": 0.0924,
+      "band": 0.8746,
+      "b_over_a": 1.177,
+      "verdict": "WITHIN-NOISE"
+    },
+    "mem.derail.ok_rate": {
+      "a_legs": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "b_legs": [
+        1.0,
+        1.0
+      ],
+      "a_median": 1.0,
+      "b_median": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.max_tool_calls": {
+      "a_legs": [
+        0,
+        0,
+        3
+      ],
+      "b_legs": [
+        3,
+        0
+      ],
+      "a_median": 0,
+      "b_median": 1.5,
+      "better": "lower",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 2.0,
+      "band": 6.0,
+      "b_over_a": Infinity,
+      "verdict": "B-WORSE"
+    },
+    "sess.turn.timeouts": {
+      "a_legs": [
+        0,
+        0,
+        0
+      ],
+      "b_legs": [
+        0,
+        0
+      ],
+      "a_median": 0,
+      "b_median": 0.0,
+      "better": "lower",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.wall_s": {
+      "a_legs": [
+        3.4884,
+        3.2771,
+        3.5627
+      ],
+      "b_legs": [
+        2.2443,
+        2.4661
+      ],
+      "a_median": 3.4884,
+      "b_median": 2.3552,
+      "better": "lower",
+      "aa_rel_spread": 0.0819,
+      "bb_rel_spread": 0.0942,
+      "band": 0.2825,
+      "b_over_a": 0.675,
+      "verdict": "B-BETTER"
+    },
+    "sess.turn.post_retain_wall_s": {
+      "a_legs": [
+        4.7941,
+        4.7409,
+        4.8985
+      ],
+      "b_legs": [
+        10.9531,
+        6.9507
+      ],
+      "a_median": 4.7941,
+      "b_median": 8.9519,
+      "better": "lower",
+      "aa_rel_spread": 0.0329,
+      "bb_rel_spread": 0.4471,
+      "band": 1.3413,
+      "b_over_a": 1.867,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.pre_main_s": {
+      "a_legs": [
+        2.76,
+        2.6336,
+        2.5802
+      ],
+      "b_legs": [
+        1.8762,
+        1.8406
+      ],
+      "a_median": 2.6336,
+      "b_median": 1.8584,
+      "better": "lower",
+      "aa_rel_spread": 0.0683,
+      "bb_rel_spread": 0.0192,
+      "band": 0.2048,
+      "b_over_a": 0.706,
+      "verdict": "B-BETTER"
+    },
+    "sess.turn.post_retain_pre_main_s": {
+      "a_legs": [
+        4.0419,
+        4.0514,
+        4.0827
+      ],
+      "b_legs": [
+        4.0398,
+        4.0337
+      ],
+      "a_median": 4.0514,
+      "b_median": 4.03675,
+      "better": "lower",
+      "aa_rel_spread": 0.0101,
+      "bb_rel_spread": 0.0015,
+      "band": 0.1,
+      "b_over_a": 0.996,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.ack_rate": {
+      "a_legs": [
+        1.0,
+        1.0,
+        0.9167
+      ],
+      "b_legs": [
+        1.0,
+        1.0
+      ],
+      "a_median": 1.0,
+      "b_median": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.0833,
+      "bb_rel_spread": 0.0,
+      "band": 0.2499,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.memory.extract_s": {
+      "a_legs": [
+        2.4775,
+        1.9945,
+        2.0935
+      ],
+      "b_legs": [
+        8.8435,
+        7.0605
+      ],
+      "a_median": 2.0935,
+      "b_median": 7.952,
+      "better": "lower",
+      "aa_rel_spread": 0.2307,
+      "bb_rel_spread": 0.2242,
+      "band": 0.6921,
+      "b_over_a": 3.798,
+      "verdict": "B-WORSE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.4.8",
+          "omp_sha": "e81e710e7636d91c",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb",
+          "smol_model": "localbench-parked:5642e97495e1",
+          "smol_digest": "5642e97495e1"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "f3a6e6d-dirty",
+        "created": "20261001T094732Z",
+        "tiers": [
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.turn.max_tool_calls": {
+          "value": 28,
+          "better": "lower",
+          "spread": [
+            0,
+            28
+          ],
+          "n": 12
+        },
+        "mem.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "mem.recall.pre_main_s": {
+          "value": 9.7764,
+          "better": "lower",
+          "spread": [
+            6.9447,
+            9.9894
+          ],
+          "n": 3
+        },
+        "mem.recall.wall_s": {
+          "value": 12.6808,
+          "better": "lower",
+          "spread": [
+            12.2831,
+            13.3229
+          ],
+          "n": 3
+        },
+        "mem.plant.wall_s": {
+          "value": 12.455,
+          "better": "lower",
+          "spread": [
+            12.2428,
+            14.471
+          ],
+          "n": 3
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "sess.turn.max_tool_calls": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.wall_s": {
+          "value": 3.4884,
+          "better": "lower",
+          "spread": [
+            2.7955,
+            5.2935
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 4.7941,
+          "better": "lower",
+          "spread": [
+            4.6547,
+            5.2558
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 2.76,
+          "better": "lower",
+          "spread": [
+            2.4674,
+            3.9569
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0419,
+          "better": "lower",
+          "spread": [
+            4.0389,
+            4.0505
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 2.4775,
+          "better": "lower",
+          "spread": [
+            2.358,
+            2.651
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20261001T094732Z__ab_a1__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.turn": {
+          "turns": [
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 12.455
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 12.681
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "control",
+              "tool_calls": 9,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 25.574
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 10.02
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 14.471
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 13.323
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "control",
+              "tool_calls": 9,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 34.097
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 7.904
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 12.243
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 12.283
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "control",
+              "tool_calls": 28,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 79.683
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "derail",
+              "tool_calls": 7,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 43.573
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 3,
+          "attempts": 3,
+          "ci95": [
+            0.4385,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-2437",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "ZEBRA-2437",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any information about a \"Falcon\" project or its deploy code in my m",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "32620",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "32620",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have access to filesystem or bash tools from my current tool inventory, ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Adeyemi",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "Adeyemi",
+              "plant_answer": "NOTED",
+              "control_answer": "I've exhaustively searched long-term memory for information about \"project Falco",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "localbench-parked:5642e97495e1",
+          "injected_tokens": {
+            "median": 154,
+            "min": 146,
+            "max": 169
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": [],
+          "invalid": [],
+          "reason": null
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.547,
+            "min": 0.484,
+            "max": 1.602,
+            "n": 4
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "localbench-parked:5642e97495e1",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 9.297,
+              "t_send": 1790848508.3169138,
+              "t_end": 1790848517.6138082,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 6.908,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 3.658,
+              "t_send": 1790848517.614305,
+              "t_end": 1790848521.272036,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.764,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 3.157,
+              "t_send": 1790848521.272585,
+              "t_end": 1790848524.4292831,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.467,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 3.509,
+              "t_send": 1790848524.429995,
+              "t_end": 1790848527.939531,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.71,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 5.256,
+              "t_send": 1790848527.940114,
+              "t_end": 1790848533.195986,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.039,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 3.798,
+              "t_send": 1790848533.197335,
+              "t_end": 1790848536.995281,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.779,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 3.469,
+              "t_send": 1790848536.9971259,
+              "t_end": 1790848540.4662971,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.656,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 3.393,
+              "t_send": 1790848540.466912,
+              "t_end": 1790848543.8602612,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.511,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 4.827,
+              "t_send": 1790848543.8606012,
+              "t_end": 1790848548.6877718,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.039,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 5.293,
+              "t_send": 1790848548.6882172,
+              "t_end": 1790848553.9817479,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.824,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 3.456,
+              "t_send": 1790848553.983923,
+              "t_end": 1790848557.440041,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.704,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 4.785,
+              "t_send": 1790848557.440644,
+              "t_end": 1790848562.226092,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.955,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 9.557,
+              "t_send": 1790848566.4492931,
+              "t_end": 1790848576.006589,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 6.597,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 3.756,
+              "t_send": 1790848576.006994,
+              "t_end": 1790848579.7629461,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.823,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 2.796,
+              "t_send": 1790848579.76409,
+              "t_end": 1790848582.559672,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.48,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 3.489,
+              "t_send": 1790848582.561026,
+              "t_end": 1790848586.050188,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.906,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 4.761,
+              "t_send": 1790848586.050516,
+              "t_end": 1790848590.811688,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.044,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 4.932,
+              "t_send": 1790848590.812096,
+              "t_end": 1790848595.744201,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.957,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 3.488,
+              "t_send": 1790848595.745774,
+              "t_end": 1790848599.233597,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.781,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 3.304,
+              "t_send": 1790848599.234528,
+              "t_end": 1790848602.53861,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.574,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 4.655,
+              "t_send": 1790848602.53953,
+              "t_end": 1790848607.194311,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.05,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 4.917,
+              "t_send": 1790848607.195083,
+              "t_end": 1790848612.112159,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.859,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 3.248,
+              "t_send": 1790848612.112845,
+              "t_end": 1790848615.36127,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.587,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 3.338,
+              "t_send": 1790848615.361639,
+              "t_end": 1790848618.699851,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.756,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 14.907,
+              "not_ok": 0,
+              "completion_tokens": 891,
+              "models": [
+                "localbench-parked:5642e97495e1"
+              ]
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "extract_overlap_with_main_s": 0.0,
+          "exit_s": [
+            2.532,
+            2.835
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790848506.819577,
+              "ended": 1790848564.7587929,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.532,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790848564.760032,
+              "ended": 1790848621.535347,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.835,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "reason": null,
+          "failures": [],
+          "turns": 24,
+          "acks": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "reason": "no positive memory-extract/main overlap in each session",
+          "llm_mode": "smol",
+          "memory_calls": 6,
+          "successful_extracts": 6,
+          "extract_overlap_with_main_s": 0.0,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 8,
+            "load1": {
+              "mean": 11.6,
+              "max": 11.67,
+              "min": 11.45
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 89.0,
+              "max": 89,
+              "min": 89
+            },
+            "swap_used_mb": {
+              "mean": 9.4,
+              "max": 9.44,
+              "min": 9.44
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "resident_owned_stop_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 4.0,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.5,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 8,
+              "app_gpu_mean_pct": 6.5,
+              "app_gpu_p95_pct": 6.9,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 32.0,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 6.9
+        },
+        "during": {
+          "samples": 266,
+          "load1": {
+            "mean": 25.1,
+            "max": 40.2,
+            "min": 9.82
+          },
+          "gpu_device_pct": {
+            "mean": 76.9,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 84.4,
+            "max": 89,
+            "min": 80
+          },
+          "swap_used_mb": {
+            "mean": 9.4,
+            "max": 9.44,
+            "min": 9.44
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "resident_owned_stop_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 84061,
+              "name": "ollama",
+              "pct": 30.6,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model localbench-parked:5642e97495e1 --port 50156",
+              "model": "localbench-parked:5642e97495e1"
+            },
+            {
+              "pid": 80970,
+              "name": "ollama",
+              "pct": 30.2,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.6:35b-mlx --port 64622",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.5,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 266,
+            "app_gpu_mean_pct": 2.2,
+            "app_gpu_p95_pct": 4.8,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 84,
+          "busy_pct": {
+            "mean": 36.3,
+            "max": 39.6,
+            "min": 32.7
+          }
+        },
+        "before_live": {
+          "t": 1790848052.802591,
+          "load1": 11.81,
+          "free_pct": 89,
+          "swap_used_mb": 9.44,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1523253248,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "resident_probes": {
+            "ollama": {
+              "server": "ollama",
+              "port": 11434,
+              "probe_start": 911854.256682083,
+              "probe_end": 911854.257600541,
+              "error_class": null,
+              "http_status": 200
+            },
+            "mlx-serve": {
+              "server": "mlx-serve",
+              "port": 11234,
+              "probe_start": 911854.257608041,
+              "probe_end": 911854.257722916,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "omlx": {
+              "server": "omlx",
+              "port": 11236,
+              "probe_start": 911854.25772575,
+              "probe_end": 911854.257835666,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlx-smol": {
+              "server": "mlx-smol",
+              "port": 11235,
+              "probe_start": 911854.257837625,
+              "probe_end": 911854.257909333,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlxfast": {
+              "server": "mlxfast",
+              "port": 11237,
+              "probe_start": 911854.257911166,
+              "probe_end": 911854.258228666,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            }
+          },
+          "user_idle_s": 11794.2
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.4.8",
+          "omp_sha": "e81e710e7636d91c",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb",
+          "smol_model": "qwen3.6:35b-mlx",
+          "smol_digest": "e92a3e94bbca"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "f3a6e6d-dirty",
+        "created": "20261001T095704Z",
+        "tiers": [
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_b1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.turn.max_tool_calls": {
+          "value": 20,
+          "better": "lower",
+          "spread": [
+            0,
+            20
+          ],
+          "n": 12
+        },
+        "mem.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "mem.recall.pre_main_s": {
+          "value": 8.0157,
+          "better": "lower",
+          "spread": [
+            5.424,
+            8.1747
+          ],
+          "n": 3
+        },
+        "mem.recall.wall_s": {
+          "value": 12.0229,
+          "better": "lower",
+          "spread": [
+            10.2949,
+            13.4287
+          ],
+          "n": 3
+        },
+        "mem.plant.wall_s": {
+          "value": 15.332,
+          "better": "lower",
+          "spread": [
+            13.6571,
+            16.1516
+          ],
+          "n": 3
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "sess.turn.max_tool_calls": {
+          "value": 3,
+          "better": "lower",
+          "spread": [
+            0,
+            3
+          ],
+          "n": 24
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.wall_s": {
+          "value": 2.2443,
+          "better": "lower",
+          "spread": [
+            1.5255,
+            2.8609
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 10.9531,
+          "better": "lower",
+          "spread": [
+            8.842,
+            11.5423
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 1.8762,
+          "better": "lower",
+          "spread": [
+            1.2875,
+            2.2816
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0398,
+          "better": "lower",
+          "spread": [
+            4.0317,
+            4.0596
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 8.8435,
+          "better": "lower",
+          "spread": [
+            4.18,
+            10.645
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20261001T095704Z__ab_b1__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.turn": {
+          "turns": [
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 16.152
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 13.429
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "control",
+              "tool_calls": 9,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 28.307
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 7.799
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "plant",
+              "tool_calls": 2,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 13.657
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 10.295
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "control",
+              "tool_calls": 18,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 59.033
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 7.807
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "plant",
+              "tool_calls": 2,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 15.332
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 12.023
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "control",
+              "tool_calls": 20,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 67.47
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 8.379
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 3,
+          "attempts": 3,
+          "ci95": [
+            0.4385,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-1526",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "ZEBRA-1526",
+              "plant_answer": "NOTED",
+              "control_answer": "I found no recorded deploy code for \"project Falcon\" in long-term memory. The on",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "24532",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "24532",
+              "plant_answer": "NOTED",
+              "control_answer": "I've thoroughly searched my long-term memory using `recall` and `reflect` but fo",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Adeyemi",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "Adeyemi",
+              "plant_answer": "NOTED",
+              "control_answer": "No relevant information found in memory.",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.6:35b-mlx",
+          "injected_tokens": {
+            "median": 151,
+            "min": 149,
+            "max": 167
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": [],
+          "invalid": [],
+          "reason": null
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 8.446,
+            "min": 6.618,
+            "max": 9.817,
+            "n": 4
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.6:35b-mlx",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 7.021,
+              "t_send": 1790849055.237491,
+              "t_end": 1790849062.258729,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 4.915,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 1.644,
+              "t_send": 1790849062.259535,
+              "t_end": 1790849063.903378,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.287,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 2.258,
+              "t_send": 1790849063.90366,
+              "t_end": 1790849066.16183,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.892,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 1.526,
+              "t_send": 1790849066.16255,
+              "t_end": 1790849067.688093,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.384,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 11.542,
+              "t_send": 1790849067.6881988,
+              "t_end": 1790849079.2306392,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 3,
+              "pre_main": 4.035,
+              "overlap_s": 0.149,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 1.926,
+              "t_send": 1790849079.236085,
+              "t_end": 1790849081.162037,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.45,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 2.149,
+              "t_send": 1790849081.162731,
+              "t_end": 1790849083.312053,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.792,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 2.544,
+              "t_send": 1790849083.3123431,
+              "t_end": 1790849085.856716,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.236,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 8.842,
+              "t_send": 1790849085.857336,
+              "t_end": 1790849094.699469,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.032,
+              "overlap_s": 4.415,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 1.904,
+              "t_send": 1790849094.7002702,
+              "t_end": 1790849096.604686,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.57,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 2.231,
+              "t_send": 1790849096.605281,
+              "t_end": 1790849098.835812,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.923,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 2.364,
+              "t_send": 1790849098.836052,
+              "t_end": 1790849101.1999612,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.886,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 8.113,
+              "t_send": 1790849112.5810409,
+              "t_end": 1790849120.694477,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 5.845,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 2.512,
+              "t_send": 1790849120.695519,
+              "t_end": 1790849123.2077818,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.167,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 2.195,
+              "t_send": 1790849123.208483,
+              "t_end": 1790849125.4032,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.867,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 2.399,
+              "t_send": 1790849125.403927,
+              "t_end": 1790849127.802701,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.861,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 10.868,
+              "t_send": 1790849127.8032482,
+              "t_end": 1790849138.6718342,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.045,
+              "overlap_s": 6.248,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 2.792,
+              "t_send": 1790849138.672622,
+              "t_end": 1790849141.46418,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.193,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 2.861,
+              "t_send": 1790849141.4653718,
+              "t_end": 1790849144.3263192,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.282,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 2.653,
+              "t_send": 1790849144.327878,
+              "t_end": 1790849146.980512,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.205,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 11.038,
+              "t_send": 1790849146.9813702,
+              "t_end": 1790849158.0193548,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.06,
+              "overlap_s": 6.588,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 2.184,
+              "t_send": 1790849158.0196512,
+              "t_end": 1790849160.203747,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.761,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 2.514,
+              "t_send": 1790849160.2049012,
+              "t_end": 1790849162.718925,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.155,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 2.228,
+              "t_send": 1790849162.719302,
+              "t_end": 1790849164.947553,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.85,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 50.182,
+              "not_ok": 0,
+              "completion_tokens": 7984,
+              "models": [
+                "qwen3.6:35b-mlx"
+              ]
+            }
+          },
+          "overlap_with_main_s": 17.4,
+          "extract_overlap_with_main_s": 17.4,
+          "exit_s": [
+            9.409,
+            7.499
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790849053.618965,
+              "ended": 1790849110.610079,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 9.409,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790849110.612301,
+              "ended": 1790849172.447017,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 7.499,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "reason": null,
+          "failures": [],
+          "turns": 24,
+          "acks": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "reason": null,
+          "llm_mode": "smol",
+          "memory_calls": 6,
+          "successful_extracts": 6,
+          "extract_overlap_with_main_s": 17.4,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 8,
+            "load1": {
+              "mean": 20.8,
+              "max": 21.25,
+              "min": 20.51
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 89.0,
+              "max": 89,
+              "min": 89
+            },
+            "swap_used_mb": {
+              "mean": 9.4,
+              "max": 9.44,
+              "min": 9.44
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "resident_owned_stop_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 4.3,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.6,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 8,
+              "app_gpu_mean_pct": 6.9,
+              "app_gpu_p95_pct": 8.0,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 31.8,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 8.1
+        },
+        "during": {
+          "samples": 248,
+          "load1": {
+            "mean": 30.1,
+            "max": 47.12,
+            "min": 13.97
+          },
+          "gpu_device_pct": {
+            "mean": 74.9,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 85.6,
+            "max": 89,
+            "min": 84
+          },
+          "swap_used_mb": {
+            "mean": 9.4,
+            "max": 9.44,
+            "min": 9.44
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "resident_owned_stop_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 96993,
+              "name": "ollama",
+              "pct": 54.4,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.6:35b-mlx --port 53439",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.6,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 248,
+            "app_gpu_mean_pct": 2.2,
+            "app_gpu_p95_pct": 4.9,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 74,
+          "busy_pct": {
+            "mean": 37.0,
+            "max": 40.7,
+            "min": 33.0
+          }
+        },
+        "before_live": {
+          "t": 1790848624.557826,
+          "load1": 21.25,
+          "free_pct": 89,
+          "swap_used_mb": 9.44,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1545961472,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1",
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "resident_probes": {
+            "ollama": {
+              "server": "ollama",
+              "port": 11434,
+              "probe_start": 912426.003449916,
+              "probe_end": 912426.0052395,
+              "error_class": null,
+              "http_status": 200
+            },
+            "mlx-serve": {
+              "server": "mlx-serve",
+              "port": 11234,
+              "probe_start": 912426.005246583,
+              "probe_end": 912426.005427791,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "omlx": {
+              "server": "omlx",
+              "port": 11236,
+              "probe_start": 912426.005429958,
+              "probe_end": 912426.0055475,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlx-smol": {
+              "server": "mlx-smol",
+              "port": 11235,
+              "probe_start": 912426.005550125,
+              "probe_end": 912426.005679083,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlxfast": {
+              "server": "mlxfast",
+              "port": 11237,
+              "probe_start": 912426.005681208,
+              "probe_end": 912426.005780958,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            }
+          },
+          "user_idle_s": 12366.0
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.4.8",
+          "omp_sha": "e81e710e7636d91c",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb",
+          "smol_model": "localbench-parked:5642e97495e1",
+          "smol_digest": "5642e97495e1"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "f3a6e6d-dirty",
+        "created": "20261001T100615Z",
+        "tiers": [
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.turn.max_tool_calls": {
+          "value": 15,
+          "better": "lower",
+          "spread": [
+            0,
+            15
+          ],
+          "n": 12
+        },
+        "mem.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "mem.recall.pre_main_s": {
+          "value": 9.1539,
+          "better": "lower",
+          "spread": [
+            9.0688,
+            12.6074
+          ],
+          "n": 3
+        },
+        "mem.recall.wall_s": {
+          "value": 13.409,
+          "better": "lower",
+          "spread": [
+            11.6678,
+            20.0378
+          ],
+          "n": 3
+        },
+        "mem.plant.wall_s": {
+          "value": 14.863,
+          "better": "lower",
+          "spread": [
+            10.5935,
+            18.8779
+          ],
+          "n": 3
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "sess.turn.max_tool_calls": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.wall_s": {
+          "value": 3.2771,
+          "better": "lower",
+          "spread": [
+            2.6358,
+            4.5972
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 4.7409,
+          "better": "lower",
+          "spread": [
+            4.6042,
+            5.5445
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 2.6336,
+          "better": "lower",
+          "spread": [
+            2.321,
+            3.6316
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0514,
+          "better": "lower",
+          "spread": [
+            4.0384,
+            4.0638
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 1.9945,
+          "better": "lower",
+          "spread": [
+            1.887,
+            2.292
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20261001T100615Z__ab_a2__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.turn": {
+          "turns": [
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 18.878
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 20.038
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "control",
+              "tool_calls": 12,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 55.668
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 11.702
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "plant",
+              "tool_calls": 2,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 14.863
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 11.668
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "control",
+              "tool_calls": 15,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 50.542
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 11.594
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "plant",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 10.594
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 13.409
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "control",
+              "tool_calls": 9,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 32.714
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 10.253
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 3,
+          "attempts": 3,
+          "ci95": [
+            0.4385,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-6003",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "ZEBRA-6003",
+              "plant_answer": "NOTED",
+              "control_answer": "No deploy code exists for a project called \"Falcon\" in my memory.",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "59018",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "59018",
+              "plant_answer": "NOTED",
+              "control_answer": "Based on my memory search, I don't have any stored information about a \"staging ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Moreau",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "fresh-process-recall",
+              "recall_answer": "Moreau",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have a record of a \"Falcon\" project or its on-call rotation schedule in ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": []
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "localbench-parked:5642e97495e1",
+          "injected_tokens": {
+            "median": 151,
+            "min": 80,
+            "max": 154
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": [],
+          "invalid": [],
+          "reason": null
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 1.544,
+            "min": 1.366,
+            "max": 1.647,
+            "n": 4
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "localbench-parked:5642e97495e1",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 9.243,
+              "t_send": 1790849594.3987882,
+              "t_end": 1790849603.641762,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 6.842,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 3.413,
+              "t_send": 1790849603.643329,
+              "t_end": 1790849607.05634,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.842,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 2.636,
+              "t_send": 1790849607.0570471,
+              "t_end": 1790849609.6929128,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.321,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 3.132,
+              "t_send": 1790849609.693457,
+              "t_end": 1790849612.825679,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.635,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 4.604,
+              "t_send": 1790849612.826227,
+              "t_end": 1790849617.430439,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.064,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 3.343,
+              "t_send": 1790849617.4309719,
+              "t_end": 1790849620.774474,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.772,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 3.128,
+              "t_send": 1790849620.7748532,
+              "t_end": 1790849623.902459,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.583,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 3.144,
+              "t_send": 1790849623.90316,
+              "t_end": 1790849627.0468218,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.412,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 4.681,
+              "t_send": 1790849627.047616,
+              "t_end": 1790849631.728825,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.063,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 3.318,
+              "t_send": 1790849631.729429,
+              "t_end": 1790849635.047828,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.812,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 2.948,
+              "t_send": 1790849635.048531,
+              "t_end": 1790849637.996665,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.375,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 3.25,
+              "t_send": 1790849637.997296,
+              "t_end": 1790849641.2478,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.633,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 9.003,
+              "t_send": 1790849645.379999,
+              "t_end": 1790849654.383122,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 6.587,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 3.47,
+              "t_send": 1790849654.3842518,
+              "t_end": 1790849657.854155,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.877,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 3.241,
+              "t_send": 1790849657.8544261,
+              "t_end": 1790849661.0953999,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.509,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 3.198,
+              "t_send": 1790849661.095886,
+              "t_end": 1790849664.294074,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.629,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 5.544,
+              "t_send": 1790849664.294636,
+              "t_end": 1790849669.83917,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.038,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 4.597,
+              "t_send": 1790849669.840138,
+              "t_end": 1790849674.4373481,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.6,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 3.325,
+              "t_send": 1790849674.437807,
+              "t_end": 1790849677.762593,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.539,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 2.708,
+              "t_send": 1790849677.762919,
+              "t_end": 1790849680.4706318,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.357,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 4.801,
+              "t_send": 1790849680.4715142,
+              "t_end": 1790849685.2721322,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.039,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 3.619,
+              "t_send": 1790849685.2723799,
+              "t_end": 1790849688.891087,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.694,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 3.304,
+              "t_send": 1790849688.892818,
+              "t_end": 1790849692.196626,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.64,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 4.526,
+              "t_send": 1790849692.197414,
+              "t_end": 1790849696.72367,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.632,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 12.21,
+              "not_ok": 0,
+              "completion_tokens": 884,
+              "models": [
+                "localbench-parked:5642e97495e1"
+              ]
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "extract_overlap_with_main_s": 0.0,
+          "exit_s": [
+            2.265,
+            2.038
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790849592.4606879,
+              "ended": 1790849643.5128949,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.265,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790849643.5144,
+              "ended": 1790849698.7622972,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.038,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "reason": null,
+          "failures": [],
+          "turns": 24,
+          "acks": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "reason": "no positive memory-extract/main overlap in each session",
+          "llm_mode": "smol",
+          "memory_calls": 6,
+          "successful_extracts": 6,
+          "extract_overlap_with_main_s": 0.0,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 10,
+            "load1": {
+              "mean": 35.4,
+              "max": 37.81,
+              "min": 34.15
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 89.0,
+              "max": 89,
+              "min": 89
+            },
+            "swap_used_mb": {
+              "mean": 9.4,
+              "max": 9.44,
+              "min": 9.44
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "resident_owned_stop_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.8,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.6,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 10,
+              "app_gpu_mean_pct": 5.3,
+              "app_gpu_p95_pct": 6.7,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 35.2,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 10.1
+        },
+        "during": {
+          "samples": 236,
+          "load1": {
+            "mean": 43.0,
+            "max": 62.56,
+            "min": 25.98
+          },
+          "gpu_device_pct": {
+            "mean": 65.9,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 85.0,
+            "max": 89,
+            "min": 81
+          },
+          "swap_used_mb": {
+            "mean": 9.4,
+            "max": 9.44,
+            "min": 9.44
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "resident_owned_stop_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 23119,
+              "name": "ollama",
+              "pct": 27.2,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model localbench-parked:5642e97495e1 --port 60442",
+              "model": "localbench-parked:5642e97495e1"
+            },
+            {
+              "pid": 20255,
+              "name": "ollama",
+              "pct": 17.4,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.6:35b-mlx --port 58807",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 2.0,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 236,
+            "app_gpu_mean_pct": 2.2,
+            "app_gpu_p95_pct": 3.7,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 65,
+          "busy_pct": {
+            "mean": 36.7,
+            "max": 39.9,
+            "min": 32.3
+          }
+        },
+        "before_live": {
+          "t": 1790849176.340375,
+          "load1": 37.81,
+          "free_pct": 89,
+          "swap_used_mb": 9.44,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1545879552,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "resident_probes": {
+            "ollama": {
+              "server": "ollama",
+              "port": 11434,
+              "probe_start": 912977.778258833,
+              "probe_end": 912977.780015875,
+              "error_class": null,
+              "http_status": 200
+            },
+            "mlx-serve": {
+              "server": "mlx-serve",
+              "port": 11234,
+              "probe_start": 912977.780026958,
+              "probe_end": 912977.78039575,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "omlx": {
+              "server": "omlx",
+              "port": 11236,
+              "probe_start": 912977.780403166,
+              "probe_end": 912977.780732416,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlx-smol": {
+              "server": "mlx-smol",
+              "port": 11235,
+              "probe_start": 912977.780737125,
+              "probe_end": 912977.781023291,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlxfast": {
+              "server": "mlxfast",
+              "port": 11237,
+              "probe_start": 912977.781031291,
+              "probe_end": 912977.781334541,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            }
+          },
+          "user_idle_s": 12917.7
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.4.8",
+          "omp_sha": "e81e710e7636d91c",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb",
+          "smol_model": "qwen3.6:35b-mlx",
+          "smol_digest": "e92a3e94bbca"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "f3a6e6d-dirty",
+        "created": "20261001T101502Z",
+        "tiers": [
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_b2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.turn.max_tool_calls": {
+          "value": 18,
+          "better": "lower",
+          "spread": [
+            0,
+            18
+          ],
+          "n": 12
+        },
+        "mem.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "mem.recall.pre_main_s": {
+          "value": 6.7457,
+          "better": "lower",
+          "spread": [
+            6.5083,
+            6.8862
+          ],
+          "n": 3
+        },
+        "mem.recall.wall_s": {
+          "value": 10.3317,
+          "better": "lower",
+          "spread": [
+            9.0436,
+            13.6186
+          ],
+          "n": 3
+        },
+        "mem.plant.wall_s": {
+          "value": 13.9776,
+          "better": "lower",
+          "spread": [
+            10.3579,
+            19.6473
+          ],
+          "n": 3
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "sess.turn.max_tool_calls": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.wall_s": {
+          "value": 2.4661,
+          "better": "lower",
+          "spread": [
+            1.6635,
+            3.4428
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 6.9507,
+          "better": "lower",
+          "spread": [
+            6.5,
+            9.9564
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 1.8406,
+          "better": "lower",
+          "spread": [
+            1.24,
+            2.7164
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0337,
+          "better": "lower",
+          "spread": [
+            4.0326,
+            4.0355
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 7.0605,
+          "better": "lower",
+          "spread": [
+            5.718,
+            8.772
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20261001T101502Z__ab_b2__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.turn": {
+          "turns": [
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "plant",
+              "tool_calls": 2,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 19.647
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 10.332
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "control",
+              "tool_calls": 11,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 39.294
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 8.512
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 13.978
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 9.044
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "control",
+              "tool_calls": 18,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 45.535
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 7.284
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 10.358
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 13.619
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "control",
+              "tool_calls": 8,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 20.653
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 6.333
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 3,
+          "attempts": 3,
+          "ci95": [
+            0.4385,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-9644",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "ZEBRA-9644",
+              "plant_answer": "NOTED",
+              "control_answer": "No deploy code for \"project Falcon\" exists in memory. No relevant memories were ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "23346",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "23346",
+              "plant_answer": "NOTED",
+              "control_answer": "0",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Adeyemi",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "Adeyemi",
+              "plant_answer": "NOTED",
+              "control_answer": "Patel",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.6:35b-mlx",
+          "injected_tokens": {
+            "median": 148,
+            "min": 147,
+            "max": 174
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": [],
+          "invalid": [],
+          "reason": null
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 4.386,
+            "min": 4.013,
+            "max": 7.846,
+            "n": 4
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "qwen3.6:35b-mlx",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 5.935,
+              "t_send": 1790850088.166307,
+              "t_end": 1790850094.101623,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.793,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 2.952,
+              "t_send": 1790850094.102031,
+              "t_end": 1790850097.053802,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.785,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 2.359,
+              "t_send": 1790850097.054726,
+              "t_end": 1790850099.413269,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.93,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 3.216,
+              "t_send": 1790850099.4136379,
+              "t_end": 1790850102.629868,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.685,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 6.512,
+              "t_send": 1790850102.63133,
+              "t_end": 1790850109.143012,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.033,
+              "overlap_s": 2.165,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 1.781,
+              "t_send": 1790850109.143221,
+              "t_end": 1790850110.9244611,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.422,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 2.579,
+              "t_send": 1790850110.924757,
+              "t_end": 1790850113.503909,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.221,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 2.104,
+              "t_send": 1790850113.504305,
+              "t_end": 1790850115.608035,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.803,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 9.956,
+              "t_send": 1790850115.60833,
+              "t_end": 1790850125.5648692,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.035,
+              "overlap_s": 4.739,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 2.118,
+              "t_send": 1790850125.566381,
+              "t_end": 1790850127.6844091,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.753,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 2.59,
+              "t_send": 1790850127.68472,
+              "t_end": 1790850130.275027,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.859,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 3.027,
+              "t_send": 1790850130.275579,
+              "t_end": 1790850133.302161,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.716,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 4.172,
+              "t_send": 1790850142.019277,
+              "t_end": 1790850146.191637,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.089,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 1.663,
+              "t_send": 1790850146.1920068,
+              "t_end": 1790850147.855505,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.24,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 2.574,
+              "t_send": 1790850147.8558981,
+              "t_end": 1790850150.429707,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.2,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 2.238,
+              "t_send": 1790850150.4300318,
+              "t_end": 1790850152.66808,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.822,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 6.5,
+              "t_send": 1790850152.668441,
+              "t_end": 1790850159.16856,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.033,
+              "overlap_s": 1.689,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 2.293,
+              "t_send": 1790850159.169214,
+              "t_end": 1790850161.46258,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.482,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 2.874,
+              "t_send": 1790850161.463354,
+              "t_end": 1790850164.337146,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.374,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 3.443,
+              "t_send": 1790850164.337578,
+              "t_end": 1790850167.780433,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.26,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 7.39,
+              "t_send": 1790850167.781547,
+              "t_end": 1790850175.1714602,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.035,
+              "overlap_s": 2.948,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 2.263,
+              "t_send": 1790850175.1717381,
+              "t_end": 1790850177.435138,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.912,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 2.752,
+              "t_send": 1790850177.435431,
+              "t_end": 1790850180.1878169,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.439,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 1.866,
+              "t_send": 1790850180.188084,
+              "t_end": 1790850182.0545962,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.513,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 42.66,
+              "not_ok": 0,
+              "completion_tokens": 6831,
+              "models": [
+                "qwen3.6:35b-mlx"
+              ]
+            }
+          },
+          "overlap_with_main_s": 11.541,
+          "extract_overlap_with_main_s": 11.541,
+          "exit_s": [
+            7.932,
+            7.319
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790850087.171777,
+              "ended": 1790850141.2350552,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 7.932,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790850141.2357252,
+              "ended": 1790850189.373653,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 7.319,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "reason": null,
+          "failures": [],
+          "turns": 24,
+          "acks": 24,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "reason": null,
+          "llm_mode": "smol",
+          "memory_calls": 6,
+          "successful_extracts": 6,
+          "extract_overlap_with_main_s": 11.541,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 8,
+            "load1": {
+              "mean": 24.2,
+              "max": 24.46,
+              "min": 23.3
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 89.0,
+              "max": 89,
+              "min": 89
+            },
+            "swap_used_mb": {
+              "mean": 9.4,
+              "max": 9.44,
+              "min": 9.44
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "resident_owned_stop_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 3.2,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.7,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              }
+            ],
+            "load": {
+              "samples": 8,
+              "app_gpu_mean_pct": 5.9,
+              "app_gpu_p95_pct": 6.2,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 27.8,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 8.0
+        },
+        "during": {
+          "samples": 219,
+          "load1": {
+            "mean": 22.1,
+            "max": 29.59,
+            "min": 14.32
+          },
+          "gpu_device_pct": {
+            "mean": 76.6,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 85.6,
+            "max": 89,
+            "min": 84
+          },
+          "swap_used_mb": {
+            "mean": 9.4,
+            "max": 9.44,
+            "min": 9.44
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "resident_owned_stop_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 35498,
+              "name": "ollama",
+              "pct": 63.3,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.6:35b-mlx --port 63523",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.4,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 219,
+            "app_gpu_mean_pct": 2.2,
+            "app_gpu_p95_pct": 5.9,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 76,
+          "busy_pct": {
+            "mean": 34.0,
+            "max": 43.4,
+            "min": 26.5
+          }
+        },
+        "before_live": {
+          "t": 1790849702.7312782,
+          "load1": 25.98,
+          "free_pct": 89,
+          "swap_used_mb": 9.44,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 2057404416,
+          "resident": {
+            "ollama": [
+              "localbench-parked:5642e97495e1",
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "resident_probes": {
+            "ollama": {
+              "server": "ollama",
+              "port": 11434,
+              "probe_start": 913504.164291291,
+              "probe_end": 913504.16591125,
+              "error_class": null,
+              "http_status": 200
+            },
+            "mlx-serve": {
+              "server": "mlx-serve",
+              "port": 11234,
+              "probe_start": 913504.165917125,
+              "probe_end": 913504.166046375,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "omlx": {
+              "server": "omlx",
+              "port": 11236,
+              "probe_start": 913504.166048083,
+              "probe_end": 913504.166135583,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlx-smol": {
+              "server": "mlx-smol",
+              "port": 11235,
+              "probe_start": 913504.166136791,
+              "probe_end": 913504.1662165,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlxfast": {
+              "server": "mlxfast",
+              "port": 11237,
+              "probe_start": 913504.166217416,
+              "probe_end": 913504.166291166,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            }
+          },
+          "user_idle_s": 13444.1
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "omp_version": "18.4.8",
+          "omp_sha": "e81e710e7636d91c",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb",
+          "smol_model": "localbench-parked:5642e97495e1",
+          "smol_digest": "5642e97495e1"
+        },
+        "fingerprint": {
+          "backend": "ollama",
+          "backend_version": "0.35.0",
+          "backend_sha": "add45eb02df0252f",
+          "model": "qwen3.6:35b-mlx",
+          "model_digest": "e92a3e94bbca",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "nvfp4",
+          "parameters": "36.0B",
+          "loaded_context": 262144
+        },
+        "localbench_rev": "f3a6e6d-dirty",
+        "created": "20261001T102312Z",
+        "tiers": [
+          "mem",
+          "sess"
+        ],
+        "repeats": 2,
+        "label": "ab_a3"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [
+          "sess.turns_complete"
+        ],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "mem.turn.max_tool_calls": {
+          "value": 14,
+          "better": "lower",
+          "spread": [
+            0,
+            14
+          ],
+          "n": 12
+        },
+        "mem.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 12
+        },
+        "mem.recall.hit_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "mem.recall.pre_main_s": {
+          "value": 7.3054,
+          "better": "lower",
+          "spread": [
+            7.2456,
+            8.3124
+          ],
+          "n": 3
+        },
+        "mem.recall.wall_s": {
+          "value": 11.0974,
+          "better": "lower",
+          "spread": [
+            10.8857,
+            11.5228
+          ],
+          "n": 3
+        },
+        "mem.plant.wall_s": {
+          "value": 11.2319,
+          "better": "lower",
+          "spread": [
+            10.3434,
+            13.3173
+          ],
+          "n": 3
+        },
+        "mem.derail.ok_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 3
+        },
+        "sess.turn.max_tool_calls": {
+          "value": 3,
+          "better": "lower",
+          "spread": [
+            0,
+            3
+          ],
+          "n": 24
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 24
+        },
+        "sess.turn.wall_s": {
+          "value": 3.5627,
+          "better": "lower",
+          "spread": [
+            2.6924,
+            9.6966
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 4.8985,
+          "better": "lower",
+          "spread": [
+            4.6673,
+            6.7569
+          ],
+          "n": 4
+        },
+        "sess.turn.pre_main_s": {
+          "value": 2.5802,
+          "better": "lower",
+          "spread": [
+            2.2949,
+            3.6554
+          ],
+          "n": 18
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 4.0827,
+          "better": "lower",
+          "spread": [
+            4.0639,
+            4.1474
+          ],
+          "n": 4
+        },
+        "sess.turn.ack_rate": {
+          "value": 0.9167,
+          "better": "higher",
+          "spread": [
+            0.9167,
+            0.9167
+          ],
+          "n": 24
+        },
+        "sess.memory.extract_s": {
+          "value": 2.0935,
+          "better": "lower",
+          "spread": [
+            2.016,
+            2.491
+          ],
+          "n": 6
+        }
+      },
+      "conformance": {
+        "mem.no_leak": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "FAIL"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20261001T102312Z__ab_a3__ollama__qwen3.6_35b-mlx",
+      "details": {
+        "mem.turn": {
+          "turns": [
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "plant",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 11.232
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 11.097
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "control",
+              "tool_calls": 14,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 49.652
+            },
+            {
+              "round": 0,
+              "fact": "code",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 4.921
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 10.343
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "recall",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 10.886
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "control",
+              "tool_calls": 14,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 49.024
+            },
+            {
+              "round": 0,
+              "fact": "port",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 7.108
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "plant",
+              "tool_calls": 1,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 13.317
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "recall",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 11.523
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "control",
+              "tool_calls": 8,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 41.657
+            },
+            {
+              "round": 0,
+              "fact": "owner",
+              "kind": "derail",
+              "tool_calls": 0,
+              "timeout": false,
+              "rc": 0,
+              "wall_s": 19.962
+            }
+          ]
+        },
+        "mem.recall": {
+          "hits": 3,
+          "attempts": 3,
+          "ci95": [
+            0.4385,
+            1.0
+          ],
+          "rounds": [
+            {
+              "fact": "code",
+              "round": 0,
+              "expected": "ZEBRA-7646",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "fresh-process-recall",
+              "recall_answer": "ZEBRA-7646",
+              "plant_answer": "NOTED",
+              "control_answer": "I've exhausted my available tools for finding \"Project Falcon\" information:\n\n1. ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": []
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "port",
+              "round": 0,
+              "expected": "32349",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "32349",
+              "plant_answer": "NOTED",
+              "control_answer": "I cannot determine the staging database port for project Falcon from my availabl",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            },
+            {
+              "fact": "owner",
+              "round": 0,
+              "expected": "Takahashi",
+              "hit": true,
+              "reason": null,
+              "reasons": [],
+              "retention_provenance": "extraction",
+              "recall_answer": "Takahashi",
+              "plant_answer": "NOTED",
+              "control_answer": "I don't have any stored information about project Falcon or its on-call owners. ",
+              "rcs": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "plant_trace": {
+                "main": {
+                  "purpose": "main",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                },
+                "retention": [
+                  {
+                    "purpose": "memory-extract",
+                    "status": 200,
+                    "aborted": false,
+                    "response_complete": true
+                  }
+                ]
+              },
+              "recall_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "control_trace": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              }
+            }
+          ],
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "localbench-parked:5642e97495e1",
+          "injected_tokens": {
+            "median": 116,
+            "min": 83,
+            "max": 127
+          }
+        },
+        "mem.plant": {},
+        "mem.derail": {
+          "derails": []
+        },
+        "mem.no_leak": {
+          "leaks": [],
+          "invalid": [],
+          "reason": null
+        },
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 1.148,
+            "min": 1.039,
+            "max": 1.734,
+            "n": 4
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "llm_mode": "smol",
+          "smol_model": "localbench-parked:5642e97495e1",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 17.145,
+              "t_send": 1790850611.7843661,
+              "t_end": 1790850628.929651,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 13.829,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 3.329,
+              "t_send": 1790850628.9300978,
+              "t_end": 1790850632.259199,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.847,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 2.952,
+              "t_send": 1790850632.260224,
+              "t_end": 1790850635.212675,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.404,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 3.409,
+              "t_send": 1790850635.213223,
+              "t_end": 1790850638.6227431,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.8,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 5.055,
+              "t_send": 1790850638.6235929,
+              "t_end": 1790850643.6783009,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.147,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 3.232,
+              "t_send": 1790850643.679305,
+              "t_end": 1790850646.911724,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.532,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 9.697,
+              "t_send": 1790850646.9123142,
+              "t_end": 1790850656.6090271,
+              "ok": false,
+              "timeout": false,
+              "post_retain": false,
+              "reply": "Noted. I've stored these project Falcon configuration details:\n\n- **deploy code**: F731\n- **staging port**: A420  \n- **on-call owner**: B705\n- **release branch*",
+              "tool_calls": 1,
+              "pre_main": 2.569,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 6.471,
+              "t_send": 1790850656.683011,
+              "t_end": 1790850663.1541529,
+              "ok": false,
+              "timeout": false,
+              "post_retain": false,
+              "reply": "Noted. Queue name E736 has been added to project Falcon configuration.",
+              "tool_calls": 3,
+              "pre_main": 2.594,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 6.757,
+              "t_send": 1790850663.1570392,
+              "t_end": 1790850669.913982,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 2,
+              "pre_main": 4.082,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 4.964,
+              "t_send": 1790850669.91604,
+              "t_end": 1790850674.880437,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 1,
+              "pre_main": 2.926,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 4.298,
+              "t_send": 1790850674.8820422,
+              "t_end": 1790850679.179743,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 1,
+              "pre_main": 2.473,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 4.69,
+              "t_send": 1790850679.1826031,
+              "t_end": 1790850683.872277,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 1,
+              "pre_main": 2.589,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 14.971,
+              "t_send": 1790850696.2366211,
+              "t_end": 1790850711.207478,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 12.581,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 3.436,
+              "t_send": 1790850711.208755,
+              "t_end": 1790850714.644771,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.776,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 3.689,
+              "t_send": 1790850714.645372,
+              "t_end": 1790850718.334841,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.428,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 3.314,
+              "t_send": 1790850718.336927,
+              "t_end": 1790850721.651388,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.571,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 4.742,
+              "t_send": 1790850721.652142,
+              "t_end": 1790850726.3945868,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.064,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 4.091,
+              "t_send": 1790850726.3952708,
+              "t_end": 1790850730.4860659,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.47,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 3.194,
+              "t_send": 1790850730.486662,
+              "t_end": 1790850733.680663,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.524,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 2.692,
+              "t_send": 1790850733.682146,
+              "t_end": 1790850736.374579,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.295,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 4.667,
+              "t_send": 1790850736.375469,
+              "t_end": 1790850741.0427892,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 4.084,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 4.128,
+              "t_send": 1790850741.0431209,
+              "t_end": 1790850745.171139,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.369,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 3.082,
+              "t_send": 1790850745.174422,
+              "t_end": 1790850748.256834,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 2.458,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 4.268,
+              "t_send": 1790850748.257609,
+              "t_end": 1790850752.525564,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 3.655,
+              "overlap_s": 0.0,
+              "main_call_ok": true
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 6,
+              "busy_s": 12.952,
+              "not_ok": 0,
+              "completion_tokens": 900,
+              "models": [
+                "localbench-parked:5642e97495e1"
+              ]
+            }
+          },
+          "overlap_with_main_s": 0.0,
+          "extract_overlap_with_main_s": 0.0,
+          "exit_s": [
+            5.149,
+            2.234
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790850605.9913962,
+              "ended": 1790850689.02554,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 5.149,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790850689.0371761,
+              "ended": 1790850754.760206,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 2.234,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "reason": "incorrect acknowledgement",
+          "failures": [],
+          "turns": 24,
+          "acks": 22,
+          "expected": 24
+        },
+        "sess.memory_calls_ok": {
+          "reason": "no positive memory-extract/main overlap in each session",
+          "llm_mode": "smol",
+          "memory_calls": 6,
+          "successful_extracts": 6,
+          "extract_overlap_with_main_s": 0.0,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 7,
+            "load1": {
+              "mean": 14.8,
+              "max": 14.86,
+              "min": 14.79
+            },
+            "gpu_device_pct": {
+              "mean": 0.0,
+              "max": 0,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 89.0,
+              "max": 89,
+              "min": 89
+            },
+            "swap_used_mb": {
+              "mean": 9.4,
+              "max": 9.44,
+              "min": 9.44
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "resident_owned_stop_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.6,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.4,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 7,
+              "app_gpu_mean_pct": 5.1,
+              "app_gpu_p95_pct": 5.8,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 31.2,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 8.3
+        },
+        "during": {
+          "samples": 241,
+          "load1": {
+            "mean": 46.0,
+            "max": 106.64,
+            "min": 11.67
+          },
+          "gpu_device_pct": {
+            "mean": 69.6,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 85.1,
+            "max": 89,
+            "min": 81
+          },
+          "swap_used_mb": {
+            "mean": 9.4,
+            "max": 9.44,
+            "min": 9.44
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "resident_owned_stop_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 47541,
+              "name": "ollama",
+              "pct": 27.6,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.6:35b-mlx --port 51820",
+              "model": "qwen3.6:35b-mlx"
+            },
+            {
+              "pid": 49748,
+              "name": "ollama",
+              "pct": 26.3,
+              "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model localbench-parked:5642e97495e1 --port 53589",
+              "model": "localbench-parked:5642e97495e1"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.7,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 241,
+            "app_gpu_mean_pct": 2.1,
+            "app_gpu_p95_pct": 4.8,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 68,
+          "busy_pct": {
+            "mean": 38.1,
+            "max": 43.5,
+            "min": 32.5
+          }
+        },
+        "before_live": {
+          "t": 1790850193.142563,
+          "load1": 14.32,
+          "free_pct": 89,
+          "swap_used_mb": 9.44,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 1501839360,
+          "resident": {
+            "ollama": [
+              "qwen3.6:35b-mlx"
+            ],
+            "mlx-serve": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "resident_probes": {
+            "ollama": {
+              "server": "ollama",
+              "port": 11434,
+              "probe_start": 913994.569269333,
+              "probe_end": 913994.570861791,
+              "error_class": null,
+              "http_status": 200
+            },
+            "mlx-serve": {
+              "server": "mlx-serve",
+              "port": 11234,
+              "probe_start": 913994.570868875,
+              "probe_end": 913994.5710905,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "omlx": {
+              "server": "omlx",
+              "port": 11236,
+              "probe_start": 913994.571093375,
+              "probe_end": 913994.571227625,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlx-smol": {
+              "server": "mlx-smol",
+              "port": 11235,
+              "probe_start": 913994.571232125,
+              "probe_end": 913994.571332708,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            },
+            "mlxfast": {
+              "server": "mlxfast",
+              "port": 11237,
+              "probe_start": 913994.57133425,
+              "probe_end": 913994.571435166,
+              "error_class": "ConnectionRefusedError",
+              "http_status": null
+            }
+          },
+          "user_idle_s": 13934.5
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

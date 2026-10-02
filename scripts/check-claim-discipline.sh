@@ -2,14 +2,10 @@
 # check-claim-discipline.sh [claims.tsv] [README.md]
 # Adapted from franken_markdown scripts/check-claim-discipline.sh.
 # For every row with enforce=yes:
-#   - if readme_pattern is set but NOT found in the README, the row is NOT
-#     silently skipped: it prints a loud WARNING. A pattern that misses the
-#     README means the claim is registered but UNVERIFIED — the usual cause
-#     is a pattern that doesn't match the README prose EXACTLY
-#     (case-sensitive, same line breaks). The registry never forces a claim
-#     the README does not actually make (franken_markdown).
-#   - otherwise proof_path must exist and be non-empty, and expected_substr
-#     (if set) must appear inside the proof artifact.
+#   - if readme_pattern is set, it must appear exactly in the README. If not,
+#     fail loudly; set enforce=no only when the claim is retired.
+#   - proof_path must exist and be non-empty, and expected_substr (if set)
+#     must appear inside the proof artifact.
 # Exit 0: every enforced row passes. Exit 1: any enforced row fails.
 # Also exit 1 when zero rows are enforced while README.md exists and is
 # non-empty: a public README with an unenforced registry is undecorated
@@ -53,10 +49,10 @@ EOF
   enforced=$((enforced + 1))
   if [ -n "$pattern" ]; then
     if [ ! -f "$README_F" ] || ! grep -qF -- "$pattern" "$README_F"; then
-      echo "WARNING  $label: enforce=yes but the pattern was NOT found in the README — row NOT checked."
-      echo "         pattern must match README prose EXACTLY (case-sensitive, same line breaks)."
-      echo "         This claim is registered but UNVERIFIED until the pattern matches."
+      echo "FAIL  $label: enforce=yes but the pattern was NOT found in the README."
+      echo "      restore the registered sentence or set enforce=no if the claim is retired."
       unmatched=$((unmatched + 1))
+      fail=$((fail + 1))
       continue
     fi
   fi

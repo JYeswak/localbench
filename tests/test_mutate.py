@@ -44,6 +44,19 @@ class Tree(unittest.TestCase):
         """A runner whose tests catch the plant: they pass only while m.py says X = 1."""
         return (0, []) if "X = 1" in (self.root / "m.py").read_text() else (1, ["FAIL: test_x"])
 
+    def editing(self, at_call: int):
+        """A runner that catches the plant, and during call `at_call` another agent writes m.py (a real edit on top
+        of whatever is on disk, as an editor would)."""
+        calls = []
+
+        def run(tests):
+            calls.append(1)
+            if len(calls) == at_call:
+                m = self.root / "m.py"
+                m.write_text(m.read_text() + "Y = 3  # the other agent's edit\n")
+            return self.detects(tests)
+        return run
+
 
 class FreshBytecode(Tree):
     def test_a_same_size_plant_with_the_cached_mtime_is_executed(self):
@@ -96,6 +109,21 @@ class RunCase(Tree):
             mut.run_case(CASE, self.root, boom)
         self.assertEqual(self.sha(), before)
 
+    def test_an_edit_made_while_the_plant_is_in_place_is_kept_not_restored_over(self):
+        r = mut.run_case(CASE, self.root, self.editing(2))
+        self.assertIn("conflict", r)
+        self.assertNotIn("caught", r, "a case whose file changed under it is void, not a verdict")
+        self.assertEqual((self.root / "m.py").read_text(), "X = 2\nY = 3  # the other agent's edit\n")
+        kept = Path(r["kept"])
+        self.assertEqual({p.name: p.read_text() for p in kept.iterdir()},
+                         {"m.py.original": "X = 1\n", "m.py.planted": "X = 2\n",
+                          "m.py.found": "X = 2\nY = 3  # the other agent's edit\n"})
+
+    def test_an_edit_made_during_the_known_good_run_voids_the_case_before_any_plant(self):
+        r = mut.run_case(CASE, self.root, self.editing(1))
+        self.assertIn("conflict", r)
+        self.assertEqual((self.root / "m.py").read_text(), "X = 1\nY = 3  # the other agent's edit\n")
+
 
 class Main(Tree):
     """The exit code is what a grader reads: 0 must mean every plant was caught and restored."""
@@ -132,6 +160,30 @@ class Main(Tree):
         with mock.patch.object(mut, "run_case", return_value=left):
             rc, rows = self.main(self.detects)
         self.assertEqual((rc, rows[0]["restored"]), (1, False))
+
+    def test_a_concurrent_edit_exits_2_and_names_where_the_versions_are(self):
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            rc, rows = self.main(self.editing(2))
+        self.assertEqual(rc, 2)
+        self.assertIn("CONFLICT", err.getvalue())
+        self.assertIn(rows[0]["kept"], err.getvalue())
+
+    def test_the_lock_names_the_files_the_cases_plant_in(self):
+        seen = []
+        real = mut.held
+
+        def spy(lock, **kw):
+            ctx = real(lock, **kw)
+
+            @contextlib.contextmanager
+            def wrapped():
+                with ctx:
+                    seen.append((lock / "owner").read_text())
+                    yield
+            return wrapped()
+        with mock.patch.object(mut, "held", spy):
+            self.main(self.detects)
+        self.assertIn("files: m.py", seen[0])
 
     def test_an_empty_case_list_is_a_usage_error_not_success(self):
         path = self.root / "cases.json"

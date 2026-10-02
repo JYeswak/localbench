@@ -1,0 +1,359 @@
+{
+  "kind": "run",
+  "feature": "mnemopi-extraction",
+  "omp_module_sha": "0f5961b921a92aa7b6ae4c807e2cfc5ec6245f22c6b51edbf1b550469f7036db",
+  "problems": [
+    "MUST FAIL: ab_b1:sess.turns_complete, ab_b2:sess.turns_complete",
+    "llmMode none has no memory model: the proof contract binds run.provenance.pins.model_digest to the model a route targets, which this configuration does not have"
+  ],
+  "verdict": {
+    "compare": "BETTER",
+    "baseline": {
+      "kind": "route",
+      "id": "ollama/qwen3.8:27b-mlx"
+    }
+  },
+  "run": {
+    "label": "memory",
+    "provenance": {
+      "pins": {
+        "backend": "ollama",
+        "backend_version": "0.35.0",
+        "backend_sha": "add45eb02df0252f",
+        "model": null,
+        "model_digest": null,
+        "backend_args": "",
+        "omp_version": "18.4.8",
+        "omp_sha": "e81e710e7636d91c",
+        "omp_path": "~/.bun/bin/omp",
+        "omp_child_config": "62eed267e219ddde",
+        "omp_mem_config": "f34298dcc76789a1",
+        "omp_agent_config": "38b87e2b63396937",
+        "omp_mem_tools": "memory_edit,recall,reflect,retain",
+        "fixtures_sha": "41ff309f03a98aa5",
+        "macos_build": "25F84",
+        "host_id": "mac-studio-apple-m3-ultra-512gb",
+        "smol_model": "localbench-parked:5642e97495e1",
+        "smol_digest": "5642e97495e1",
+        "main_model": "qwen3.6:35b-mlx",
+        "main_model_digest": "e92a3e94bbca"
+      },
+      "label": "memory",
+      "tiers": [
+        "mem",
+        "sess"
+      ],
+      "llm_mode": "none",
+      "created": "20261001T114321Z",
+      "localbench_rev": "372b9ac",
+      "fingerprint": {
+        "backend": "ollama",
+        "backend_version": "0.35.0",
+        "backend_sha": "add45eb02df0252f",
+        "model": "qwen3.6:35b-mlx",
+        "model_digest": "e92a3e94bbca",
+        "backend_args": "",
+        "omp_version": "18.4.8",
+        "omp_sha": "e81e710e7636d91c",
+        "omp_path": "~/.bun/bin/omp",
+        "omp_child_config": "62eed267e219ddde",
+        "omp_mem_config": "f34298dcc76789a1",
+        "omp_agent_config": "38b87e2b63396937",
+        "omp_mem_tools": "memory_edit,recall,reflect,retain",
+        "fixtures_sha": "41ff309f03a98aa5",
+        "macos_build": "25F84",
+        "host_id": "mac-studio-apple-m3-ultra-512gb",
+        "smol_model": "localbench-parked:5642e97495e1",
+        "smol_digest": "5642e97495e1",
+        "legs": [
+          {
+            "arm": "candidate",
+            "label": "ab_b1",
+            "run_dir": "runs/20261001T110439Z__ab_b1__ollama__qwen3.6_35b-mlx",
+            "created": "20261001T110439Z",
+            "localbench_rev": "17ae2b5"
+          },
+          {
+            "arm": "candidate",
+            "label": "ab_b2",
+            "run_dir": "runs/20261001T112316Z__ab_b2__ollama__qwen3.6_35b-mlx",
+            "created": "20261001T112316Z",
+            "localbench_rev": "17ae2b5"
+          },
+          {
+            "arm": "baseline",
+            "label": "ab_a1",
+            "run_dir": "runs/20261001T105649Z__ab_a1__ollama__qwen3.6_35b-mlx",
+            "created": "20261001T105649Z",
+            "localbench_rev": "17ae2b5"
+          },
+          {
+            "arm": "baseline",
+            "label": "ab_a2",
+            "run_dir": "runs/20261001T111427Z__ab_a2__ollama__qwen3.6_35b-mlx",
+            "created": "20261001T111427Z",
+            "localbench_rev": "17ae2b5"
+          },
+          {
+            "arm": "baseline",
+            "label": "ab_a3",
+            "run_dir": "runs/20261001T113148Z__ab_a3__ollama__qwen3.6_35b-mlx",
+            "created": "20261001T113148Z",
+            "localbench_rev": "17ae2b5"
+          }
+        ]
+      },
+      "legs": {
+        "candidate": [
+          "ab_b1",
+          "ab_b2"
+        ],
+        "baseline": [
+          "ab_a1",
+          "ab_a2",
+          "ab_a3"
+        ]
+      }
+    },
+    "verdicts": {
+      "must_fail": [
+        "ab_b1:sess.turns_complete",
+        "ab_b2:sess.turns_complete"
+      ],
+      "baseline_must_fail": [],
+      "contended": []
+    },
+    "metrics": {
+      "mem.recall.hit_rate": {
+        "value": 1.0,
+        "better": "higher",
+        "n": 2
+      },
+      "mem.no_leak": {
+        "value": 1.0,
+        "better": "higher",
+        "n": 2
+      },
+      "mem.derail.ok_rate": {
+        "value": 1.0,
+        "better": "higher",
+        "n": 2
+      },
+      "sess.memory_calls_ok": {
+        "value": 0.0,
+        "better": "higher",
+        "n": 2
+      },
+      "mem.recall.pre_main_s": {
+        "value": 7.841799999999999,
+        "better": "lower",
+        "n": 2
+      },
+      "sess.turn.post_retain_wall_s": {
+        "value": 3.1489000000000003,
+        "better": "lower",
+        "n": 2
+      },
+      "sess.memory.extract_s": {
+        "value": null,
+        "better": "lower",
+        "n": 2
+      },
+      "system.during.gpu_device_pct": {
+        "value": 71.85,
+        "better": "lower",
+        "n": 2
+      }
+    },
+    "conformance": {
+      "memory.baseline_route": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "baseline": "ollama/qwen3.8:27b-mlx",
+        "digest": "5642e97495e1",
+        "off_route": []
+      },
+      "memory.served_model": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "problems": []
+      },
+      "memory.comparison_valid": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "void": []
+      },
+      "memory.loop_gate": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "factor": 3,
+        "failures": [],
+        "unmeasured": []
+      },
+      "memory.llm_mode": {
+        "level": "MUST",
+        "verdict": "FAIL",
+        "candidate": "none",
+        "problems": [
+          "llmMode none has no memory model: the proof contract binds run.provenance.pins.model_digest to the model a route targets, which this configuration does not have"
+        ]
+      }
+    },
+    "run_dir": null,
+    "memory": {
+      "compare": {
+        "verdict": "BETTER",
+        "computed": "BETTER",
+        "void": [],
+        "quality_losses": [],
+        "wins": [
+          "post_retain_latency"
+        ],
+        "unmeasured_quality": [],
+        "noise": "aa_spread_over_legs",
+        "deltas": {
+          "mem.recall.hit_rate": {
+            "class": "quality",
+            "candidate_legs": [
+              1.0,
+              1.0
+            ],
+            "baseline_legs": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "better": "higher",
+            "judgement": "within_noise",
+            "candidate": 1.0,
+            "baseline": 1.0,
+            "delta": 0.0,
+            "band": 0.0
+          },
+          "mem.no_leak": {
+            "class": "quality",
+            "candidate_legs": [
+              1.0,
+              1.0
+            ],
+            "baseline_legs": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "better": "higher",
+            "judgement": "within_noise",
+            "candidate": 1.0,
+            "baseline": 1.0,
+            "delta": 0.0,
+            "band": 0.0
+          },
+          "mem.derail.ok_rate": {
+            "class": "quality",
+            "candidate_legs": [
+              1.0,
+              1.0
+            ],
+            "baseline_legs": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "better": "higher",
+            "judgement": "within_noise",
+            "candidate": 1.0,
+            "baseline": 1.0,
+            "delta": 0.0,
+            "band": 0.0
+          },
+          "sess.memory_calls_ok": {
+            "class": "quality",
+            "candidate_legs": [
+              0.0,
+              0.0
+            ],
+            "baseline_legs": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "better": "higher",
+            "judgement": "within_noise",
+            "candidate": 0.0,
+            "baseline": 0.0,
+            "delta": 0.0,
+            "band": 0.0
+          },
+          "mem.recall.pre_main_s": {
+            "class": "win",
+            "candidate_legs": [
+              8.1962,
+              7.4874
+            ],
+            "baseline_legs": [
+              8.7265,
+              7.3795,
+              8.3109
+            ],
+            "better": "lower",
+            "judgement": "within_noise",
+            "candidate": 7.841799999999999,
+            "baseline": 8.3109,
+            "delta": -0.46910000000000096,
+            "band": 1.3469999999999995
+          },
+          "sess.turn.post_retain_wall_s": {
+            "class": "win",
+            "candidate_legs": [
+              3.121,
+              3.1768
+            ],
+            "baseline_legs": [
+              4.7889,
+              4.6346,
+              4.9049
+            ],
+            "better": "lower",
+            "judgement": "gain",
+            "candidate": 3.1489000000000003,
+            "baseline": 4.7889,
+            "delta": -1.6399999999999997,
+            "band": 0.27029999999999976
+          },
+          "sess.memory.extract_s": {
+            "class": "win",
+            "candidate_legs": [
+              null,
+              null
+            ],
+            "baseline_legs": [
+              2.2885,
+              2.0865,
+              2.097
+            ],
+            "better": "lower",
+            "judgement": "unmeasured"
+          },
+          "system.during.gpu_device_pct": {
+            "class": "win",
+            "candidate_legs": [
+              73.0,
+              70.7
+            ],
+            "baseline_legs": [
+              70.6,
+              79.9,
+              80.5
+            ],
+            "better": "lower",
+            "judgement": "within_noise",
+            "candidate": 71.85,
+            "baseline": 79.9,
+            "delta": -8.050000000000011,
+            "band": 9.900000000000006
+          }
+        }
+      }
+    }
+  }
+}

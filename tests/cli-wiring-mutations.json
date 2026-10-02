@@ -1,0 +1,430 @@
+[
+  {
+    "label": "decision run refuses --hosted-arm without its key",
+    "file": "localbench/__main__.py",
+    "old": "perturb both\"\n    elif hosted is not None and not os.environ.get(hosted.api_key_env, \"\").strip():",
+    "new": "perturb both\"\n    elif False:",
+    "tests": [
+      "tests.test_cli.DecisionRun.test_hosted_arm_without_key_is_refused_before_any_request"
+    ]
+  },
+  {
+    "label": "decision run is not refused by the one-model CONTENDED preflight",
+    "file": "localbench/__main__.py",
+    "old": "        module_sha, module_why = _feature_module_sha(feature)\n    refuse = None\n    if _run_alive():",
+    "new": "        module_sha, module_why = _feature_module_sha(feature)\n    refuse = \"; \".join(_busy_check()[2]) or None\n    if _run_alive():",
+    "tests": [
+      "tests.test_cli.DecisionRun.test_clean_run_under_foreign_load_banks_and_exits_0_never_contended"
+    ]
+  },
+  {
+    "label": "decision run refuses while a localbench run is alive",
+    "file": "localbench/__main__.py",
+    "old": "        module_sha, module_why = _feature_module_sha(feature)\n    refuse = None\n    if _run_alive():\n        refuse = \"a localbench run is alive; a decision run",
+    "new": "        module_sha, module_why = _feature_module_sha(feature)\n    refuse = None\n    if False:\n        refuse = \"a localbench run is alive; a decision run",
+    "tests": [
+      "tests.test_cli.DecisionRun.test_refused_while_a_localbench_run_is_alive"
+    ]
+  },
+  {
+    "label": "decision run exits 1 on problems",
+    "file": "localbench/__main__.py",
+    "old": "\n                 {**receipt, \"problems\": problems, \"run\": run})\n    rel = str(path.relative_to(ROOT))\n    m.detail.update(receipt=rel, run_dir=str(rel_dir), unsound=problems)\n    print(f\"banked decision receipt {rel}\")\n    for p in problems:\n        print(f\"UNSOUND  {p}\", file=sys.stderr)\n    m.outcome = \"done\"   # banked either way; exit 1 says the run has problems\n    return 1 if problems else 0",
+    "new": "\n                 {**receipt, \"problems\": problems, \"run\": run})\n    rel = str(path.relative_to(ROOT))\n    m.detail.update(receipt=rel, run_dir=str(rel_dir), unsound=problems)\n    print(f\"banked decision receipt {rel}\")\n    for p in problems:\n        print(f\"UNSOUND  {p}\", file=sys.stderr)\n    m.outcome = \"done\"   # banked either way; exit 1 says the run has problems\n    return 0",
+    "tests": [
+      "tests.test_cli.DecisionRun.test_problems_bank_a_receipt_carrying_them_and_exit_1"
+    ]
+  },
+  {
+    "label": "decision run laya: is not refused by the one-model CONTENDED preflight",
+    "file": "localbench/__main__.py",
+    "old": "    venv = decision.laya_venv()\n    refuse = None\n",
+    "new": "    venv = decision.laya_venv()\n    refuse = \"; \".join(_busy_check()[2]) or None\n",
+    "tests": [
+      "tests.test_cli.DecisionRunLaya.test_clean_run_under_foreign_load_goes_through_run_laya_banks_and_exits_0"
+    ]
+  },
+  {
+    "label": "decision run laya: refuses while a localbench run is alive",
+    "file": "localbench/__main__.py",
+    "old": "    venv = decision.laya_venv()\n    refuse = None\n    if _run_alive():",
+    "new": "    venv = decision.laya_venv()\n    refuse = None\n    if False:",
+    "tests": [
+      "tests.test_cli.DecisionRunLaya.test_refused_while_a_localbench_run_is_alive"
+    ]
+  },
+  {
+    "label": "decision run laya: refuses --hosted-arm without its key",
+    "file": "localbench/__main__.py",
+    "old": "has laya_mlx\"\n    elif hosted is not None and not os.environ.get(hosted.api_key_env, \"\").strip():",
+    "new": "has laya_mlx\"\n    elif False:",
+    "tests": [
+      "tests.test_cli.DecisionRunLaya.test_hosted_arm_without_key_is_refused_before_any_request"
+    ]
+  },
+  {
+    "label": "decision run laya: refuses a feature whose module is gone",
+    "file": "localbench/__main__.py",
+    "old": "has laya_mlx\"\n    elif hosted is not None and not os.environ.get(hosted.api_key_env, \"\").strip():\n        refuse = (f\"--hosted-arm needs {hosted.api_key_env} in the environment; the hosted arm never runs without it \"\n                  \"and never stands in for the local arm\")\n    elif feature is not None and module_sha is None:",
+    "new": "has laya_mlx\"\n    elif hosted is not None and not os.environ.get(hosted.api_key_env, \"\").strip():\n        refuse = (f\"--hosted-arm needs {hosted.api_key_env} in the environment; the hosted arm never runs without it \"\n                  \"and never stands in for the local arm\")\n    elif False:",
+    "tests": [
+      "tests.test_cli.DecisionRunLaya.test_a_feature_whose_module_is_gone_is_refused"
+    ]
+  },
+  {
+    "label": "decision run laya: exits 1 on problems",
+    "file": "localbench/__main__.py",
+    "old": "run['provenance']['created']}\", {**receipt, \"problems\": problems, \"run\": run})\n    rel = str(path.relative_to(ROOT))\n    m.detail.update(receipt=rel, run_dir=str(rel_dir), unsound=problems)\n    print(f\"banked decision receipt {rel}\")\n    for p in problems:\n        print(f\"UNSOUND  {p}\", file=sys.stderr)\n    m.outcome = \"done\"   # banked either way; exit 1 says the run has problems\n    return 1 if problems else 0",
+    "new": "run['provenance']['created']}\", {**receipt, \"problems\": problems, \"run\": run})\n    rel = str(path.relative_to(ROOT))\n    m.detail.update(receipt=rel, run_dir=str(rel_dir), unsound=problems)\n    print(f\"banked decision receipt {rel}\")\n    for p in problems:\n        print(f\"UNSOUND  {p}\", file=sys.stderr)\n    m.outcome = \"done\"   # banked either way; exit 1 says the run has problems\n    return 0",
+    "tests": [
+      "tests.test_cli.DecisionRunLaya.test_problems_bank_a_receipt_carrying_them_and_exit_1"
+    ]
+  },
+  {
+    "label": "cmd_gpu honours task.disabledAgents",
+    "file": "localbench/__main__.py",
+    "old": "routes.setdefault(prof, models.local_routes(prof))",
+    "new": "routes.setdefault(prof, park.local_routes(prof))",
+    "tests": [
+      "tests.test_cli.DisabledAgentRoutes.test_gpu_prints_a_disabled_scout_as_disabled_not_a_route"
+    ]
+  },
+  {
+    "label": "features exit code reflects FAIL findings",
+    "file": "localbench/__main__.py",
+    "old": "    return 1 if any(level == \"FAIL\" for level, _, _ in found) else 0",
+    "new": "    return 0",
+    "tests": [
+      "tests.test_cli.FeaturesCommand.test_a_local_route_without_proof_fails"
+    ]
+  },
+  {
+    "label": "report --by-purpose groups by purpose across profiles",
+    "file": "localbench/__main__.py",
+    "old": "    keys = [k for k, on in ((\"profile\", args.by_profile), (\"purpose\", args.by_purpose)) if on]",
+    "new": "    keys = [\"profile\", \"purpose\"]",
+    "tests": [
+      "tests.test_cli.ReportByPurpose.test_by_purpose_sums_profiles_inside_the_window"
+    ]
+  },
+  {
+    "label": "doctor features row takes the worst finding",
+    "file": "localbench/doctor.py",
+    "old": "    level, message, fix = max(found, key=lambda f: rank[f[0]])",
+    "new": "    level, message, fix = found[0]",
+    "tests": [
+      "tests.test_doctor.Features.test_the_worst_finding_sets_the_row_and_its_fix"
+    ]
+  },
+  {
+    "label": "a live decision run counts as a localbench run for aa/ab/run",
+    "file": "localbench/__main__.py",
+    "old": "RUN_PATTERN = \"localbench (aa|run|ab|record|decision run)\"",
+    "new": "RUN_PATTERN = \"localbench (aa|run|ab|record)\"",
+    "tests": [
+      "tests.test_cli.RunAliveSeesDecisionRuns.test_another_processs_decision_run_is_a_live_run"
+    ]
+  },
+  {
+    "label": "a decision run does not refuse itself as a live run",
+    "file": "localbench/__main__.py",
+    "old": "    return any(int(pid) not in (os.getpid(), os.getppid()) for pid in out)",
+    "new": "    return bool(out)",
+    "tests": [
+      "tests.test_cli.RunAliveSeesDecisionRuns.test_a_decision_run_does_not_see_itself_or_its_wrapper"
+    ]
+  },
+  {
+    "label": "decision run banks run_suite's verdict, not a rebuilt payload",
+    "file": "localbench/__main__.py",
+    "old": "                 {**receipt, \"problems\": problems, \"run\": run})",
+    "new": "                 {\"kind\": \"run\", \"problems\": problems, \"run\": run})",
+    "tests": [
+      "tests.test_cli.DecisionRun.test_a_not_better_comparison_banks_its_verdict_and_exits_1",
+      "tests.test_cli.DecisionRun.test_feature_stamps_the_installed_module_sha_on_the_receipt"
+    ]
+  },
+  {
+    "label": "decision run passes the feature's installed module sha",
+    "file": "localbench/__main__.py",
+    "old": "rev=_rev(), feature=feature, omp_module_sha=module_sha,",
+    "new": "rev=_rev(), feature=feature, omp_module_sha=None,",
+    "tests": [
+      "tests.test_cli.DecisionRun.test_feature_stamps_the_installed_module_sha_on_the_receipt"
+    ]
+  },
+  {
+    "label": "decision run refuses a feature whose module is gone",
+    "file": "localbench/__main__.py",
+    "old": "perturb both\"\n    elif hosted is not None and not os.environ.get(hosted.api_key_env, \"\").strip():\n        refuse = (f\"--hosted-arm needs {hosted.api_key_env} in the environment; the hosted arm never runs without it \"\n                  \"and never stands in for the local arm\")\n    elif feature is not None and module_sha is None:",
+    "new": "perturb both\"\n    elif hosted is not None and not os.environ.get(hosted.api_key_env, \"\").strip():\n        refuse = (f\"--hosted-arm needs {hosted.api_key_env} in the environment; the hosted arm never runs without it \"\n                  \"and never stands in for the local arm\")\n    elif False:",
+    "tests": [
+      "tests.test_cli.DecisionRun.test_a_feature_whose_module_is_gone_is_refused"
+    ]
+  },
+  {
+    "label": "corpus import and proj-b-build require an explicit gate",
+    "file": "localbench/__main__.py",
+    "old": "type=_gate_arg, action=\"append\", required=True,",
+    "new": "type=_gate_arg, action=\"append\", required=False,",
+    "tests": [
+      "tests.test_cli.CorpusCommand.test_import_without_a_gate_is_a_usage_error",
+      "tests.test_cli.CorpusCommand.test_jev_build_requires_and_passes_the_gate"
+    ]
+  },
+  {
+    "label": "a gate bound must be min or max",
+    "file": "localbench/__main__.py",
+    "old": "    if not metric or op not in (\"min\", \"max\") or number is None or not math.isfinite(number):",
+    "new": "    if not metric or number is None:",
+    "tests": [
+      "tests.test_cli.CorpusCommand.test_a_malformed_gate_is_a_usage_error"
+    ]
+  },
+  {
+    "label": "preset apply honours the plan's refusal",
+    "file": "localbench/__main__.py",
+    "old": "    if (rc := m.gate(steps, refuse=p[\"refused\"], noop=noop)) is not None:",
+    "new": "    if (rc := m.gate(steps, refuse=None, noop=noop)) is not None:",
+    "tests": [
+      "tests.test_cli.PresetCommand.test_live_apply_of_an_unproven_local_preset_is_refused_printed_and_audited",
+      "tests.test_cli.PresetCommand.test_dry_run_prints_the_plan_lines_and_the_refusal_and_writes_nothing"
+    ]
+  },
+  {
+    "label": "preset drift exits 1 on drift",
+    "file": "localbench/__main__.py",
+    "old": "                print(\"no drift: every applied preset still holds\")\n        return 1 if rows else 0",
+    "new": "                print(\"no drift: every applied preset still holds\")\n        return 0",
+    "tests": [
+      "tests.test_cli.PresetCommand.test_drift_exits_1_when_live_config_left_a_preset"
+    ]
+  },
+  {
+    "label": "watch-releases --once is an audited mutation",
+    "file": "localbench/__main__.py",
+    "old": "        return c if args.once or args.install_agent else None",
+    "new": "        return None",
+    "tests": [
+      "tests.test_cli.WatchReleasesCommand.test_once_runs_one_pass_and_is_audited"
+    ]
+  },
+  {
+    "label": "watch-releases --once dry run makes no pass",
+    "file": "localbench/__main__.py",
+    "old": "        if (rc := _mut(args).gate(steps, refuse=refuse)) is not None:\n            return rc\n    rc = releasewatch.cli(",
+    "new": "        _mut(args).gate(steps, refuse=refuse)\n    rc = releasewatch.cli(",
+    "tests": [
+      "tests.test_cli.WatchReleasesCommand.test_once_dry_run_makes_no_pass_and_no_row"
+    ]
+  },
+  {
+    "label": "--smol-model reaches Ctx",
+    "file": "localbench/__main__.py",
+    "old": "e2e_case=e2e_case, smol_model=smol_model)",
+    "new": "e2e_case=e2e_case)",
+    "tests": [
+      "tests.test_cli.SmolModelRuns.test_smol_model_reaches_ctx_pins_sampler_and_is_warmed"
+    ]
+  },
+  {
+    "label": "--smol-model is pinned",
+    "file": "localbench/__main__.py",
+    "old": "    pins = {**run_pins(backend, model, before[\"host\"], mem_config), **smol,",
+    "new": "    pins = {**run_pins(backend, model, before[\"host\"], mem_config),",
+    "tests": [
+      "tests.test_cli.SmolModelRuns.test_smol_model_reaches_ctx_pins_sampler_and_is_warmed"
+    ]
+  },
+  {
+    "label": "the sampler treats the smol model as the run's own",
+    "file": "localbench/__main__.py",
+    "old": "    target = (backend.name, model, *([smol_model] if smol_model else []))",
+    "new": "    target = (backend.name, model)",
+    "tests": [
+      "tests.test_cli.SmolModelRuns.test_smol_model_reaches_ctx_pins_sampler_and_is_warmed"
+    ]
+  },
+  {
+    "label": "--write-golden refused with --smol-model",
+    "file": "localbench/__main__.py",
+    "old": "args.mem_rounds != MEM_ROUNDS\n                              or args.smol_model):",
+    "new": "args.mem_rounds != MEM_ROUNDS):",
+    "tests": [
+      "tests.test_cli.GoldenWriteRefusals.test_a_separate_smol_model_cannot_write_a_golden"
+    ]
+  },
+  {
+    "label": "ab refuses a smol model on a non-ollama arm before any leg",
+    "file": "localbench/__main__.py",
+    "old": "        if smol_model and spec.partition(\":\")[0] != \"ollama\":",
+    "new": "        if False:",
+    "tests": [
+      "tests.test_cli.SmolModelRuns.test_ab_refuses_a_smol_model_on_a_non_ollama_arm_before_any_leg"
+    ]
+  },
+  {
+    "label": "an unusable watch dir is refused, not a traceback",
+    "file": "localbench/__main__.py",
+    "old": "        except releasewatch.WatchError as exc:   # e.g. a watch dir inside the repo: refused, never written\n            refuse = f\"watch-releases: {exc}\"",
+    "new": "        except ZeroDivisionError as exc:\n            refuse = f\"watch-releases: {exc}\"",
+    "tests": [
+      "tests.test_cli.WatchReleasesCommand.test_an_unusable_watch_dir_is_refused_cleanly_before_any_pass"
+    ]
+  },
+  {
+    "label": "profile names cannot be paths",
+    "file": "localbench/__main__.py",
+    "old": "    if bad:   # a profile is a directory name under ~/.omp/profiles; a path would escape it",
+    "new": "    if False:",
+    "tests": [
+      "tests.test_cli.ProfileNames.test_paths_are_not_profile_names"
+    ]
+  },
+  {
+    "label": "capture on requires purpose, cap and expiry",
+    "file": "localbench/__main__.py",
+    "old": "    if action == \"capture\" and state == \"on\" and not (args.purpose and args.max_items and args.minutes):",
+    "new": "    if action == \"capture\" and state == \"on\" and not args.purpose:",
+    "tests": [
+      "tests.test_cli.CorpusCaptureAndMutations.test_capture_on_needs_purpose_cap_and_expiry"
+    ]
+  },
+  {
+    "label": "capture on is a gated, audited mutation",
+    "file": "localbench/__main__.py",
+    "old": "            return None if args.capture_state == \"status\" else f\"corpus capture {args.capture_state}\"",
+    "new": "            return None",
+    "tests": [
+      "tests.test_cli.CorpusCaptureAndMutations.test_capture_on_is_an_audited_mutation_passing_its_bounds",
+      "tests.test_cli.CorpusCaptureAndMutations.test_capture_on_dry_run_writes_nothing"
+    ]
+  },
+  {
+    "label": "corpus import is a gated mutation",
+    "file": "localbench/__main__.py",
+    "old": "        return f\"corpus {args.corpus_action}\" if args.corpus_action in (\"import\", \"proj-b-build\") else None",
+    "new": "        return None",
+    "tests": [
+      "tests.test_cli.CorpusCaptureAndMutations.test_import_dry_run_reads_and_writes_nothing"
+    ]
+  },
+  {
+    "label": "memory-verdict refuses legs with unknown residency",
+    "file": "localbench/__main__.py",
+    "old": "              \"comparison\" if _unknown_residency(*candidate, *baseline) else None)",
+    "new": "              \"comparison\" if False else None)",
+    "tests": [
+      "tests.test_cli.MemoryVerdictCommand.test_a_leg_with_unknown_or_unrecorded_residency_is_refused_unbanked"
+    ]
+  },
+  {
+    "label": "memory-verdict passes the installed module sha",
+    "file": "localbench/__main__.py",
+    "old": "    receipt = workloads.memory_verdict(candidate, baseline, feature=args.feature, omp_module_sha=module_sha)",
+    "new": "    receipt = workloads.memory_verdict(candidate, baseline, feature=args.feature, omp_module_sha=\"\")",
+    "tests": [
+      "tests.test_cli.MemoryVerdictCommand.test_a_clean_verdict_banks_with_the_installed_module_sha"
+    ]
+  },
+  {
+    "label": "memory-verdict exits 1 on problems",
+    "file": "localbench/__main__.py",
+    "old": "    m.outcome = \"done\"   # banked either way; exit 1 says it is not proof\n    return 1 if problems else 0",
+    "new": "    m.outcome = \"done\"   # banked either way; exit 1 says it is not proof\n    return 0",
+    "tests": [
+      "tests.test_cli.MemoryVerdictCommand.test_problems_bank_as_evidence_and_exit_1"
+    ]
+  },
+  {
+    "label": "a context refusal is a clean refused exit, not a traceback",
+    "file": "localbench/__main__.py",
+    "old": "        m.outcome, m.detail[\"reason\"] = \"refused\", str(exc)\n        return _fail(str(exc))",
+    "new": "        raise",
+    "tests": [
+      "tests.test_cli.DecisionRun.test_a_context_refusal_exits_1_with_one_line_banks_nothing_and_is_audited_refused"
+    ]
+  },
+  {
+    "label": "omp refresh exits 1 when a proof went STALE",
+    "file": "localbench/__main__.py",
+    "old": "                      + (f\"; re-prove: {queue}\" if queue else \"\"))\n        return 1 if stale else 0",
+    "new": "                      + (f\"; re-prove: {queue}\" if queue else \"\"))\n        return 0",
+    "tests": [
+      "tests.test_cli.OmpCommand.test_refresh_exits_1_when_any_feature_went_stale_and_names_its_reproof"
+    ]
+  },
+  {
+    "label": "omp refresh is gated (a dry run captures nothing)",
+    "file": "localbench/__main__.py",
+    "old": "        return \"omp refresh\"",
+    "new": "        return None",
+    "tests": [
+      "tests.test_cli.OmpCommand.test_refresh_dry_run_captures_nothing",
+      "tests.test_cli.OmpCommand.test_refresh_exits_1_when_any_feature_went_stale_and_names_its_reproof"
+    ]
+  },
+  {
+    "label": "omp watch install refuses a foreign plist",
+    "file": "localbench/__main__.py",
+    "old": "    elif existing is not None and existing.get(\"Label\") != label:",
+    "new": "    elif False:",
+    "tests": [
+      "tests.test_cli.OmpCommand.test_watch_install_refuses_a_foreign_plist_at_its_path"
+    ]
+  },
+  {
+    "label": "omp watch install bootstraps the job",
+    "file": "localbench/__main__.py",
+    "old": "        p = subprocess.run([\"launchctl\", \"bootstrap\", domain, str(path)], capture_output=True, text=True, check=False)",
+    "new": "        p = subprocess.CompletedProcess([], 0)",
+    "tests": [
+      "tests.test_cli.OmpCommand.test_watch_install_writes_the_watchpaths_plist_bootstraps_and_audits"
+    ]
+  },
+  {
+    "label": "decision derive is dispatched",
+    "file": "localbench/__main__.py",
+    "old": "    if getattr(args, \"decision_action\", \"run\") == \"derive\":",
+    "new": "    if False:",
+    "tests": [
+      "tests.test_cli.DecisionDerive.test_dry_run_prints_the_create_request_and_changes_nothing"
+    ]
+  },
+  {
+    "label": "decision derive gates on the plan's refusal",
+    "file": "localbench/__main__.py",
+    "old": "if (rc := m.gate(steps, refuse=plan[\"refuse\"], noop=plan[\"noop\"])) is not None:",
+    "new": "if (rc := m.gate(steps, noop=plan[\"noop\"])) is not None:",
+    "tests": [
+      "tests.test_cli.DecisionDerive.test_a_refused_plan_creates_nothing_and_is_audited_refused"
+    ]
+  },
+  {
+    "label": "decision derive takes --dry-run",
+    "file": "localbench/__main__.py",
+    "old": "                        (dec_derive, False),\n",
+    "new": "",
+    "tests": [
+      "tests.test_cli.DecisionDerive.test_dry_run_prints_the_create_request_and_changes_nothing"
+    ]
+  },
+  {
+    "label": "decision derive records the derived identity",
+    "file": "localbench/__main__.py",
+    "old": "    m.detail.update(out)\n",
+    "new": "",
+    "tests": [
+      "tests.test_cli.DecisionDerive.test_derive_creates_and_records_the_derived_identity"
+    ]
+  },
+  {
+    "label": "decision run forwards --allow-evict",
+    "file": "localbench/__main__.py",
+    "old": "                                     allow_evict=getattr(args, \"allow_evict\", False),\n",
+    "new": "",
+    "tests": [
+      "tests.test_cli.DecisionRunAllowEvict.test_allow_evict_is_passed_to_run_suite_only_when_given"
+    ]
+  }
+]

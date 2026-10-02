@@ -20,7 +20,7 @@ HTTP_METHODS = {"GET", "POST", "PUT", "DELETE", "ANY"}
 
 # Calls that stand for a fixed executable or for a copy of the environment, mapped by name (test_helper_maps_are_live
 # fails when a mapped helper disappears, so a rename cannot silently blind the extractor).
-EXEC_HELPERS = {"omp_bin": "omp", "mlx_serve_bin": "mlx-serve", "server_bin": "mlx-serve"}
+EXEC_HELPERS = {"omp_bin": "omp", "mlx_serve_bin": "mlx-serve", "server_bin": "mlx-serve", "mlxfast_bin": "mlx-server"}
 ENV_HELPERS = {"omp_env"}
 # Functions returning a whole argv list, and the program at its head.
 ARGV_HELPERS = {"server_argv": "mlx-serve"}
@@ -128,6 +128,7 @@ class Extraction:
         self.defined: set[str] = set()
         mods = [_Module(rel, ast.parse(text, rel)) for rel, text in files]
         self.helpers: dict[str, tuple[str, int]] = {}
+        self.helper_sites: set[ast.AST] = set()  # launch sites whose argv is a registered helper's own parameter
         while self._find_helpers(mods):
             pass
         for m in mods:
@@ -249,14 +250,18 @@ class Extraction:
                 if name not in self.helpers:  # first definition wins: a name clash cannot make the fixpoint oscillate
                     self.helpers[name] = spec
                     changed = True
+                if self.helpers[name] == spec:
+                    self.helper_sites.add(node)
         return changed
 
     def _subprocess(self, m: _Module, node: ast.AST) -> None:
         if not self._argv_sites(node):
             return
         head, extra = self._resolve(m, node)
-        if head is PARAM:
+        if head is PARAM and node in self.helper_sites:
             return  # a helper's own launch site: its callers are resolved instead
+        # Any other parameter head (e.g. `def f(exe): subprocess.run([exe, "x"])`) registers no helper, so no caller
+        # is ever resolved: unresolved, not silently skipped.
         if not isinstance(head, str):
             self.unresolved.append(f"{m.rel}:{node.lineno}")
             return
@@ -596,6 +601,23 @@ def use(base, path):
                                                "DEBUG_X", "HOME", "TMPDIR"})
         self.assertEqual(set(x.found["http"]), {"http://127.0.0.1:11434", "/api/ps", "/api/tags", "/chat/completions"})
         self.assertEqual(set(x.found["sqlite"]), {"observe.db"})
+
+    def test_a_parameter_executable_is_unresolved_unless_its_function_is_a_helper(self):
+        # A parameter as argv[0] inside a list registers no helper, so nothing resolves its callers; skipping the site
+        # (as a helper's own launch is skipped) hid `exe` entirely (kit-is9).
+        src = (
+            "import subprocess\n"
+            "def f(exe):\n"
+            "    subprocess.run([exe, 'x'])\n"
+            "def _run(argv):\n"
+            "    return subprocess.run(argv)\n"
+            "def use():\n"
+            "    f('ls')\n"
+            "    _run(['ioreg', '-r'])\n"
+        )
+        x = Extraction([("mod.py", src)])
+        self.assertEqual(x.unresolved, ["mod.py:3"])
+        self.assertEqual(set(x.found["subprocess"]), {"ioreg"})
 
 
 if __name__ == "__main__":

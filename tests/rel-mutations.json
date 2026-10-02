@@ -1,0 +1,38 @@
+[
+  {
+    "label": "rel keeps only passing answers: the FAIL attempt is dropped from rel details",
+    "file": "localbench/workloads.py",
+    "old": "                answers.append(text)\n                if proc.returncode == 0 and check(text):\n                    passed += 1\n",
+    "new": "                if proc.returncode == 0 and check(text):\n                    answers.append(text)\n                    passed += 1\n",
+    "tests": [
+      "tests.test_workloads.AnswerReachesTheVerdict.test_a_pass_and_a_fail_reach_e2e_and_rel_details"
+    ]
+  },
+  {
+    "label": "rel loses its failed attempts from the wrong list",
+    "file": "localbench/workloads.py",
+    "old": "\"answers\": recorded_answers(answers), \"wrong\": wrong}))",
+    "new": "\"answers\": recorded_answers(answers), \"wrong\": []}))",
+    "tests": [
+      "tests.test_workloads.AnswerReachesTheVerdict.test_a_pass_and_a_fail_reach_e2e_and_rel_details"
+    ]
+  },
+  {
+    "label": "rel banks raw unclipped answers",
+    "file": "localbench/workloads.py",
+    "old": "\"answers\": recorded_answers(answers), \"wrong\": wrong}))",
+    "new": "\"answers\": answers, \"wrong\": wrong}))",
+    "tests": [
+      "tests.test_workloads.AnswerReachesTheVerdict.test_a_pass_and_a_fail_reach_e2e_and_rel_details"
+    ]
+  },
+  {
+    "label": "e2e keeps only passing answers: the FAIL attempt is dropped from e2e details",
+    "file": "localbench/workloads.py",
+    "old": "                answers.append(text)\n                scored_attempt = score_e2e_attempt(task, text, proc.returncode, proc.stdout)\n",
+    "new": "                scored_attempt = score_e2e_attempt(task, text, proc.returncode, proc.stdout)\n                if scored_attempt[\"ok\"]:\n                    answers.append(text)\n",
+    "tests": [
+      "tests.test_workloads.AnswerReachesTheVerdict.test_a_pass_and_a_fail_reach_e2e_and_rel_details"
+    ]
+  }
+]

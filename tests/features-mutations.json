@@ -1,0 +1,334 @@
+[
+  {
+    "label": "feature map honors task.disabledAgents",
+    "file": "localbench/features.py",
+    "old": "if kind == \"agent\" and key in (cfg.get(\"task.disabledAgents\") or []):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_disabled_agent_is_disabled_where_listed_and_a_local_route_where_not",
+      "tests.test_features.FeatureMap.test_agent_disabled_in_every_profile_is_disabled_and_not_a_failure"
+    ]
+  },
+  {
+    "label": "task.disabledAgents gates only the agent it lists",
+    "file": "localbench/features.py",
+    "old": "if kind == \"agent\" and key in (cfg.get(\"task.disabledAgents\") or []):",
+    "new": "if kind == \"agent\" and (cfg.get(\"task.disabledAgents\") or []):",
+    "tests": [
+      "tests.test_features.FeatureMap.test_disabled_agents_gate_only_the_agent_they_list"
+    ]
+  },
+  {
+    "label": "models route listing honors task.disabledAgents",
+    "file": "localbench/models.py",
+    "old": "DISABLED if _agent(feature) in off else target",
+    "new": "target",
+    "tests": [
+      "tests.test_models.DisabledAgents.test_disabled_scout_is_not_listed_as_a_qwen_route_but_its_other_smol_uses_are"
+    ]
+  },
+  {
+    "label": "flow-style disabledAgents list is read",
+    "file": "localbench/models.py",
+    "old": "if flow.startswith(\"[\"):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_models.DisabledAgents.test_disabled_scout_is_not_listed_as_a_qwen_route_but_its_other_smol_uses_are"
+    ]
+  },
+  {
+    "label": "proof requires a run receipt",
+    "file": "localbench/features.py",
+    "old": "if receipt.get(\"kind\") != \"run\" or run.get(\"label\") not in PROOF_LABELS:",
+    "new": "if run.get(\"label\") not in PROOF_LABELS:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason"
+    ]
+  },
+  {
+    "label": "proof requires a decision/memory run label",
+    "file": "localbench/features.py",
+    "old": "if receipt.get(\"kind\") != \"run\" or run.get(\"label\") not in PROOF_LABELS:",
+    "new": "if receipt.get(\"kind\") != \"run\":",
+    "tests": [
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason"
+    ]
+  },
+  {
+    "label": "proof applies only to its own feature",
+    "file": "localbench/features.py",
+    "old": "candidates = found.get(row[\"feature\"], [])",
+    "new": "candidates = [r for v in found.values() for r in v]",
+    "tests": [
+      "tests.test_features.FeatureMap.test_receipt_for_another_feature_proves_nothing_here"
+    ]
+  },
+  {
+    "label": "receipt sha is compared to the installed module",
+    "file": "localbench/features.py",
+    "old": "if sha is None or receipt.get(SHA_FIELD) != sha:",
+    "new": "if sha is None:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_module_edited_after_its_receipt_is_stale_and_a_doctor_failure",
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason"
+    ]
+  },
+  {
+    "label": "receipt with problems is not proof",
+    "file": "localbench/features.py",
+    "old": "if receipt.get(\"problems\"):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason"
+    ]
+  },
+  {
+    "label": "proof requires a verdict.compare",
+    "file": "localbench/features.py",
+    "old": "if verdict.get(\"compare\") is None:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason"
+    ]
+  },
+  {
+    "label": "proof requires compare BETTER",
+    "file": "localbench/features.py",
+    "old": "if verdict[\"compare\"] != \"BETTER\":",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason"
+    ]
+  },
+  {
+    "label": "proof requires a pinned model digest",
+    "file": "localbench/features.py",
+    "old": "if not pinned:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason"
+    ]
+  },
+  {
+    "label": "proof digest must match the routed model",
+    "file": "localbench/features.py",
+    "old": "if not same_digest(pinned, digest):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason",
+      "tests.test_features.FeatureMap.test_proof_applies_only_to_profiles_routing_the_measured_model"
+    ]
+  },
+  {
+    "label": "digest prefix shorter than a pin never matches",
+    "file": "localbench/features.py",
+    "old": "return len(short) >= 12 and long.startswith(short)",
+    "new": "return long.startswith(short)",
+    "tests": [
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason"
+    ]
+  },
+  {
+    "label": "uninstalled route model is not proven",
+    "file": "localbench/features.py",
+    "old": "if digest is None:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_route_model_not_installed_is_unproven"
+    ]
+  },
+  {
+    "label": "feature proof is its worst local profile's",
+    "file": "localbench/features.py",
+    "old": "worst = max(proofs.values(), key=lambda q: STATUSES.index(q[\"proof\"]), default=None)",
+    "new": "worst = min(proofs.values(), key=lambda q: STATUSES.index(q[\"proof\"]), default=None)",
+    "tests": [
+      "tests.test_features.FeatureMap.test_proof_applies_only_to_profiles_routing_the_measured_model"
+    ]
+  },
+  {
+    "label": "doctor fails a profile whose route is unproven",
+    "file": "localbench/features.py",
+    "old": "failing = {p: q for p, q in proofs.items() if q[\"proof\"] in FAILING}",
+    "new": "failing = {}",
+    "tests": [
+      "tests.test_features.FeatureMap.test_local_route_without_receipt_is_unproven_and_a_doctor_failure",
+      "tests.test_features.FeatureMap.test_proof_applies_only_to_profiles_routing_the_measured_model"
+    ]
+  },
+  {
+    "label": "carried-forward receipt is CARRIED, not PROVEN",
+    "file": "localbench/features.py",
+    "old": "if receipt.get(CARRIED_FIELD):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_carried_forward_receipt_is_carried_and_only_a_warning"
+    ]
+  },
+  {
+    "label": "direct ollama route warns it bypasses the gateway",
+    "file": "localbench/features.py",
+    "old": "return base if url.hostname in LOOPBACK and url.port == OLLAMA_PORT else None",
+    "new": "return None",
+    "tests": [
+      "tests.test_features.FeatureMap.test_local_route_straight_to_ollama_warns_it_bypasses_the_gateway"
+    ]
+  },
+  {
+    "label": "gateway-routed provider is not a bypass",
+    "file": "localbench/features.py",
+    "old": "return base if url.hostname in LOOPBACK and url.port == OLLAMA_PORT else None",
+    "new": "return base if url.hostname in LOOPBACK else None",
+    "tests": [
+      "tests.test_features.FeatureMap.test_local_route_straight_to_ollama_warns_it_bypasses_the_gateway"
+    ]
+  },
+  {
+    "label": "hosted targets are not local routes",
+    "file": "localbench/features.py",
+    "old": "\"local\": any(is_local(t, provs) for t in targets)",
+    "new": "\"local\": bool(targets)",
+    "tests": [
+      "tests.test_features.FeatureMap.test_hosted_route_without_proof_is_not_a_failure"
+    ]
+  },
+  {
+    "label": "a loopback models.yml provider is local",
+    "file": "localbench/features.py",
+    "old": "return urllib.parse.urlsplit(base).hostname in LOOPBACK",
+    "new": "return False",
+    "tests": [
+      "tests.test_features.FeatureMap.test_local_system_one_provider_is_a_native_local_judge_and_an_unproven_failure"
+    ]
+  },
+  {
+    "label": "find under auto needs a native judge",
+    "file": "localbench/features.py",
+    "old": "if not (targets and is_native(targets[0], provs)):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_find_under_auto_is_off_while_the_judge_is_a_prompted_model"
+    ]
+  },
+  {
+    "label": "judge chain stops at the first native judge",
+    "file": "localbench/features.py",
+    "old": "targets = [t for i, t in enumerate(targets) if i < first or native[i]]",
+    "new": "pass",
+    "tests": [
+      "tests.test_features.FeatureMap.test_judge_chain_never_falls_from_a_native_judge_to_a_prompted_local_model"
+    ]
+  },
+  {
+    "label": "role chain falls through to the first set role",
+    "file": "localbench/features.py",
+    "old": "for r in chain if",
+    "new": "for r in chain[:1] if",
+    "tests": [
+      "tests.test_features.FeatureMap.test_setting_gate_disables_the_route_and_role_chain_falls_through_to_smol"
+    ]
+  },
+  {
+    "label": "duplicate registry feature is rejected",
+    "file": "localbench/features.py",
+    "old": "if any(r[\"feature\"] == row[\"feature\"] for r in rows):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.Registry.test_malformed_rows_are_rejected_with_their_line"
+    ]
+  },
+  {
+    "label": "proof baseline must name this profile's incumbent route",
+    "file": "localbench/features.py",
+    "old": "if alt is None and not baseline_matches(baseline, inc):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason",
+      "tests.test_features.FeatureMap.test_baseline_must_be_the_route_the_applied_local_preset_replaced",
+      "tests.test_features.FeatureMap.test_without_a_local_preset_apply_the_baseline_is_the_current_route_never_the_model_itself"
+    ]
+  },
+  {
+    "label": "baseline needs both kind and id",
+    "file": "localbench/features.py",
+    "old": "if not baseline.get(\"kind\") or not baseline.get(\"id\"):",
+    "new": "if not baseline:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason"
+    ]
+  },
+  {
+    "label": "incumbent is read from the applied local preset's recorded before",
+    "file": "localbench/features.py",
+    "old": "before[s[\"key\"]] = s.get(\"before\")",
+    "new": "pass",
+    "tests": [
+      "tests.test_features.FeatureMap.test_baseline_must_be_the_route_the_applied_local_preset_replaced",
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason",
+      "tests.test_features.FeatureMap.test_memory_receipt_proves_the_sibling_package_module"
+    ]
+  },
+  {
+    "label": "baseline is never the routed model itself",
+    "file": "localbench/features.py",
+    "old": "if alt is None and own:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_features.FeatureMap.test_without_a_local_preset_apply_the_baseline_is_the_current_route_never_the_model_itself"
+    ]
+  },
+  {
+    "label": "hosted baseline must be a non-local route",
+    "file": "localbench/features.py",
+    "old": "return bool(sel) and not inc[\"local\"] and bid in",
+    "new": "return bool(sel) and bid in",
+    "tests": [
+      "tests.test_features.FeatureMap.test_pre_flip_incumbent_is_the_current_route_by_kind"
+    ]
+  },
+  {
+    "label": "fixed baseline is the gating setting value",
+    "file": "localbench/features.py",
+    "old": "return inc[\"setting\"] is not None and bid == inc[\"setting\"]",
+    "new": "return True",
+    "tests": [
+      "tests.test_features.FeatureMap.test_pre_flip_incumbent_is_the_current_route_by_kind"
+    ]
+  },
+  {
+    "label": "missing apply manifest denies proof",
+    "file": "localbench/features.py",
+    "old": "return f\"apply {entry['id']} of {entry['preset']} has no readable manifest ({manifest}: {exc})\"",
+    "new": "return cfg, provs, \"current route\"",
+    "tests": [
+      "tests.test_features.FeatureMap.test_unreadable_apply_manifest_denies_proof"
+    ]
+  },
+  {
+    "label": "proof needs a run receipt of a proof-tier label",
+    "file": "localbench/features.py",
+    "old": "if receipt.get(\"kind\") != \"run\" or run.get(\"label\") not in PROOF_LABELS:",
+    "new": "if receipt.get(\"kind\") != \"run\":",
+    "tests": [
+      "tests.test_features.FeatureMap.test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason"
+    ]
+  },
+  {
+    "label": "generation receipts prove features like decision and memory",
+    "file": "localbench/features.py",
+    "old": "PROOF_LABELS = (\"decision\", \"memory\", \"generation\")",
+    "new": "PROOF_LABELS = (\"decision\", \"memory\")",
+    "tests": [
+      "tests.test_features.FeatureMap.test_generation_label_receipt_proves_the_feature_like_decision_and_memory"
+    ]
+  },
+  {
+    "label": "laya routes resolve to the hub snapshot sha, not ollama digests",
+    "file": "localbench/features.py",
+    "old": "    if model.startswith(\"laya:\"):",
+    "new": "    if False:",
+    "tests": [
+      "tests.test_prove.Prove.test_installed_digest_resolves_laya_snapshot"
+    ]
+  }
+]

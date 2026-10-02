@@ -1,0 +1,262 @@
+{
+  "kind": "run",
+  "problems": [],
+  "run": {
+    "provenance": {
+      "pins": {
+        "backend": "ollama",
+        "backend_version": "0.34.4",
+        "backend_sha": "bba8b79eac84ab09",
+        "model": "qwen3.6:35b-mlx",
+        "model_digest": "e92a3e94bbca",
+        "backend_args": "",
+        "omp_version": "18.4.3",
+        "omp_sha": "b72ee39b7feb2d59",
+        "omp_path": "~/.bun/bin/omp",
+        "omp_child_config": "62eed267e219ddde",
+        "omp_mem_config": "019eef862b65ed03",
+        "omp_agent_config": "38b87e2b63396937",
+        "omp_mem_tools": "memory_edit,recall,reflect,retain",
+        "fixtures_sha": "41ff309f03a98aa5",
+        "macos_build": "25F84",
+        "host_id": "mac-studio-apple-m3-ultra-512gb"
+      },
+      "fingerprint": {
+        "backend": "ollama",
+        "backend_version": "0.34.4",
+        "backend_sha": "bba8b79eac84ab09",
+        "model": "qwen3.6:35b-mlx",
+        "model_digest": "e92a3e94bbca",
+        "backend_args": "",
+        "architecture": "qwen3_5_moe",
+        "quantization": "nvfp4",
+        "parameters": "36.0B",
+        "loaded_context": 262144
+      },
+      "localbench_rev": "9230b9d-dirty",
+      "created": "20260929T083840Z",
+      "tiers": [
+        "conf"
+      ],
+      "repeats": 3,
+      "label": "run"
+    },
+    "verdicts": {
+      "contended": false,
+      "must_fail": [],
+      "preflight_problems": [],
+      "allow_busy": false,
+      "pins_changed": {}
+    },
+    "metrics": {},
+    "conformance": {
+      "conf.tool_call": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "shape": {
+          "name": "read_file",
+          "arg_keys": [
+            "path"
+          ]
+        }
+      },
+      "conf.usage_reported": {
+        "level": "MUST",
+        "verdict": "PASS"
+      },
+      "conf.no_truncation_64k": {
+        "level": "MUST",
+        "verdict": "PASS"
+      },
+      "conf.streams_incrementally": {
+        "level": "MUST",
+        "verdict": "PASS"
+      },
+      "conf.greedy_deterministic": {
+        "level": "SHOULD",
+        "verdict": "FAIL"
+      }
+    },
+    "run_dir": "runs/20260929T083840Z__run__ollama__qwen3.6_35b-mlx",
+    "details": {
+      "conf.greedy_deterministic": {
+        "a": "by 5, 3)\n     - 106 (even)\n     - 107 (prime)\n     - 108 (even)\n     - 109 (prime)\n     - 110 (even)\n     - 111 (div by 3)\n     - 112 (even)\n     -\n--content--\n",
+        "b": " - 105 (div by 5, 3)\n     - 106 (even)\n     - 107 (prime)\n     - 108 (even)\n     - 109 (prime)\n     - 110 (even)\n     - 111 (div by 3)\n     - 112 (\n--content--\n",
+        "finish": [
+          "length",
+          "length"
+        ]
+      }
+    },
+    "system": {
+      "preflight": {
+        "idle_check": {
+          "samples": 13,
+          "load1": {
+            "mean": 10.1,
+            "max": 10.21,
+            "min": 10.02
+          },
+          "gpu_device_pct": {
+            "mean": 1.7,
+            "max": 8,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 96.0,
+            "max": 96,
+            "min": 96
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 7.4,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 2.2,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 9392,
+              "name": "Terminal",
+              "pct": 2.0,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            }
+          ],
+          "load": {
+            "samples": 13,
+            "app_gpu_mean_pct": 11.7,
+            "app_gpu_p95_pct": 13.5,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "cpu_busy_pct": 22.5,
+        "problems": [],
+        "allow_busy": false,
+        "waited_s": 10.7
+      },
+      "during": {
+        "samples": 46,
+        "load1": {
+          "mean": 8.7,
+          "max": 9.2,
+          "min": 8.43
+        },
+        "gpu_device_pct": {
+          "mean": 98.1,
+          "max": 100,
+          "min": 91
+        },
+        "free_pct": {
+          "mean": 90.5,
+          "max": 91,
+          "min": 89
+        },
+        "swap_used_mb": {
+          "mean": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "pressure_levels": [
+          "normal"
+        ],
+        "resident_unknown_samples": 0,
+        "gpu_by_process": [
+          {
+            "pid": 32941,
+            "name": "ollama",
+            "pct": 70.2,
+            "cmd": "/Applications/Ollama.app/Contents/Resources/ollama runner --model qwen3.6:35b-mlx --port 64492",
+            "model": "qwen3.6:35b-mlx"
+          },
+          {
+            "pid": 65371,
+            "name": "Google Chrome fo",
+            "pct": 17.8,
+            "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+          },
+          {
+            "pid": 179,
+            "name": "WindowServer",
+            "pct": 3.4,
+            "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+          },
+          {
+            "pid": 9392,
+            "name": "Terminal",
+            "pct": 3.1,
+            "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+          }
+        ],
+        "load": {
+          "samples": 46,
+          "app_gpu_mean_pct": 24.6,
+          "app_gpu_p95_pct": 33.7,
+          "app_spike_seconds": 2,
+          "user_active_pct": 0.0
+        }
+      },
+      "contention": [],
+      "power": {
+        "available": false,
+        "samples": 0,
+        "thermal_pressure": []
+      },
+      "cpu": {
+        "samples": 14,
+        "busy_pct": {
+          "mean": 22.3,
+          "max": 25.1,
+          "min": 20.8
+        }
+      },
+      "before_live": {
+        "t": 1790671120.871109,
+        "load1": 10.21,
+        "free_pct": 96,
+        "swap_used_mb": 0.0,
+        "pressure_level": "normal",
+        "gpu_device_pct": 0,
+        "gpu_renderer_pct": 0,
+        "gpu_tiler_pct": 0,
+        "gpu_in_use_mem_bytes": 2195111936,
+        "resident": {
+          "ollama": [],
+          "mlx-serve": [],
+          "splash": [],
+          "omlx": [],
+          "mlx-smol": [],
+          "mlxfast": []
+        },
+        "user_idle_s": 18610.8
+      },
+      "host": {
+        "hostname": "mac-studio",
+        "model": "Mac15,14",
+        "chip": "Apple M3 Ultra",
+        "p_cores": 24,
+        "e_cores": 8,
+        "gpu_cores": 80,
+        "mem_gb": 512,
+        "macos": "26.5.2",
+        "macos_build": "25F84",
+        "gpu_wired_limit_mb": null,
+        "host_id": "mac-studio-apple-m3-ultra-512gb"
+      }
+    }
+  }
+}

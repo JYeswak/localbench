@@ -1,0 +1,23 @@
+[
+  {
+    "label": "interrupting a session turn must close its RPC child",
+    "file": "localbench/workloads.py",
+    "old": "exit_s, rc = rpc.close(120)",
+    "new": "exit_s, rc = 0.0, 0  # BUG: child survives cancellation",
+    "tests": ["tests.test_workloads.RpcCancellation.test_sess_closes_child_and_propagates_keyboard_interrupt"]
+  },
+  {
+    "label": "interrupting RPC close must kill and reap the child",
+    "file": "localbench/workloads.py",
+    "old": "if self.proc.poll() is None:\n                self.proc.kill()",
+    "new": "if False:\n                self.proc.kill()",
+    "tests": ["tests.test_workloads.RpcCancellation.test_close_cancellation_kills_and_reaps_child"]
+  },
+  {
+    "label": "RPC constructor cancellation must kill and reap the spawned child",
+    "file": "localbench/workloads.py",
+    "old": "threading.Thread(target=self._pump, daemon=True).start()\n        except BaseException:",
+    "new": "threading.Thread(target=self._pump, daemon=True).start()\n        except Exception:",
+    "tests": ["tests.test_workloads.RpcCancellation.test_constructor_cancellation_kills_child_and_closes_pipes"]
+  }
+]

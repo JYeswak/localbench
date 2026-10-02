@@ -1,0 +1,101 @@
+[
+  {
+    "label": "a dirty spec refuses before planning anything",
+    "file": "localbench/prove.py",
+    "old": "    if out:\n        raise ProveError(f\"{target}: spec modified since its commit; commit it for %20's review first\")",
+    "new": "    pass",
+    "tests": [
+      "tests.test_prove.Prove.test_prove_spec_refuses_blocked_and_dirty"
+    ]
+  },
+  {
+    "label": "unknown spec fields are refused",
+    "file": "localbench/prove.py",
+    "old": "    if unknown:\n        raise _fail(target, f\"unknown fields {unknown}\")",
+    "new": "    pass",
+    "tests": [
+      "tests.test_prove.Prove.test_load_spec_accepts_and_rejects"
+    ]
+  },
+  {
+    "label": "blocked specs never run",
+    "file": "localbench/prove.py",
+    "old": "    if spec.get(\"blocked\"):\n        raise ProveError(f\"{spec_path}: spec is blocked ({spec['blocked'].get('reason')})\")",
+    "new": "    pass",
+    "tests": [
+      "tests.test_prove.Prove.test_prove_spec_refuses_blocked_and_dirty"
+    ]
+  },
+  {
+    "label": "unmeasured wins are problems, not silent passes",
+    "file": "localbench/prove.py",
+    "old": "    if measured < needed:",
+    "new": "    if False:",
+    "tests": [
+      "tests.test_prove.Prove.test_unmeasured_win_is_a_problem"
+    ]
+  },
+  {
+    "label": "privacy counts only when verified hosted-incumbent and loopback arms",
+    "file": "localbench/prove.py",
+    "old": "            if evidence.get(\"privacy_verified\") is True:",
+    "new": "            if True:",
+    "tests": [
+      "tests.test_prove.Prove.test_privacy_win_counts_only_when_verified"
+    ]
+  },
+  {
+    "label": "the receipt records the privacy evidence",
+    "file": "localbench/prove.py",
+    "old": "            receipt[\"privacy\"] = {\"verified\": verified, \"reason\": why, **priv}",
+    "new": "            pass",
+    "tests": [
+      "tests.test_prove.Prove.test_prove_spec_decision_end_to_end"
+    ]
+  },
+  {
+    "label": "allow_errors above 0.05 is refused at load",
+    "file": "localbench/prove.py",
+    "old": "        if not isinstance(allowed, (int, float)) or isinstance(allowed, bool) or not 0 <= allowed <= 0.05:\n            raise _fail(target, \"allow_errors must be a number in [0, 0.05]\")",
+    "new": "        pass",
+    "tests": [
+      "tests.test_prove.Prove.test_allow_errors_capped_at_load"
+    ]
+  },
+  {
+    "label": "metric wins need non-overlapping spread bands, not point comparison",
+    "file": "localbench/prove.py",
+    "old": "        won = band[1] < base_band[0] if direction == \"lower\" else band[0] > base_band[1]",
+    "new": "        won = value < base if direction == \"lower\" else value > base",
+    "tests": [
+      "tests.test_prove.Prove.test_metric_win_within_noise_is_a_problem"
+    ]
+  },
+  {
+    "label": "accuracy wins use the paired verdict, not the bands",
+    "file": "localbench/prove.py",
+    "old": "        paired = (evidence.get(\"paired\") or {}).get(name)",
+    "new": "        paired = None",
+    "tests": [
+      "tests.test_prove.Prove.test_accuracy_win_uses_the_paired_verdict"
+    ]
+  },
+  {
+    "label": "error kinds over allow_errors are problems",
+    "file": "localbench/prove.py",
+    "old": "        if rate > allowed:",
+    "new": "        if False:",
+    "tests": [
+      "tests.test_prove.Prove.test_error_kinds_over_cap_are_problems"
+    ]
+  },
+  {
+    "label": "judge family comes from runtime /api/show, never the model id",
+    "file": "localbench/prove.py",
+    "old": "    family = (doc.get(\"details\") or {}).get(\"family\") if isinstance(doc, dict) else None",
+    "new": "    family = model.split(\":\")[0] if isinstance(doc, dict) else None",
+    "tests": [
+      "tests.test_prove.Prove.test_judge_family_from_runtime_show"
+    ]
+  }
+]

@@ -1,0 +1,4406 @@
+{
+  "kind": "ab",
+  "a": "mlx-serve:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit",
+  "b": "omlx:~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit",
+  "order": [
+    "A",
+    "B",
+    "A",
+    "B",
+    "A"
+  ],
+  "problems": [],
+  "pin_drift": {},
+  "load_balance": {
+    "a": [
+      21.7,
+      21.6,
+      21.7
+    ],
+    "b": [
+      24.9,
+      23.4
+    ],
+    "tol_pct": 5.0,
+    "favours": null
+  },
+  "table": {
+    "sess.turn.max_tool_calls": {
+      "a_legs": [
+        0,
+        0,
+        1
+      ],
+      "b_legs": [
+        0,
+        0
+      ],
+      "a_median": 0,
+      "b_median": 0.0,
+      "better": "lower",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.timeouts": {
+      "a_legs": [
+        0,
+        0,
+        0
+      ],
+      "b_legs": [
+        0,
+        0
+      ],
+      "a_median": 0,
+      "b_median": 0.0,
+      "better": "lower",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.1,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.wall_s": {
+      "a_legs": [
+        0.6579,
+        0.7121,
+        0.7433
+      ],
+      "b_legs": [
+        0.7622,
+        0.8039
+      ],
+      "a_median": 0.7121,
+      "b_median": 0.78305,
+      "better": "lower",
+      "aa_rel_spread": 0.1199,
+      "bb_rel_spread": 0.0533,
+      "band": 0.3598,
+      "b_over_a": 1.1,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.post_retain_wall_s": {
+      "a_legs": [
+        0.8938,
+        0.6318,
+        0.6411
+      ],
+      "b_legs": [
+        1.257,
+        1.2481
+      ],
+      "a_median": 0.6411,
+      "b_median": 1.2525499999999998,
+      "better": "lower",
+      "aa_rel_spread": 0.4087,
+      "bb_rel_spread": 0.0071,
+      "band": 1.226,
+      "b_over_a": 1.954,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.pre_main_s": {
+      "a_legs": [
+        0.217,
+        0.2178,
+        0.2185
+      ],
+      "b_legs": [
+        0.2371,
+        0.2463
+      ],
+      "a_median": 0.2178,
+      "b_median": 0.2417,
+      "better": "lower",
+      "aa_rel_spread": 0.0069,
+      "bb_rel_spread": 0.0381,
+      "band": 0.1142,
+      "b_over_a": 1.11,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.turn.post_retain_pre_main_s": {
+      "a_legs": [
+        0.4166,
+        0.4152,
+        0.4172
+      ],
+      "b_legs": [
+        0.5647,
+        0.5538
+      ],
+      "a_median": 0.4166,
+      "b_median": 0.55925,
+      "better": "lower",
+      "aa_rel_spread": 0.0048,
+      "bb_rel_spread": 0.0195,
+      "band": 0.1,
+      "b_over_a": 1.342,
+      "verdict": "B-WORSE"
+    },
+    "sess.turn.ack_rate": {
+      "a_legs": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "b_legs": [
+        1.0,
+        1.0
+      ],
+      "a_median": 1.0,
+      "b_median": 1.0,
+      "better": "higher",
+      "aa_rel_spread": 0.0,
+      "bb_rel_spread": 0.0,
+      "band": 0.05,
+      "b_over_a": 1.0,
+      "verdict": "WITHIN-NOISE"
+    },
+    "sess.memory.extract_s": {
+      "a_legs": [
+        0.907,
+        1.177,
+        0.898
+      ],
+      "b_legs": [
+        1.074,
+        1.052
+      ],
+      "a_median": 0.907,
+      "b_median": 1.0630000000000002,
+      "better": "lower",
+      "aa_rel_spread": 0.3076,
+      "bb_rel_spread": 0.0207,
+      "band": 0.9228,
+      "b_over_a": 1.172,
+      "verdict": "WITHIN-NOISE"
+    }
+  },
+  "legs": [
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.4.3",
+          "omp_sha": "b72ee39b7feb2d59",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "4-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "9230b9d-dirty",
+        "created": "20260929T093342Z",
+        "tiers": [
+          "sess"
+        ],
+        "repeats": 3,
+        "label": "ab_a1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "sess.turn.max_tool_calls": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 36
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 36
+        },
+        "sess.turn.wall_s": {
+          "value": 0.6579,
+          "better": "lower",
+          "spread": [
+            0.3892,
+            1.6524
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 0.8938,
+          "better": "lower",
+          "spread": [
+            0.6294,
+            1.2772
+          ],
+          "n": 6
+        },
+        "sess.turn.pre_main_s": {
+          "value": 0.217,
+          "better": "lower",
+          "spread": [
+            0.2142,
+            0.2576
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 0.4166,
+          "better": "lower",
+          "spread": [
+            0.4134,
+            0.4206
+          ],
+          "n": 6
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 36
+        },
+        "sess.memory.extract_s": {
+          "value": 0.907,
+          "better": "lower",
+          "spread": [
+            0.425,
+            1.501
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260929T093342Z__ab_a1__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.187,
+            "min": 0.062,
+            "max": 0.671,
+            "n": 6
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 2.858,
+              "t_send": 1790674437.27999,
+              "t_end": 1790674440.138134,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.051,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 0.672,
+              "t_send": 1790674440.138321,
+              "t_end": 1790674440.810455,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.217,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 0.389,
+              "t_send": 1790674440.810797,
+              "t_end": 1790674441.199968,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.214,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 0.394,
+              "t_send": 1790674441.2000499,
+              "t_end": 1790674441.59377,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.217,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 0.629,
+              "t_send": 1790674441.593846,
+              "t_end": 1790674442.223259,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.419,
+              "overlap_s": 0.209
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 0.5,
+              "t_send": 1790674442.223365,
+              "t_end": 1790674442.723082,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.258,
+              "overlap_s": 0.241
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 0.426,
+              "t_send": 1790674442.723156,
+              "t_end": 1790674443.1491442,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.237,
+              "overlap_s": 0.138
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 0.395,
+              "t_send": 1790674443.14924,
+              "t_end": 1790674443.5438972,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 1.149,
+              "t_send": 1790674443.543989,
+              "t_end": 1790674444.692567,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.414,
+              "overlap_s": 0.485
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 0.561,
+              "t_send": 1790674444.692951,
+              "t_end": 1790674445.2536,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.217,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 0.677,
+              "t_send": 1790674445.253819,
+              "t_end": 1790674445.930891,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.217,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 0.658,
+              "t_send": 1790674445.931212,
+              "t_end": 1790674446.589094,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.219,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 3.075,
+              "t_send": 1790674447.7685592,
+              "t_end": 1790674450.843799,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.976,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 0.978,
+              "t_send": 1790674450.844206,
+              "t_end": 1790674451.822685,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.221,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 0.393,
+              "t_send": 1790674451.823335,
+              "t_end": 1790674452.216365,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 0.633,
+              "t_send": 1790674452.216448,
+              "t_end": 1790674452.849159,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 0.639,
+              "t_send": 1790674452.849449,
+              "t_end": 1790674453.4884238,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.421,
+              "overlap_s": 0.218
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 0.47,
+              "t_send": 1790674453.488524,
+              "t_end": 1790674453.958505,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.247,
+              "overlap_s": 0.222
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 0.734,
+              "t_send": 1790674453.9585862,
+              "t_end": 1790674454.6925771,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.253,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 0.795,
+              "t_send": 1790674454.692964,
+              "t_end": 1790674455.488466,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.217,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 1.277,
+              "t_send": 1790674455.488928,
+              "t_end": 1790674456.7661161,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.414,
+              "overlap_s": 0.495
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 0.681,
+              "t_send": 1790674456.7665899,
+              "t_end": 1790674457.4472718,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.217,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 1.652,
+              "t_send": 1790674457.4475951,
+              "t_end": 1790674459.1000519,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.215,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 1.247,
+              "t_send": 1790674459.1013398,
+              "t_end": 1790674460.3479922,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 1,
+              "wall": 2.783,
+              "t_send": 1790674461.634327,
+              "t_end": 1790674464.417544,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.975,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 2,
+              "wall": 0.672,
+              "t_send": 1790674464.4177222,
+              "t_end": 1790674465.089445,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.219,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 3,
+              "wall": 0.392,
+              "t_send": 1790674465.0897322,
+              "t_end": 1790674465.481819,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 4,
+              "wall": 0.392,
+              "t_send": 1790674465.4819021,
+              "t_end": 1790674465.874368,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 5,
+              "wall": 0.631,
+              "t_send": 1790674465.874465,
+              "t_end": 1790674466.505142,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.42,
+              "overlap_s": 0.211
+            },
+            {
+              "session": 2,
+              "turn": 6,
+              "wall": 0.486,
+              "t_send": 1790674466.505219,
+              "t_end": 1790674466.990832,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.256,
+              "overlap_s": 0.229
+            },
+            {
+              "session": 2,
+              "turn": 7,
+              "wall": 0.429,
+              "t_send": 1790674466.990914,
+              "t_end": 1790674467.419859,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.25,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 8,
+              "wall": 0.759,
+              "t_send": 1790674467.419942,
+              "t_end": 1790674468.179148,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 9,
+              "wall": 1.228,
+              "t_send": 1790674468.179584,
+              "t_end": 1790674469.407276,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.413,
+              "overlap_s": 0.499
+            },
+            {
+              "session": 2,
+              "turn": 10,
+              "wall": 1.572,
+              "t_send": 1790674469.407709,
+              "t_end": 1790674470.9801621,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.215,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 11,
+              "wall": 1.259,
+              "t_send": 1790674470.981345,
+              "t_end": 1790674472.240153,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 12,
+              "wall": 0.697,
+              "t_send": 1790674472.241076,
+              "t_end": 1790674472.9383738,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.217,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 9,
+              "busy_s": 8.176,
+              "not_ok": 0,
+              "completion_tokens": 423
+            }
+          },
+          "overlap_with_main_s": 2.946,
+          "exit_s": [
+            0.557,
+            0.62,
+            0.646
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790674436.645919,
+              "ended": 1790674447.146251,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.557,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790674447.146682,
+              "ended": 1790674460.969197,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.62,
+              "rc": 0
+            },
+            {
+              "session": 2,
+              "started": 1790674460.973265,
+              "ended": 1790674473.5850172,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.646,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 36,
+          "expected": 36
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 9,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 13,
+            "load1": {
+              "mean": 7.3,
+              "max": 7.69,
+              "min": 7.13
+            },
+            "gpu_device_pct": {
+              "mean": 2.5,
+              "max": 9,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 95.5,
+              "max": 96,
+              "min": 93
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 6.8,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.9,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.4,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 13,
+              "app_gpu_mean_pct": 12.1,
+              "app_gpu_p95_pct": 14.6,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 16.8,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 10.3
+        },
+        "during": {
+          "samples": 29,
+          "load1": {
+            "mean": 6.8,
+            "max": 7.36,
+            "min": 6.54
+          },
+          "gpu_device_pct": {
+            "mean": 89.7,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 92.0,
+            "max": 93,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 48227,
+              "name": "mlx-serve",
+              "pct": 73.8,
+              "cmd": "/opt/homebrew/bin/mlx-serve --model ~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit --serve --host 127.0.0.1 --port 11234 --metrics",
+              "model": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            },
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 5.0,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.3,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 29,
+            "app_gpu_mean_pct": 7.0,
+            "app_gpu_p95_pct": 15.2,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 7,
+          "busy_pct": {
+            "mean": 21.7,
+            "max": 22.6,
+            "min": 20.4
+          }
+        },
+        "before_live": {
+          "t": 1790674422.740275,
+          "load1": 7.69,
+          "free_pct": 93,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 22802169856,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            ],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 21912.6
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "omlx",
+          "backend_version": "0.7.0rc1",
+          "backend_sha": "0765dade2ba118f5",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.4.3",
+          "omp_sha": "b72ee39b7feb2d59",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "omlx",
+          "backend_version": "0.7.0rc1",
+          "backend_sha": "0765dade2ba118f5",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe_text",
+          "quantization": "4-bit",
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "9230b9d-dirty",
+        "created": "20260929T093438Z",
+        "tiers": [
+          "sess"
+        ],
+        "repeats": 3,
+        "label": "ab_b1"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "sess.turn.max_tool_calls": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 36
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 36
+        },
+        "sess.turn.wall_s": {
+          "value": 0.7622,
+          "better": "lower",
+          "spread": [
+            0.6585,
+            0.955
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 1.257,
+          "better": "lower",
+          "spread": [
+            1.2222,
+            1.4354
+          ],
+          "n": 6
+        },
+        "sess.turn.pre_main_s": {
+          "value": 0.2371,
+          "better": "lower",
+          "spread": [
+            0.23,
+            0.3463
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 0.5647,
+          "better": "lower",
+          "spread": [
+            0.5407,
+            0.7381
+          ],
+          "n": 6
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 36
+        },
+        "sess.memory.extract_s": {
+          "value": 1.074,
+          "better": "lower",
+          "spread": [
+            0.576,
+            1.257
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20260929T093438Z__ab_b1__omlx__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.469,
+            "min": 0.383,
+            "max": 0.678,
+            "n": 6
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 3.185,
+              "t_send": 1790674498.249364,
+              "t_end": 1790674501.4346461,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.472,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 0.77,
+              "t_send": 1790674501.434817,
+              "t_end": 1790674502.204857,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.268,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 0.728,
+              "t_send": 1790674502.204986,
+              "t_end": 1790674502.932535,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.23,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 0.748,
+              "t_send": 1790674502.932672,
+              "t_end": 1790674503.6807501,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.23,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 1.435,
+              "t_send": 1790674503.680879,
+              "t_end": 1790674505.116328,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.738,
+              "overlap_s": 0.523
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 0.767,
+              "t_send": 1790674505.116482,
+              "t_end": 1790674505.8835971,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.246,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 0.762,
+              "t_send": 1790674505.88375,
+              "t_end": 1790674506.645356,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.249,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 0.758,
+              "t_send": 1790674506.6454852,
+              "t_end": 1790674507.403376,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.237,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 1.222,
+              "t_send": 1790674507.403521,
+              "t_end": 1790674508.625729,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.548,
+              "overlap_s": 0.527
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 0.878,
+              "t_send": 1790674508.625891,
+              "t_end": 1790674509.5041978,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.238,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 0.845,
+              "t_send": 1790674509.5043468,
+              "t_end": 1790674510.3496819,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.233,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 0.883,
+              "t_send": 1790674510.349822,
+              "t_end": 1790674511.233068,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.235,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 1.737,
+              "t_send": 1790674513.684195,
+              "t_end": 1790674515.421581,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.187,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 0.737,
+              "t_send": 1790674515.42181,
+              "t_end": 1790674516.1590579,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.25,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 0.762,
+              "t_send": 1790674516.159174,
+              "t_end": 1790674516.92141,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.233,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 0.748,
+              "t_send": 1790674516.921542,
+              "t_end": 1790674517.670024,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.233,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 1.248,
+              "t_send": 1790674517.670154,
+              "t_end": 1790674518.917784,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.581,
+              "overlap_s": 0.522
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 0.768,
+              "t_send": 1790674518.9179578,
+              "t_end": 1790674519.6855261,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.248,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 0.873,
+              "t_send": 1790674519.68567,
+              "t_end": 1790674520.5590668,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.346,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 0.817,
+              "t_send": 1790674520.559202,
+              "t_end": 1790674521.376151,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.286,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 1.234,
+              "t_send": 1790674521.3762949,
+              "t_end": 1790674522.610501,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.602,
+              "overlap_s": 0.564
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 0.754,
+              "t_send": 1790674522.6106508,
+              "t_end": 1790674523.3649468,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.237,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 0.762,
+              "t_send": 1790674523.3650718,
+              "t_end": 1790674524.127213,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.233,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 0.76,
+              "t_send": 1790674524.127342,
+              "t_end": 1790674524.887478,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.237,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 1,
+              "wall": 1.539,
+              "t_send": 1790674526.594005,
+              "t_end": 1790674528.132712,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.99,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 2,
+              "wall": 0.658,
+              "t_send": 1790674528.1328928,
+              "t_end": 1790674528.791373,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.237,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 3,
+              "wall": 0.69,
+              "t_send": 1790674528.79149,
+              "t_end": 1790674529.481806,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.245,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 4,
+              "wall": 0.747,
+              "t_send": 1790674529.481942,
+              "t_end": 1790674530.229179,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.247,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 5,
+              "wall": 1.372,
+              "t_send": 1790674530.229323,
+              "t_end": 1790674531.60093,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.541,
+              "overlap_s": 0.549
+            },
+            {
+              "session": 2,
+              "turn": 6,
+              "wall": 0.76,
+              "t_send": 1790674531.601092,
+              "t_end": 1790674532.361504,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.246,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 7,
+              "wall": 0.874,
+              "t_send": 1790674532.361643,
+              "t_end": 1790674533.235355,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.231,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 8,
+              "wall": 0.812,
+              "t_send": 1790674533.235511,
+              "t_end": 1790674534.047789,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.232,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 9,
+              "wall": 1.266,
+              "t_send": 1790674534.0479271,
+              "t_end": 1790674535.314282,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.542,
+              "overlap_s": 0.512
+            },
+            {
+              "session": 2,
+              "turn": 10,
+              "wall": 0.955,
+              "t_send": 1790674535.314471,
+              "t_end": 1790674536.269526,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.233,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 11,
+              "wall": 0.798,
+              "t_send": 1790674536.269683,
+              "t_end": 1790674537.0673978,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.231,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 12,
+              "wall": 0.853,
+              "t_send": 1790674537.0675359,
+              "t_end": 1790674537.921036,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.246,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 9,
+              "busy_s": 8.532,
+              "not_ok": 5,
+              "completion_tokens": 431
+            }
+          },
+          "overlap_with_main_s": 3.197,
+          "exit_s": [
+            0.676,
+            0.629,
+            0.759
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790674497.557581,
+              "ended": 1790674511.9092748,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.676,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790674511.909902,
+              "ended": 1790674525.516513,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.629,
+              "rc": 0
+            },
+            {
+              "session": 2,
+              "started": 1790674525.5168362,
+              "ended": 1790674538.679858,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.759,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 36,
+          "expected": 36
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 9,
+          "not_ok": [
+            {
+              "purpose": "memory-extract",
+              "status": 200,
+              "aborted": true,
+              "total_s": 1.257
+            },
+            {
+              "purpose": "memory-extract",
+              "status": 200,
+              "aborted": true,
+              "total_s": 0.626
+            },
+            {
+              "purpose": "memory-extract",
+              "status": 200,
+              "aborted": true,
+              "total_s": 1.099
+            },
+            {
+              "purpose": "memory-extract",
+              "status": 200,
+              "aborted": true,
+              "total_s": 1.164
+            },
+            {
+              "purpose": "memory-extract",
+              "status": 200,
+              "aborted": true,
+              "total_s": 1.052
+            }
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 15,
+            "load1": {
+              "mean": 6.9,
+              "max": 6.93,
+              "min": 6.86
+            },
+            "gpu_device_pct": {
+              "mean": 1.5,
+              "max": 9,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.0,
+              "max": 96,
+              "min": 96
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 6.7,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.7,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.4,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 15,
+              "app_gpu_mean_pct": 12.0,
+              "app_gpu_p95_pct": 14.7,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 19.3,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 12.8
+        },
+        "during": {
+          "samples": 30,
+          "load1": {
+            "mean": 7.8,
+            "max": 8.46,
+            "min": 7.17
+          },
+          "gpu_device_pct": {
+            "mean": 85.2,
+            "max": 98,
+            "min": 9
+          },
+          "free_pct": {
+            "mean": 92.7,
+            "max": 93,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 50015,
+              "name": "python3.13",
+              "pct": 63.9,
+              "cmd": "omlx-server"
+            },
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 5.0,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.3,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 30,
+            "app_gpu_mean_pct": 71.7,
+            "app_gpu_p95_pct": 86.9,
+            "app_spike_seconds": 26,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 8,
+          "busy_pct": {
+            "mean": 24.9,
+            "max": 33.4,
+            "min": 22.4
+          }
+        },
+        "before_live": {
+          "t": 1790674479.689087,
+          "load1": 6.83,
+          "free_pct": 96,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 0,
+          "gpu_renderer_pct": 0,
+          "gpu_tiler_pct": 0,
+          "gpu_in_use_mem_bytes": 2195046400,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 21969.7
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.4.3",
+          "omp_sha": "b72ee39b7feb2d59",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "4-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "9230b9d-dirty",
+        "created": "20260929T093542Z",
+        "tiers": [
+          "sess"
+        ],
+        "repeats": 3,
+        "label": "ab_a2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "sess.turn.max_tool_calls": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 36
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 36
+        },
+        "sess.turn.wall_s": {
+          "value": 0.7121,
+          "better": "lower",
+          "spread": [
+            0.3889,
+            2.3944
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 0.6318,
+          "better": "lower",
+          "spread": [
+            0.6268,
+            1.0522
+          ],
+          "n": 6
+        },
+        "sess.turn.pre_main_s": {
+          "value": 0.2178,
+          "better": "lower",
+          "spread": [
+            0.2135,
+            0.2581
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 0.4152,
+          "better": "lower",
+          "spread": [
+            0.4105,
+            0.4202
+          ],
+          "n": 6
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 36
+        },
+        "sess.memory.extract_s": {
+          "value": 1.177,
+          "better": "lower",
+          "spread": [
+            0.423,
+            1.343
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260929T093542Z__ab_a2__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": -0.251,
+            "min": -1.11,
+            "max": 0.055,
+            "n": 6
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 2.805,
+              "t_send": 1790674558.801125,
+              "t_end": 1790674561.605867,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.996,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 0.708,
+              "t_send": 1790674561.606029,
+              "t_end": 1790674562.3144069,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 0.389,
+              "t_send": 1790674562.314774,
+              "t_end": 1790674562.703664,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.214,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 0.663,
+              "t_send": 1790674562.703744,
+              "t_end": 1790674563.367171,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.214,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 0.63,
+              "t_send": 1790674563.367504,
+              "t_end": 1790674563.997778,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.418,
+              "overlap_s": 0.211
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 0.486,
+              "t_send": 1790674563.997853,
+              "t_end": 1790674564.4841018,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.258,
+              "overlap_s": 0.227
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 0.43,
+              "t_send": 1790674564.484179,
+              "t_end": 1790674564.9144099,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.253,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 0.712,
+              "t_send": 1790674564.914496,
+              "t_end": 1790674565.626623,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.214,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 0.637,
+              "t_send": 1790674565.627,
+              "t_end": 1790674566.263637,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.412,
+              "overlap_s": 0.221
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 1.818,
+              "t_send": 1790674566.2637272,
+              "t_end": 1790674568.081573,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.253,
+              "overlap_s": 0.288
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 2.001,
+              "t_send": 1790674568.082923,
+              "t_end": 1790674570.084026,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.219,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 1.093,
+              "t_send": 1790674570.085711,
+              "t_end": 1790674571.179032,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.223,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 2.805,
+              "t_send": 1790674572.3434272,
+              "t_end": 1790674575.148022,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.997,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 0.642,
+              "t_send": 1790674575.148182,
+              "t_end": 1790674575.78972,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 0.746,
+              "t_send": 1790674575.790025,
+              "t_end": 1790674576.535784,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.217,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 0.831,
+              "t_send": 1790674576.536166,
+              "t_end": 1790674577.367312,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.22,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 0.628,
+              "t_send": 1790674577.3678138,
+              "t_end": 1790674577.996107,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.42,
+              "overlap_s": 0.207
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 0.485,
+              "t_send": 1790674577.99618,
+              "t_end": 1790674578.481649,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.256,
+              "overlap_s": 0.229
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 0.43,
+              "t_send": 1790674578.4817579,
+              "t_end": 1790674578.912086,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.253,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 1.093,
+              "t_send": 1790674578.912179,
+              "t_end": 1790674580.005283,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 0.633,
+              "t_send": 1790674580.006072,
+              "t_end": 1790674580.6394482,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.412,
+              "overlap_s": 0.221
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 2.394,
+              "t_send": 1790674580.639529,
+              "t_end": 1790674583.033946,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.239,
+              "overlap_s": 0.315
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 0.824,
+              "t_send": 1790674583.0359292,
+              "t_end": 1790674583.8595881,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 2.018,
+              "t_send": 1790674583.8600261,
+              "t_end": 1790674585.877702,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.214,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 1,
+              "wall": 2.799,
+              "t_send": 1790674587.0949602,
+              "t_end": 1790674589.894464,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.992,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 2,
+              "wall": 0.635,
+              "t_send": 1790674589.894638,
+              "t_end": 1790674590.530079,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.219,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 3,
+              "wall": 0.696,
+              "t_send": 1790674590.530408,
+              "t_end": 1790674591.226698,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 4,
+              "wall": 0.666,
+              "t_send": 1790674591.227088,
+              "t_end": 1790674591.893536,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.217,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 5,
+              "wall": 0.627,
+              "t_send": 1790674591.893847,
+              "t_end": 1790674592.520627,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.419,
+              "overlap_s": 0.207
+            },
+            {
+              "session": 2,
+              "turn": 6,
+              "wall": 0.487,
+              "t_send": 1790674592.520718,
+              "t_end": 1790674593.008167,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.257,
+              "overlap_s": 0.229
+            },
+            {
+              "session": 2,
+              "turn": 7,
+              "wall": 0.429,
+              "t_send": 1790674593.008239,
+              "t_end": 1790674593.4371421,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.251,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 8,
+              "wall": 1.36,
+              "t_send": 1790674593.437223,
+              "t_end": 1790674594.797367,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 9,
+              "wall": 1.052,
+              "t_send": 1790674594.798524,
+              "t_end": 1790674595.850695,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.41,
+              "overlap_s": 0.496
+            },
+            {
+              "session": 2,
+              "turn": 10,
+              "wall": 1.687,
+              "t_send": 1790674595.8510091,
+              "t_end": 1790674597.5381792,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 11,
+              "wall": 0.845,
+              "t_send": 1790674597.539676,
+              "t_end": 1790674598.384597,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.215,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 12,
+              "wall": 0.844,
+              "t_send": 1790674598.3850791,
+              "t_end": 1790674599.229023,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.215,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 9,
+              "busy_s": 8.573,
+              "not_ok": 0,
+              "completion_tokens": 420
+            }
+          },
+          "overlap_with_main_s": 2.851,
+          "exit_s": [
+            0.504,
+            0.57,
+            0.544
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790674558.1691551,
+              "ended": 1790674571.684124,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.504,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790674571.684536,
+              "ended": 1790674586.4492018,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.57,
+              "rc": 0
+            },
+            {
+              "session": 2,
+              "started": 1790674586.44964,
+              "ended": 1790674599.773356,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.544,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 36,
+          "expected": 36
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 9,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 13,
+            "load1": {
+              "mean": 8.2,
+              "max": 8.34,
+              "min": 8.05
+            },
+            "gpu_device_pct": {
+              "mean": 2.5,
+              "max": 9,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 95.5,
+              "max": 96,
+              "min": 93
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 6.8,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.8,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.4,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 13,
+              "app_gpu_mean_pct": 12.0,
+              "app_gpu_p95_pct": 13.8,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 16.7,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 10.5
+        },
+        "during": {
+          "samples": 32,
+          "load1": {
+            "mean": 7.8,
+            "max": 9.15,
+            "min": 7.34
+          },
+          "gpu_device_pct": {
+            "mean": 92.7,
+            "max": 99,
+            "min": 68
+          },
+          "free_pct": {
+            "mean": 92.0,
+            "max": 92,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 52049,
+              "name": "mlx-serve",
+              "pct": 76.8,
+              "cmd": "/opt/homebrew/bin/mlx-serve --model ~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit --serve --host 127.0.0.1 --port 11234 --metrics",
+              "model": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            },
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 4.4,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.2,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 32,
+            "app_gpu_mean_pct": 6.3,
+            "app_gpu_p95_pct": 16.6,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 9,
+          "busy_pct": {
+            "mean": 21.6,
+            "max": 23.7,
+            "min": 20.2
+          }
+        },
+        "before_live": {
+          "t": 1790674543.4163651,
+          "load1": 8.34,
+          "free_pct": 92,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 9,
+          "gpu_renderer_pct": 8,
+          "gpu_tiler_pct": 8,
+          "gpu_in_use_mem_bytes": 22810394624,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            ],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 22033.3
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "omlx",
+          "backend_version": "0.7.0rc1",
+          "backend_sha": "0765dade2ba118f5",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.4.3",
+          "omp_sha": "b72ee39b7feb2d59",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "omlx",
+          "backend_version": "0.7.0rc1",
+          "backend_sha": "0765dade2ba118f5",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe_text",
+          "quantization": "4-bit",
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "9230b9d-dirty",
+        "created": "20260929T093645Z",
+        "tiers": [
+          "sess"
+        ],
+        "repeats": 3,
+        "label": "ab_b2"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "sess.turn.max_tool_calls": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 36
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 36
+        },
+        "sess.turn.wall_s": {
+          "value": 0.8039,
+          "better": "lower",
+          "spread": [
+            0.66,
+            0.9324
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 1.2481,
+          "better": "lower",
+          "spread": [
+            1.1554,
+            1.3489
+          ],
+          "n": 6
+        },
+        "sess.turn.pre_main_s": {
+          "value": 0.2463,
+          "better": "lower",
+          "spread": [
+            0.2293,
+            0.3907
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 0.5538,
+          "better": "lower",
+          "spread": [
+            0.5505,
+            0.5671
+          ],
+          "n": 6
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 36
+        },
+        "sess.memory.extract_s": {
+          "value": 1.052,
+          "better": "lower",
+          "spread": [
+            0.589,
+            1.072
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "FAIL"
+        }
+      },
+      "run_dir": "runs/20260929T093645Z__ab_b2__omlx__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.456,
+            "min": 0.349,
+            "max": 0.492,
+            "n": 6
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 3.017,
+              "t_send": 1790674624.6627269,
+              "t_end": 1790674627.680187,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.027,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 0.743,
+              "t_send": 1790674627.68045,
+              "t_end": 1790674628.423892,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.29,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 0.864,
+              "t_send": 1790674628.424022,
+              "t_end": 1790674629.288074,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.378,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 0.878,
+              "t_send": 1790674629.288197,
+              "t_end": 1790674630.166421,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.239,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 1.255,
+              "t_send": 1790674630.166611,
+              "t_end": 1790674631.4211981,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.557,
+              "overlap_s": 0.531
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 0.932,
+              "t_send": 1790674631.4213471,
+              "t_end": 1790674632.35372,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.391,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 0.845,
+              "t_send": 1790674632.353848,
+              "t_end": 1790674633.198634,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.291,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 0.804,
+              "t_send": 1790674633.198763,
+              "t_end": 1790674634.0027158,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.249,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 1.349,
+              "t_send": 1790674634.002837,
+              "t_end": 1790674635.351785,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.552,
+              "overlap_s": 0.51
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 0.91,
+              "t_send": 1790674635.351948,
+              "t_end": 1790674636.2622468,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.247,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 0.929,
+              "t_send": 1790674636.26239,
+              "t_end": 1790674637.191849,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.252,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 0.931,
+              "t_send": 1790674637.19199,
+              "t_end": 1790674638.123157,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.246,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 1.594,
+              "t_send": 1790674639.550106,
+              "t_end": 1790674641.1442409,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.043,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 0.699,
+              "t_send": 1790674641.144419,
+              "t_end": 1790674641.843282,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.238,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 0.748,
+              "t_send": 1790674641.8434198,
+              "t_end": 1790674642.591625,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.232,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 0.757,
+              "t_send": 1790674642.591743,
+              "t_end": 1790674643.348783,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.229,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 1.155,
+              "t_send": 1790674643.3489122,
+              "t_end": 1790674644.504321,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.567,
+              "overlap_s": 0.428
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 0.815,
+              "t_send": 1790674644.504477,
+              "t_end": 1790674645.31984,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.26,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 0.765,
+              "t_send": 1790674645.319968,
+              "t_end": 1790674646.084939,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.245,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 0.87,
+              "t_send": 1790674646.085082,
+              "t_end": 1790674646.955319,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.246,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 1.301,
+              "t_send": 1790674646.955468,
+              "t_end": 1790674648.2563221,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.551,
+              "overlap_s": 0.519
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 0.812,
+              "t_send": 1790674648.256501,
+              "t_end": 1790674649.06801,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.233,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 0.79,
+              "t_send": 1790674649.068139,
+              "t_end": 1790674649.8581529,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.252,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 0.882,
+              "t_send": 1790674649.858304,
+              "t_end": 1790674650.740381,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.246,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 1,
+              "wall": 1.533,
+              "t_send": 1790674652.075236,
+              "t_end": 1790674653.6087081,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.988,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 2,
+              "wall": 0.679,
+              "t_send": 1790674653.608893,
+              "t_end": 1790674654.2874408,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.242,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 3,
+              "wall": 0.66,
+              "t_send": 1790674654.287586,
+              "t_end": 1790674654.947602,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.245,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 4,
+              "wall": 0.75,
+              "t_send": 1790674654.9477482,
+              "t_end": 1790674655.698184,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.246,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 5,
+              "wall": 1.217,
+              "t_send": 1790674655.6983192,
+              "t_end": 1790674656.915301,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.553,
+              "overlap_s": 0.503
+            },
+            {
+              "session": 2,
+              "turn": 6,
+              "wall": 0.779,
+              "t_send": 1790674656.915468,
+              "t_end": 1790674657.694394,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.246,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 7,
+              "wall": 0.774,
+              "t_send": 1790674657.694518,
+              "t_end": 1790674658.468777,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.246,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 8,
+              "wall": 0.759,
+              "t_send": 1790674658.4689238,
+              "t_end": 1790674659.228012,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.23,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 9,
+              "wall": 1.242,
+              "t_send": 1790674659.228137,
+              "t_end": 1790674660.469791,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.555,
+              "overlap_s": 0.513
+            },
+            {
+              "session": 2,
+              "turn": 10,
+              "wall": 0.804,
+              "t_send": 1790674660.4699578,
+              "t_end": 1790674661.274434,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.251,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 11,
+              "wall": 0.858,
+              "t_send": 1790674661.27457,
+              "t_end": 1790674662.13242,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.309,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 12,
+              "wall": 0.797,
+              "t_send": 1790674662.132552,
+              "t_end": 1790674662.9296,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.254,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 9,
+              "busy_s": 8.198,
+              "not_ok": 4,
+              "completion_tokens": 446
+            }
+          },
+          "overlap_with_main_s": 3.003,
+          "exit_s": [
+            0.751,
+            0.691,
+            0.788
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790674624.00654,
+              "ended": 1790674638.874308,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.751,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790674638.874722,
+              "ended": 1790674651.431988,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.691,
+              "rc": 0
+            },
+            {
+              "session": 2,
+              "started": 1790674651.432338,
+              "ended": 1790674663.717389,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.788,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 36,
+          "expected": 36
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 9,
+          "not_ok": [
+            {
+              "purpose": "memory-extract",
+              "status": 200,
+              "aborted": true,
+              "total_s": 1.061
+            },
+            {
+              "purpose": "memory-extract",
+              "status": 200,
+              "aborted": true,
+              "total_s": 0.589
+            },
+            {
+              "purpose": "memory-extract",
+              "status": 200,
+              "aborted": true,
+              "total_s": 1.066
+            },
+            {
+              "purpose": "memory-extract",
+              "status": 200,
+              "aborted": true,
+              "total_s": 0.646
+            }
+          ]
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 13,
+            "load1": {
+              "mean": 8.7,
+              "max": 8.9,
+              "min": 8.46
+            },
+            "gpu_device_pct": {
+              "mean": 2.6,
+              "max": 10,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.0,
+              "max": 96,
+              "min": 96
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 6.9,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.7,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.1,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 13,
+              "app_gpu_mean_pct": 11.9,
+              "app_gpu_p95_pct": 13.7,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 18.2,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 12.7
+        },
+        "during": {
+          "samples": 30,
+          "load1": {
+            "mean": 8.9,
+            "max": 9.64,
+            "min": 8.31
+          },
+          "gpu_device_pct": {
+            "mean": 88.2,
+            "max": 97,
+            "min": 52
+          },
+          "free_pct": {
+            "mean": 92.7,
+            "max": 93,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 54173,
+              "name": "python3.13",
+              "pct": 68.3,
+              "cmd": "omlx-server"
+            },
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 4.8,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.2,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 30,
+            "app_gpu_mean_pct": 74.6,
+            "app_gpu_p95_pct": 86.1,
+            "app_spike_seconds": 27,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 8,
+          "busy_pct": {
+            "mean": 23.4,
+            "max": 26.3,
+            "min": 21.7
+          }
+        },
+        "before_live": {
+          "t": 1790674605.773571,
+          "load1": 8.9,
+          "free_pct": 96,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 9,
+          "gpu_renderer_pct": 9,
+          "gpu_tiler_pct": 9,
+          "gpu_in_use_mem_bytes": 2197864448,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 22095.7
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    },
+    {
+      "provenance": {
+        "pins": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "omp_version": "18.4.3",
+          "omp_sha": "b72ee39b7feb2d59",
+          "omp_path": "~/.bun/bin/omp",
+          "omp_child_config": "62eed267e219ddde",
+          "omp_mem_config": "019eef862b65ed03",
+          "omp_agent_config": "38b87e2b63396937",
+          "omp_mem_tools": "memory_edit,recall,reflect,retain",
+          "fixtures_sha": "41ff309f03a98aa5",
+          "macos_build": "25F84",
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        },
+        "fingerprint": {
+          "backend": "mlx-serve",
+          "backend_version": "26.9.2",
+          "backend_sha": "4d09a3beb8d4c9be",
+          "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+          "model_digest": "files:68dedceb5da0",
+          "backend_args": "",
+          "architecture": "qwen3_5_moe",
+          "quantization": "4-bit",
+          "mtp_loaded": true,
+          "loaded_context": 262144,
+          "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+        },
+        "localbench_rev": "9230b9d-dirty",
+        "created": "20260929T093747Z",
+        "tiers": [
+          "sess"
+        ],
+        "repeats": 3,
+        "label": "ab_a3"
+      },
+      "verdicts": {
+        "contended": false,
+        "must_fail": [],
+        "preflight_problems": [],
+        "allow_busy": false,
+        "pins_changed": {}
+      },
+      "metrics": {
+        "sess.turn.max_tool_calls": {
+          "value": 1,
+          "better": "lower",
+          "spread": [
+            0,
+            1
+          ],
+          "n": 36
+        },
+        "sess.turn.timeouts": {
+          "value": 0,
+          "better": "lower",
+          "spread": [
+            0,
+            0
+          ],
+          "n": 36
+        },
+        "sess.turn.wall_s": {
+          "value": 0.7433,
+          "better": "lower",
+          "spread": [
+            0.3914,
+            2.1712
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_wall_s": {
+          "value": 0.6411,
+          "better": "lower",
+          "spread": [
+            0.634,
+            1.8335
+          ],
+          "n": 6
+        },
+        "sess.turn.pre_main_s": {
+          "value": 0.2185,
+          "better": "lower",
+          "spread": [
+            0.2132,
+            0.2655
+          ],
+          "n": 27
+        },
+        "sess.turn.post_retain_pre_main_s": {
+          "value": 0.4172,
+          "better": "lower",
+          "spread": [
+            0.4132,
+            0.4234
+          ],
+          "n": 6
+        },
+        "sess.turn.ack_rate": {
+          "value": 1.0,
+          "better": "higher",
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "n": 36
+        },
+        "sess.memory.extract_s": {
+          "value": 0.898,
+          "better": "lower",
+          "spread": [
+            0.426,
+            1.725
+          ],
+          "n": 9
+        }
+      },
+      "conformance": {
+        "sess.turns_complete": {
+          "level": "MUST",
+          "verdict": "PASS"
+        },
+        "sess.memory_calls_ok": {
+          "level": "SHOULD",
+          "verdict": "PASS"
+        }
+      },
+      "run_dir": "runs/20260929T093747Z__ab_a3__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+      "details": {
+        "sess.turn": {
+          "neighbour_delta_s": {
+            "median": 0.204,
+            "min": -0.739,
+            "max": 0.619,
+            "n": 6
+          },
+          "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+          "turns": [
+            {
+              "session": 0,
+              "turn": 1,
+              "wall": 2.81,
+              "t_send": 1790674686.6154518,
+              "t_end": 1790674689.4259589,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 1.001,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 2,
+              "wall": 0.631,
+              "t_send": 1790674689.426123,
+              "t_end": 1790674690.056648,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 3,
+              "wall": 0.391,
+              "t_send": 1790674690.0569348,
+              "t_end": 1790674690.4483578,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 4,
+              "wall": 0.394,
+              "t_send": 1790674690.44844,
+              "t_end": 1790674690.842565,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 5,
+              "wall": 0.635,
+              "t_send": 1790674690.842647,
+              "t_end": 1790674691.477453,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.423,
+              "overlap_s": 0.21
+            },
+            {
+              "session": 0,
+              "turn": 6,
+              "wall": 0.465,
+              "t_send": 1790674691.4775481,
+              "t_end": 1790674691.9425511,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.265,
+              "overlap_s": 0.198
+            },
+            {
+              "session": 0,
+              "turn": 7,
+              "wall": 0.434,
+              "t_send": 1790674691.942626,
+              "t_end": 1790674692.376362,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.232,
+              "overlap_s": 0.2
+            },
+            {
+              "session": 0,
+              "turn": 8,
+              "wall": 0.927,
+              "t_send": 1790674692.376467,
+              "t_end": 1790674693.303225,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.231,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 9,
+              "wall": 1.534,
+              "t_send": 1790674693.3038132,
+              "t_end": 1790674694.837485,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.413,
+              "overlap_s": 0.485
+            },
+            {
+              "session": 0,
+              "turn": 10,
+              "wall": 1.122,
+              "t_send": 1790674694.838218,
+              "t_end": 1790674695.9601438,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.22,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 11,
+              "wall": 0.397,
+              "t_send": 1790674695.96085,
+              "t_end": 1790674696.357579,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 0,
+              "turn": 12,
+              "wall": 0.732,
+              "t_send": 1790674696.357674,
+              "t_end": 1790674697.08919,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.214,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 1,
+              "wall": 2.803,
+              "t_send": 1790674698.258326,
+              "t_end": 1790674701.061354,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.991,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 2,
+              "wall": 0.743,
+              "t_send": 1790674701.061527,
+              "t_end": 1790674701.804817,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 3,
+              "wall": 0.393,
+              "t_send": 1790674701.8052008,
+              "t_end": 1790674702.198376,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 4,
+              "wall": 0.396,
+              "t_send": 1790674702.1984608,
+              "t_end": 1790674702.593966,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.219,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 5,
+              "wall": 0.645,
+              "t_send": 1790674702.5940568,
+              "t_end": 1790674703.239172,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.42,
+              "overlap_s": 0.221
+            },
+            {
+              "session": 1,
+              "turn": 6,
+              "wall": 0.491,
+              "t_send": 1790674703.239255,
+              "t_end": 1790674703.7303622,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.254,
+              "overlap_s": 0.236
+            },
+            {
+              "session": 1,
+              "turn": 7,
+              "wall": 1.79,
+              "t_send": 1790674703.7304478,
+              "t_end": 1790674705.52042,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.259,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 8,
+              "wall": 0.904,
+              "t_send": 1790674705.521844,
+              "t_end": 1790674706.4259799,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.217,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 9,
+              "wall": 0.637,
+              "t_send": 1790674706.42651,
+              "t_end": 1790674707.0636532,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.413,
+              "overlap_s": 0.222
+            },
+            {
+              "session": 1,
+              "turn": 10,
+              "wall": 1.847,
+              "t_send": 1790674707.063741,
+              "t_end": 1790674708.911201,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.262,
+              "overlap_s": 0.29
+            },
+            {
+              "session": 1,
+              "turn": 11,
+              "wall": 0.836,
+              "t_send": 1790674708.9125261,
+              "t_end": 1790674709.74863,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 1,
+              "turn": 12,
+              "wall": 0.832,
+              "t_send": 1790674709.749078,
+              "t_end": 1790674710.581399,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 1,
+              "wall": 2.787,
+              "t_send": 1790674711.7279449,
+              "t_end": 1790674714.5147252,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.978,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 2,
+              "wall": 2.171,
+              "t_send": 1790674714.514888,
+              "t_end": 1790674716.686141,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 1,
+              "pre_main": 0.22,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 3,
+              "wall": 0.738,
+              "t_send": 1790674716.6874728,
+              "t_end": 1790674717.425418,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.219,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 4,
+              "wall": 1.579,
+              "t_send": 1790674717.4257898,
+              "t_end": 1790674719.004467,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.213,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 5,
+              "wall": 0.634,
+              "t_send": 1790674719.005656,
+              "t_end": 1790674719.6397069,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.421,
+              "overlap_s": 0.212
+            },
+            {
+              "session": 2,
+              "turn": 6,
+              "wall": 0.481,
+              "t_send": 1790674719.639803,
+              "t_end": 1790674720.1206841,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.25,
+              "overlap_s": 0.23
+            },
+            {
+              "session": 2,
+              "turn": 7,
+              "wall": 1.33,
+              "t_send": 1790674720.120766,
+              "t_end": 1790674721.4508271,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.255,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 8,
+              "wall": 1.219,
+              "t_send": 1790674721.451745,
+              "t_end": 1790674722.670778,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.218,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 9,
+              "wall": 1.834,
+              "t_send": 1790674722.6716201,
+              "t_end": 1790674724.5051332,
+              "ok": true,
+              "timeout": false,
+              "post_retain": true,
+              "tool_calls": 0,
+              "pre_main": 0.414,
+              "overlap_s": 0.48
+            },
+            {
+              "session": 2,
+              "turn": 10,
+              "wall": 1.211,
+              "t_send": 1790674724.506132,
+              "t_end": 1790674725.7166631,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.217,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 11,
+              "wall": 0.577,
+              "t_send": 1790674725.7175229,
+              "t_end": 1790674726.2943182,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.219,
+              "overlap_s": 0.0
+            },
+            {
+              "session": 2,
+              "turn": 12,
+              "wall": 0.923,
+              "t_send": 1790674726.2945569,
+              "t_end": 1790674727.2172601,
+              "ok": true,
+              "timeout": false,
+              "post_retain": false,
+              "tool_calls": 0,
+              "pre_main": 0.216,
+              "overlap_s": 0.0
+            }
+          ]
+        },
+        "sess.memory": {
+          "by_purpose": {
+            "memory-extract": {
+              "calls": 9,
+              "busy_s": 8.704,
+              "not_ok": 0,
+              "completion_tokens": 419
+            }
+          },
+          "overlap_with_main_s": 2.987,
+          "exit_s": [
+            0.541,
+            0.499,
+            0.542
+          ],
+          "sessions": [
+            {
+              "session": 0,
+              "started": 1790674685.9573739,
+              "ended": 1790674697.630402,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.541,
+              "rc": 0
+            },
+            {
+              "session": 1,
+              "started": 1790674697.630889,
+              "ended": 1790674711.0807948,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.499,
+              "rc": 0
+            },
+            {
+              "session": 2,
+              "started": 1790674711.081214,
+              "ended": 1790674727.7599092,
+              "turns": 12,
+              "failure": null,
+              "exit_s": 0.542,
+              "rc": 0
+            }
+          ]
+        },
+        "sess.turns_complete": {
+          "failures": [],
+          "turns": 36,
+          "expected": 36
+        },
+        "sess.memory_calls_ok": {
+          "memory_calls": 9,
+          "not_ok": []
+        }
+      },
+      "system": {
+        "preflight": {
+          "idle_check": {
+            "samples": 12,
+            "load1": {
+              "mean": 8.1,
+              "max": 8.2,
+              "min": 7.79
+            },
+            "gpu_device_pct": {
+              "mean": 1.9,
+              "max": 8,
+              "min": 0
+            },
+            "free_pct": {
+              "mean": 96.0,
+              "max": 96,
+              "min": 96
+            },
+            "swap_used_mb": {
+              "mean": 0.0,
+              "max": 0.0,
+              "min": 0.0
+            },
+            "pressure_levels": [
+              "normal"
+            ],
+            "resident_unknown_samples": 0,
+            "gpu_by_process": [
+              {
+                "pid": 65371,
+                "name": "Google Chrome fo",
+                "pct": 7.0,
+                "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+              },
+              {
+                "pid": 179,
+                "name": "WindowServer",
+                "pct": 2.7,
+                "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+              },
+              {
+                "pid": 9392,
+                "name": "Terminal",
+                "pct": 2.3,
+                "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+              }
+            ],
+            "load": {
+              "samples": 12,
+              "app_gpu_mean_pct": 12.3,
+              "app_gpu_p95_pct": 14.7,
+              "app_spike_seconds": 0,
+              "user_active_pct": 0.0
+            }
+          },
+          "cpu_busy_pct": 21.2,
+          "problems": [],
+          "allow_busy": false,
+          "waited_s": 12.6
+        },
+        "during": {
+          "samples": 32,
+          "load1": {
+            "mean": 7.7,
+            "max": 8.44,
+            "min": 7.23
+          },
+          "gpu_device_pct": {
+            "mean": 87.6,
+            "max": 99,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 92.0,
+            "max": 93,
+            "min": 92
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 56388,
+              "name": "mlx-serve",
+              "pct": 76.8,
+              "cmd": "/opt/homebrew/bin/mlx-serve --model ~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit --serve --host 127.0.0.1 --port 11234 --metrics",
+              "model": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            },
+            {
+              "pid": 65371,
+              "name": "Google Chrome fo",
+              "pct": 4.5,
+              "cmd": "~/.omp/puppeteer/chrome/mac_arm-150.0.7871.24/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.f"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 1.2,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            }
+          ],
+          "load": {
+            "samples": 32,
+            "app_gpu_mean_pct": 6.4,
+            "app_gpu_p95_pct": 14.6,
+            "app_spike_seconds": 0,
+            "user_active_pct": 0.0
+          }
+        },
+        "contention": [],
+        "power": {
+          "available": false,
+          "samples": 0,
+          "thermal_pressure": []
+        },
+        "cpu": {
+          "samples": 7,
+          "busy_pct": {
+            "mean": 21.7,
+            "max": 22.8,
+            "min": 21.1
+          }
+        },
+        "before_live": {
+          "t": 1790674668.5459871,
+          "load1": 8.66,
+          "free_pct": 92,
+          "swap_used_mb": 0.0,
+          "pressure_level": "normal",
+          "gpu_device_pct": 9,
+          "gpu_renderer_pct": 9,
+          "gpu_tiler_pct": 9,
+          "gpu_in_use_mem_bytes": 22805741568,
+          "resident": {
+            "ollama": [],
+            "mlx-serve": [
+              "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+            ],
+            "splash": [],
+            "omlx": [],
+            "mlx-smol": [],
+            "mlxfast": []
+          },
+          "user_idle_s": 22158.8
+        },
+        "host": {
+          "hostname": "mac-studio",
+          "model": "Mac15,14",
+          "chip": "Apple M3 Ultra",
+          "p_cores": 24,
+          "e_cores": 8,
+          "gpu_cores": 80,
+          "mem_gb": 512,
+          "macos": "26.5.2",
+          "macos_build": "25F84",
+          "gpu_wired_limit_mb": null,
+          "host_id": "mac-studio-apple-m3-ultra-512gb"
+        }
+      }
+    }
+  ]
+}

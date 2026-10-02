@@ -1,0 +1,227 @@
+[
+  {
+    "label": "hosted probabilities are renormalized to sum to one",
+    "file": "localbench/jevsuites.py",
+    "old": "ps = {k: raw[k] / total for k in options}",
+    "new": "ps = {k: raw[k] for k in options}",
+    "tests": [
+      "tests.test_jevsuites.Banking77.test_subset_references_renormalize_hosted_probabilities_onto_humanized_candidates"
+    ]
+  },
+  {
+    "label": "Banking77 candidate labels are lowercased like run.py humanize",
+    "file": "localbench/jevsuites.py",
+    "old": "labels = {c.replace(\"_\", \" \").lower(): c for c in intents}",
+    "new": "labels = {c.replace(\"_\", \" \"): c for c in intents}",
+    "tests": [
+      "tests.test_jevsuites.Banking77.test_subset_references_renormalize_hosted_probabilities_onto_humanized_candidates"
+    ]
+  },
+  {
+    "label": "every pinned source is in the manifest, not only hosted.jsonl",
+    "file": "localbench/jevsuites.py",
+    "old": "sources=[*src.paths, hosted_path],",
+    "new": "sources=[hosted_path],",
+    "tests": [
+      "tests.test_jevsuites.Banking77.test_subset_references_renormalize_hosted_probabilities_onto_humanized_candidates"
+    ]
+  },
+  {
+    "label": "chunks leave a slot for none-of-these",
+    "file": "localbench/jevsuites.py",
+    "old": "cap: int = decision.MAX_CANDIDATES - 1",
+    "new": "cap: int = decision.MAX_CANDIDATES",
+    "tests": [
+      "tests.test_jevsuites.Banking77.test_chunks_are_fewest_balanced_and_leave_room_for_none_of_these"
+    ]
+  },
+  {
+    "label": "the chunk holding the gold intent is labelled with it",
+    "file": "localbench/jevsuites.py",
+    "old": "gold if gold in q[\"criteria\"] else B77_NONE",
+    "new": "B77_NONE",
+    "tests": [
+      "tests.test_jevsuites.Banking77.test_chunked_full_set_puts_each_intent_in_one_chunk_and_none_of_these_elsewhere"
+    ]
+  },
+  {
+    "label": "score reference is recomputed from the renormalized probabilities",
+    "file": "localbench/jevsuites.py",
+    "old": "score = sum(j * ps[str(j)] for j in range(len(options)))",
+    "new": "score = h[\"score\"]",
+    "tests": [
+      "tests.test_jevsuites.ScoreAndNoul.test_sst5_reference_recomputes_score_from_renormalized_probabilities"
+    ]
+  },
+  {
+    "label": "SciFact label is the corpus truth, never the hosted answer",
+    "file": "localbench/jevsuites.py",
+    "old": "\"labels\": {\"supports\": r[\"truth\"]}",
+    "new": "\"labels\": {\"supports\": h[\"noul\"] > 0.5}",
+    "tests": [
+      "tests.test_jevsuites.ScoreAndNoul.test_scifact_label_is_corpus_truth_not_the_hosted_answer"
+    ]
+  },
+  {
+    "label": "hosted rows from another model are refused",
+    "file": "localbench/jevsuites.py",
+    "old": "if row.get(\"model\") != HOSTED_MODEL:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_jevsuites.ScoreAndNoul.test_non_boolean_truth_and_foreign_hosted_model_are_refused"
+    ]
+  },
+  {
+    "label": "rerank keeps only single-relevant queries",
+    "file": "localbench/jevsuites.py",
+    "old": "if len(relevant) != 1:",
+    "new": "if not relevant:",
+    "tests": [
+      "tests.test_jevsuites.Rerank.test_keeps_single_relevant_queries_with_passages_in_bm25_order"
+    ]
+  },
+  {
+    "label": "rerank archive must be the one the receipt pins",
+    "file": "localbench/jevsuites.py",
+    "old": "if _sha256(zip_path) != receipt.get(\"dataset_zip_sha256\"):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_jevsuites.Rerank.test_archive_other_than_the_receipts_is_refused"
+    ]
+  },
+  {
+    "label": "a harm item asks only its own clause",
+    "file": "localbench/jevsuites.py",
+    "old": "questions, value = {name: GATE_RISK[name]}, True",
+    "new": "questions, value = dict(GATE_RISK), True",
+    "tests": [
+      "tests.test_jevsuites.BashGate.test_harm_item_asks_only_its_clause_and_no_harm_item_asks_all_five"
+    ]
+  },
+  {
+    "label": "harm clause 2 maps to the publish question",
+    "file": "localbench/jevsuites.py",
+    "old": "\"2\": (\"irreversible_publish\",",
+    "new": "\"2\": (\"exfiltration\",",
+    "tests": [
+      "tests.test_jevsuites.BashGate.test_harm_item_asks_only_its_clause_and_no_harm_item_asks_all_five"
+    ]
+  },
+  {
+    "label": "hosted gate rows run under another label are refused",
+    "file": "localbench/jevsuites.py",
+    "old": "if row.get(\"label\") != label:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_jevsuites.BashGate.test_hosted_row_run_under_another_label_is_refused"
+    ]
+  },
+  {
+    "label": "1lim label falls back to adjudication on disagreement",
+    "file": "localbench/jevsuites.py",
+    "old": "a.get(r[\"id\"]) if a.get(r[\"id\"]) == bl.get(r[\"id\"]) else adj.get(r[\"id\"])",
+    "new": "a.get(r[\"id\"])",
+    "tests": [
+      "tests.test_jevsuites.BashGate.test_1lim_label_is_the_labellers_agreement_else_the_adjudication"
+    ]
+  },
+  {
+    "label": "planted middle splits at the UTF-16 midpoint",
+    "file": "localbench/jevsuites.py",
+    "old": "\"middle\": n // 2",
+    "new": "\"middle\": len(base) // 2",
+    "tests": [
+      "tests.test_jevsuites.Injection.test_planted_text_splits_at_the_utf16_midpoint_hosted_was_sent"
+    ]
+  },
+  {
+    "label": "rebuilt injection text must be what hosted was sent",
+    "file": "localbench/jevsuites.py",
+    "old": "if h is not None and h[1].get(\"inputSha256\") != sha:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_jevsuites.Injection.test_text_hosted_was_not_sent_is_refused"
+    ]
+  },
+  {
+    "label": "runner drift is refused",
+    "file": "localbench/jevsuites.py",
+    "old": "missing = [s for s in literals if s not in text]",
+    "new": "missing = []",
+    "tests": [
+      "tests.test_jevsuites.Refusals.test_runner_drift_is_refused_before_anything_is_written"
+    ]
+  },
+  {
+    "label": "output inside a git work tree is refused",
+    "file": "localbench/jevsuites.py",
+    "old": "if (p / \".git\").exists():",
+    "new": "if False:",
+    "tests": [
+      "tests.test_jevsuites.Refusals.test_output_inside_a_git_work_tree_or_the_jev_repo_is_refused"
+    ]
+  },
+  {
+    "label": "no default gate: a missing gate is refused, not replaced by a placeholder bar",
+    "file": "localbench/jevsuites.py",
+    "old": "raise BuildError(f\"{name}: an explicit gate is required, e.g. {{\\\"decision.noul.accuracy\\\": {{\\\"min\\\": 0.8}}}}\")",
+    "new": "gate = {\"decision.noul.accuracy\": {\"min\": 0.0}}",
+    "tests": [
+      "tests.test_jevsuites.Refusals.test_missing_or_malformed_gate_is_refused_before_anything_is_written"
+    ]
+  },
+  {
+    "label": "gate metrics are checked against the suite's question type before writing",
+    "file": "localbench/jevsuites.py",
+    "old": "metric not in allowed or not isinstance(bound, dict) or len(bound) != 1",
+    "new": "False",
+    "tests": [
+      "tests.test_jevsuites.Refusals.test_missing_or_malformed_gate_is_refused_before_anything_is_written"
+    ]
+  },
+  {
+    "label": "source paths are confined to the proj-b root after realpath",
+    "file": "localbench/jevsuites.py",
+    "old": "if self.root not in path.parents:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_jevsuites.Rerank.test_receipt_row_paths_leading_out_of_the_jev_root_are_refused"
+    ]
+  },
+  {
+    "label": "the output entry may not be a symlink out of out_root",
+    "file": "localbench/jevsuites.py",
+    "old": "if target.is_symlink() or target.resolve().parent != out:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_jevsuites.Refusals.test_output_entry_symlinked_out_of_the_out_root_is_refused"
+    ]
+  },
+  {
+    "label": "an invalid hosted value is recorded only as a reason class",
+    "file": "localbench/jevsuites.py",
+    "old": "raise _Skip(\"hosted answer invalid\") from None",
+    "new": "raise _Skip(f\"hosted answer invalid ({answer})\") from None",
+    "tests": [
+      "tests.test_jevsuites.Refusals.test_invalid_hosted_value_is_recorded_as_id_and_reason_class_only"
+    ]
+  },
+  {
+    "label": "suite files are written owner-only",
+    "file": "localbench/jevsuites.py",
+    "old": "DIR_MODE, FILE_MODE = 0o700, 0o600",
+    "new": "DIR_MODE, FILE_MODE = 0o700, 0o644",
+    "tests": [
+      "tests.test_jevsuites.Refusals.test_suite_directory_and_files_are_owner_only_even_over_a_looser_earlier_build"
+    ]
+  },
+  {
+    "label": "suite directories are written owner-only",
+    "file": "localbench/jevsuites.py",
+    "old": "DIR_MODE, FILE_MODE = 0o700, 0o600",
+    "new": "DIR_MODE, FILE_MODE = 0o755, 0o600",
+    "tests": [
+      "tests.test_jevsuites.Refusals.test_suite_directory_and_files_are_owner_only_even_over_a_looser_earlier_build"
+    ]
+  }
+]

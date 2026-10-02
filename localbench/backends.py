@@ -13,11 +13,47 @@ import shutil
 import socket
 import subprocess
 import tempfile
+import threading
 import time
 import urllib.request
 from functools import cache
 from pathlib import Path
 from typing import Self
+
+_OWNED_STOP_LOCK = threading.Lock()
+_OWNED_STOP_LOG: list[dict] = []
+
+
+def owned_stop_events() -> list[dict]:
+    """Snapshot completed child stops so the sampler can match probe gaps to their exact process window."""
+    with _OWNED_STOP_LOCK:
+        return [{**event, "pre": list(event["pre"]) if event["pre"] is not None else None}
+                for event in _OWNED_STOP_LOG]
+
+
+def _record_owned_stop(event: dict) -> None:
+    with _OWNED_STOP_LOCK:
+        _OWNED_STOP_LOG.append(event)
+
+
+def _loaded_prestate(url: str) -> list[str] | None:
+    """Return loaded model IDs only when the server gave a complete, readable model list."""
+    try:
+        payload = _get(url)
+    except Exception:
+        return None
+    if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
+        return None
+    ids = []
+    for model in payload["data"]:
+        if not isinstance(model, dict) or type(model.get("loaded")) is not bool:
+            return None
+        if model["loaded"]:
+            model_id = model.get("id")
+            if not isinstance(model_id, str):
+                return None
+            ids.append(model_id)
+    return sorted(ids)
 
 
 def _get(url: str, timeout: float = 10) -> dict:
@@ -69,6 +105,23 @@ def splash_pin() -> dict:
     return {"splash_version": version, "splash_sha": sha16(binary)}
 
 
+def _ollama_tokenizer_identity(model_info: dict | None) -> str | None:
+    """Hash Ollama's reported GGML tokenizer metadata when its vocabulary and algorithm are present."""
+    if not isinstance(model_info, dict):
+        return None
+    fields = {key: value for key, value in model_info.items() if key.startswith("tokenizer.ggml.")}
+    tokens = fields.get("tokenizer.ggml.tokens")
+    if (not isinstance(fields.get("tokenizer.ggml.model"), str) or not fields["tokenizer.ggml.model"]
+            or not isinstance(tokens, list) or not tokens or any(not isinstance(token, str) for token in tokens)):
+        return None
+    digest = hashlib.sha256()
+    for key, value in sorted(fields.items()):
+        digest.update(key.encode("utf-8") + b"\0")
+        digest.update(json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
+        digest.update(b"\0")
+    return f"ollama-ggml-sha256:{digest.hexdigest()}"
+
+
 def _warm(base_url: str, model: str) -> None:
     _post(base_url + "/chat/completions",
           {"model": model, "messages": [{"role": "user", "content": "hi"}], "max_tokens": 1})
@@ -114,13 +167,19 @@ class Ollama:
         show = _post(self.root + "/api/show", {"model": model})
         running = {m["name"]: m for m in self.loaded()}
         details = show.get("details", {})
+        model_info = show.get("model_info") or {}
         return {
             **self.pins(model),
-            "architecture": show.get("model_info", {}).get("general.architecture"),
+            "architecture": model_info.get("general.architecture"),
             "quantization": details.get("quantization_level"),
             "parameters": details.get("parameter_size"),
             "loaded_context": running.get(model, {}).get("context_length"),
         }
+
+    def tokenizer_identity(self, model: str) -> str | None:
+        """Hash the complete tokenizer table from Ollama's verbose model report, not model names or architecture."""
+        show = _post(self.root + "/api/show", {"model": model, "verbose": True})
+        return _ollama_tokenizer_identity(show.get("model_info"))
 
 
 def mlx_serve_bin() -> str:
@@ -187,12 +246,27 @@ class MlxServe:
             time.sleep(1)
 
     def stop(self) -> None:
-        if self._proc and self._proc.poll() is None:
-            self._proc.terminate()
+        proc = self._proc
+        if proc and proc.poll() is None:
+            pre = _loaded_prestate(self.base_url + "/models")
+            t_term = time.monotonic()
+            killed = False
+            rc = None
             try:
-                self._proc.wait(timeout=30)
-            except subprocess.TimeoutExpired:
-                self._proc.kill()
+                proc.terminate()
+                try:
+                    rc = proc.wait(timeout=30)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    killed = True
+                    try:
+                        rc = proc.wait(timeout=30)
+                    except subprocess.TimeoutExpired:
+                        rc = None
+            finally:
+                _record_owned_stop({"server": self.name, "port": self.port, "pid": proc.pid, "t_term": t_term,
+                                    "t_exit": time.monotonic() if rc is not None else None,
+                                    "pre": pre, "rc": rc, "killed": killed})
         self._proc = None
 
     def __enter__(self) -> Self:
@@ -229,6 +303,11 @@ class MlxServe:
             if p.is_file():
                 h.update(p.read_bytes())
         return "files:" + h.hexdigest()[:12]
+
+    def tokenizer_identity(self, model: str) -> str | None:
+        """This server exposes no tokenizer report; keep legacy backend-only replay comparison."""
+        return None
+
 
     def pins(self, model: str) -> dict:
         binary = mlx_serve_bin()
@@ -304,18 +383,19 @@ class OMLX(MlxServe):
 
     def fingerprint(self, model: str) -> dict:
         row = next((m for m in self.models() if m["id"] == model), {})
-        cfg = {}
-        with contextlib.suppress(OSError, ValueError):
-            cfg = json.loads((self.model_dir / "config.json").read_text())
-        text = cfg.get("text_config") or cfg
-        quant = cfg.get("quantization") or {}
-        return {
-            **self.pins(model),
-            "architecture": text.get("model_type") or cfg.get("model_type"),
-            "quantization": f"{quant['bits']}-bit" if quant.get("bits") else None,
-            "loaded_context": row.get("max_model_len"),
-            "model_dir": str(self.model_dir),
-        }
+        return {**self.pins(model), **config_meta(self.model_dir), "loaded_context": row.get("max_model_len"),
+                "model_dir": str(self.model_dir)}
+
+
+def config_meta(model_dir: Path) -> dict:
+    """Architecture and quantization from a model dir's config.json, for servers whose /v1/models does not say."""
+    cfg = {}
+    with contextlib.suppress(OSError, ValueError):
+        cfg = json.loads((model_dir / "config.json").read_text())
+    text = cfg.get("text_config") or cfg
+    quant = cfg.get("quantization") or {}
+    return {"architecture": text.get("model_type") or cfg.get("model_type"),
+            "quantization": f"{quant['bits']}-bit" if quant.get("bits") else None}
 
 
 def omlx_sha() -> str | None:
@@ -327,3 +407,76 @@ def omlx_sha() -> str | None:
     env = Path(exe).resolve().parent.parent
     records = sorted(env.glob("lib/python*/site-packages/omlx-*.dist-info/RECORD"))
     return sha16(str(records[-1])) if records else None
+
+
+def mlxfast_bin() -> str:
+    """The Layr-Labs mlx-server every mlxfast launch and pin uses: LOCALBENCH_MLXFAST, else PATH's `mlx-server`. Read at
+    every call, so ab --b-mlxfast reaches the B legs' launches and pins alike."""
+    return os.environ.get("LOCALBENCH_MLXFAST") or shutil.which("mlx-server") or "mlx-server"
+
+
+def git_commit(binary: str) -> str | None:
+    """HEAD of the git tree holding `binary` (git walks up from its directory), None outside one. mlx-server has no
+    --version: the commit it was built from plus its sha16 are its generation. The directory is not resolved: a
+    symlink inside the tree would lead out of it. The caller's GIT_* variables are dropped: under a git hook GIT_DIR /
+    GIT_INDEX_FILE point at the caller's repository, and rev-parse would answer for it instead (2026-09-26)."""
+    if not Path(binary).is_file():
+        return None     # an unresolved bare name would ask the caller's cwd: localbench's own commit
+    try:
+        p = subprocess.run(["git", "-C", str(Path(binary).absolute().parent), "rev-parse", "HEAD"],
+                           capture_output=True, text=True, timeout=10, check=False,
+                           env={k: v for k, v in os.environ.items() if not k.startswith("GIT_")})
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return (p.stdout.strip() or None) if p.returncode == 0 else None
+
+
+class MlxFast(MlxServe):
+    """Layr-Labs mlx-server (MLX.FAST Bonsai 2 engine, github.com/Layr-Labs/mlxfast-bonsai2-27b-engine) pinned to one
+    model directory, started and stopped by the harness like mlx-serve; a restart drops its caches. It serves the
+    --model string as the model id, returns reasoning in message.reasoning_content and tool calls structured (the
+    xml_function / qwen3 parsers). Without mlx.metallib beside the binary it exits rc=133 with no output, so start
+    refuses first. Port 11237 (11234 mlx-serve, 11235 smol, 11236 oMLX, 11299 proxy). Ready (listening) took 1-2 s
+    with the weights in the page cache and 60-120 s cold (2026-09-26, build 88cf569 on this M3 Ultra; HEAD f616f65
+    emitted gibberish here)."""
+
+    name = "mlxfast"
+
+    def __init__(self, model_dir: str | Path, extra_args: tuple[str, ...] = (), host: str = "127.0.0.1",
+                 port: int = 11237):
+        super().__init__(model_dir, (), host, port)
+        self.extra_args = tuple(extra_args)
+        self.log = Path("/tmp") / f"{self.model_dir.name}.mlxfast.log"
+
+    def _spawn(self, log) -> subprocess.Popen:
+        binary = mlxfast_bin()
+        if not (Path(binary).absolute().parent / "mlx.metallib").is_file():
+            raise RuntimeError(f"no mlx.metallib beside {binary}: mlx-server would exit rc=133 without a word; copy "
+                               "it from the build's .build/release")
+        return subprocess.Popen(
+            [binary, "--model", str(self.model_dir), "--host", self.host, "--port", str(self.port),
+             "--tool-call-parser", "xml_function", "--reasoning-parser", "qwen3", *self.extra_args],
+            stdout=log, stderr=subprocess.STDOUT)
+
+    def pins(self, model: str) -> dict:
+        binary = mlxfast_bin()
+        return {
+            "backend": self.name,
+            "backend_version": git_commit(binary),
+            "backend_sha": sha16(binary) if Path(binary).is_file() else None,
+            "model": model,
+            "model_digest": self.model_digest(),
+            "backend_args": " ".join(self.extra_args),
+        }
+
+    def fingerprint(self, model: str) -> dict:
+        # /v1/models carries only the id (checked 2026-09-26) and mlx-server applies no context cap (its
+        # Libraries/MLXLMServer has no maxKVSize / context-length setting at 88cf569): the context it can serve is the
+        # checkpoint's max_position_embeddings. omp's tiers refuse to run without a context, so its source is recorded.
+        cfg = {}
+        with contextlib.suppress(OSError, ValueError):
+            cfg = json.loads((self.model_dir / "config.json").read_text())
+        ctx = (cfg.get("text_config") or {}).get("max_position_embeddings") or cfg.get("max_position_embeddings")
+        return {**self.pins(model), **config_meta(self.model_dir), "loaded_context": ctx,
+                "loaded_context_source": "config.max_position_embeddings (server applies no cap)" if ctx else None,
+                "model_dir": str(self.model_dir)}

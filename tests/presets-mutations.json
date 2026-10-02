@@ -1,0 +1,121 @@
+[
+  {
+    "label": "apply backs up every profile file before writing",
+    "file": "localbench/presets.py",
+    "old": "                _atomic_write(Path(record[\"backup\"]), src.read_bytes(), 0o600)",
+    "new": "                pass",
+    "tests": ["tests.test_presets.Applying.test_apply_backs_up_writes_reads_back_and_rollback_restores_identical_bytes"]
+  },
+  {
+    "label": "readback mismatch restores every file before raising",
+    "file": "localbench/presets.py",
+    "old": "            _restore(manifest[\"files\"])\n        except BaseException as failed:",
+    "new": "            pass\n        except BaseException as failed:",
+    "tests": ["tests.test_presets.Applying.test_readback_mismatch_restores_every_profile_file_and_raises"]
+  },
+  {
+    "label": "live proof baseline is each target profile's own current route",
+    "file": "localbench/presets.py",
+    "old": "features.incumbent(row, *current[prof], \"current route\")",
+    "new": "features.incumbent(row, *current[next(iter(routes))], \"current route\")",
+    "tests": ["tests.test_presets.Applying.test_live_proof_is_graded_against_each_target_profiles_own_current_route"]
+  },
+  {
+    "label": "profile names are plain names, never ./ aliases or ../ escapes",
+    "file": "localbench/presets.py",
+    "old": "if not isinstance(profile, str) or not _PROFILE.fullmatch(profile) or \"..\" in profile:",
+    "new": "if not isinstance(profile, str):",
+    "tests": ["tests.test_presets.Confinement.test_profile_aliases_escapes_and_symlinked_agent_dirs_are_refused_before_any_write"]
+  },
+  {
+    "label": "a profile's agent dir must resolve inside ~/.omp",
+    "file": "localbench/presets.py",
+    "old": "if agent.resolve() != allowed:",
+    "new": "if False:",
+    "tests": ["tests.test_presets.Confinement.test_profile_aliases_escapes_and_symlinked_agent_dirs_are_refused_before_any_write"]
+  },
+  {
+    "label": "a failed restore is recorded as restore_failed",
+    "file": "localbench/presets.py",
+    "old": "manifest[\"status\"] = \"restore_failed\"",
+    "new": "manifest[\"status\"] = \"applying\"",
+    "tests": ["tests.test_presets.Confinement.test_failed_restore_leaves_a_manifest_that_rollback_finishes"]
+  },
+  {
+    "label": "rollback finishes an apply whose restore failed",
+    "file": "localbench/presets.py",
+    "old": "ROLLBACKABLE = (\"applied\", \"applying\", \"restore_failed\")",
+    "new": "ROLLBACKABLE = (\"applied\",)",
+    "tests": ["tests.test_presets.Confinement.test_failed_restore_leaves_a_manifest_that_rollback_finishes"]
+  },
+  {
+    "label": "live apply refuses an UNPROVEN local preset",
+    "file": "localbench/presets.py",
+    "old": "for prof, q in per.items() if q[\"proof\"] != \"PROVEN\"}",
+    "new": "for prof, q in per.items() if q[\"proof\"] not in (\"PROVEN\", \"UNPROVEN\")}",
+    "tests": ["tests.test_presets.Applying.test_live_local_preset_needs_every_family_feature_proven_unless_forced"]
+  },
+  {
+    "label": "live apply refuses a STALE local preset",
+    "file": "localbench/presets.py",
+    "old": "for prof, q in per.items() if q[\"proof\"] != \"PROVEN\"}",
+    "new": "for prof, q in per.items() if q[\"proof\"] not in (\"PROVEN\", \"STALE\")}",
+    "tests": ["tests.test_presets.Applying.test_live_local_preset_needs_every_family_feature_proven_unless_forced"]
+  },
+  {
+    "label": "live proof must pin the digest of the model the preset routes to",
+    "file": "localbench/presets.py",
+    "old": "graded = features.proof_status(found.get(row[\"feature\"], []), sha, model, digest,",
+    "new": "graded = features.proof_status(found.get(row[\"feature\"], []), sha, None, None,",
+    "tests": ["tests.test_presets.Applying.test_live_local_preset_needs_every_family_feature_proven_unless_forced"]
+  },
+  {
+    "label": "test target cannot write a live profile",
+    "file": "localbench/presets.py",
+    "old": "outside = [p for p in profiles if p not in reg[\"test_profiles\"]]",
+    "new": "outside = []",
+    "tests": ["tests.test_presets.Planning.test_test_target_refuses_a_non_test_profile_even_when_forced"]
+  },
+  {
+    "label": "role preset keeps the roles localbench does not own",
+    "file": "localbench/presets.py",
+    "old": "return {**(value or {}), op[\"role\"]: op[\"selector\"]}",
+    "new": "return {op[\"role\"]: op[\"selector\"]}",
+    "tests": ["tests.test_presets.Planning.test_plan_changes_only_owned_entries_and_writes_nothing"]
+  },
+  {
+    "label": "default profile writes run without the caller's OMP_PROFILE",
+    "file": "localbench/presets.py",
+    "old": "    env = omp_env()\n    if profile != \"default\":",
+    "new": "    env = dict(os.environ)\n    if profile != \"default\":",
+    "tests": ["tests.test_presets.Applying.test_live_writes_each_profile_through_its_own_omp_profile_whatever_the_caller_profile"]
+  },
+  {
+    "label": "keep-old sessions are matched to their own profile",
+    "file": "localbench/presets.py",
+    "old": "step = changed.get((session[\"profile\"], key))",
+    "new": "step = next((s for (_p, k), s in changed.items() if k == key), None)",
+    "tests": ["tests.test_presets.Planning.test_only_running_sessions_on_a_changed_profile_are_named_as_keeping_the_old_thinking_level"]
+  },
+  {
+    "label": "rollback refuses to undo a later change",
+    "file": "localbench/presets.py",
+    "old": "if later and not force:",
+    "new": "if False:",
+    "tests": ["tests.test_presets.DriftAndRollback.test_rollback_refuses_to_undo_a_later_change_unless_forced"]
+  },
+  {
+    "label": "drift compares the managed provider block",
+    "file": "localbench/presets.py",
+    "old": "ok, key, expected = actual == e[\"block\"], ",
+    "new": "ok, key, expected = True, ",
+    "tests": ["tests.test_presets.DriftAndRollback.test_drift_reports_owned_values_changed_after_apply_and_ignores_unowned_ones"]
+  },
+  {
+    "label": "preset registry rejects keys localbench does not own",
+    "file": "localbench/presets.py",
+    "old": "op.get(\"key\") not in OWNED_KEYS[1:]:",
+    "new": "op.get(\"key\") is None:",
+    "tests": ["tests.test_presets.Registry.test_preset_writing_a_key_localbench_does_not_own_does_not_load"]
+  }
+]

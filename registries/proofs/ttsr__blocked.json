@@ -1,0 +1,53 @@
+{
+  "assertions": [
+    {
+      "id": "paired-vs-recorded",
+      "params": {
+        "alpha": 0.05,
+        "min_n": 100,
+        "rule": "NOT_WORSE",
+        "seed": 20261001
+      },
+      "type": "paired"
+    },
+    {
+      "id": "gate-accuracy",
+      "params": {
+        "max": null,
+        "metric": "decision.noul.accuracy",
+        "min": 0.9
+      },
+      "type": "metric"
+    }
+  ],
+  "blocked": {
+    "reason": "no positives: 2 positives below JUDGED_RULE_THRESHOLD 0.7, recall unmeasurable; needs positives from ttsr.judge-on sessions or a higher base-rate rule, then a recall-sensitive gate",
+    "since": "2026-10-01"
+  },
+  "candidates": [
+    {
+      "preset": "judge:nimble"
+    },
+    {
+      "preset": "judge:tev1"
+    }
+  ],
+  "dataset": {
+    "items_sha256": "c04baa19908c84b56fdbac730d6890db3950a30e0a3cfc5e119ee82bc0b8f6c6",
+    "suite": "decision.noul/ttsr-judge-jevlatest-20261001"
+  },
+  "description": "kit-klx: ttsr-judge on 543 root-cache items (typesafe labels). Blocked, never runnable as filed: a screen here can only REJECT, never ADVANCE.",
+  "feature": "ttsr-judge",
+  "fresh_per_round": false,
+  "kind": "decision",
+  "regime": "side",
+  "repeats": 1,
+  "seed": 20261001,
+  "stage": "screen",
+  "wins": [
+    {
+      "metric": "privacy"
+    }
+  ],
+  "wins_needed": 1
+}

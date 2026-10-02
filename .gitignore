@@ -3,3 +3,6 @@ fixtures/omp/.capture/
 *.actual
 __pycache__/
 .venv/
+.ntm/
+.beads/beads.db-*
+.beads/beads.db.*

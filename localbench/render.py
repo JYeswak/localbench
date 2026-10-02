@@ -168,7 +168,9 @@ def _system(leg: dict) -> dict:
     # Whole-machine CPU busy (top). Across 35 legs 2026-09-23..25 it tracked mlx-serve decode (160 tok/s at <=12%
     # busy, 29-79 at 37-40%); a leg table without it hides the largest confounder on this host.
     busy = (sysd.get("cpu") or {}).get("busy_pct") or {}
-    return {"contended": "yes" if v.get("contended") else "no", "must_fail": ", ".join(v.get("must_fail") or []) or "0",
+    return {"contended": "yes" if v.get("contended") else "no",
+            "owned_stop": num(during.get("resident_owned_stop_samples")),
+            "must_fail": ", ".join(v.get("must_fail") or []) or "0",
             "preflight": "ok" if not pre else clip("; ".join(pre), 80),
             "gpu": f"{num(gpu.get('mean'))}/{num(gpu.get('max'))}",
             "other_gpu": f"{top['name']} {num(top.get('pct'))}" if top else "—",
@@ -189,6 +191,32 @@ def _conformance(legs: list[tuple[str, dict]]) -> list[str]:
     return out
 
 
+def _summary_problems(summary: dict) -> list[str]:
+    """Mirror the run soundness gates for a summary without importing __main__ (which imports this renderer)."""
+    verdicts = summary.get("verdicts") or {}
+    problems = []
+    if summary.get("evaluation_campaign"):
+        problems.append("behavioral evaluation campaign: these runs are not performance or golden evidence")
+    if verdicts.get("contended"):
+        problems.append("CONTENDED: another model was resident or running during the run (system.contention)")
+    during = (summary.get("system") or {}).get("during") or {}
+    if not isinstance(during, dict) or "resident_unknown_samples" not in during:
+        problems.append("residency sampling incomplete: resident_unknown_samples is missing; run is non-proof")
+    elif during["resident_unknown_samples"]:
+        problems.append(
+            f"resident model state unknown in {during['resident_unknown_samples']} sampler sample(s); run is non-proof")
+    if verdicts.get("must_fail"):
+        problems.append(f"MUST FAIL: {', '.join(verdicts['must_fail'])}")
+    for case, entry in sorted((summary.get("conformance") or {}).items()):
+        if entry.get("level") == "MUST" and entry.get("verdict") == "VOID":
+            problems.append(f"MUST VOID: {case} (required conformance was not established)")
+    if verdicts.get("preflight_problems"):
+        problems.append(f"preflight: {'; '.join(verdicts['preflight_problems'])}")
+    if verdicts.get("pins_changed"):
+        problems.append(f"PINS CHANGED mid-run (another generation measured part of it): {verdicts['pins_changed']}")
+    return problems
+
+
 def show(doc: dict, label: str, *, cursor: int = 0, limit: int = PAGE, cmd: str | None = None) -> str:
     """The reading view of a receipt (aa, ab, run), a golden, or a run's summary.json. `label` names the file in
     citations; `cmd` is the command that re-renders it (for the continuation line)."""
@@ -200,14 +228,10 @@ def show(doc: dict, label: str, *, cursor: int = 0, limit: int = PAGE, cmd: str 
         return _show_json(doc, label)
     legs = _legs(doc, kind)
     labels = [(leg.get("provenance") or {}).get("label") or f"leg{i}" for i, leg in enumerate(legs)]
-    problems = doc.get("problems") if kind != "summary" else None
+    problems = _summary_problems(doc) if kind == "summary" else (doc.get("problems") or [])
     sound = "SOUND" if not problems else "UNSOUND"
-    if kind == "summary":
-        sysrow = _system(legs[0])
-        sound = "UNSOUND" if any(sysrow[k] not in ("no", "0", "ok") for k in ("contended", "must_fail", "preflight",
-                                                                                "pins_changed")) else "SOUND"
     lines = [f"# {kind} · {sound} · {label}"]
-    lines += [f"UNSOUND: {clip(p, 300)}" for p in problems or []]
+    lines += [f"UNSOUND: {clip(p, 300)}" for p in problems]
     if kind == "ab":
         lines.append(f"A: {doc.get('a')}   B: {doc.get('b')}{'  (same spec)' if doc.get('a') == doc.get('b') else ''}"
                      f"   order {','.join(doc.get('order') or [])}")
@@ -220,13 +244,13 @@ def show(doc: dict, label: str, *, cursor: int = 0, limit: int = PAGE, cmd: str 
     if extra:
         lines.append(f"backend: {kv(extra)}")
     sysrows = [_system(leg) for leg in legs]
-    lines += ["", *table(["leg", "created", "rev", "contended", "MUST fail", "preflight", "GPU mean/max %",
-                          "top other GPU %", "app GPU mean/p95 %", "CPU busy mean/max %", "user active %",
-                          "pins changed", "run_dir"],
+    lines += ["", *table(["leg", "created", "rev", "contended", "owned-stop samples", "MUST fail", "preflight",
+                          "GPU mean/max %", "top other GPU %", "app GPU mean/p95 %", "CPU busy mean/max %",
+                          "user active %", "pins changed", "run_dir"],
                          [[lab, str((leg.get("provenance") or {}).get("created")),
-                           str((leg.get("provenance") or {}).get("localbench_rev")), s["contended"], s["must_fail"],
-                           s["preflight"], s["gpu"], s["other_gpu"], s["app_gpu"], f"{s['cpu']}/{s['cpu_max']}",
-                           s["user_active"], s["pins_changed"], str(leg.get("run_dir"))]
+                           str((leg.get("provenance") or {}).get("localbench_rev")), s["contended"], s["owned_stop"],
+                           s["must_fail"], s["preflight"], s["gpu"], s["other_gpu"], s["app_gpu"],
+                           f"{s['cpu']}/{s['cpu_max']}", s["user_active"], s["pins_changed"], str(leg.get("run_dir"))]
                           for lab, leg, s in zip(labels, legs, sysrows)])]
     if kind == "ab":
         tbl = doc.get("table") or {}
@@ -287,7 +311,8 @@ def show(doc: dict, label: str, *, cursor: int = 0, limit: int = PAGE, cmd: str 
         leg_ptr = _leg_ptr(kind, 0).replace("/0", "/<i>") if kind == "aa" else _leg_ptr(kind, 0)
         cite = f"cite: {label}#{leg_ptr}{pointer('metrics', '<metric>')}"
     lines += ["", "conformance: " + " | ".join(_conformance(list(zip(labels, legs))))]
-    lines += _details([(lab, leg.get("details") or {}, _leg_ptr(kind, i)) for i, (lab, leg) in enumerate(zip(labels, legs))])
+    lines += _details([(lab, leg.get("details") or {}, leg.get("conformance") or {}, _leg_ptr(kind, i))
+                       for i, (lab, leg) in enumerate(zip(labels, legs))])
     lines += [cite + f" · raw subtree: localbench show {label} --path <pointer>"]
     return "\n".join(lines) + "\n"
 
@@ -295,12 +320,15 @@ def show(doc: dict, label: str, *, cursor: int = 0, limit: int = PAGE, cmd: str 
 INLINE = 120
 
 
-def _details(legs: list[tuple[str, dict, str]]) -> list[str]:
-    """Per-case detail fields of omp-driven tiers: a field whose rendering fits INLINE chars is shown; a larger one is
-    named with its size and the pointer that prints it whole."""
+def _details(legs: list[tuple[str, dict, dict, str]]) -> list[str]:
+    """Show verdict-bearing case detail; replay perf counts remain accessible through --path without bloating PASS."""
     out = []
-    for lab, details, leg_ptr in legs:
+    for lab, details, conformance, leg_ptr in legs:
         for case, d in details.items():
+            if case.startswith(("conf.", "replay.")) and conformance.get(case, {}).get("verdict") == "PASS":
+                continue
+            if case.startswith("replay.") and case not in conformance:
+                continue
             if not isinstance(d, dict) or not d:
                 continue
             small, big = [], []
@@ -419,8 +447,10 @@ def run_report(summary: dict, rows: list[dict], gstate: str, bad: list[str]) -> 
              f"- pins: {kv(pins)}",
              f"- host: {host['chip']} · {host['gpu_cores']} GPU cores · {host['mem_gb']} GB · macOS {host['macos']}",
              (f"- during run: GPU {span(during.get('gpu_device_pct'), '%')} · CPU busy "
-              f"{span((sysd.get('cpu') or {}).get('busy_pct'), '%')} · load1 {span(during.get('load1'))} · swap "
-              f"{span(during.get('swap_used_mb'), ' MB')} · pressure {', '.join(during.get('pressure_levels') or []) or '—'}"),
+             f"{span((sysd.get('cpu') or {}).get('busy_pct'), '%')} · load1 {span(during.get('load1'))} · swap "
+             f"{span(during.get('swap_used_mb'), ' MB')} · pressure {', '.join(during.get('pressure_levels') or []) or '—'}"),
+             f"- residency samples: {num(during.get('resident_unknown_samples'))} unknown · "
+             f"{num(during.get('resident_owned_stop_samples'))} owned-stop",
              "- GPU by process (whole run): " + (", ".join(
                  f"{r['name']} pid {r['pid']}{' (' + r['model'] + ')' if r.get('model') else ''} {num(r['pct'])}%"
                  for r in during.get("gpu_by_process", [])) or "—"),

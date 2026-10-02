@@ -1,0 +1,114 @@
+[
+  {
+    "label": "title signature needs both envelope markers",
+    "file": "localbench/generation.py",
+    "old": "return \"<title>\" in text and \"<user>\" in text",
+    "new": "return \"<title>\" in text",
+    "tests": ["tests.test_generation.Classify.test_signatures_route_each_feature_and_leave_the_rest"]
+  },
+  {
+    "label": "generation corpora gate on real volume",
+    "file": "localbench/generation.py",
+    "old": "\"gate\": {\"min_items\": MIN_ITEMS}",
+    "new": "\"gate\": {}",
+    "tests": ["tests.test_generation.Assemble.test_assemble_writes_pinned_manifest_and_content_addressed_ids"]
+  },
+  {
+    "label": "unknown feature refused before writing",
+    "file": "localbench/generation.py",
+    "old": "raise corpus.CorpusError(f\"generation feature {feature!r} has no request signature\")",
+    "new": "pass",
+    "tests": ["tests.test_generation.Assemble.test_unknown_feature_is_refused_before_anything_is_written"]
+  },
+  {
+    "label": "session name wins over cwd basename",
+    "file": "localbench/generation.py",
+    "old": "    named = _sanitize_terminal_part(session_name)\n    if named is not None:\n        return named",
+    "new": "    named = None",
+    "tests": ["tests.test_generation.BuiltinArms.test_title_falls_back_to_cwd_basename_or_stays_unnamed"]
+  },
+  {
+    "label": "commit without a model is a typed error",
+    "file": "localbench/generation.py",
+    "old": "    raise BuiltinUnavailable(\"No model available for commit generation\")",
+    "new": "    return None",
+    "tests": ["tests.test_generation.BuiltinArms.test_commit_without_a_model_is_a_typed_error"]
+  },
+  {
+    "label": "titles stay within 3-8 words",
+    "file": "localbench/generation.py",
+    "old": "    if not 3 <= len(words) <= 8:",
+    "new": "    if False:",
+    "tests": ["tests.test_generation.DeterministicChecks.test_title_shape_violations"]
+  },
+  {
+    "label": "commit scope must occur in the diff",
+    "file": "localbench/generation.py",
+    "old": "    if scope is not None and scope[1:-1] not in \"\\n\".join(diff_files):",
+    "new": "    if False:",
+    "tests": ["tests.test_generation.DeterministicChecks.test_commit_shape_violations"]
+  },
+  {
+    "label": "skill compression retains source tokens",
+    "file": "localbench/generation.py",
+    "old": "    if source and len(source & out) / len(source) < 0.4:",
+    "new": "    if False:",
+    "tests": ["tests.test_generation.DeterministicChecks.test_skill_compression_violations"]
+  },
+  {
+    "label": "pairwise lower bound subtracts noise",
+    "file": "localbench/generation.py",
+    "old": "    return point - 1.96 * math.sqrt(point * (1.0 - point) / n)",
+    "new": "    return point",
+    "tests": ["tests.test_generation.JudgeHook.test_win_lower_bound_math"]
+  },
+  {
+    "label": "corpora pin an int seed and a version",
+    "file": "localbench/generation.py",
+    "old": "    if not isinstance(seed, int) or isinstance(seed, bool):",
+    "new": "    if False:",
+    "tests": ["tests.test_generation.Assemble.test_bad_seed_or_version_is_refused_before_anything_is_written"]
+  },
+  {
+    "label": "ollama generate replies resolve their text",
+    "file": "localbench/generation.py",
+    "old": "    response = body.get(\"response\")\n    return response if isinstance(response, str) else None",
+    "new": "    return None",
+    "tests": ["tests.test_generation.ResponseText.test_each_route_shape_resolves_its_text_path"]
+  },
+  {
+    "label": "every feature has a uniform check entry",
+    "file": "localbench/generation.py",
+    "old": "    \"commit-messages\": lambda text, context: check_commit_message(",
+    "new": "    \"commit-messages\": lambda text, context: check_title(",
+    "tests": ["tests.test_generation.FeatureChecksMap.test_checks_live_in_generation_with_a_uniform_call_shape"]
+  },
+  {
+    "label": "judge sees the title span, not the preamble",
+    "file": "localbench/generation.py",
+    "old": "            return text.split(\"<title>\", 1)[1].split(\"</title>\", 1)[0].strip()",
+    "new": "            return text.strip()",
+    "tests": ["tests.test_generation.JudgeView.test_view_is_the_checked_core_span_only"]
+  },
+  {
+    "label": "judge isolation is fail-closed",
+    "file": "localbench/generation.py",
+    "old": "    return None not in arm_families and judge_family not in arm_families",
+    "new": "    return True",
+    "tests": ["tests.test_generation.JudgeIsolation.test_isolated_judge_differs_from_both_arms"]
+  },
+  {
+    "label": "commit body lines wrap at 72",
+    "file": "localbench/generation.py",
+    "old": "            found.append(f\"body line {lineno} is {len(line)} chars, wrap at 72\")",
+    "new": "            pass",
+    "tests": ["tests.test_generation.CommitBodyRule.test_long_body_lines_fail_shape"]
+  },
+  {
+    "label": "unanswerable records never enter corpora",
+    "file": "localbench/generation.py",
+    "old": "        if not answerable(feature, body):\n            skipped += 1\n            continue",
+    "new": "        pass",
+    "tests": ["tests.test_generation.Answerable.test_assemble_skips_unanswerable_and_counts_them"]
+  }
+]

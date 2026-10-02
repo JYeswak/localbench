@@ -1,0 +1,100 @@
+[
+  {
+    "label": "reject any mock endpoint outside loopback",
+    "file": "localbench/ompupdate.py",
+    "old": "if parsed.scheme != \"http\" or parsed.hostname not in {\"127.0.0.1\", \"localhost\", \"::1\"}:",
+    "new": "if False:",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_capture_rejects_a_non_loopback_mock_endpoint_before_omp_or_agent_access"]
+  },
+  {
+    "label": "compare normalized request shapes before carrying a proof",
+    "file": "localbench/ompupdate.py",
+    "old": "_normalized_value(baseline[capture_name]) == _normalized_value(current[capture_name])",
+    "new": "True",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_byte_and_module_identity_carry_only_matching_proofs_and_queue_stale_routes"]
+  },
+  {
+    "label": "changed feature module SHA must stale the proof",
+    "file": "localbench/ompupdate.py",
+    "old": "and old_sha == new_sha)",
+    "new": "and True)",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_matching_request_stales_when_the_feature_module_sha_changes"]
+  },
+  {
+    "label": "missing registered feature SHA cannot carry a proof",
+    "file": "localbench/ompupdate.py",
+    "old": "and old_sha is not None\n                       and old_sha == new_sha)",
+    "new": "and old_sha == new_sha)",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_missing_feature_module_sha_cannot_carry_a_proof"]
+  },
+  {
+    "label": "unregistered feature cannot carry a proof when module SHA keys are absent",
+    "file": "localbench/ompupdate.py",
+    "old": "same_module = (feature in old_module_shas and feature in new_module_shas and old_sha is not None",
+    "new": "same_module = feature not in old_module_shas and feature not in new_module_shas",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_unregistered_feature_module_sha_cannot_carry_a_proof"]
+  },
+  {
+    "label": "every stale proof queues the through-omp acceptance leg",
+    "file": "localbench/ompupdate.py",
+    "old": "queue = [] if carried else ([suite] if suite != \"-\" else []) + [\"through-omp\"]",
+    "new": "queue = [] if carried else ([suite] if suite != \"-\" else [])",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_byte_and_module_identity_carry_only_matching_proofs_and_queue_stale_routes"]
+  },
+  {
+    "label": "the update mock preserves the exact request body bytes",
+    "file": "localbench/mockomp.py",
+    "old": "record = RequestRecord(\"POST\", self.path, dict(self.headers.items()), body)",
+    "new": "record = RequestRecord(\"POST\", self.path, dict(self.headers.items()), body.strip())",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_mock_server_records_raw_body_and_serves_compat_endpoints"]
+  },
+  {
+    "label": "streaming completions remain Server-Sent Events",
+    "file": "localbench/mockomp.py",
+    "old": "if request_data.get(\"stream\"):",
+    "new": "if False:",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_streaming_openai_response_uses_sse_and_records_exact_request"]
+  },
+  {
+    "label": "mock find responds when the request advertises multiple tools",
+    "file": "localbench/mockomp.py",
+    "old": "if has_find and not prior_find_call:",
+    "new": "if False and not prior_find_call:",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_mock_find_call_is_selected_when_other_tools_are_also_advertised"]
+  },
+  {
+    "label": "isolated TypeSafe requests cannot use cloud base URL credentials",
+    "file": "localbench/ompupdate.py",
+    "old": "\"TYPESAFE_BASE_URL\": mock_url",
+    "new": "\"TYPESAFE_BASE_URL\": \"https://api.typesafe.ai\"",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_isolated_environment_cannot_inherit_or_use_cloud_typesafe_credentials"]
+  },
+  {
+    "label": "WatchPaths targets the installed omp package metadata",
+    "file": "localbench/ompupdate.py",
+    "old": "\"WatchPaths\": [package_json]",
+    "new": "\"WatchPaths\": [\"/tmp/package.json\"]",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_watch_plist_watches_only_installed_omp_package_json_and_runs_refresh"]
+  },
+  {
+    "label": "a changing package refuses capture past the deadline",
+    "file": "localbench/ompupdate.py",
+    "old": "raise CaptureError(\n                f\"installed omp package still changing after {deadline_secs:.0f} s; refusing capture\")",
+    "new": "return",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_settle_returns_when_quiet_and_refuses_a_changing_package"]
+  },
+  {
+    "label": "a transient capture failure is retried once",
+    "file": "localbench/ompupdate.py",
+    "old": "for attempt in (1, 2):",
+    "new": "for attempt in (1,):",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_refresh_retries_once_after_a_transient_capture_failure"]
+  },
+  {
+    "label": "the second capture failure names both attempts",
+    "file": "localbench/ompupdate.py",
+    "old": "raise CaptureError(f\"capture failed twice ({'; '.join(failures)})\") from exc",
+    "new": "raise CaptureError(\"capture failed\") from exc",
+    "tests": ["tests.test_ompupdate.OmpUpdate.test_refresh_second_failure_names_both_attempts"]
+  }
+]

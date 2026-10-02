@@ -19,9 +19,8 @@ import time
 from pathlib import Path
 
 BANKS = Path.home() / ".omp" / "agent" / "memories" / "mnemopi" / "banks"
-# Working directories localbench children and probes run in. Every harness cwd now starts with /tmp/localbench-, so a
-# bank's cwd (mnemopi names a bank `<basename(cwd)>-<hash>`) identifies it; lbmem-/lbside-/lbcap- are the
-# 2026-09-23 probes that predate that rule.
+# Match localbench child directories and the probe directories still used by standalone scripts.
+# Mnemopi names each bank from its cwd basename and hash; historical lbcap- probes also used this prefix.
 HARNESS_CWD = re.compile(r"^(?:/private)?/tmp/(?:localbench-|lbmem-|lbside-|lbcap-)")
 HARNESS_PREFIX = "localbench-"
 

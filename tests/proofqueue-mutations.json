@@ -1,0 +1,23 @@
+[
+  {
+    "label": "only a PROVEN route closes its trigger bead",
+    "file": "localbench/proofqueue.py",
+    "old": "elif bead is not None and unit[\"status\"] == \"PROVEN\":",
+    "new": "elif bead is not None:",
+    "tests": ["tests.test_proofqueue.ProofQueue.test_close_cites_receipt_and_carried_leaves_open"]
+  },
+  {
+    "label": "a matching body marker is a no-op, not a rewrite",
+    "file": "localbench/proofqueue.py",
+    "old": "if line.startswith(MARKER):",
+    "new": "if False:",
+    "tests": ["tests.test_proofqueue.ProofQueue.test_plan_noop_on_matching_marker"]
+  },
+  {
+    "label": "the close reason cites the proving receipt",
+    "file": "localbench/proofqueue.py",
+    "old": "\"reason\": f\"route proven: receipt {receipt} grades PROVEN for \"",
+    "new": "\"reason\": f\"route proven for \"",
+    "tests": ["tests.test_proofqueue.ProofQueue.test_close_cites_receipt_and_carried_leaves_open"]
+  }
+]

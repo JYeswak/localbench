@@ -1,0 +1,37 @@
+{
+  "assertions": [
+    {
+      "id": "paired-vs-hosted",
+      "params": {
+        "alpha": 0.05,
+        "min_n": 396,
+        "rule": "NOT_WORSE",
+        "seed": 20261001
+      },
+      "type": "paired"
+    }
+  ],
+  "candidates": [
+    {
+      "route": "laya:aac6fef/laya-mlx"
+    }
+  ],
+  "dataset": {
+    "items_sha256": "4d9aa117a42528048eed864dbc8ad19dbb9fbaf36cad2861ccb7693678f97c18",
+    "suite": "proj-b/bash-gate-1lim"
+  },
+  "description": "kit-8rp screen 1/4: laya checkpoint on 396 bash-gate items, 0% truncated, --repeats 2. Paired exact McNemar vs hosted proj-b-1.13.0 correctness (uhc5 method). ADVANCE on NOT_WORSE/BETTER, REJECT on WORSE. Filed under unexpected-stop (pre-execution risk classification, same domain); the sst5 screen is deferred (no registry row covers sentiment scoring). Multilingual checkpoint follows kit-mdi.",
+  "feature": "unexpected-stop",
+  "fresh_per_round": false,
+  "kind": "decision",
+  "regime": "side",
+  "repeats": 2,
+  "seed": 20261001,
+  "stage": "screen",
+  "wins": [
+    {
+      "metric": "privacy"
+    }
+  ],
+  "wins_needed": 1
+}

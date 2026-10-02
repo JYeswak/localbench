@@ -1,0 +1,72 @@
+[
+  {
+    "label": "FAIL conf and replay detail dropped",
+    "file": "localbench/__main__.py",
+    "old": "r.get(\"verdict\") != \"PASS\"",
+    "new": "r.get(\"verdict\") not in (\"PASS\", \"FAIL\")",
+    "tests": ["tests.test_cli.ReceiptView.test_nonpassing_conformance_and_replay_details_survive_banking"]
+  },
+  {
+    "label": "VOID replay detail dropped",
+    "file": "localbench/__main__.py",
+    "old": "r.get(\"verdict\") != \"PASS\"",
+    "new": "r.get(\"verdict\") not in (\"PASS\", \"VOID\")",
+    "tests": ["tests.test_cli.ReceiptView.test_nonpassing_conformance_and_replay_details_survive_banking"]
+  },
+  {
+    "label": "perf-only replay counts dropped",
+    "file": "localbench/__main__.py",
+    "old": "r.get(\"verdict\") != \"PASS\"",
+    "new": "r.get(\"verdict\") not in (None, \"PASS\")",
+    "tests": ["tests.test_cli.ReceiptView.test_nonpassing_conformance_and_replay_details_survive_banking"]
+  },
+  {
+    "label": "PASS conf and replay detail banked",
+    "file": "localbench/__main__.py",
+    "old": "r.get(\"verdict\") != \"PASS\"",
+    "new": "r.get(\"verdict\") != \"FAIL\"",
+    "tests": ["tests.test_cli.ReceiptView.test_nonpassing_conformance_and_replay_details_survive_banking"]
+  },
+  {
+    "label": "perf-only counts displayed inline in all-PASS view",
+    "file": "localbench/render.py",
+    "old": "case.startswith(\"replay.\") and case not in conformance",
+    "new": "case.startswith(\"replay.\") and False",
+    "tests": ["tests.test_render.ReceiptViews.test_nonpassing_replay_detail_is_visible_and_reachable_by_path"]
+  },
+  {
+    "label": "PASS replay detail rendered inline from a banked receipt",
+    "file": "localbench/render.py",
+    "old": "conformance.get(case, {}).get(\"verdict\") == \"PASS\"",
+    "new": "conformance.get(case, {}).get(\"verdict\") == \"FAIL\"",
+    "tests": ["tests.test_render.ReceiptViews.test_nonpassing_replay_detail_is_visible_and_reachable_by_path"]
+  },
+  {
+    "label": "duplicate tier IDs overwrite prior diagnostics",
+    "file": "localbench/__main__.py",
+    "old": "if len(tiers) != len(set(tiers)):",
+    "new": "if False:",
+    "tests": ["tests.test_cli.DuplicateTiers.test_repeated_tier_is_rejected_before_measurement"]
+  },
+  {
+    "label": "receipt without commit revision accepted",
+    "file": "localbench/__main__.py",
+    "old": "not isinstance(prov.get(\"localbench_rev\"), str) or not prov[\"localbench_rev\"]",
+    "new": "False",
+    "tests": ["tests.test_mutations.Validate.test_a_leg_without_commit_provenance_is_invalid"]
+  },
+  {
+    "label": "receipt without worker fingerprint accepted",
+    "file": "localbench/__main__.py",
+    "old": "reasons.append(f\"{where} provenance: no fingerprint\")",
+    "new": "pass",
+    "tests": ["tests.test_mutations.Validate.test_a_leg_without_worker_identity_is_invalid"]
+  },
+  {
+    "label": "receipt worker without model accepted",
+    "file": "localbench/__main__.py",
+    "old": "for k in (\"backend\", \"model\") if not fingerprint.get(k)",
+    "new": "for k in (\"backend\",) if not fingerprint.get(k)",
+    "tests": ["tests.test_mutations.Validate.test_a_worker_without_model_identity_is_invalid"]
+  }
+]

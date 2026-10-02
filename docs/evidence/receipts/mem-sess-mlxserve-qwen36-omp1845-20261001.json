@@ -1,0 +1,867 @@
+{
+  "kind": "run",
+  "problems": [],
+  "run": {
+    "provenance": {
+      "pins": {
+        "backend": "mlx-serve",
+        "backend_version": "26.9.2",
+        "backend_sha": "4d09a3beb8d4c9be",
+        "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+        "model_digest": "files:68dedceb5da0",
+        "backend_args": "",
+        "omp_version": "18.4.5",
+        "omp_sha": "63fc92a4e33fd7fe",
+        "omp_path": "~/.bun/bin/omp",
+        "omp_child_config": "62eed267e219ddde",
+        "omp_mem_config": "019eef862b65ed03",
+        "omp_agent_config": "38b87e2b63396937",
+        "omp_mem_tools": "memory_edit,recall,reflect,retain",
+        "fixtures_sha": "41ff309f03a98aa5",
+        "macos_build": "25F84",
+        "host_id": "mac-studio-apple-m3-ultra-512gb"
+      },
+      "fingerprint": {
+        "backend": "mlx-serve",
+        "backend_version": "26.9.2",
+        "backend_sha": "4d09a3beb8d4c9be",
+        "model": "Qwen3.6-35B-A3B-MLX-Serve-4bit",
+        "model_digest": "files:68dedceb5da0",
+        "backend_args": "",
+        "architecture": "qwen3_5_moe",
+        "quantization": "4-bit",
+        "mtp_loaded": true,
+        "loaded_context": 262144,
+        "model_dir": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+      },
+      "localbench_rev": "9230b9d-dirty",
+      "created": "20261001T005315Z",
+      "tiers": [
+        "mem",
+        "sess"
+      ],
+      "repeats": 1,
+      "label": "run"
+    },
+    "verdicts": {
+      "contended": false,
+      "must_fail": [],
+      "preflight_problems": [],
+      "allow_busy": false,
+      "pins_changed": {}
+    },
+    "metrics": {
+      "mem.turn.max_tool_calls": {
+        "value": 8,
+        "better": "lower",
+        "spread": [
+          0,
+          8
+        ],
+        "n": 12
+      },
+      "mem.turn.timeouts": {
+        "value": 0,
+        "better": "lower",
+        "spread": [
+          0,
+          0
+        ],
+        "n": 12
+      },
+      "mem.recall.hit_rate": {
+        "value": 1.0,
+        "better": "higher",
+        "spread": [
+          1.0,
+          1.0
+        ],
+        "n": 3
+      },
+      "mem.recall.pre_main_s": {
+        "value": 5.0626,
+        "better": "lower",
+        "spread": [
+          5.0274,
+          5.1915
+        ],
+        "n": 3
+      },
+      "mem.recall.wall_s": {
+        "value": 9.1889,
+        "better": "lower",
+        "spread": [
+          8.9464,
+          12.1913
+        ],
+        "n": 3
+      },
+      "mem.plant.wall_s": {
+        "value": 11.5107,
+        "better": "lower",
+        "spread": [
+          7.8699,
+          14.1569
+        ],
+        "n": 3
+      },
+      "mem.derail.ok_rate": {
+        "value": 1.0,
+        "better": "higher",
+        "spread": [
+          1.0,
+          1.0
+        ],
+        "n": 3
+      },
+      "sess.turn.max_tool_calls": {
+        "value": 0,
+        "better": "lower",
+        "spread": [
+          0,
+          0
+        ],
+        "n": 12
+      },
+      "sess.turn.timeouts": {
+        "value": 0,
+        "better": "lower",
+        "spread": [
+          0,
+          0
+        ],
+        "n": 12
+      },
+      "sess.turn.wall_s": {
+        "value": 1.3153,
+        "better": "lower",
+        "spread": [
+          0.5126,
+          7.0729
+        ],
+        "n": 9
+      },
+      "sess.turn.post_retain_wall_s": {
+        "value": 4.9399,
+        "better": "lower",
+        "spread": [
+          2.0946,
+          7.7853
+        ],
+        "n": 2
+      },
+      "sess.turn.pre_main_s": {
+        "value": 0.4846,
+        "better": "lower",
+        "spread": [
+          0.2841,
+          0.7801
+        ],
+        "n": 9
+      },
+      "sess.turn.post_retain_pre_main_s": {
+        "value": 1.6697,
+        "better": "lower",
+        "spread": [
+          1.4364,
+          1.9029
+        ],
+        "n": 2
+      },
+      "sess.turn.ack_rate": {
+        "value": 1.0,
+        "better": "higher",
+        "spread": [
+          1.0,
+          1.0
+        ],
+        "n": 12
+      },
+      "sess.memory.extract_s": {
+        "value": 3.757,
+        "better": "lower",
+        "spread": [
+          3.692,
+          5.681
+        ],
+        "n": 3
+      }
+    },
+    "conformance": {
+      "mem.no_leak": {
+        "level": "MUST",
+        "verdict": "PASS"
+      },
+      "sess.turns_complete": {
+        "level": "MUST",
+        "verdict": "PASS"
+      },
+      "sess.memory_calls_ok": {
+        "level": "SHOULD",
+        "verdict": "PASS"
+      }
+    },
+    "run_dir": "runs/20261001T005315Z__run__mlx-serve__Qwen3.6-35B-A3B-MLX-Serve-4bit",
+    "details": {
+      "mem.turn": {
+        "turns": [
+          {
+            "round": 0,
+            "fact": "code",
+            "kind": "plant",
+            "tool_calls": 1,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 14.157
+          },
+          {
+            "round": 0,
+            "fact": "code",
+            "kind": "recall",
+            "tool_calls": 0,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 8.946
+          },
+          {
+            "round": 0,
+            "fact": "code",
+            "kind": "control",
+            "tool_calls": 6,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 25.439
+          },
+          {
+            "round": 0,
+            "fact": "code",
+            "kind": "derail",
+            "tool_calls": 0,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 9.517
+          },
+          {
+            "round": 0,
+            "fact": "port",
+            "kind": "plant",
+            "tool_calls": 1,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 11.511
+          },
+          {
+            "round": 0,
+            "fact": "port",
+            "kind": "recall",
+            "tool_calls": 0,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 9.189
+          },
+          {
+            "round": 0,
+            "fact": "port",
+            "kind": "control",
+            "tool_calls": 8,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 41.184
+          },
+          {
+            "round": 0,
+            "fact": "port",
+            "kind": "derail",
+            "tool_calls": 0,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 7.364
+          },
+          {
+            "round": 0,
+            "fact": "owner",
+            "kind": "plant",
+            "tool_calls": 0,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 7.87
+          },
+          {
+            "round": 0,
+            "fact": "owner",
+            "kind": "recall",
+            "tool_calls": 0,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 12.191
+          },
+          {
+            "round": 0,
+            "fact": "owner",
+            "kind": "control",
+            "tool_calls": 4,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 21.107
+          },
+          {
+            "round": 0,
+            "fact": "owner",
+            "kind": "derail",
+            "tool_calls": 0,
+            "timeout": false,
+            "rc": 0,
+            "wall_s": 6.978
+          }
+        ]
+      },
+      "mem.recall": {
+        "hits": 3,
+        "attempts": 3,
+        "ci95": [
+          0.4385,
+          1.0
+        ],
+        "rounds": [
+          {
+            "fact": "code",
+            "round": 0,
+            "expected": "ZEBRA-2101",
+            "hit": true,
+            "reason": null,
+            "reasons": [],
+            "retention_provenance": "extraction",
+            "recall_answer": "ZEBRA-2101",
+            "plant_answer": "NOTED",
+            "control_answer": "I don't have access to any deploy code for a project called \"Falcon\" in my curre",
+            "rcs": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "plant_trace": {
+              "main": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "retention": [
+                {
+                  "purpose": "memory-extract",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                }
+              ]
+            },
+            "recall_trace": {
+              "purpose": "main",
+              "status": 200,
+              "aborted": false,
+              "response_complete": true
+            },
+            "control_trace": {
+              "purpose": "main",
+              "status": 200,
+              "aborted": false,
+              "response_complete": true
+            }
+          },
+          {
+            "fact": "port",
+            "round": 0,
+            "expected": "31959",
+            "hit": true,
+            "reason": null,
+            "reasons": [],
+            "retention_provenance": "extraction",
+            "recall_answer": "31959",
+            "plant_answer": "NOTED",
+            "control_answer": "I don't have access to the filesystem or any stored information about a \"Falcon\"",
+            "rcs": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "plant_trace": {
+              "main": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "retention": [
+                {
+                  "purpose": "memory-extract",
+                  "status": 200,
+                  "aborted": false,
+                  "response_complete": true
+                }
+              ]
+            },
+            "recall_trace": {
+              "purpose": "main",
+              "status": 200,
+              "aborted": false,
+              "response_complete": true
+            },
+            "control_trace": {
+              "purpose": "main",
+              "status": 200,
+              "aborted": false,
+              "response_complete": true
+            }
+          },
+          {
+            "fact": "owner",
+            "round": 0,
+            "expected": "Adeyemi",
+            "hit": true,
+            "reason": null,
+            "reasons": [],
+            "retention_provenance": "fresh-process-recall",
+            "recall_answer": "Adeyemi",
+            "plant_answer": "NOTED",
+            "control_answer": "Not in memory \u2014 I have no record of a Falcon project or its on-call schedule.",
+            "rcs": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "plant_trace": {
+              "main": {
+                "purpose": "main",
+                "status": 200,
+                "aborted": false,
+                "response_complete": true
+              },
+              "retention": []
+            },
+            "recall_trace": {
+              "purpose": "main",
+              "status": 200,
+              "aborted": false,
+              "response_complete": true
+            },
+            "control_trace": {
+              "purpose": "main",
+              "status": 200,
+              "aborted": false,
+              "response_complete": true
+            }
+          }
+        ],
+        "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+        "injected_tokens": {
+          "median": 116,
+          "min": 81,
+          "max": 147
+        }
+      },
+      "mem.plant": {},
+      "mem.derail": {
+        "derails": []
+      },
+      "mem.no_leak": {
+        "leaks": [],
+        "invalid": [],
+        "reason": null
+      },
+      "sess.turn": {
+        "neighbour_delta_s": {
+          "median": 3.529,
+          "min": 1.407,
+          "max": 5.65,
+          "n": 2
+        },
+        "config": "~/Developer/localbench/fixtures/omp/child-config-mem.yml",
+        "turns": [
+          {
+            "session": 0,
+            "turn": 1,
+            "wall": 6.125,
+            "t_send": 1790816194.253591,
+            "t_end": 1790816200.378206,
+            "ok": true,
+            "timeout": false,
+            "post_retain": false,
+            "tool_calls": 0,
+            "pre_main": 4.177,
+            "overlap_s": 0.0,
+            "main_call_ok": true
+          },
+          {
+            "session": 0,
+            "turn": 2,
+            "wall": 1.612,
+            "t_send": 1790816200.378797,
+            "t_end": 1790816201.991267,
+            "ok": true,
+            "timeout": false,
+            "post_retain": false,
+            "tool_calls": 0,
+            "pre_main": 0.356,
+            "overlap_s": 0.0,
+            "main_call_ok": true
+          },
+          {
+            "session": 0,
+            "turn": 3,
+            "wall": 1.315,
+            "t_send": 1790816201.991732,
+            "t_end": 1790816203.307029,
+            "ok": true,
+            "timeout": false,
+            "post_retain": false,
+            "tool_calls": 0,
+            "pre_main": 0.309,
+            "overlap_s": 0.0,
+            "main_call_ok": true
+          },
+          {
+            "session": 0,
+            "turn": 4,
+            "wall": 0.513,
+            "t_send": 1790816203.3078651,
+            "t_end": 1790816203.820426,
+            "ok": true,
+            "timeout": false,
+            "post_retain": false,
+            "tool_calls": 0,
+            "pre_main": 0.284,
+            "overlap_s": 0.0,
+            "main_call_ok": true
+          },
+          {
+            "session": 0,
+            "turn": 5,
+            "wall": 2.095,
+            "t_send": 1790816203.8206248,
+            "t_end": 1790816205.915204,
+            "ok": true,
+            "timeout": false,
+            "post_retain": true,
+            "tool_calls": 0,
+            "pre_main": 1.436,
+            "overlap_s": 0.651,
+            "main_call_ok": true
+          },
+          {
+            "session": 0,
+            "turn": 6,
+            "wall": 0.862,
+            "t_send": 1790816205.915403,
+            "t_end": 1790816206.7777941,
+            "ok": true,
+            "timeout": false,
+            "post_retain": false,
+            "tool_calls": 0,
+            "pre_main": 0.485,
+            "overlap_s": 0.376,
+            "main_call_ok": true
+          },
+          {
+            "session": 0,
+            "turn": 7,
+            "wall": 1.125,
+            "t_send": 1790816206.777899,
+            "t_end": 1790816207.90322,
+            "ok": true,
+            "timeout": false,
+            "post_retain": false,
+            "tool_calls": 0,
+            "pre_main": 0.352,
+            "overlap_s": 0.454,
+            "main_call_ok": true
+          },
+          {
+            "session": 0,
+            "turn": 8,
+            "wall": 3.009,
+            "t_send": 1790816207.9034371,
+            "t_end": 1790816210.91236,
+            "ok": true,
+            "timeout": false,
+            "post_retain": false,
+            "tool_calls": 0,
+            "pre_main": 0.731,
+            "overlap_s": 0.0,
+            "main_call_ok": true
+          },
+          {
+            "session": 0,
+            "turn": 9,
+            "wall": 7.785,
+            "t_send": 1790816210.913068,
+            "t_end": 1790816218.698381,
+            "ok": true,
+            "timeout": false,
+            "post_retain": true,
+            "tool_calls": 0,
+            "pre_main": 1.903,
+            "overlap_s": 3.783,
+            "main_call_ok": true
+          },
+          {
+            "session": 0,
+            "turn": 10,
+            "wall": 1.261,
+            "t_send": 1790816218.699584,
+            "t_end": 1790816219.960769,
+            "ok": true,
+            "timeout": false,
+            "post_retain": false,
+            "tool_calls": 0,
+            "pre_main": 0.53,
+            "overlap_s": 0.0,
+            "main_call_ok": true
+          },
+          {
+            "session": 0,
+            "turn": 11,
+            "wall": 6.528,
+            "t_send": 1790816219.960879,
+            "t_end": 1790816226.488665,
+            "ok": true,
+            "timeout": false,
+            "post_retain": false,
+            "tool_calls": 0,
+            "pre_main": 0.78,
+            "overlap_s": 0.0,
+            "main_call_ok": true
+          },
+          {
+            "session": 0,
+            "turn": 12,
+            "wall": 7.073,
+            "t_send": 1790816226.490601,
+            "t_end": 1790816233.563549,
+            "ok": true,
+            "timeout": false,
+            "post_retain": false,
+            "tool_calls": 0,
+            "pre_main": 0.553,
+            "overlap_s": 0.0,
+            "main_call_ok": true
+          }
+        ]
+      },
+      "sess.memory": {
+        "by_purpose": {
+          "memory-extract": {
+            "calls": 3,
+            "busy_s": 13.129,
+            "not_ok": 0,
+            "completion_tokens": 155
+          }
+        },
+        "overlap_with_main_s": 5.265,
+        "extract_overlap_with_main_s": 5.265,
+        "exit_s": [
+          3.72
+        ],
+        "sessions": [
+          {
+            "session": 0,
+            "started": 1790816192.3541918,
+            "ended": 1790816237.284389,
+            "turns": 12,
+            "failure": null,
+            "exit_s": 3.72,
+            "rc": 0
+          }
+        ]
+      },
+      "sess.turns_complete": {
+        "reason": null,
+        "failures": [],
+        "turns": 12,
+        "acks": 12,
+        "expected": 12
+      },
+      "sess.memory_calls_ok": {
+        "reason": null,
+        "memory_calls": 3,
+        "successful_extracts": 3,
+        "extract_overlap_with_main_s": 5.265,
+        "not_ok": []
+      }
+    },
+    "system": {
+      "preflight": {
+        "idle_check": {
+          "samples": 15,
+          "load1": {
+            "mean": 16.3,
+            "max": 16.75,
+            "min": 15.63
+          },
+          "gpu_device_pct": {
+            "mean": 1.6,
+            "max": 6,
+            "min": 0
+          },
+          "free_pct": {
+            "mean": 91.0,
+            "max": 91,
+            "min": 91
+          },
+          "swap_used_mb": {
+            "mean": 0.0,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "pressure_levels": [
+            "normal"
+          ],
+          "resident_unknown_samples": 0,
+          "gpu_by_process": [
+            {
+              "pid": 9392,
+              "name": "Terminal",
+              "pct": 7.7,
+              "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+            },
+            {
+              "pid": 179,
+              "name": "WindowServer",
+              "pct": 2.5,
+              "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+            },
+            {
+              "pid": 99086,
+              "name": "Grok Bot Helper",
+              "pct": 1.3,
+              "cmd": "/Applications/Grok Bot.app/Contents/Frameworks/Grok Bot Helper.app/Contents/MacOS/Grok Bot Helper --type=gpu-process --user-data-dir=~/Library/Applica"
+            }
+          ],
+          "load": {
+            "samples": 15,
+            "app_gpu_mean_pct": 11.5,
+            "app_gpu_p95_pct": 12.4,
+            "app_spike_seconds": 0,
+            "user_active_pct": 100.0
+          }
+        },
+        "cpu_busy_pct": 30.1,
+        "problems": [],
+        "allow_busy": false,
+        "waited_s": 12.7
+      },
+      "during": {
+        "samples": 151,
+        "load1": {
+          "mean": 39.8,
+          "max": 61.59,
+          "min": 15.66
+        },
+        "gpu_device_pct": {
+          "mean": 43.6,
+          "max": 97,
+          "min": 0
+        },
+        "free_pct": {
+          "mean": 88.2,
+          "max": 91,
+          "min": 86
+        },
+        "swap_used_mb": {
+          "mean": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "pressure_levels": [
+          "normal"
+        ],
+        "resident_unknown_samples": 0,
+        "gpu_by_process": [
+          {
+            "pid": 11411,
+            "name": "mlx-serve",
+            "pct": 23.4,
+            "cmd": "/opt/homebrew/bin/mlx-serve --model ~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit --serve --host 127.0.0.1 --port 11234 --metrics",
+            "model": "~/.mlx-serve/models/ddalcu/Qwen3.6-35B-A3B-MLX-Serve-4bit"
+          },
+          {
+            "pid": 9392,
+            "name": "Terminal",
+            "pct": 5.2,
+            "cmd": "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
+          },
+          {
+            "pid": 179,
+            "name": "WindowServer",
+            "pct": 3.1,
+            "cmd": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon"
+          },
+          {
+            "pid": 99086,
+            "name": "Grok Bot Helper",
+            "pct": 1.8,
+            "cmd": "/Applications/Grok Bot.app/Contents/Frameworks/Grok Bot Helper.app/Contents/MacOS/Grok Bot Helper --type=gpu-process --user-data-dir=~/Library/Applica"
+          }
+        ],
+        "load": {
+          "samples": 151,
+          "app_gpu_mean_pct": 10.5,
+          "app_gpu_p95_pct": 18.3,
+          "app_spike_seconds": 0,
+          "user_active_pct": 79.5
+        }
+      },
+      "contention": [],
+      "power": {
+        "available": false,
+        "samples": 0,
+        "thermal_pressure": []
+      },
+      "cpu": {
+        "samples": 37,
+        "busy_pct": {
+          "mean": 34.2,
+          "max": 39.1,
+          "min": 30.4
+        }
+      },
+      "before_live": {
+        "t": 1790815997.371128,
+        "load1": 16.98,
+        "free_pct": 87,
+        "swap_used_mb": 0.0,
+        "pressure_level": "normal",
+        "gpu_device_pct": 7,
+        "gpu_renderer_pct": 7,
+        "gpu_tiler_pct": 7,
+        "gpu_in_use_mem_bytes": 23041605632,
+        "resident": {
+          "ollama": [],
+          "mlx-serve": [
+            "Qwen3.6-35B-A3B-MLX-Serve-4bit"
+          ],
+          "splash": [],
+          "omlx": [],
+          "mlx-smol": [],
+          "mlxfast": []
+        },
+        "user_idle_s": 0.1
+      },
+      "host": {
+        "hostname": "mac-studio",
+        "model": "Mac15,14",
+        "chip": "Apple M3 Ultra",
+        "p_cores": 24,
+        "e_cores": 8,
+        "gpu_cores": 80,
+        "mem_gb": 512,
+        "macos": "26.5.2",
+        "macos_build": "25F84",
+        "gpu_wired_limit_mb": null,
+        "host_id": "mac-studio-apple-m3-ultra-512gb"
+      }
+    }
+  }
+}

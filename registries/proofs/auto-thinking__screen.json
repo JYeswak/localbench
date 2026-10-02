@@ -1,0 +1,42 @@
+{
+  "assertions": [
+    {
+      "id": "gate-accuracy",
+      "params": {
+        "max": null,
+        "metric": "decision.choice.accuracy",
+        "min": 0.9
+      },
+      "type": "metric"
+    }
+  ],
+  "candidates": [
+    {
+      "route": "ollama:nimble:latest"
+    },
+    {
+      "route": "ollama:tev1:latest"
+    },
+    {
+      "route": "ollama:tev1:0.8b"
+    }
+  ],
+  "dataset": {
+    "items_sha256": "ae86eaa55e3515f56447bace22c1971ff096368b47f8a7f649bc2f1788571478",
+    "suite": "decision.choice/auto-thinking-level-jev174-20261001"
+  },
+  "description": "kit-auto-thinking-route-kmt screen: captured auto-thinking requests, 174 items. No paired assertion: the suite carries no hosted reference (labels only); agreement vs hosted comes at stage 2 with the hosted arm. Screen bar is the accuracy gate; latency p95 inside omp's 4 s cap is read from the receipt, not gated here.",
+  "feature": "auto-thinking",
+  "fresh_per_round": false,
+  "kind": "decision",
+  "regime": "side",
+  "repeats": 1,
+  "seed": 20261001,
+  "stage": "screen",
+  "wins": [
+    {
+      "metric": "privacy"
+    }
+  ],
+  "wins_needed": 1
+}

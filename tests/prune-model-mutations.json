@@ -1,0 +1,23 @@
+[
+  {
+    "label": "an open-bead model must not be offered for deletion",
+    "file": "scripts/prune_models.py",
+    "old": "        keep.extend(named_in(r, open_beads or {}))",
+    "new": "        keep.extend([])",
+    "tests": ["tests.test_prune_models.OpenBeads.test_a_description_only_open_bead_keeps_its_model"]
+  },
+  {
+    "label": "closed beads must stop protecting models",
+    "file": "scripts/prune_models.py",
+    "old": "if bead.get(\"status\") != \"closed\":",
+    "new": "if True:",
+    "tests": ["tests.test_prune_models.OpenBeads.test_a_closed_bead_does_not_keep_its_model"]
+  },
+  {
+    "label": "description-only model mentions must be protected",
+    "file": "scripts/prune_models.py",
+    "old": "for field in (\"title\", \"description\")",
+    "new": "for field in (\"title\",)",
+    "tests": ["tests.test_prune_models.OpenBeads.test_a_description_only_open_bead_keeps_its_model"]
+  }
+]

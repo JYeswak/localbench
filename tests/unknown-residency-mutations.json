@@ -1,0 +1,93 @@
+[
+  {
+    "label": "unknown resident state cannot be accepted as an isolated E2E campaign case",
+    "file": "localbench/__main__.py",
+    "old": "or _resident_unknown(summary) != 0)",
+    "new": "or False)",
+    "tests": ["tests.test_cli.E2ECaseStatus.test_unknown_residency_voids_a_would_be_pass"]
+  },
+  {
+    "label": "a second endpoint's unknown state must not erase a known foreign resident",
+    "file": "localbench/sysstats.py",
+    "old": "if names and any(m not in ours for m in names)}",
+    "new": "if all(resident.values()) and names and any(m not in ours for m in names)}",
+    "tests": ["tests.test_sysstats.RunnerAttribution.test_known_competitor_remains_contention_when_another_server_is_unknown"]
+  },
+  {
+    "label": "unknown sample cannot pass the shared run and A/A/A/B soundness gate",
+    "file": "localbench/__main__.py",
+    "old": "elif not side and unknown:\n        reasons.append(f\"resident model state unknown in {unknown} sampler sample(s); run is non-proof\")",
+    "new": "elif False:\n        reasons.append(f\"resident model state unknown in {unknown} sampler sample(s); run is non-proof\")",
+    "tests": ["tests.test_load.Verdict.test_unknown_residency_withholds_proof_without_inventing_contention"]
+  },
+  {
+    "label": "bank must refuse rather than persist a sampled unknown-residency receipt",
+    "file": "localbench/__main__.py",
+    "old": "refuse = (None if unknown == 0 else",
+    "new": "refuse = (None if unknown is not None else",
+    "tests": ["tests.test_cli.UnknownResidencyBank.test_unknown_residency_cannot_create_a_banked_receipt"]
+  },
+  {
+    "label": "owned-stop sample must be bounded by the observed child exit window",
+    "file": "localbench/sysstats.py",
+    "old": "if not start <= probe_start <= probe_end <= end:\n                continue",
+    "new": "if False:\n                continue",
+    "tests": ["tests.test_load.OwnedStopClassification.test_rejects_untrusted_none_samples"]
+  },
+  {
+    "label": "owned-stop sample requires a target-only loaded prestate",
+    "file": "localbench/sysstats.py",
+    "old": "if stop.get(\"pre\") != sorted({target[1], *target[2:]}):\n                continue",
+    "new": "if False:\n                continue",
+    "tests": ["tests.test_load.OwnedStopClassification.test_rejects_untrusted_none_samples"]
+  },
+  {
+    "label": "HTTP 200 residency responses missing their required array are unknown",
+    "file": "localbench/sysstats.py",
+    "old": "if not isinstance(result, dict) or not isinstance(result.get(field), list):",
+    "new": "if not isinstance(result, dict) or False:",
+    "tests": ["tests.test_sysstats.ResidencySchemaAndSamplerResilience.test_http_200_objects_missing_residency_arrays_are_unknown_schema_errors"]
+  },
+  {
+    "label": "sampler keeps recording an unknown sample after a live probe raises",
+    "file": "localbench/sysstats.py",
+    "old": "except Exception as exc:\n                s = _unknown_residency_sample(exc)",
+    "new": "except Exception as exc:\n                raise",
+    "tests": ["tests.test_sysstats.ResidencySchemaAndSamplerResilience.test_sampler_records_a_raising_live_probe_as_unknown_and_keeps_sampling"]
+  },
+  {
+    "label": "missing residency count cannot be treated as complete",
+    "file": "localbench/render.py",
+    "old": "if not isinstance(during, dict) or \"resident_unknown_samples\" not in during:",
+    "new": "if False:",
+    "tests": ["tests.test_render.SummaryViews.test_missing_residency_sample_count_is_unsound_and_incomplete"]
+  },
+  {
+    "label": "oMLX status entries must match the installed list-of-string contract",
+    "file": "localbench/sysstats.py",
+    "old": "name = model if isinstance(model, str) else None",
+    "new": "name = model.get(\"id\") if isinstance(model, dict) else None",
+    "tests": ["tests.test_omlx.OneModelAtATime.test_unrecognized_omlx_loaded_model_entry_is_unknown"]
+  },
+  {
+    "label": "declared auxiliary models are not Ollama GPU contenders",
+    "file": "localbench/sysstats.py",
+    "old": "{model, *also} & set(row.get(\"model_names\") or [row.get(\"model\")])",
+    "new": "{model} & set(row.get(\"model_names\") or [row.get(\"model\")])",
+    "tests": ["tests.test_sysstats.RunnerAttribution.test_ollama_runner_with_a_declared_smol_is_ours_but_not_an_undeclared_model"]
+  },
+  {
+    "label": "every declared model is excluded from foreign residency",
+    "file": "localbench/sysstats.py",
+    "old": "return {srv: [m for m in names if m not in ours]\n            for srv, names in resident.items()\n            if names and any(m not in ours for m in names)}",
+    "new": "return {srv: [m for m in names if m != model]\n            for srv, names in resident.items()\n            if names and any(m != model for m in names)}",
+    "tests": ["tests.test_load.Classify.test_declared_smol_residency_is_expected_but_other_model_still_contends"]
+  },
+  {
+    "label": "owned stop prestate must exactly match all declared target models",
+    "file": "localbench/sysstats.py",
+    "old": "if stop.get(\"pre\") != sorted({target[1], *target[2:]}):",
+    "new": "if stop.get(\"pre\") != [target[1]]:",
+    "tests": ["tests.test_load.OwnedStopClassification.test_owned_stop_with_smol_prestate_requires_declared_smol"]
+  }
+]

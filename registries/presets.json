@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "test_profiles": ["omp-test", "omp-test2"],
+  "presets": [
+    {
+      "name": "scout:off",
+      "local": false,
+      "ops": [{"op": "list_add", "key": "task.disabledAgents", "item": "scout"}],
+      "notes": "scout subagent off; its turns ran on @smol (2026-10-01 manual change, backup omp-config-scout-20261001T0143Z)"
+    },
+    {
+      "name": "scout:on",
+      "local": true,
+      "ops": [{"op": "list_remove", "key": "task.disabledAgents", "item": "scout"}],
+      "notes": "scout subagent back on; whole agent turns on @smol",
+      "queue": false,
+      "queue_reason": "the owner 2026-10-01: scouts off"
+    },
+    {
+      "name": "thinking:auto",
+      "local": false,
+      "ops": [{"op": "set", "key": "defaultThinkingLevel", "value": "auto"}],
+      "notes": "auto-thinking classifies every user turn on the judge chain; the judge preset decides whether that is local"
+    },
+    {
+      "name": "thinking:fixed-high",
+      "local": false,
+      "ops": [{"op": "set", "key": "defaultThinkingLevel", "value": "high"}],
+      "notes": "no per-turn classifier call (2026-10-01 manual change, backup omp-config-thinking-20261001T0158Z)"
+    },
+    {
+      "name": "judge:hosted",
+      "local": false,
+      "ops": [
+        {"op": "role", "role": "judge", "selector": "typesafe/proj-b-latest"},
+        {"op": "provider", "model": null}
+      ],
+      "notes": "hosted TypeSafe judge; removes the localbench gateway System One provider"
+    },
+    {
+      "name": "judge:nimble",
+      "local": true,
+      "ops": [
+        {"op": "provider", "model": "nimble:latest"},
+        {"op": "role", "role": "judge", "selector": "localbench-sys1/nimble:latest"}
+      ],
+      "notes": "nimble 9B on Ollama /v1/systemone through the residency gateway"
+    },
+    {
+      "name": "judge:tev1",
+      "local": true,
+      "ops": [
+        {"op": "provider", "model": "tev1:latest"},
+        {"op": "role", "role": "judge", "selector": "localbench-sys1/tev1:latest"}
+      ],
+      "notes": "tev1 4B on Ollama /v1/systemone through the residency gateway"
+    },
+    {
+      "name": "judge:tev1-0.8b",
+      "local": true,
+      "ops": [
+        {"op": "provider", "model": "tev1:0.8b"},
+        {"op": "role", "role": "judge", "selector": "localbench-sys1/tev1:0.8b"}
+      ],
+      "notes": "tev1 0.8B on Ollama /v1/systemone through the residency gateway"
+    },
+    {
+      "name": "memory:qwen38",
+      "local": true,
+      "ops": [
+        {"op": "role", "role": "smol", "selector": "ollama/qwen3.8:27b-mlx"},
+        {"op": "set", "key": "mnemopi.llmMode", "value": "smol"}
+      ],
+      "notes": "mnemopi fact extraction on @smol = qwen3.8 27B through the residency gateway's ollama provider"
+    },
+    {
+      "name": "memory:none",
+      "local": true,
+      "ops": [{"op": "set", "key": "mnemopi.llmMode", "value": "none"}],
+      "notes": "mnemopi stores without LLM-backed extraction; a proved no-model route (features.grade NO_MODEL_ROUTE, kind fixed id none) replacing the local smol extractor, so live apply needs its memory proof"
+    },
+    {
+      "name": "embeddings:fts",
+      "local": false,
+      "ops": [{"op": "set", "key": "mnemopi.noEmbeddings", "value": true}],
+      "notes": "mnemopi recall by full-text search only, no fastembed embedding model (recall-embeddings route off at noEmbeddings true): the declared non-local alternative a local embeddings route is proven against. Own family, so memory:* applies never need an embeddings proof"
+    },
+    {
+      "name": "embeddings:on",
+      "local": true,
+      "ops": [{"op": "set", "key": "mnemopi.noEmbeddings", "value": false}],
+      "notes": "mnemopi recall with the local fastembed embedding model (local/fast-bge-base-en-v1.5 by default); live apply needs recall-embeddings PROVEN against embeddings:fts"
+    }
+  ]
+}

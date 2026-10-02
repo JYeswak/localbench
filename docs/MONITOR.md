@@ -11,7 +11,7 @@
 You observe. You do not grade, re-run, fix, or steer. Your output is a list of
 timestamped findings the main agent can act on.
 
-## 1. Before you watch: prove you are not a contaminant
+## 1. Before you watch: screen your own pane for local-model use
 
 Run the check on **your own** pane (your pane id: `tmux display -p '#{pane_id}'`):
 
@@ -21,7 +21,7 @@ Run the check on **your own** pane (your pane id: `tmux display -p '#{pane_id}'`
 
 | exit | meaning | what you do |
 |---|---|---|
-| 0 | your main model is non-local | proceed, unless a `WARNING:` line printed (below) |
+| 0 | no local main model detected by this check | proceed only if there is no `WARNING:` line (below); this is not proof that every model route is remote |
 | 1 | `LOCAL MODEL: <selector>` | stop. Do not watch. Report the line. |
 | 2 | undetermined (no such pane, no omp under it, selector without provider) | stop. Unknown is not safe. |
 
@@ -31,52 +31,58 @@ to a local model even though your main model is cloud. During an active run
 that is contamination: a title generation loads the model the run may be
 measuring against. Treat the warning as disqualifying while a run is active;
 relaunching with `omp --smol <cloud-provider>/<model>` clears it in the check
-(`--smol` beats config). Since 2026-09-25 every profile has `modelRoles.smol:
-mlx-smol/Qwen3.8-27B-MLX-Serve-4bit` (a dedicated mlx-serve on 127.0.0.1:11235, `localbench smol status`) and most
-set `mnemopi.llmMode: smol`, so every omp pane carries this warning; the check classes `mlx-smol` as local because
-its models.yml baseUrl is loopback.
+(`--smol` beats config). The 2026-09-29 `localbench models` inventory found a local
+`smol` route to `ollama/qwen3.8:27b-mlx` in 12 of 13 profiles; `agy` had no
+installed local `smol` route. Several profiles also set `mnemopi.llmMode: smol`.
+Check the actual pane before watching: a profile inventory does not prove the
+route cached by an already-running omp process.
 
-**The check's limit.** It is a point-in-time check, not a guarantee. It reads
+**The check's limit.** It is a point-in-time screen, not a guarantee. It reads
 the omp process argv (`--model`, `--provider`, `--smol`, `--profile`), the
 session `.jsonl` the process holds open (the last `model_change` / assistant
-message, which is the only place a runtime `/model` switch shows up), and the
-profile's `config.yml`. A `/model` switch made after the check, or not yet
-written to the session file, is invisible to it. Never switch models while
-watching; re-run the check whenever you are unsure. An earlier exit 0 is not a
-standing permission.
+message, if `jq` is installed), and the profile's `config.yml`. It recognizes
+local provider names and loopback providers declared in `models.yml`; other
+provider names default to non-local, so exit 0 is not proof against an
+undeclared local endpoint. A `/model` switch made after the check, or not yet
+written to the session file, is invisible to it; without `jq`, session-file
+evidence is skipped. Never switch models while watching; re-run the check
+whenever you are unsure. An earlier exit 0 is not a standing permission.
 
 ## 2. What to read
 
 ```sh
 RUN=~/Developer/localbench/runs/LATEST        # symlink to the newest run dir
-tail -n +1 -F "$RUN/progress.jsonl"           # one JSON event per line; every event has "t" (unix s)
-uv run python scripts/monitor-report.py "$RUN/progress.jsonl"
+tail -n +1 -F "$RUN/progress.jsonl"           # live follow; stop with Ctrl-C before the next command
+uv run python scripts/monitor-report.py "$RUN/progress.jsonl"  # one-shot progress summary
 ```
 
-`monitor-report.py` prints one finding line per contention, sample error, failed e2e, gap over 10
-minutes, preflight_wait series (count, first and last time, last problems), or a stream whose last
-event is not `done`. A clean done is one `done no findings` line. It does not grade. `LATEST` is
+`monitor-report.py` prints one finding line per contention, sample with a nonempty error, failed e2e, **completed**
+gap over 10 minutes, preflight_wait series (count, first and last time, last problems), or a stream
+whose last event is not `done`. It cannot identify an ongoing stall from a single file read; use
+the clock check in section 3. A `done` with no such progress-event findings prints `done no findings`,
+not an all-clear for result rows or machine state. It does not grade. `LATEST` is
 repointed when the next run starts; note the resolved directory name (`readlink "$RUN"`) at the start and put it in every finding.
 When the `done` event arrives, read `$RUN/summary.json` (`system.before`, `system.during`,
-`system.after`, and the result rows).
+`system.after`, and raw `results`/`conformance`). If `$RUN/report.md` exists,
+read its golden-comparison statuses; A/A and A/B legs need not have one.
 
-Events: `start`, `isolated`, `tier`, `sample`, `e2e`, `contention`, `done`
-(field list: see the progress contract in the lb-09 packet).
+Events include `start`, `preflight_wait`, `isolated`, `tier`, `sample`, `e2e`,
+`contention`, `done` (field list: see the progress contract in the lb-09 packet).
 
 ## 3. What to flag (each with its timestamp)
 
 | flag | where you see it |
 |---|---|
 | any `contention` event | `progress.jsonl`; quote `resident` and `gpu_device_pct`. If the resident foreign model is under `mlx-smol` (or, before 2026-09-25, `qwen3.8:27b-mlx`), suspect an omp smol role (possibly a watcher) and say so. |
-| GPU busy at start | `start`/`isolated` events and `summary.json` `system.before` / preflight problems (GPU device % above idle, `--allow-busy` runs). |
-| thermal pressure other than `Nominal`, or any `thermal_warning` | `summary.json` system power/thermal fields (`thermal_pressure`, `thermal_warning`). Absent powermetrics data (`available: false`) is itself worth one line: thermal state was not measured. |
-| swap growth | `swap_used_mb` in `system.before` vs `system.during` max vs `system.after`; any increase. |
-| sample errors | a `sample` event with non-null `error`; an `e2e` event with `ok: false`. |
-| bad result rows | any row with status `REGRESSED`, `FAIL`, `GENERATION-MISMATCH`, or `TOL-UNPROVEN` in `summary.json`. |
+| GPU busy at start | `summary.json` `system.before.live.gpu_device_pct` / `system.preflight.problems` (including `--allow-busy` runs). `start` and `isolated` events mark timing but do not contain GPU usage. |
+| thermal pressure other than `Nominal`, or any `thermal_warning` | `summary.json` `system.power.thermal_pressure` and `system.before.power.thermal_warning` / `system.after.power.thermal_warning`. `system.power.available: false` means sampled thermal pressure was not measured; check the separate before/after warning fields too. |
+| swap growth | `summary.json` `system.before.live.swap_used_mb` vs `system.during.swap_used_mb.max` vs `system.after.live.swap_used_mb`; any increase. |
+| sample errors | a `sample` event with a nonempty `error`; an `e2e` event with `ok: false`. |
+| bad result rows | if present, `report.md` golden-comparison rows with `REGRESSED`, `FAIL`, `MUST-VOID`, `MISSING`, `GENERATION-MISMATCH`, or `TOL-UNPROVEN`; `summary.json` holds raw metrics/conformance, not these statuses. |
 | stall | no new event in `progress.jsonl` for more than 10 minutes before `done` (compare the last event's `t` with `date +%s`). |
-| run ended without `done` | the process is gone (`pgrep -f 'localbench'` empty) and the last event is not `done`. |
+| run ended without `done` | the process for this run is gone and the last event is not `done`; `pgrep -f 'localbench'` alone cannot distinguish another run or command. |
 
-Report what you saw; do not interpret it into a verdict. `XFAIL`, `MISSING`,
+Report what you saw; do not interpret it into a verdict. `XFAIL`,
 `IMPROVED`, and `PASS` rows are not findings unless something above also applies.
 
 ## 4. What you never do
@@ -108,6 +114,8 @@ Examples:
 2026-09-22T21:52:44Z 20260922T211002Z__ollama__qwen3.6-35b summary.json row decode_tps/long status=REGRESSED
 ```
 
-Convert `t` with `date -u -r <int t> +%Y-%m-%dT%H:%M:%SZ`. Quote the evidence
-line verbatim from the file; do not paraphrase numbers. If the run is clean,
-report one line: `<time> <run dir> done no findings`.
+Convert `t` with `date -u -r <int t> +%Y-%m-%dT%H:%M:%SZ`. For a source event,
+quote its evidence fields from the file without changing values; the helper
+re-serializes events and synthesizes stall/wait/end lines, so its lines are not
+verbatim `progress.jsonl` records. If the run is clean on both progress and
+summary inspection, report one line: `<time> <run dir> done no findings`.

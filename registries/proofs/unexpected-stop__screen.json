@@ -1,0 +1,58 @@
+{
+  "assertions": [
+    {
+      "id": "paired-vs-recorded",
+      "params": {
+        "alpha": 0.05,
+        "min_n": 540,
+        "rule": "NOT_WORSE",
+        "seed": 20261001
+      },
+      "type": "paired"
+    },
+    {
+      "id": "gate-accuracy",
+      "params": {
+        "max": null,
+        "metric": "decision.noul.accuracy",
+        "min": 0.9
+      },
+      "type": "metric"
+    },
+    {
+      "id": "gate-macro-f1",
+      "params": {
+        "max": null,
+        "metric": "decision.noul.macro_f1",
+        "min": 0.8
+      },
+      "type": "metric"
+    }
+  ],
+  "candidates": [
+    {
+      "route": "ollama:nimble:latest"
+    },
+    {
+      "route": "ollama:tev1-ctx4608"
+    }
+  ],
+  "dataset": {
+    "items_sha256": "cdfa4d9ab696370ca75a4bd12ef92b1b6ee6cd937e4f7f26d3278b3afaaa843a",
+    "suite": "decision.noul/unexpected-stop-jevlatest-20261001"
+  },
+  "description": "kit-icy stage-1 screen: 540 omp-faithful items, labels are recorded hosted answers. tev1 runs on the derived 4608-ctx model (decision derive first). Pass both gates to ADVANCE to the hosted-arm A/B; otherwise REJECT. Macro-F1 bound is load-bearing: always-false scores accuracy 0.922 at macro-F1 ~0.48.",
+  "feature": "unexpected-stop",
+  "fresh_per_round": false,
+  "kind": "decision",
+  "regime": "side",
+  "repeats": 1,
+  "seed": 20261001,
+  "stage": "screen",
+  "wins": [
+    {
+      "metric": "privacy"
+    }
+  ],
+  "wins_needed": 1
+}

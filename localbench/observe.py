@@ -70,19 +70,29 @@ def record(con: sqlite3.Connection, before: dict, t0: float, commands: dict[int,
 def watch(interval: float = 60.0, samples: int | None = None, path: Path = DB) -> None:
     """Record every `interval` seconds until interrupted (or `samples` times)."""
     con = connect(path)
-    commands: dict[int, str] = {}
-    before, conn, t0 = sysstats.gpu_time_by_pid(), sysstats.connection_bytes(), time.time()
-    n = 0
-    while samples is None or n < samples:
-        time.sleep(max(0.0, t0 + interval - time.time()))
-        before, t0, conn = record(con, before, t0, commands, conn)
-        n += 1
+    try:
+        commands: dict[int, str] = {}
+        before, conn, t0 = sysstats.gpu_time_by_pid(), sysstats.connection_bytes(), time.time()
+        n = 0
+        while samples is None or n < samples:
+            time.sleep(max(0.0, t0 + interval - time.time()))
+            before, t0, conn = record(con, before, t0, commands, conn)
+            n += 1
+    finally:
+        con.close()
 
 
 def report(since_s: float, path: Path = DB) -> dict:
     """GPU-seconds by process/model, model residency, clients seen, and the bytes each client moved to and from each
     server over the last `since_s` seconds."""
     con = connect(path)
+    try:
+        return _report(con, since_s)
+    finally:
+        con.close()  # left to the GC, the connection printed a ResourceWarning into whatever stderr was current
+
+
+def _report(con: sqlite3.Connection, since_s: float) -> dict:
     t_min = time.time() - since_s
     covered = con.execute("select count(*), coalesce(sum(window_s), 0), min(t), max(t) from samples where t >= ?",
                           (t_min,)).fetchone()

@@ -1,0 +1,65 @@
+[
+  {
+    "label": "backend-reported tokenizer identity is omitted",
+    "file": "localbench/backends.py",
+    "old": "return f\"ollama-ggml-sha256:{digest.hexdigest()}\"",
+    "new": "return None",
+    "tests": ["tests.test_backends.OllamaTokenizerIdentity.test_identity_comes_from_reported_tokenizer_tables_not_model_generation", "tests.test_backends.OllamaTokenizerIdentity.test_a_changed_token_table_has_a_different_identity"]
+  },
+  {
+    "label": "empty vocabulary accepted as tokenizer identity",
+    "file": "localbench/backends.py",
+    "old": "or not tokens",
+    "new": "or False",
+    "tests": ["tests.test_backends.OllamaTokenizerIdentity.test_missing_or_incomplete_tokenizer_report_does_not_guess_an_identity"]
+  },
+  {
+    "label": "different tokenizer still compared as drift",
+    "file": "localbench/workloads.py",
+    "old": "if recorded_tok and run_tok and recorded_tok != run_tok:",
+    "new": "if False:",
+    "tests": ["tests.test_workloads.PromptTokens.test_same_backend_with_a_different_reported_tokenizer_is_void", "tests.test_workloads.ReplayTokenWiring.test_same_backend_tokenizer_change_is_void_through_replay"]
+  },
+  {
+    "label": "same tokenizer is incorrectly voided",
+    "file": "localbench/workloads.py",
+    "old": "if recorded_tok and run_tok and recorded_tok != run_tok:",
+    "new": "if recorded_tok and run_tok and recorded_tok == run_tok:",
+    "tests": ["tests.test_workloads.PromptTokens.test_same_tokenizer_on_a_different_model_still_judges_drift"]
+  },
+  {
+    "label": "missing tokenizer identity fails closed instead of preserving backend rule",
+    "file": "localbench/workloads.py",
+    "old": "if recorded_tok and run_tok and recorded_tok != run_tok:",
+    "new": "if not recorded_tok or not run_tok or recorded_tok != run_tok:",
+    "tests": ["tests.test_workloads.PromptTokens.test_missing_tokenizer_identity_falls_back_to_the_backend_rule"]
+  },
+  {
+    "label": "recorded sidecar tokenizer identity is ignored",
+    "file": "localbench/workloads.py",
+    "old": "recorded_tok = backend_pins.get(\"tokenizer_identity\")",
+    "new": "recorded_tok = None",
+    "tests": ["tests.test_workloads.ReplayTokenWiring.test_same_backend_tokenizer_change_is_void_through_replay"]
+  },
+  {
+    "label": "current backend tokenizer identity is ignored during replay",
+    "file": "localbench/workloads.py",
+    "old": "run_tok=ctx.tok_identity",
+    "new": "run_tok=None",
+    "tests": ["tests.test_workloads.ReplayTokenWiring.test_same_backend_tokenizer_change_is_void_through_replay"]
+  },
+  {
+    "label": "record sidecar drops measured tokenizer identity",
+    "file": "localbench/__main__.py",
+    "old": "if tok_identity:",
+    "new": "if False:",
+    "tests": ["tests.test_cli.RecordTokenizerIdentity.test_record_sidecar_keeps_the_backend_reported_tokenizer_identity"]
+  },
+  {
+    "label": "backend query omits complete tokenizer tables",
+    "file": "localbench/backends.py",
+    "old": "\"verbose\": True",
+    "new": "\"verbose\": False",
+    "tests": ["tests.test_backends.OllamaTokenizerIdentity.test_identity_comes_from_reported_tokenizer_tables_not_model_generation"]
+  }
+]

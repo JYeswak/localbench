@@ -1,0 +1,543 @@
+[
+  {
+    "label": "non-normalized probabilities are an ERROR, not a score",
+    "file": "localbench/decision.py",
+    "old": "if abs(total - 1.0) > TOL:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Quality.test_each_malformed_response_class_is_an_error_not_a_score"
+    ]
+  },
+  {
+    "label": "a choice that is not the argmax is an ERROR",
+    "file": "localbench/decision.py",
+    "old": "if ps[choice] < max(ps.values()):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Quality.test_each_malformed_response_class_is_an_error_not_a_score"
+    ]
+  },
+  {
+    "label": "a score that is not sum(j * p_j) is an ERROR",
+    "file": "localbench/decision.py",
+    "old": "if abs(score - expect) > TOL:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Quality.test_each_malformed_response_class_is_an_error_not_a_score"
+    ]
+  },
+  {
+    "label": "answers out of request order are an ERROR",
+    "file": "localbench/decision.py",
+    "old": "if list(answers) != names:",
+    "new": "if set(answers) != set(names):",
+    "tests": [
+      "tests.test_decision.Quality.test_each_malformed_response_class_is_an_error_not_a_score"
+    ]
+  },
+  {
+    "label": "ERROR outcomes stay in the accuracy denominator",
+    "file": "localbench/decision.py",
+    "old": "out[pre + \"accuracy\"] = (sum(c[\"correct\"] for c in cs) / n, n)",
+    "new": "out[pre + \"accuracy\"] = (sum(c[\"correct\"] for c in cs) / max(1, sum(not c[\"err\"] for c in cs)), n)",
+    "tests": [
+      "tests.test_decision.Quality.test_errors_count_as_wrong_in_the_denominator"
+    ]
+  },
+  {
+    "label": "the predeclared gate bound decides PASS/FAIL",
+    "file": "localbench/decision.py",
+    "old": "ok = value is not None and (value >= limit if op == \"min\" else value <= limit)",
+    "new": "ok = value is not None",
+    "tests": [
+      "tests.test_decision.Quality.test_wrong_answer_model_has_low_accuracy_and_fails_its_gate"
+    ]
+  },
+  {
+    "label": "compare() never calls a quality loss beyond noise BETTER",
+    "file": "localbench/decision.py",
+    "old": "verdict = \"WORSE\" if losses else (\"BETTER\" if wins else \"NOT_BETTER\")",
+    "new": "verdict = \"BETTER\" if wins else \"NOT_BETTER\"",
+    "tests": [
+      "tests.test_decision.Compare.test_quality_drop_beyond_noise_is_worse_even_when_faster"
+    ]
+  },
+  {
+    "label": "with repeats the noise is the A/A spread, not the bootstrap",
+    "file": "localbench/decision.py",
+    "old": "aa = c[\"repeats\"] >= 2 and b[\"repeats\"] >= 2",
+    "new": "aa = False",
+    "tests": [
+      "tests.test_decision.Compare.test_noise_is_the_aa_spread_when_repeats_exist_else_a_paired_bootstrap"
+    ]
+  },
+  {
+    "label": "the suite loader refuses a changed label file",
+    "file": "localbench/decision.py",
+    "old": "if got != m[\"items_sha256\"]:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Suites.test_changed_labels_or_source_fail_the_hash_check"
+    ]
+  },
+  {
+    "label": "the hosted arm never runs without its key",
+    "file": "localbench/decision.py",
+    "old": "if not key:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.HostedArm.test_hosted_arm_needs_its_key_and_never_stands_in_for_the_local_arm"
+    ]
+  },
+  {
+    "label": "the local arm is loopback only",
+    "file": "localbench/decision.py",
+    "old": "if not loopback and not allow_remote:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Requests.test_local_arm_is_loopback_only_and_remote_arm_https_only"
+    ]
+  },
+  {
+    "label": "the 64 KiB body cap is exact",
+    "file": "localbench/decision.py",
+    "old": "if size > MAX_BODY_BYTES:",
+    "new": "if size > MAX_BODY_BYTES + 1:",
+    "tests": [
+      "tests.test_decision.Requests.test_limits_are_refused_before_sending_and_boundaries_accepted"
+    ]
+  },
+  {
+    "label": "2-26 candidates per question",
+    "file": "localbench/decision.py",
+    "old": "if not MIN_CANDIDATES <= len(options) <= MAX_CANDIDATES:",
+    "new": "if not MIN_CANDIDATES <= len(options) <= MAX_CANDIDATES + 1:",
+    "tests": [
+      "tests.test_decision.Requests.test_limits_are_refused_before_sending_and_boundaries_accepted"
+    ]
+  },
+  {
+    "label": "a comparison that is not BETTER is a receipt problem",
+    "file": "localbench/decision.py",
+    "old": "if comparison[\"verdict\"] != \"BETTER\":",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Compare.test_a_run_worse_than_its_route_baseline_is_a_problem_and_feature_pins_are_written"
+    ]
+  },
+  {
+    "label": "nondeterministic repeats are a MUST failure",
+    "file": "localbench/decision.py",
+    "old": "return {\"level\": \"MUST\", \"verdict\": \"FAIL\" if differs else \"PASS\"",
+    "new": "return {\"level\": \"SHOULD\", \"verdict\": \"FAIL\" if differs else \"PASS\"",
+    "tests": [
+      "tests.test_decision.Quality.test_repeats_that_disagree_fail_the_determinism_check"
+    ]
+  },
+  {
+    "label": "invalid responses are a MUST failure",
+    "file": "localbench/decision.py",
+    "old": "{\"level\": \"MUST\", \"verdict\": \"FAIL\" if invalid else \"PASS\",",
+    "new": "{\"level\": \"SHOULD\", \"verdict\": \"FAIL\" if invalid else \"PASS\",",
+    "tests": [
+      "tests.test_decision.Quality.test_each_malformed_response_class_is_an_error_not_a_score"
+    ]
+  },
+  {
+    "label": "the caller's feature id is written to the receipt",
+    "file": "localbench/decision.py",
+    "old": "if feature is not None:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Compare.test_a_run_worse_than_its_route_baseline_is_a_problem_and_feature_pins_are_written"
+    ]
+  },
+  {
+    "label": "the pinned model digest is the full Ollama digest",
+    "file": "localbench/decision.py",
+    "old": "\"model_digest\": tag.get(\"digest\") or None,",
+    "new": "\"model_digest\": (tag.get(\"digest\") or \"\")[:12] or None,",
+    "tests": [
+      "tests.test_decision.Quality.test_label_echoing_model_scores_perfectly_and_passes_its_gate"
+    ]
+  },
+  {
+    "label": "an answer from another model is not scored",
+    "file": "localbench/decision.py",
+    "old": "if self.arm == \"local\" and reply[\"model\"] != self.model:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Quality.test_an_answer_from_another_model_is_invalid"
+    ]
+  },
+  {
+    "label": "written suite directories are owner-only",
+    "file": "localbench/decision.py",
+    "old": "os.chmod(d, 0o700)",
+    "new": "os.chmod(d, 0o755)",
+    "tests": [
+      "tests.test_decision.Suites.test_written_suites_are_owner_only"
+    ]
+  },
+  {
+    "label": "written suite files are owner-only",
+    "file": "localbench/decision.py",
+    "old": "os.fchmod(fh.fileno(), 0o600)",
+    "new": "os.fchmod(fh.fileno(), 0o644)",
+    "tests": [
+      "tests.test_decision.Suites.test_written_suites_are_owner_only"
+    ]
+  },
+  {
+    "label": "a baseline id must name what its receipt measured",
+    "file": "localbench/decision.py",
+    "old": "if baseline is not None and baseline.id not in baseline_ids(baseline.receipt):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Compare.test_a_baseline_id_must_name_what_its_receipt_measured"
+    ]
+  },
+  {
+    "label": "sampler contention is copied into the receipt",
+    "file": "localbench/decision.py",
+    "old": "\"contention\": list(getattr(sampler, \"contention\", []) or []),",
+    "new": "\"contention\": [],",
+    "tests": [
+      "tests.test_decision.Load.test_coresident_load_is_recorded_around_the_requests_and_never_voids_the_run"
+    ]
+  },
+  {
+    "label": "the resident context is checked before any item",
+    "file": "localbench/decision.py",
+    "old": "        context |= ensure_context(base_url, model, context[\"required_tokens\"], in_use=in_use,\n                                  allow_evict=allow_evict)",
+    "new": "        context |= {\"before\": None, \"action\": \"resident\", \"loaded_context\": None, \"model_num_ctx\": None, \"evicted\": []}",
+    "tests": [
+      "tests.test_decision.Context.test_a_small_resident_context_is_reloaded_with_the_required_num_ctx_and_pinned"
+    ]
+  },
+  {
+    "label": "a small runner in use by another client is never reloaded",
+    "file": "localbench/decision.py",
+    "old": "        if users:\n",
+    "new": "        if False:\n",
+    "tests": [
+      "tests.test_decision.Context.test_a_small_runner_in_use_by_another_client_is_refused_not_reloaded"
+    ]
+  },
+  {
+    "label": "a load is read back against the requirement",
+    "file": "localbench/decision.py",
+    "old": "if loaded is None or loaded < required:",
+    "new": "if loaded is None:",
+    "tests": [
+      "tests.test_decision.Context.test_a_load_that_stays_below_the_requirement_is_refused"
+    ]
+  },
+  {
+    "label": "the loaded context is pinned",
+    "file": "localbench/decision.py",
+    "old": "pins = {**before, \"loaded_context\": context[\"loaded_context\"],",
+    "new": "pins = {**before, \"loaded_context\": None,",
+    "tests": [
+      "tests.test_decision.Context.test_a_small_resident_context_is_reloaded_with_the_required_num_ctx_and_pinned"
+    ]
+  },
+  {
+    "label": "context 400s are their own error class",
+    "file": "localbench/decision.py",
+    "old": "kind = \"context\" if exc.code == 400 and CONTEXT_ERROR.search(detail) else \"http\"",
+    "new": "kind = \"http\"",
+    "tests": [
+      "tests.test_decision.Context.test_context_400s_mid_run_are_their_own_error_class_and_fail_the_run"
+    ]
+  },
+  {
+    "label": "a context that changed mid-run is a pin change",
+    "file": "localbench/decision.py",
+    "old": "if laya is None and context[\"action\"] != \"unreachable\" and context[\"after_run\"] != context[\"loaded_context\"]:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Context.test_context_400s_mid_run_are_their_own_error_class_and_fail_the_run"
+    ]
+  },
+  {
+    "label": "an eviction by the warm load is a problem",
+    "file": "localbench/decision.py",
+    "old": "if context[\"evicted\"]:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Context.test_a_load_that_evicts_another_resident_is_a_problem"
+    ]
+  },
+  {
+    "label": "the conservative estimate covers the longest prompt",
+    "file": "localbench/decision.py",
+    "old": "math.ceil(biggest / CONTEXT_BYTES_PER_TOKEN)",
+    "new": "math.ceil(biggest / 4)",
+    "tests": [
+      "tests.test_decision.Context.test_a_small_resident_context_is_reloaded_with_the_required_num_ctx_and_pinned"
+    ]
+  },
+  {
+    "label": "an unsound baseline receipt never anchors a comparison",
+    "file": "localbench/decision.py",
+    "old": "if baseline is not None and baseline.receipt.get(\"kind\") == \"run\" and baseline.receipt.get(\"problems\") != []:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Compare.test_an_unsound_baseline_receipt_is_refused_before_any_request"
+    ]
+  },
+  {
+    "label": "a shipped num_ctx below the suite's need is refused before any load",
+    "file": "localbench/decision.py",
+    "old": "if shipped is not None and shipped < required:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.ShippedContext.test_a_suite_longer_than_the_shipped_num_ctx_is_refused_before_any_load_or_item"
+    ]
+  },
+  {
+    "label": "the warm-load uses the shipped num_ctx when it is larger",
+    "file": "localbench/decision.py",
+    "old": "want = max(required, shipped or 0)",
+    "new": "want = required",
+    "tests": [
+      "tests.test_decision.ShippedContext.test_a_model_shipping_enough_context_is_loaded_at_its_shipped_value_and_pinned"
+    ]
+  },
+  {
+    "label": "a resident runner must sit at the shipped num_ctx",
+    "file": "localbench/decision.py",
+    "old": "(ctx == shipped if shipped is not None else ctx >= required)",
+    "new": "ctx >= required",
+    "tests": [
+      "tests.test_decision.ShippedContext.test_a_resident_runner_at_another_size_than_shipped_is_reloaded"
+    ]
+  },
+  {
+    "label": "the shipped num_ctx is pinned",
+    "file": "localbench/decision.py",
+    "old": "\"model_num_ctx\": context[\"model_num_ctx\"],",
+    "new": "\"model_num_ctx\": None,",
+    "tests": [
+      "tests.test_decision.ShippedContext.test_a_model_shipping_enough_context_is_loaded_at_its_shipped_value_and_pinned"
+    ]
+  },
+  {
+    "label": "derive reads num_ctx back",
+    "file": "localbench/decision.py",
+    "old": "if ctx != plan[\"num_ctx\"]:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Derive.test_a_readback_that_differs_from_what_was_asked_is_refused"
+    ]
+  },
+  {
+    "label": "derive reads the base's weights back",
+    "file": "localbench/decision.py",
+    "old": "if weights != plan[\"base_weights\"]:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Derive.test_a_readback_that_differs_from_what_was_asked_is_refused"
+    ]
+  },
+  {
+    "label": "derive reads the base's other parameters back",
+    "file": "localbench/decision.py",
+    "old": "if params != plan[\"base_parameters\"]:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Derive.test_a_readback_that_differs_from_what_was_asked_is_refused"
+    ]
+  },
+  {
+    "label": "derive checks the base is untouched",
+    "file": "localbench/decision.py",
+    "old": "if installed.get(_tagged(base)) != plan[\"base_digest\"]:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Derive.test_a_readback_that_differs_from_what_was_asked_is_refused"
+    ]
+  },
+  {
+    "label": "an existing name is a no-op only when it is the same derivation",
+    "file": "localbench/decision.py",
+    "old": "if got == (weights, num_ctx, params):",
+    "new": "if got[0] == weights:",
+    "tests": [
+      "tests.test_decision.Derive.test_an_existing_name_is_refused_unless_it_is_the_same_derivation"
+    ]
+  },
+  {
+    "label": "derive never names the base itself",
+    "file": "localbench/decision.py",
+    "old": "if _tagged(name) == _tagged(model):",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.Derive.test_an_existing_name_is_refused_unless_it_is_the_same_derivation"
+    ]
+  },
+  {
+    "label": "a load at the cap with an in-use resident is refused",
+    "file": "localbench/decision.py",
+    "old": "if at_risk and not allow_evict:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_decision.LoadedModelCap.test_a_load_at_the_cap_with_an_in_use_resident_is_refused_before_any_load"
+    ]
+  },
+  {
+    "label": "the cap check counts the residents against the cap",
+    "file": "localbench/decision.py",
+    "old": "if len(before) >= cap[\"cap\"]:",
+    "new": "if len(before) > cap[\"cap\"]:",
+    "tests": [
+      "tests.test_decision.LoadedModelCap.test_a_load_at_the_cap_with_an_in_use_resident_is_refused_before_any_load"
+    ]
+  },
+  {
+    "label": "--allow-evict lets the load proceed",
+    "file": "localbench/decision.py",
+    "old": "if at_risk and not allow_evict:",
+    "new": "if at_risk:",
+    "tests": [
+      "tests.test_decision.LoadedModelCap.test_allow_evict_loads_past_an_in_use_resident_and_records_it"
+    ]
+  },
+  {
+    "label": "Ollama's automatic cap is 3 per GPU",
+    "file": "localbench/decision.py",
+    "old": "DEFAULT_MODELS_PER_GPU = 3",
+    "new": "DEFAULT_MODELS_PER_GPU = 4",
+    "tests": [
+      "tests.test_decision.LoadedModelCap.test_the_cap_is_launchd_s_value_else_three_per_metal_gpu"
+    ]
+  },
+  {
+    "label": "a positive launchd OLLAMA_MAX_LOADED_MODELS sets the cap",
+    "file": "localbench/decision.py",
+    "old": "        if int(raw) > 0:\n",
+    "new": "        if False:\n",
+    "tests": [
+      "tests.test_decision.LoadedModelCap.test_below_the_cap_no_resident_is_at_risk"
+    ]
+  },
+  {
+    "label": "a laya subfolder that leaves the repo is refused",
+    "file": "localbench/decision.py",
+    "old": "any(p in (\"\", \".\", \"..\") for p in sub.split(\"/\"))",
+    "new": "sub.startswith(\"..\")",
+    "tests": [
+      "tests.test_decision.Laya.test_specs_name_a_hub_repo_and_an_optional_relative_subfolder"
+    ]
+  },
+  {
+    "label": "a laya shim that exits before ready is reported at once with its status and log tail",
+    "file": "localbench/decision.py",
+    "old": "                raise ShimError(f\"laya shim for {name} exited with status {rc} before it was ready: {self._tail()}\")\n",
+    "new": "                pass\n",
+    "tests": [
+      "tests.test_decision.Laya.test_a_shim_that_cannot_become_ready_is_a_shim_error_and_is_reaped"
+    ]
+  },
+  {
+    "label": "a ready shim serving another model is refused",
+    "file": "localbench/decision.py",
+    "old": "if h.get(\"ready\") is not True or h.get(\"model\") != name or not _count(h.get(\"max_len\")):",
+    "new": "if h.get(\"ready\") is not True or not _count(h.get(\"max_len\")):",
+    "tests": [
+      "tests.test_decision.Laya.test_a_shim_that_cannot_become_ready_is_a_shim_error_and_is_reaped"
+    ]
+  },
+  {
+    "label": "a shim that fails to become ready is stopped, not left running",
+    "file": "localbench/decision.py",
+    "old": "        except BaseException:\n            self.stop()\n            raise\n",
+    "new": "        except BaseException:\n            raise\n",
+    "tests": [
+      "tests.test_decision.Laya.test_a_shim_that_cannot_become_ready_is_a_shim_error_and_is_reaped"
+    ]
+  },
+  {
+    "label": "the shim is stopped when the run ends, also when it raises",
+    "file": "localbench/decision.py",
+    "old": "    def __exit__(self, *exc) -> bool:\n        self.stop()\n",
+    "new": "    def __exit__(self, *exc) -> bool:\n",
+    "tests": [
+      "tests.test_decision.Laya.test_a_run_goes_through_the_shim_pins_it_counts_truncation_and_stops_it",
+      "tests.test_decision.Laya.test_the_shim_is_stopped_when_the_run_raises"
+    ]
+  },
+  {
+    "label": "a laya answer reporting a truncated state counts in decision.laya.truncated_items",
+    "file": "localbench/decision.py",
+    "old": "(\"truncated\", rep[\"truncated\"])",
+    "new": "(\"truncated\", False)",
+    "tests": [
+      "tests.test_decision.Laya.test_a_run_goes_through_the_shim_pins_it_counts_truncation_and_stops_it"
+    ]
+  },
+  {
+    "label": "truncation is counted over answered requests only (a dead shim's errors carry no report)",
+    "file": "localbench/decision.py",
+    "old": "    ok = [o for o in arm[\"outcomes\"] if o[\"ok\"]]\n\n    def items(",
+    "new": "    ok = arm[\"outcomes\"]\n\n    def items(",
+    "tests": [
+      "tests.test_decision.Laya.test_a_shim_that_dies_mid_run_gives_availability_errors_not_invalid"
+    ]
+  },
+  {
+    "label": "the Ollama runner-context check after the run does not apply to a laya run",
+    "file": "localbench/decision.py",
+    "old": "    if laya is None and context[\"action\"] != \"unreachable\"",
+    "new": "    if context[\"action\"] != \"unreachable\"",
+    "tests": [
+      "tests.test_decision.Laya.test_a_run_goes_through_the_shim_pins_it_counts_truncation_and_stops_it"
+    ]
+  },
+  {
+    "label": "a laya checkout with uncommitted changes is pinned -dirty",
+    "file": "localbench/decision.py",
+    "old": "sha + (\"-dirty\" if p.stdout.strip() else \"\")",
+    "new": "sha",
+    "tests": [
+      "tests.test_decision.Laya.test_a_checkpoint_outside_the_hf_cache_or_a_dirty_checkout_is_not_pinned"
+    ]
+  },
+  {
+    "label": "noul 0.5 counts as non-destructive (strict >)",
+    "file": "localbench/decision.py",
+    "old": "return (answer[\"noul\"] > 0.5) == bool(label)",
+    "new": "return (answer[\"noul\"] >= 0.5) == bool(label)",
+    "tests": [
+      "tests.test_decision.Paired.test_noul_half_counts_as_non_destructive"
+    ]
+  },
+  {
+    "label": "BETTER needs a positive diff at p < alpha",
+    "file": "localbench/decision.py",
+    "old": "if p < alpha and diff > 0:",
+    "new": "if p < alpha and diff < 0:",
+    "tests": [
+      "tests.test_decision.Paired.test_better_and_worse_ends"
+    ]
+  },
+  {
+    "label": "McNemar p is the doubled lower tail",
+    "file": "localbench/decision.py",
+    "old": "return min(1.0, 2.0 * sum(math.comb(n, i) for i in range(min(b, c) + 1)) / 2 ** n)",
+    "new": "return max(1.0, 2.0 * sum(math.comb(n, i) for i in range(min(b, c) + 1)) / 2 ** n)",
+    "tests": [
+      "tests.test_decision.Paired.test_exact_mcnemar_p_is_known"
+    ]
+  },
+  {
+    "label": "bootstrap CI reports lo below hi",
+    "file": "localbench/decision.py",
+    "old": "\"bootstrap\": {\"mean_pp\": mean * 100, \"lo_pp\": lo * 100, \"hi_pp\": hi * 100,",
+    "new": "\"bootstrap\": {\"mean_pp\": mean * 100, \"lo_pp\": hi * 100, \"hi_pp\": lo * 100,",
+    "tests": [
+      "tests.test_decision.Paired.test_bootstrap_ci_is_deterministic_and_ordered"
+    ]
+  }
+]

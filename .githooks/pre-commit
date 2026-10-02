@@ -64,11 +64,9 @@ else
   echo "pre-commit: canary self-test ok (gate rejects overclaims for a missing proof)." >&2
 fi
 
-# 2. Claim discipline on the real registry.
-#    Checker output is captured: on failure the whole report prints; on
-#    success, WARNING lines still surface — an enforce=yes row whose
-#    readme_pattern misses the README prose is registered but UNVERIFIED,
-#    and that must be visible, not buried in a passing run.
+# 2. Claim discipline on the real registry. An enforced pattern missing from
+#    README or an absent proof is a failure; print the whole report before
+#    blocking the commit.
 if [ -f "$ROOT/registries/claims.tsv" ]; then
   if out=$(sh "$CHECKER" "$ROOT/registries/claims.tsv" "$ROOT/README.md" 2>&1); then
     printf '%s\n' "$out" | grep '^WARNING' >&2 || true
@@ -151,9 +149,12 @@ fi
 # 5. Regression suite (tests/, stdlib unittest): the code that judges runs — golden generation binding and merge,
 #    the proxy's side-call labels, CLI refusals, output projections — must keep failing on the bugs it was written
 #    against (each test is mutation-checked; 2026-09-23 merge() tier drop, 0b6832e, reached review untested).
-#    Pure logic, about a second; runs when code, tests or fixtures are staged. It tests the working tree, not the
-#    staged snapshot. Fails CLOSED without uv: a suite that silently does not run is decoration.
-if git diff --cached --name-only 2>/dev/null | grep -qE '^(localbench|tests|fixtures)/'; then
+#    Runs when anything the suite reads is staged: code, tests, fixtures, scripts, goldens, registries, banked
+#    receipts, the port map, the packet, pyproject.toml (2026-10-01: a receipt-only commit skipped the suite and left
+#    main red; test_render reads every receipt). It tests the working tree, not the staged snapshot. Fails CLOSED
+#    without uv: a suite that silently does not run is decoration.
+if git diff --cached --name-only 2>/dev/null \
+    | grep -qE '^(localbench|tests|fixtures|scripts|goldens|registries|docs/evidence/receipts|docs/port)/|^docs/planning/packet\.md$|^pyproject\.toml$'; then
   if ! command -v uv >/dev/null 2>&1; then
     echo "pre-commit: BLOCKED — uv not found, so the regression suite (tests/) cannot run." >&2
     fail=1

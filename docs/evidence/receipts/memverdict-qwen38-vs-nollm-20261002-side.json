@@ -1,0 +1,469 @@
+{
+  "kind": "run",
+  "feature": "mnemopi-extraction",
+  "omp_module_sha": "0f5961b921a92aa7b6ae4c807e2cfc5ec6245f22c6b51edbf1b550469f7036db",
+  "problems": [
+    "quality unmeasured (a leg lacks it, or < 2 legs per arm): mem.no_leak",
+    "tool-call loop gate failed: ab_a1 sess.turn.max_tool_calls 9 > 3x largest baseline leg (3); ab_a2 sess.turn.timeouts 1 > 0",
+    "MUST FAIL: ab_a2:sess.turns_complete",
+    "comparison void: baseline MUST FAIL: ab_b1:mem.no_leak",
+    "mem: arm A legs ran different omp_version: 18.4.9 / 18.4.10 (arm A = candidate, B = baseline)",
+    "sess: arm A legs ran different omp_version: 18.4.9 / 18.4.10 (arm A = candidate, B = baseline)",
+    "not better than fixed none: NONE"
+  ],
+  "verdict": {
+    "compare": "NONE",
+    "baseline": {
+      "kind": "fixed",
+      "id": "none"
+    }
+  },
+  "run": {
+    "label": "memory",
+    "provenance": {
+      "pins": {
+        "backend": "ollama",
+        "backend_version": "0.35.0",
+        "backend_sha": "add45eb02df0252f",
+        "model": "qwen3.8:27b-mlx",
+        "model_digest": "5642e97495e1",
+        "backend_args": "",
+        "omp_version": "18.4.9",
+        "omp_sha": "981d0536c6fce168",
+        "omp_path": "~/.bun/bin/omp",
+        "omp_child_config": "62eed267e219ddde",
+        "omp_mem_config": "019eef862b65ed03",
+        "omp_agent_config": "38b87e2b63396937",
+        "omp_mem_tools": "memory_edit,recall,reflect,retain",
+        "embedder": "local/fast-bge-base-en-v1.5",
+        "embedder_digest": "d7176de16bfe",
+        "fixtures_sha": "41ff309f03a98aa5",
+        "macos_build": "25F84",
+        "host_id": "mac-studio-apple-m3-ultra-512gb",
+        "smol_model": "qwen3.8:27b-mlx",
+        "smol_digest": "5642e97495e1",
+        "regime": "side",
+        "main_model": "qwen3.6:35b-mlx",
+        "main_model_digest": "e92a3e94bbca",
+        "embeddings": "on"
+      },
+      "label": "memory",
+      "tiers": [
+        "mem",
+        "sess"
+      ],
+      "llm_mode": "smol",
+      "created": "20261002T044404Z",
+      "localbench_rev": "1f01ff8",
+      "fingerprint": {
+        "backend": "ollama",
+        "backend_version": "0.35.0",
+        "backend_sha": "add45eb02df0252f",
+        "model": "qwen3.6:35b-mlx",
+        "model_digest": "e92a3e94bbca",
+        "backend_args": "",
+        "omp_path": "~/.bun/bin/omp",
+        "omp_child_config": "62eed267e219ddde",
+        "omp_mem_config": "019eef862b65ed03",
+        "omp_agent_config": "38b87e2b63396937",
+        "omp_mem_tools": "memory_edit,recall,reflect,retain",
+        "embedder": "local/fast-bge-base-en-v1.5",
+        "embedder_digest": "d7176de16bfe",
+        "fixtures_sha": "41ff309f03a98aa5",
+        "macos_build": "25F84",
+        "host_id": "mac-studio-apple-m3-ultra-512gb",
+        "smol_model": "qwen3.8:27b-mlx",
+        "smol_digest": "5642e97495e1",
+        "regime": "side",
+        "legs": [
+          {
+            "arm": "candidate",
+            "label": "ab_a1",
+            "run_dir": "runs/20261002T025706Z__ab_a1__ollama__qwen3.6_35b-mlx",
+            "created": "20261002T025706Z",
+            "localbench_rev": "1f01ff8"
+          },
+          {
+            "arm": "candidate",
+            "label": "ab_a2",
+            "run_dir": "runs/20261002T032249Z__ab_a2__ollama__qwen3.6_35b-mlx",
+            "created": "20261002T032249Z",
+            "localbench_rev": "1f01ff8"
+          },
+          {
+            "arm": "candidate",
+            "label": "ab_a3",
+            "run_dir": "runs/20261002T042557Z__ab_a3__ollama__qwen3.6_35b-mlx",
+            "created": "20261002T042557Z",
+            "localbench_rev": "1f01ff8"
+          },
+          {
+            "arm": "baseline",
+            "label": "ab_b1",
+            "run_dir": "runs/20261002T031319Z__ab_b1__ollama__qwen3.6_35b-mlx",
+            "created": "20261002T031319Z",
+            "localbench_rev": "1f01ff8"
+          },
+          {
+            "arm": "baseline",
+            "label": "ab_b2",
+            "run_dir": "runs/20261002T041520Z__ab_b2__ollama__qwen3.6_35b-mlx",
+            "created": "20261002T041520Z",
+            "localbench_rev": "1f01ff8"
+          }
+        ]
+      },
+      "legs": {
+        "candidate": [
+          "ab_a1",
+          "ab_a2",
+          "ab_a3"
+        ],
+        "baseline": [
+          "ab_b1",
+          "ab_b2"
+        ]
+      }
+    },
+    "verdicts": {
+      "must_fail": [
+        "ab_a2:sess.turns_complete"
+      ],
+      "baseline_must_fail": [
+        "ab_b1:mem.no_leak"
+      ],
+      "contended": [
+        "ab_a1",
+        "ab_a2",
+        "ab_a3",
+        "ab_b1",
+        "ab_b2"
+      ]
+    },
+    "metrics": {
+      "mem.recall.hit_rate": {
+        "value": 1.0,
+        "better": "higher",
+        "n": 3
+      },
+      "mem.no_leak": {
+        "value": null,
+        "better": "higher",
+        "n": 3
+      },
+      "mem.derail.ok_rate": {
+        "value": 1.0,
+        "better": "higher",
+        "n": 3
+      },
+      "sess.memory_calls_ok": {
+        "value": 0.0,
+        "better": "higher",
+        "n": 3
+      },
+      "mem.recall.pre_main_s": {
+        "value": 26.3092,
+        "better": "lower",
+        "n": 3
+      },
+      "sess.turn.post_retain_wall_s": {
+        "value": 6.1996,
+        "better": "lower",
+        "n": 3
+      },
+      "sess.memory.extract_s": {
+        "value": null,
+        "better": "lower",
+        "n": 3
+      },
+      "system.during.gpu_device_pct": {
+        "value": 89.2,
+        "better": "lower",
+        "n": 3
+      }
+    },
+    "conformance": {
+      "memory.baseline_route": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "baseline": "none",
+        "digest": null,
+        "off_route": [],
+        "problems": []
+      },
+      "memory.served_model": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "problems": []
+      },
+      "memory.comparison_valid": {
+        "level": "MUST",
+        "verdict": "FAIL",
+        "void": [
+          "baseline MUST FAIL: ab_b1:mem.no_leak"
+        ]
+      },
+      "memory.loop_gate": {
+        "level": "MUST",
+        "verdict": "FAIL",
+        "factor": 3,
+        "failures": [
+          "ab_a1 sess.turn.max_tool_calls 9 > 3x largest baseline leg (3)",
+          "ab_a2 sess.turn.timeouts 1 > 0"
+        ],
+        "unmeasured": []
+      },
+      "memory.llm_mode": {
+        "level": "MUST",
+        "verdict": "PASS",
+        "candidate": "smol",
+        "problems": []
+      },
+      "memory.main_ack_slips": {
+        "level": "SHOULD",
+        "verdict": "PASS",
+        "slips": {
+          "candidate": {
+            "ab_a1": 0,
+            "ab_a2": null,
+            "ab_a3": 0
+          },
+          "baseline": {
+            "ab_b1": 0,
+            "ab_b2": 0
+          }
+        }
+      },
+      "memory.co_resident": {
+        "level": "SHOULD",
+        "verdict": "FAIL",
+        "legs": {
+          "candidate": {
+            "ab_a1": {
+              "models": [
+                "nimble:latest, nimble-ctx21507:latest",
+                "ollama/nimble:latest"
+              ],
+              "episodes": 4,
+              "foreign_gpu_mean_pct": 37.8,
+              "resident_unknown_samples": 11
+            },
+            "ab_a2": {
+              "models": [
+                "nimble:latest, nimble-ctx21507:latest",
+                "ollama/nimble:latest",
+                "ollama/nomic-embed-text:latest",
+                "ollama/thinkingcap-qwen3.8:27b-nvfp4",
+                "thinkingcap-qwen3.8:27b-nvfp4"
+              ],
+              "episodes": 21,
+              "foreign_gpu_mean_pct": 68.1,
+              "resident_unknown_samples": 373
+            },
+            "ab_a3": {
+              "models": [
+                "ollama/thinkingcap-qwen3.8:27b-nvfp4",
+                "thinkingcap-qwen3.8:27b-nvfp4"
+              ],
+              "episodes": 1,
+              "foreign_gpu_mean_pct": 52.4,
+              "resident_unknown_samples": 0
+            }
+          },
+          "baseline": {
+            "ab_b1": {
+              "models": [
+                "nimble:latest, nimble-ctx21507:latest",
+                "ollama/nimble:latest",
+                "ollama/nomic-embed-text:latest"
+              ],
+              "episodes": 4,
+              "foreign_gpu_mean_pct": 38.5,
+              "resident_unknown_samples": 12
+            },
+            "ab_b2": {
+              "models": [
+                "nimble:latest, nimble-ctx21507:latest",
+                "ollama/nimble:latest",
+                "ollama/thinkingcap-qwen3.8:27b-nvfp4"
+              ],
+              "episodes": 4,
+              "foreign_gpu_mean_pct": 69.1,
+              "resident_unknown_samples": 32
+            }
+          }
+        },
+        "regimes": {
+          "ab_a1": "side",
+          "ab_a2": "side",
+          "ab_a3": "side",
+          "ab_b1": "side",
+          "ab_b2": "side"
+        }
+      }
+    },
+    "run_dir": null,
+    "memory": {
+      "compare": {
+        "verdict": "NONE",
+        "computed": "WORSE",
+        "void": [
+          "baseline MUST FAIL: ab_b1:mem.no_leak"
+        ],
+        "quality_losses": [],
+        "wins": [],
+        "baseline": {
+          "kind": "fixed",
+          "id": "none",
+          "preset": "memory:none",
+          "leg": [
+            "llm_mode",
+            "none"
+          ]
+        },
+        "unmeasured_quality": [
+          "mem.no_leak"
+        ],
+        "noise": "aa_spread_over_legs",
+        "deltas": {
+          "mem.recall.hit_rate": {
+            "class": "quality",
+            "candidate_legs": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "baseline_legs": [
+              0.6667,
+              1.0
+            ],
+            "better": "higher",
+            "judgement": "within_noise",
+            "candidate": 1.0,
+            "baseline": 0.83335,
+            "delta": 0.16664999999999996,
+            "band": 0.33330000000000004
+          },
+          "mem.no_leak": {
+            "class": "quality",
+            "candidate_legs": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "baseline_legs": [
+              null,
+              1.0
+            ],
+            "better": "higher",
+            "judgement": "unmeasured"
+          },
+          "mem.derail.ok_rate": {
+            "class": "quality",
+            "candidate_legs": [
+              1.0,
+              1.0,
+              0.6667
+            ],
+            "baseline_legs": [
+              1.0,
+              1.0
+            ],
+            "better": "higher",
+            "judgement": "within_noise",
+            "candidate": 1.0,
+            "baseline": 1.0,
+            "delta": 0.0,
+            "band": 0.33330000000000004
+          },
+          "sess.memory_calls_ok": {
+            "class": "quality",
+            "candidate_legs": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "baseline_legs": [
+              1.0,
+              1.0
+            ],
+            "better": "higher",
+            "judgement": "within_noise",
+            "candidate": 0.0,
+            "baseline": 1.0,
+            "delta": -1.0,
+            "band": 1.0
+          },
+          "mem.recall.pre_main_s": {
+            "class": "win",
+            "candidate_legs": [
+              28.6337,
+              18.2553,
+              26.3092
+            ],
+            "baseline_legs": [
+              22.2029,
+              16.8147
+            ],
+            "better": "lower",
+            "judgement": "within_noise",
+            "candidate": 26.3092,
+            "baseline": 19.5088,
+            "delta": 6.8004,
+            "band": 10.378400000000003
+          },
+          "sess.turn.post_retain_wall_s": {
+            "class": "win",
+            "candidate_legs": [
+              5.9709,
+              7.9267,
+              6.1996
+            ],
+            "baseline_legs": [
+              3.7986,
+              6.0339
+            ],
+            "better": "lower",
+            "judgement": "within_noise",
+            "candidate": 6.1996,
+            "baseline": 4.91625,
+            "delta": 1.2833500000000004,
+            "band": 2.2353
+          },
+          "sess.memory.extract_s": {
+            "class": "win",
+            "candidate_legs": [
+              2.351,
+              5.704,
+              6.431
+            ],
+            "baseline_legs": [
+              null,
+              null
+            ],
+            "better": "lower",
+            "judgement": "unmeasured"
+          },
+          "system.during.gpu_device_pct": {
+            "class": "win",
+            "candidate_legs": [
+              42.6,
+              89.2,
+              98.7
+            ],
+            "baseline_legs": [
+              43.6,
+              82.8
+            ],
+            "better": "lower",
+            "judgement": "within_noise",
+            "candidate": 89.2,
+            "baseline": 63.2,
+            "delta": 26.0,
+            "band": 56.1
+          }
+        }
+      }
+    }
+  }
+}

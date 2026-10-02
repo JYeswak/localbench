@@ -1,0 +1,228 @@
+[
+ {
+  "label": "first fetch of a unit is a silent baseline, not a bead flood",
+  "file": "localbench/releasewatch.py",
+  "old": "silent = unit.key not in state[\"units\"] and not unit.new_family",
+  "new": "silent = False",
+  "tests": [
+   "tests.test_releasewatch.Baseline.test_first_run_records_everything_listed_without_filing_and_a_dead_network_writes_nothing"
+  ]
+ },
+ {
+  "label": "a name new to a baselined library is a new family, not baselined",
+  "file": "localbench/releasewatch.py",
+  "old": "yield Unit(key, items, new_family=baselined and name not in known)",
+  "new": "yield Unit(key, items, new_family=False)",
+  "tests": [
+   "tests.test_releasewatch.NewRelease.test_new_decision_family_files_one_bead_and_one_queue_entry_then_nothing_when_seen_again"
+  ]
+ },
+ {
+  "label": "an item already handled is not filed again",
+  "file": "localbench/releasewatch.py",
+  "old": "            if item[\"id\"] in handled:\n                continue",
+  "new": "            if False:\n                continue",
+  "tests": [
+   "tests.test_releasewatch.NewRelease.test_new_decision_family_files_one_bead_and_one_queue_entry_then_nothing_when_seen_again"
+  ]
+ },
+ {
+  "label": "Ollama candidates are keyed by manifest digest, so alias tags are one item",
+  "file": "localbench/releasewatch.py",
+  "old": "\"id\": f\"ollama:{name}@{digest12}\"",
+  "new": "\"id\": f\"ollama:{name}@{tag}\"",
+  "tests": [
+   "tests.test_releasewatch.NewRelease.test_new_tag_of_a_baselined_family_is_a_candidate_but_a_new_alias_of_a_known_manifest_is_not"
+  ]
+ },
+ {
+  "label": "excluded names (embed/coder/vl) are out of scope",
+  "file": "localbench/releasewatch.py",
+  "old": "return None if f.exclude and re.search(f.exclude, n) else f.role",
+  "new": "return f.role",
+  "tests": [
+   "tests.test_releasewatch.Bounds.test_family_table_scope"
+  ]
+ },
+ {
+  "label": "weights over the cap are skipped",
+  "file": "localbench/releasewatch.py",
+  "old": "full[\"size\"] > max_bytes:",
+  "new": "full[\"size\"] > max_bytes * 100:",
+  "tests": [
+   "tests.test_releasewatch.Bounds.test_out_of_scope_family_is_never_fetched_and_oversize_models_are_marked_seen_not_queued"
+  ]
+ },
+ {
+  "label": "the queue holds at most max_queued screens",
+  "file": "localbench/releasewatch.py",
+  "old": ">= max_queued:",
+  "new": ">= max_queued + 1:",
+  "tests": [
+   "tests.test_releasewatch.Bounds.test_queue_cap_defers_without_marking_seen_and_files_once_the_window_takes_the_queue"
+  ]
+ },
+ {
+  "label": "a deferred candidate is not marked seen",
+  "file": "localbench/releasewatch.py",
+  "old": "                report[\"deferred\"].append(",
+  "new": "                state[\"items\"][item[\"id\"]] = {\"at\": at, \"outcome\": \"deferred\"}\n                report[\"deferred\"].append(",
+  "tests": [
+   "tests.test_releasewatch.Bounds.test_queue_cap_defers_without_marking_seen_and_files_once_the_window_takes_the_queue"
+  ]
+ },
+ {
+  "label": "unscreenable candidates do not wait on queue slots",
+  "file": "localbench/releasewatch.py",
+  "old": "if screen and sum(",
+  "new": "if sum(",
+  "tests": [
+   "tests.test_releasewatch.Bounds.test_unscreenable_candidates_are_filed_but_do_not_take_queue_slots"
+  ]
+ },
+ {
+  "label": "a failed unit changes no state",
+  "file": "localbench/releasewatch.py",
+  "old": "            report[\"errors\"].append(unit.error)\n            continue",
+  "new": "            report[\"errors\"].append(unit.error)",
+  "tests": [
+   "tests.test_releasewatch.Failures.test_dead_network_changes_no_state_and_reports_errors",
+   "tests.test_releasewatch.Baseline.test_first_run_records_everything_listed_without_filing_and_a_dead_network_writes_nothing"
+  ]
+ },
+ {
+  "label": "a new family whose tags failed is not recorded as known",
+  "file": "localbench/releasewatch.py",
+  "old": "{n for n in library.items[0][\"names\"] if n not in failed}",
+  "new": "{n for n in library.items[0][\"names\"]}",
+  "tests": [
+   "tests.test_releasewatch.Failures.test_a_new_family_whose_tags_fail_stays_new_until_they_load"
+  ]
+ },
+ {
+  "label": "a br failure neither queues nor marks seen",
+  "file": "localbench/releasewatch.py",
+  "old": "            if bead is None:",
+  "new": "            if False:",
+  "tests": [
+   "tests.test_releasewatch.Failures.test_br_failure_leaves_the_candidate_unseen_and_unqueued_for_the_next_run"
+  ]
+ },
+ {
+  "label": "registry manifest must match the library page digest",
+  "file": "localbench/releasewatch.py",
+  "old": "if not full.startswith(item[\"digest12\"]):",
+  "new": "if False:",
+  "tests": [
+   "tests.test_releasewatch.Failures.test_registry_manifest_that_disagrees_with_the_library_page_is_an_error_not_a_candidate"
+  ]
+ },
+ {
+  "label": "rc/alpha/beta runtime tags are not releases",
+  "file": "localbench/releasewatch.py",
+  "old": " and not UNSTABLE_TAG.search(r.get(\"tag_name\") or \"rc\")]",
+  "new": "]",
+  "tests": [
+   "tests.test_releasewatch.NewRelease.test_runtime_releases_stable_only_mlx_serve_queued_with_commit_ollama_filed_without_a_screen"
+  ]
+ },
+ {
+  "label": "an id in queue.json counts as handled",
+  "file": "localbench/releasewatch.py",
+  "old": "handled = set(state[\"items\"]) | {e[\"id\"] for e in queue[\"entries\"]}",
+  "new": "handled = set(state[\"items\"])",
+  "tests": [
+   "tests.test_releasewatch.NewRelease.test_an_id_already_in_the_queue_is_not_filed_again_when_its_seen_record_was_lost"
+  ]
+ },
+ {
+  "label": "state inside a git work tree is refused",
+  "file": "localbench/releasewatch.py",
+  "old": "        if (p / \".git\").exists():",
+  "new": "        if False:",
+  "tests": [
+   "tests.test_releasewatch.Failures.test_state_inside_a_git_work_tree_is_refused_before_anything_is_written"
+  ]
+ },
+ {
+  "label": "HF size counts weight files only",
+  "file": "localbench/releasewatch.py",
+  "old": "if s[\"rfilename\"].endswith(WEIGHT_SUFFIXES)]",
+  "new": "]",
+  "tests": [
+   "tests.test_releasewatch.Failures.test_one_dead_source_does_not_hide_its_releases_once_it_is_back"
+  ]
+ },
+ {
+  "label": "the LaunchAgent is a daily calendar job",
+  "file": "localbench/releasewatch.py",
+  "old": "\"StartCalendarInterval\": dict(SCHEDULE),",
+  "new": "\"StartInterval\": 86400,",
+  "tests": [
+   "tests.test_releasewatch.LaunchAgent.test_daily_agent_runs_one_pass_and_install_refuses_a_foreign_plist"
+  ]
+ },
+ {
+  "label": "install refuses a plist that is not ours",
+  "file": "localbench/releasewatch.py",
+  "old": "        if label != LABEL:",
+  "new": "        if False:",
+  "tests": [
+   "tests.test_releasewatch.LaunchAgent.test_daily_agent_runs_one_pass_and_install_refuses_a_foreign_plist"
+  ]
+ },
+ {
+  "label": "a tag outside the safe pattern is refused",
+  "file": "localbench/releasewatch.py",
+  "old": "if not isinstance(tag, str) or not SAFE_TAG.fullmatch(tag) or \"..\" in tag:",
+  "new": "if False:",
+  "tests": [
+   "tests.test_releasewatch.Injection.test_upstream_strings_outside_the_safe_patterns_are_refused_never_fetched_filed_or_queued"
+  ]
+ },
+ {
+  "label": "a URL must be on the source's own host",
+  "file": "localbench/releasewatch.py",
+  "old": "or m.group(1) != URL_HOST[src] ",
+  "new": "",
+  "tests": [
+   "tests.test_releasewatch.Injection.test_upstream_strings_outside_the_safe_patterns_are_refused_never_fetched_filed_or_queued"
+  ]
+ },
+ {
+  "label": "the mlx-serve asset URL is checked like the release URL",
+  "file": "localbench/releasewatch.py",
+  "old": "if item.get(\"asset_url\") is not None:",
+  "new": "if False:",
+  "tests": [
+   "tests.test_releasewatch.Injection.test_upstream_strings_outside_the_safe_patterns_are_refused_never_fetched_filed_or_queued"
+  ]
+ },
+ {
+  "label": "refusal runs before anything is fetched, filed or queued",
+  "file": "localbench/releasewatch.py",
+  "old": "            why = refusal(item)\n",
+  "new": "            why = None\n",
+  "tests": [
+   "tests.test_releasewatch.Injection.test_upstream_strings_outside_the_safe_patterns_are_refused_never_fetched_filed_or_queued"
+  ]
+ },
+ {
+  "label": "bead text shows each queued argv shell-quoted",
+  "file": "localbench/releasewatch.py",
+  "old": "shlex.join(a) for a in argvs",
+  "new": "\" \".join(a) for a in argvs",
+  "tests": [
+   "tests.test_releasewatch.Injection.test_queued_commands_are_argv_lists_and_beads_show_them_shell_quoted"
+  ]
+ },
+ {
+  "label": "the queued screen is an argv list, not a shell string",
+  "file": "localbench/releasewatch.py",
+  "old": "return pull, [\"localbench\", \"ab\", SMOL_INCUMBENT, f\"mlx-serve:{target}\", *SCREEN_AB], None",
+  "new": "return pull, \" \".join([\"localbench\", \"ab\", SMOL_INCUMBENT, f\"mlx-serve:{target}\", *SCREEN_AB]), None",
+  "tests": [
+   "tests.test_releasewatch.Injection.test_queued_commands_are_argv_lists_and_beads_show_them_shell_quoted"
+  ]
+ }
+]

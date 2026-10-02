@@ -22,21 +22,22 @@ from .workloads import ROOT
 GOLDENS = ROOT / "goldens"
 DISCREPANCIES = ROOT / "docs" / "evidence" / "DISCREPANCIES.md"
 
-# Below these relative bands the measurement cannot resolve a change on this desktop; see packet §7.
+# Policy floors cap alert sensitivity; the A/A spread may widen them. They are not measured resolution limits.
 TOL_FLOOR = {"higher": 0.05, "lower": 0.10}
 AA_MULTIPLIER = 3.0
-# Latencies under a few hundred ms are dominated by jitter; latency bands get an absolute slack.
+# Short latencies also receive a policy absolute allowance instead of relying on a tiny relative band.
 ABS_SLACK_S = 0.15
 
 # What a row exercised decides which pins can invalidate it. conf and micro rows talk to the backend directly;
 # replay rows send recorded omp request bodies, so their identity is those bodies (fixtures_sha), not the omp
 # installed today. omp ships most days: its version and sha are recorded on the receipt and are not generation
-# keys. The child overlay and the agent config are ours; those still bind the tiers that run live omp.
+# keys. The child overlay and the agent config are ours; those still bind the tiers that run live omp. mem rows also
+# bind the tool list their children get (omp_mem_tools): --no-tools and the memory tools are different tiers.
 BACKEND_KEYS = ("host_id", "backend", "backend_version", "backend_sha", "backend_args", "model", "model_digest",
                 "macos_build")
 OMP_KEYS = ("omp_child_config", "omp_agent_config")
 OMP_TIERS = frozenset({"e2e", "rel", "relcold", "relfresh"})
-PIN_KEYS = BACKEND_KEYS + OMP_KEYS + ("fixtures_sha", "omp_mem_config")
+PIN_KEYS = BACKEND_KEYS + OMP_KEYS + ("fixtures_sha", "omp_mem_config", "omp_mem_tools")
 # Splash is not a measured backend yet. These pins are recorded when Splash is the backend or a
 # resident, and they invalidate only tiers whose golden says the backend was Splash. Putting them in
 # PIN_KEYS would stale every ollama/mlx golden the moment the Splash binary moved, including goldens
@@ -45,8 +46,11 @@ SPLASH_KEYS = ("splash_version", "splash_sha")
 
 
 def tier_keys(tier: str) -> tuple[str, ...]:
-    """The pins a row of `tier` depends on. mem and sess run omp children with the mem overlay."""
-    if tier in ("mem", "sess"):
+    """The pins a row of `tier` depends on. mem and sess run omp children with the mem overlay; only mem children
+    get the memory-only tool list (sess keeps the lean tools)."""
+    if tier == "mem":
+        return BACKEND_KEYS + OMP_KEYS + ("omp_mem_config", "omp_mem_tools")
+    if tier == "sess":
         return BACKEND_KEYS + OMP_KEYS + ("omp_mem_config",)
     if tier in OMP_TIERS:
         return BACKEND_KEYS + OMP_KEYS
@@ -116,7 +120,7 @@ def stored_pin_block(pins: dict, tier: str | None = None) -> dict:
     return block
 
 
-FAILING = {"REGRESSED", "FAIL", "MISSING", "GENERATION-MISMATCH", "TOL-UNPROVEN"}
+FAILING = {"REGRESSED", "FAIL", "MUST-VOID", "MISSING", "GENERATION-MISMATCH", "TOL-UNPROVEN"}
 
 
 def _median(xs: list[float]) -> float:
@@ -183,15 +187,17 @@ def ab_table(a_legs: list[dict], b_legs: list[dict], void_tiers: dict[str, str] 
         else:
             cells = {"a_legs": cells["a"], "b_legs": cells["b"]}
         drifted = (void_tiers or {}).get(key.split(".", 1)[0])
-        if drifted or any(m.get("void") or not m.get("value") for m in ms_a + ms_b):
+        if drifted or any(m.get("void") or m.get("value") is None for m in ms_a + ms_b):
             table[key] = {**cells, "verdict": "VOID",
                           "void": drifted or next((m["void"] for m in ms_a + ms_b if m.get("void")), None)}
             continue
         a_vals, b_vals = [m["value"] for m in ms_a], [m["value"] for m in ms_b]
         a_med, b_med = _median(a_vals), _median(b_vals)
-        aa_rel = (max(a_vals) - min(a_vals)) / a_med
-        bb_rel = (max(b_vals) - min(b_vals)) / b_med if len(b_vals) > 1 else 0.0
-        ratio = b_med / a_med
+        aa_rel = 0.0 if a_med == 0 else (max(a_vals) - min(a_vals)) / a_med
+        bb_rel = ((max(b_vals) - min(b_vals)) / b_med
+                  if len(b_vals) > 1 and b_med else 0.0)
+        ratio = (1.0 if a_med == 0 and b_med == 0 else
+                 float("inf") if a_med == 0 else b_med / a_med)
         band = max(AA_MULTIPLIER * max(aa_rel, bb_rel), TOL_FLOOR[m1["better"]])
         better = (ratio > 1) == (m1["better"] == "higher")
         verdict = "WITHIN-NOISE" if abs(ratio - 1) <= band else ("B-BETTER" if better else "B-WORSE")
@@ -251,8 +257,12 @@ def from_aa(run1: list, run2: list, pins: dict, receipt: str, tiers: list[str]) 
     m2, c2 = flatten(run2)
     refusals = []
     listed = listed_discrepancies(pins.get("backend"), pins.get("model"))
-    for case, entry in c1.items():
-        other = c2.get(case)
+    for case in sorted(c1.keys() | c2.keys()):
+        entry, other = c1.get(case), c2.get(case)
+        if any(e is not None and e["level"] == "MUST" and e["verdict"] == "VOID" for e in (entry, other)):
+            refusals.append(f"{case}: MUST VOID in A/A run (required conformance was not established)")
+        if entry is None:
+            continue
         if (other is None or other["verdict"] != entry["verdict"]) and entry["level"] == "MUST":
             refusals.append(f"{case}: MUST verdict differs between A/A runs ({entry['verdict']} vs "
                             f"{other and other['verdict']})")
@@ -261,10 +271,10 @@ def from_aa(run1: list, run2: list, pins: dict, receipt: str, tiers: list[str]) 
     metrics = {}
     for key, a in m1.items():
         b = m2.get(key)
-        if not b or a.get("void") or b.get("void") or not a.get("value") or not b.get("value"):
+        if not b or a.get("void") or b.get("void") or a.get("value") is None or b.get("value") is None:
             continue
         mean = statistics.fmean([a["value"], b["value"]])
-        rel = abs(a["value"] - b["value"]) / mean
+        rel = 0.0 if mean == 0 else abs(a["value"] - b["value"]) / mean
         spreads = [x for m in (a, b) for x in m.get("spread", [])]
         metrics[key] = {
             "value": round(mean, 4), "better": a["better"],
@@ -303,8 +313,8 @@ def pin_diff(golden_pins: dict, pins: dict, keys: tuple[str, ...] = PIN_KEYS) ->
 
 
 def compare(metrics: dict, conformance: dict, golden: dict, pins: dict, tiers: list[str] | None = None) -> list[dict]:
-    """Row per metric/case: PASS | IMPROVED | REGRESSED | VOID | NEW | MISSING | FAIL | XFAIL | FLAKY |
-    TOL-UNPROVEN | GENERATION-MISMATCH. A row is GENERATION-MISMATCH only when a pin ITS tier depends on moved
+    """Row per metric/case: PASS | IMPROVED | REGRESSED | VOID | MUST-VOID | NEW | MISSING | FAIL | XFAIL |
+    FLAKY | TOL-UNPROVEN | GENERATION-MISMATCH. A row is GENERATION-MISMATCH only when a pin ITS tier depends on
     (tier_keys). With `tiers`, only golden rows of those tiers are judged (a `--tiers rel` run is not MISSING every
     micro row); a row of a tier that ran and produced nothing is still MISSING."""
     if tiers is not None:
@@ -356,7 +366,7 @@ def compare(metrics: dict, conformance: dict, golden: dict, pins: dict, tiers: l
         elif g["verdict"] == "FLAKY":
             rows.append({"key": key, "status": "FLAKY", "actual": a})
         elif a == g and a["verdict"] == "VOID":
-            rows.append({"key": key, "status": "VOID", "actual": a})
+            rows.append({"key": key, "status": "MUST-VOID" if a["level"] == "MUST" else "VOID", "actual": a})
         elif a == g:
             status = "PASS" if a["verdict"] == "PASS" else ("XFAIL" if key in listed else "FAIL")
             rows.append({"key": key, "status": status, "actual": a})

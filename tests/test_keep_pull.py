@@ -5,6 +5,7 @@ import contextlib
 import io
 import json
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -15,10 +16,21 @@ from typing import ClassVar
 from unittest import mock
 
 from localbench import __main__ as cli
-from localbench import sysstats
+from localbench import gateway, sysstats
 
 FOREVER = "2318-01-02T03:04:05.123456789-07:00"
 REAL_RESIDENTS = sysstats.ollama_residents
+
+
+class QuietServer(ThreadingHTTPServer):
+    """A client that gave up (the stall tests time out on purpose) is expected: its BrokenPipe traceback would
+    otherwise print from the server thread into the stderr redirect_stderr captures for the CLI under test, and flake
+    exact-stderr assertions under load (2026-10-01). Any other handler error still prints."""
+
+    def handle_error(self, request, client_address):
+        if isinstance(sys.exc_info()[1], (BrokenPipeError, ConnectionResetError)):
+            return
+        super().handle_error(request, client_address)
 
 
 class FakeOllama(BaseHTTPRequestHandler):
@@ -77,11 +89,19 @@ class CliAgainstFake(unittest.TestCase):
     def setUp(self):
         FakeOllama.requests, FakeOllama.loaded, FakeOllama.tags, FakeOllama.pull_events = [], {}, {}, []
         FakeOllama.sticky, FakeOllama.ps_stall_s = set(), 0.0
-        self.server = ThreadingHTTPServer(("127.0.0.1", 0), FakeOllama)
+        self.server = QuietServer(("127.0.0.1", 0), FakeOllama)
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
         root = f"http://127.0.0.1:{self.server.server_port}"
         fake = type("O", (), {"root": root})
-        self.patches = [mock.patch.object(cli, "Ollama", fake), mock.patch.object(cli, "_run_alive", return_value=False)]
+        self.gateway_temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.gateway_temp.cleanup)
+        self.gateway_db = Path(self.gateway_temp.name) / "gateway.sqlite"
+        self.patches = [
+            mock.patch.object(cli, "Ollama", fake),
+            mock.patch.object(cli, "_run_alive", return_value=False),
+            mock.patch.object(gateway, "database_path", lambda home=None: self.gateway_db),
+            mock.patch.object(gateway, "safe_to_unload", return_value=(True, None)),
+        ]
         for p in self.patches:
             p.start()
 
@@ -102,10 +122,16 @@ class CliAgainstFake(unittest.TestCase):
 
 
 class Keep(CliAgainstFake):
-    def test_forever_asks_for_keep_alive_minus_one_and_reports_it(self):
+    def test_default_keep_is_five_minutes_and_records_a_finite_lease(self):
         rc, out = self.run_cli("keep", "ollama:qwen3.6:35b-mlx")
-        self.assertEqual(FakeOllama.requests, [("/api/generate", {"model": "qwen3.6:35b-mlx", "keep_alive": -1})])
-        self.assertEqual((rc, out.strip()), (0, "qwen3.6:35b-mlx: loaded until forever"))
+        self.assertEqual(FakeOllama.requests, [
+            ("/api/generate", {"model": "qwen3.6:35b-mlx", "keep_alive": "5m"})])
+        self.assertEqual((rc, out.strip()),
+                         (0, "qwen3.6:35b-mlx: loaded until 09-24 10:30"))
+        lease = gateway.GatewayStore(gateway.database_path()).lease("qwen3.6:35b-mlx")
+        self.assertIsNotNone(lease)
+        assert lease is not None
+        self.assertGreater(lease["manual_expires_at"], time.time())
 
     def test_a_duration_passes_through_and_zero_unloads(self):
         self.run_cli("keep", "ollama:m:1", "30m")
@@ -124,6 +150,20 @@ class Keep(CliAgainstFake):
         rc, out = self.run_cli("keep", "ollama:m:1", "0")
         self.assertEqual((rc, out, self.err.strip()), (1, "", "m:1: still loaded"))
 
+    def test_external_activity_uncertainty_refuses_unload(self):
+        FakeOllama.loaded = {"m:1": FOREVER}
+        with mock.patch.object(cli.gateway, "safe_to_unload", return_value=(None, "client state unknown")):
+            rc, out = self.run_cli("keep", "ollama:m:1", "0")
+        self.assertEqual((rc, out, FakeOllama.requests), (1, "", []))
+        self.assertEqual(self.err.strip(), "client state unknown")
+
+    def test_unbounded_or_negative_retention_is_a_usage_error(self):
+        for value in ("forever", "-1m", "inf"):
+            with self.subTest(value=value), self.assertRaises(SystemExit) as stop:
+                self.run_cli("keep", "ollama:m:1", value)
+            self.assertEqual(stop.exception.code, 2)
+        self.assertEqual(FakeOllama.requests, [])
+
     def test_nothing_is_loaded_while_a_run_is_alive(self):
         with mock.patch.object(cli, "_run_alive", return_value=True):
             rc, _ = self.run_cli("keep", "ollama:qwen3.6:35b-mlx")
@@ -136,7 +176,7 @@ class Keep(CliAgainstFake):
         self.assertEqual(FakeOllama.requests, [])
 
     def test_a_stalled_ps_after_the_load_is_unknown_not_a_verdict(self):
-        FakeOllama.ps_stall_s = 0.5      # keep waits 120 s; the stand-in shortens only the wait, not the logic
+        FakeOllama.ps_stall_s = 0.5      # the stand-in shortens only the wait, not the decision
         with mock.patch.object(sysstats, "ollama_residents", lambda root, timeout: REAL_RESIDENTS(root, timeout=0.1)):
             rc, out = self.run_cli("keep", "ollama:m:1")
         self.assertEqual((rc, out, self.err.strip()),

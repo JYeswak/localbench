@@ -7,6 +7,8 @@ import sqlite3
 import tempfile
 import time
 import unittest
+import urllib.error
+from io import BytesIO
 from pathlib import Path
 from typing import ClassVar
 from unittest import mock
@@ -95,6 +97,130 @@ class RunnerAttribution(Models):
         mlx = self.share(2, "/x/ollama runner --model qwen3.6:35b-mlx --port 1", "ollama")
         self.assertTrue(sysstats.gpu_is_ours(mlx, "ollama", "qwen3.6:35b-mlx"))
         self.assertFalse(sysstats.gpu_is_ours(mlx, "ollama", "qwen3.8:27b-mlx"))
+
+    def test_ollama_runner_with_a_declared_smol_is_ours_but_not_an_undeclared_model(self):
+        # Ollama gives each loaded model its own runner, so the smol's runner names only the smol.
+        target, smol = "qwen3.6:35b-mlx", "qwen3.8:27b-mlx"
+        runner = self.share(3, f"ollama runner --model {smol} --port 1", "ollama")
+        runner["model_names"] = [smol]
+        foreign, runners, apps = sysstats.classify(
+            [runner], {"ollama": [target, smol]}, ("ollama", target, smol), 25)
+        self.assertEqual((foreign, runners, apps), ({}, [], []))
+
+        foreign, runners, apps = sysstats.classify(
+            [runner], {"ollama": [target, smol]}, ("ollama", target), 25)
+        self.assertEqual(foreign, {"ollama": [smol]})
+        self.assertEqual((runners, apps), ([runner], []))
+
+    def test_omlx_python_worker_is_its_own_gpu_load_not_application_load(self):
+        worker = self.share(50015, "omlx-server", "python3.13")
+        self.assertTrue(sysstats.gpu_is_ours(worker, "omlx", "Qwen3.6-35B-A3B"))
+        load = sysstats.load_summary([{"gpu_procs": [worker]}], ("omlx", "Qwen3.6-35B-A3B"), 25)
+        self.assertEqual(load["app_gpu_mean_pct"], 0)
+
+    def test_foreign_omlx_python_worker_voids_an_ollama_run(self):
+        worker = self.share(50015, "omlx-server", "python3.13")
+        foreign, runners, apps = sysstats.classify(
+            [worker], {"ollama": ["qwen3.6:35b-mlx"]}, ("ollama", "qwen3.6:35b-mlx"), 25)
+        self.assertEqual(foreign, {})
+        self.assertEqual(runners, [worker])
+        self.assertEqual(apps, [])
+
+    def test_known_competitor_remains_contention_when_another_server_is_unknown(self):
+        foreign, runners, apps = sysstats.classify(
+            [], {"ollama": ["other-model"], "mlx-serve": None}, ("ollama", "target-model"), 25)
+        self.assertEqual(foreign, {"ollama": ["other-model"]})
+        self.assertEqual((runners, apps), ([], []))
+
+
+class ResidencyProbeDiagnostics(unittest.TestCase):
+    URL = "http://127.0.0.1:11234/v1/models"
+
+    def test_json_probe_records_timeout_reset_http_status_and_invalid_json(self):
+        def failure(exc):
+            def raise_error(_url, timeout):
+                raise exc
+            return raise_error
+
+        cases = (
+            ("timeout", failure(urllib.error.URLError(TimeoutError("timeout"))), "timeout", None),
+            ("reset", failure(urllib.error.URLError(ConnectionResetError("reset"))),
+             "ConnectionResetError", None),
+            ("http status", failure(urllib.error.HTTPError(self.URL, 503, "unavailable", {}, None)),
+             "HTTPError", 503),
+            ("invalid json", lambda _url, timeout: BytesIO(b"{"), "invalid_json", None),
+        )
+        for label, endpoint, error_class, status in cases:
+            with self.subTest(label=label):
+                probe = {"server": "mlx-serve", "port": 11234}
+                with mock.patch.object(sysstats.urllib.request, "urlopen", side_effect=endpoint):
+                    result = sysstats._json(self.URL, probe=probe)
+                self.assertIsNone(result)
+                self.assertEqual(probe["error_class"], error_class)
+                self.assertEqual(probe["http_status"], status)
+                self.assertLessEqual(probe["probe_start"], probe["probe_end"])
+
+    def test_live_carries_a_timed_probe_for_each_residency_server(self):
+        def endpoint(url, timeout):
+            if url == self.URL:
+                return BytesIO(json.dumps({"data": [{"id": "target", "loaded": True}]}).encode())
+            raise urllib.error.URLError(ConnectionRefusedError("inactive"))
+
+        with mock.patch.object(sysstats.urllib.request, "urlopen", side_effect=endpoint), \
+                mock.patch.object(sysstats, "gpu_utilization", return_value={}), \
+                mock.patch.object(sysstats, "memory", return_value={}), \
+                mock.patch.object(sysstats.os, "getloadavg", return_value=(1.0,)), \
+                mock.patch.object(sysstats, "user_idle_s", return_value=None):
+            sample = sysstats.live()
+
+        probes = sample["resident_probes"]
+        self.assertEqual(set(probes), set(sample["resident"]))
+        self.assertEqual(sample["resident"]["mlx-serve"], ["target"])
+        self.assertEqual(probes["mlx-serve"]["server"], "mlx-serve")
+        self.assertEqual(probes["mlx-serve"]["port"], 11234)
+        self.assertLessEqual(probes["mlx-serve"]["probe_start"], probes["mlx-serve"]["probe_end"])
+
+
+class ResidencySchemaAndSamplerResilience(unittest.TestCase):
+
+    def test_http_200_objects_missing_residency_arrays_are_unknown_schema_errors(self):
+        class Response(BytesIO):
+            status = 200
+
+        probes = {}
+        with mock.patch.object(sysstats.urllib.request, "urlopen", side_effect=lambda *_a, **_k: Response(b"{}")):
+            residents = sysstats.resident_models(probes)
+
+        self.assertTrue(all(residents[name] is None for name in residents))
+        self.assertEqual(set(probes), set(residents))
+        self.assertTrue(all(probe["error_class"] == "schema" for probe in probes.values()))
+
+    def test_sampler_records_a_raising_live_probe_as_unknown_and_keeps_sampling(self):
+        names = ("ollama", "mlx-serve", "splash", "omlx", "mlx-smol", "mlxfast")
+        healthy = {"t": time.time(), "resident": {name: [] for name in names}, "resident_probes": {}}
+        calls = 0
+
+        def live_once_fails():
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise RuntimeError("malformed residency probe")
+            return healthy
+
+        with mock.patch.object(sysstats, "live", side_effect=live_once_fails), \
+                mock.patch.object(sysstats, "gpu_time_by_pid", return_value={}), \
+                mock.patch.object(sysstats, "gpu_share", return_value=[]):
+            with sysstats.Sampler(0.005) as sampler:
+                deadline = time.monotonic() + 2
+                while len(sampler.series) < 2 and time.monotonic() < deadline:
+                    time.sleep(0.005)
+
+        self.assertGreaterEqual(len(sampler.series), 2)
+        failed = sampler.series[0]
+        self.assertTrue(all(value is None for value in failed["resident"].values()))
+        self.assertTrue(all(probe["error_class"] == "RuntimeError"
+                            for probe in failed["resident_probes"].values()))
+        self.assertEqual(sampler.series[1]["resident"]["ollama"], [])
 
 
 class ReportMergesOldAndNewRows(Models):

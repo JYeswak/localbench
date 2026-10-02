@@ -1,0 +1,16 @@
+[
+  {
+    "label": "recall cannot pass when expected value is only a prefix of a stale answer",
+    "file": "localbench/workloads.py",
+    "old": "if r[\"text\"].strip().rstrip(\".\").casefold() != expected.casefold():",
+    "new": "if expected.casefold() not in r[\"text\"].strip().rstrip(\".\").casefold():",
+    "tests": ["tests.test_workloads.MemTurns.test_recall_must_match_the_planted_value_exactly"]
+  },
+  {
+    "label": "control answer without a completed successful proxy request cannot certify no leak",
+    "file": "localbench/workloads.py",
+    "old": "control_ok = c[\"rc\"] == 0 and bool(c[\"text\"].strip()) and _completed_call(c[\"main_trace\"])",
+    "new": "control_ok = c[\"rc\"] == 0 and bool(c[\"text\"].strip())",
+    "tests": ["tests.test_workloads.MemTurns.test_nonblank_control_with_failed_proxy_response_is_not_valid_evidence"]
+  }
+]

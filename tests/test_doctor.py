@@ -95,5 +95,25 @@ class MutationLock(unittest.TestCase):
         self.assertFalse(audit.path().exists())
 
 
+class Features(unittest.TestCase):
+    def row(self, found):
+        from localbench import features
+        with mock.patch.object(features, "doctor_findings", return_value=found):
+            return doctor.check_features(False)
+
+    def test_the_worst_finding_sets_the_row_and_its_fix(self):
+        row = self.row([("PASS", "a ok", None), ("FAIL", "b routes local and is UNPROVEN", "prove b"),
+                        ("WARN", "c carried", "re-prove c")])
+        self.assertEqual((row["status"], row["fix"]), ("FAIL", "prove b"))
+        self.assertIn("b routes local", row["detail"])
+
+    def test_a_warning_is_not_hidden_by_passes(self):
+        row = self.row([("PASS", "a ok", None), ("WARN", "c carried", "re-prove c")])
+        self.assertEqual((row["status"], row["fix"]), ("WARN", "re-prove c"))
+
+    def test_all_pass_is_pass(self):
+        self.assertEqual(self.row([("PASS", "a ok", None)])["status"], "PASS")
+
+
 if __name__ == "__main__":
     unittest.main()
