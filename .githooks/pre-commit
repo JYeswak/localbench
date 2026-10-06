@@ -151,19 +151,22 @@ fi
 #    against (each test is mutation-checked; 2026-09-23 merge() tier drop, 0b6832e, reached review untested).
 #    Runs when anything the suite reads is staged: code, tests, fixtures, scripts, goldens, registries, banked
 #    receipts, the port map, the packet, pyproject.toml (2026-10-01: a receipt-only commit skipped the suite and left
-#    main red; test_render reads every receipt). It tests the working tree, not the staged snapshot. Fails CLOSED
-#    without uv: a suite that silently does not run is decoration.
+#    main red; test_render reads every receipt). It tests the commit: scripts/suite_verdict.sh runs it on an export of
+#    `git write-tree` (the staged snapshot, or the temporary index of `git commit --only`), never the shared working
+#    tree, whose other panes' WIP turned every commit red on 2026-10-02. A PASS is cached by tree hash, so a landing
+#    that already ran the suite on this tree commits in seconds instead of holding index.lock for 4 minutes.
+#    Fails CLOSED without uv: a suite that silently does not run is decoration.
 if git diff --cached --name-only 2>/dev/null \
     | grep -qE '^(localbench|tests|fixtures|scripts|goldens|registries|docs/evidence/receipts|docs/port)/|^docs/planning/packet\.md$|^pyproject\.toml$'; then
   if ! command -v uv >/dev/null 2>&1; then
     echo "pre-commit: BLOCKED — uv not found, so the regression suite (tests/) cannot run." >&2
     fail=1
-  elif ! suite_out=$(cd "$ROOT" && uv run --quiet python -m unittest discover -s tests -t . 2>&1); then
-    printf '%s\n' "$suite_out" | grep -v '^INFO' | tail -40 >&2
+  elif ! verdict=$(SUITE_VERDICT_WAIT=0 sh "$ROOT/scripts/suite_verdict.sh" 2>&1); then
+    printf '%s\n' "$verdict" | tail -40 >&2
     echo "pre-commit: regression suite FAILED — fix the code or the test; never weaken a test to land a change." >&2
     fail=1
   else
-    echo "pre-commit: regression suite ok ($(printf '%s\n' "$suite_out" | grep -E '^Ran [0-9]+ tests' | head -1))." >&2
+    echo "pre-commit: regression suite ok ($verdict)." >&2
   fi
 fi
 

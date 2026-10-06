@@ -1,0 +1,46 @@
+{
+  "run_id": "1790979839_6N",
+  "captured_at_utc": "2026-10-02T22:24:01Z",
+  "git_sha": "9d2194170af0439615e7ba73eac1cc69c28223bf",
+  "git_dirty": true,
+  "hardware": {
+    "cpu_model": "Apple M3 Ultra",
+    "cpu_cores_per_socket": 32,
+    "cpu_sockets": 1,
+    "cpu_threads_total": 32,
+    "cpu_mhz_reported": "",
+    "ram_total": "536870912 kB",
+    "swap_total": "unknown"
+  },
+  "storage": {
+    "device": "/dev/disk3s5",
+    "model": "unknown",
+    "mount_point": "~/Developer/localbench",
+    "filesystem": "apfs",
+    "mount_options": "local,journaled,nobrowse,protect,root"
+  },
+  "os": {
+    "distribution": "Darwin",
+    "kernel": "25.5.0"
+  },
+  "toolchain": {
+    "rustc": "rustc 1.100.0-nightly (c54751567 2026-08-22)",
+    "go": "go version go1.26.5 darwin/arm64",
+    "node": "v22.23.3",
+    "python": "Python 3.14.2",
+    "clang": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+    "gcc": "Apple clang version 21.0.0 (clang-2100.1.1.101)"
+  },
+  "build_profile": {
+    "name": "release-perf"
+  },
+  "tuning_applied": {
+    "governor": "unknown",
+    "no_turbo": "n/a",
+    "smt_active": "n/a",
+    "perf_event_paranoid": "",
+    "kptr_restrict": "",
+    "nmi_watchdog": "",
+    "thp": "unknown"
+  }
+}

@@ -1,7 +1,9 @@
 """`localbench doctor`: one dead subsystem is one FAIL row and the rest still report; `--fix` removes a mutation lock
 only when its owner pid is provably dead, records that in the audit ledger, and without --fix nothing changes."""
 
+import json
 import os
+import plistlib
 import subprocess
 import tempfile
 import time
@@ -9,7 +11,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from localbench import audit, doctor
+from localbench import audit, doctor, gateway
 
 
 def _dead_pid() -> int:
@@ -93,6 +95,50 @@ class MutationLock(unittest.TestCase):
         self.assertEqual((row["status"], row["fixed"]), ("WARN", False))
         self.assertIsNotNone(row["fix"])
         self.assertFalse(audit.path().exists())
+
+
+class Coverage(unittest.TestCase):
+    def test_named_checks_resolve_from_repo_when_cwd_differs(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(doctor, "MUTATION_LOCK", Path(tmp) / "runs" / ".mutation.lock"):
+            old = Path.cwd()
+            os.chdir(tmp)
+            try:
+                self.assertEqual(doctor.check_tick_driver(False)["status"], "PASS")
+                self.assertEqual(doctor.check_public_export(False)["status"], "PASS")
+                self.assertEqual(doctor.check_hooks(False)["status"], "PASS")
+            finally:
+                os.chdir(old)
+        heavy_path = str(__import__("localbench.heavyslot", fromlist=["lock_path"]).lock_path())
+        self.assertIn(heavy_path, doctor.check_heavyslot(False)["detail"])
+
+    def test_required_foundational_subsystems_have_probes(self):
+        self.assertEqual(doctor.missing_required_subsystems(), [])
+        names = {name for name, _ in doctor.CHECKS}
+        self.assertTrue(set(doctor.REQUIRED_SUBSYSTEMS) <= names)
+
+
+class GatewayPin(unittest.TestCase):
+    def test_matching_export_and_sha_pass_but_deliberate_sha_mismatch_fails(self):
+        with tempfile.TemporaryDirectory() as td:
+            home = Path(td)
+            document = gateway.launchd_plist(home=home)
+            path = gateway.plist_path(home)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(plistlib.dumps(document))
+            with mock.patch.object(gateway, "service_status", return_value={"health": True}):
+                passed = doctor.check_gateway(False, home=home)
+            self.assertEqual(passed["status"], "PASS")
+            details = json.loads(passed["detail"])
+            self.assertEqual(details["code"]["code_sha"], details["code"]["promoted_sha"])
+            self.assertTrue(Path(details["code"]["interpreter"]).is_file())
+            self.assertTrue(Path(details["code"]["export"]).is_dir())
+
+            document["EnvironmentVariables"]["LOCALBENCH_GATEWAY_SHA"] = "0" * 64
+            path.write_bytes(plistlib.dumps(document))
+            with mock.patch.object(gateway, "service_status", return_value={"health": True}):
+                failed = doctor.check_gateway(False, home=home)
+            self.assertEqual(failed["status"], "FAIL")
+            self.assertIn("does not match", failed["detail"])
 
 
 class Features(unittest.TestCase):

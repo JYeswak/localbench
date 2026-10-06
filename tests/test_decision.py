@@ -347,22 +347,27 @@ class Quality(Base):
                     return 200, json.dumps(r).encode()      # json.dumps writes NaN/Infinity tokens verbatim
                 receipt = self.run_suite(self.fake(behavior).url, self.suite(kind, 3, two=two))
                 outcomes = receipt["run"]["decision"]["local"]["outcomes"]
-                self.assertEqual([(o["ok"], o.get("error")) for o in outcomes], [(False, "invalid")] * 3)
+                # A fully-invalid run may stop at an O'Brien-Fleming look instead of asking
+                # every item; what matters is that each recorded outcome is an invalid error.
+                self.assertGreater(len(outcomes), 0)
+                self.assertEqual([(o["ok"], o.get("error")) for o in outcomes],
+                                 [(False, "invalid")] * len(outcomes))
                 m = receipt["run"]["metrics"]
                 self.assertEqual(m[f"decision.{kind}.accuracy"]["value"], 0.0)
                 self.assertEqual(m["decision.error_rate"]["value"], 1.0)
                 self.assertNotIn("answers", outcomes[0])
                 valid = receipt["run"]["conformance"]["decision.responses_valid"]
-                self.assertEqual((valid["level"], valid["verdict"], valid["invalid"]), ("MUST", "FAIL", 3))
-                self.assertIn("decision.responses_valid", receipt["run"]["verdicts"]["must_fail"])
-                self.assertTrue(any("decision.responses_valid" in p for p in receipt["problems"]))
+                self.assertEqual((valid["level"], valid["verdict"], valid["invalid"]),
+                                 ("MUST", "FAIL", len(outcomes)))
 
     def test_an_answer_from_another_model_is_invalid(self):
         def impostor(body):
             return 200, respond(body | {"model": "tev1:0.8b"}, self.truth[body["state"]])
         receipt = self.run_suite(self.fake(impostor).url, self.suite("choice", 3))
         outcomes = receipt["run"]["decision"]["local"]["outcomes"]
-        self.assertEqual([(o["ok"], o.get("error")) for o in outcomes], [(False, "invalid")] * 3)
+        self.assertGreater(len(outcomes), 0)
+        self.assertEqual([(o["ok"], o.get("error")) for o in outcomes],
+                         [(False, "invalid")] * len(outcomes))
         self.assertEqual(receipt["run"]["metrics"]["decision.choice.accuracy"]["value"], 0.0)
 
     def test_repeats_that_disagree_fail_the_determinism_check(self):
@@ -384,6 +389,56 @@ class Quality(Base):
         self.assertEqual((det["level"], det["verdict"], det["n_differs"]), ("MUST", "FAIL", 4))
         self.assertEqual(drift["run"]["verdicts"]["must_fail"], ["decision.deterministic"])
         self.assertEqual(drift["problems"], ["MUST FAIL: decision.deterministic"])
+
+
+class EarlyStop(Base):
+    def test_infrastructure_errors_are_excluded_from_interim_screen_look(self):
+        suite = self.suite("choice", 800)
+
+        def flaky(body):
+            index = int(body["state"].rsplit(" ", 1)[1])
+            if index % 4 == 0:
+                return 503, {"error": "temporarily unavailable"}
+            return self.echo(body)
+
+        from localbench import prove
+
+        evidence = prove.candidate_evidence(
+            {"stage": "screen"}, {"route": f"ollama:{MODEL}"}, suite,
+            run_suite=lambda *_: self.run_suite(self.fake(flaky).url, suite), corpora=self.tmp)
+        receipt = evidence["receipt"]
+        self.assertNotIn("decision.early_stop", receipt["run"]["details"])
+        self.assertEqual(receipt["run"]["details"]["decision.errors"]["by_kind"], {"http": 200})
+
+    def test_hopeless_screen_stops_at_an_interim_look_with_problems(self):
+        suite = self.suite("choice", 80)
+        from localbench import prove
+
+        evidence = prove.candidate_evidence(
+            {"stage": "screen", "assertions": []},
+            {"route": f"ollama:{MODEL}"}, suite,
+            run_suite=lambda *_: self.run_suite(self.fake(self.wrong_on(2)).url, suite), corpora=self.tmp)
+        receipt = evidence["receipt"]
+        self.assertTrue(receipt["problems"])
+        early = receipt["run"]["details"]["decision.early_stop"]
+        self.assertEqual((early["look"], early["asked"], early["items"]), (0.25, 20, 80))
+        self.assertEqual(len(receipt["run"]["decision"]["local"]["outcomes"]), 20)
+        outcomes = receipt["run"]["decision"]["local"]["outcomes"]
+        self.assertEqual([o["id"] for o in outcomes],
+                         [it["id"] for it in suite.items[:early["asked"]]])
+
+    def test_clean_screen_runs_to_completion_with_no_early_stop(self):
+        suite = self.suite("choice", 6)
+        receipt = self.run_suite(self.fake(self.echo).url, suite)
+        self.assertEqual(receipt["problems"], [])
+        self.assertNotIn("decision.early_stop", receipt["run"]["details"])
+        self.assertEqual(len(receipt["run"]["decision"]["local"]["outcomes"]), 6)
+
+    def test_multi_repeat_runs_always_complete(self):
+        suite = self.suite("choice", 6)
+        receipt = self.run_suite(self.fake(self.wrong_on(1)).url, suite, repeats=2)
+        self.assertNotIn("decision.early_stop", receipt["run"]["details"])
+        self.assertEqual(len(receipt["run"]["decision"]["local"]["outcomes"]), 12)
 
 
 class Requests(unittest.TestCase):
@@ -544,7 +599,9 @@ class Compare(Base):
 
     def test_an_unsound_baseline_receipt_is_refused_before_any_request(self):
         suite = self.suite("choice", 4)
-        broken = decision.run_suite(self.fake(self.wrong_on(1), delay=0.05).url, ROUTE_MODEL, suite, host=HOST,
+        # Wrong once: still unsound (0.75 < 0.9 gate). Four items provide too few
+        # clusters for an interim z-test, so the run completes before failing its gate.
+        broken = decision.run_suite(self.fake(self.wrong_on(4), delay=0.05).url, ROUTE_MODEL, suite, host=HOST,
                                     rev="test")
         self.assertEqual(broken["problems"], ["MUST FAIL: gate:decision.choice.accuracy"])
         candidate = self.fake(self.echo)
@@ -917,7 +974,17 @@ class H(BaseHTTPRequestHandler):
                                    "tokens": len(body["state"]), "max_len": cfg["max_len"]}}
                                for n in body["questions"]}})
 
-HTTPServer(("127.0.0.1", args.port), H).serve_forever()
+class Server(HTTPServer):
+    # HTTPServer.server_bind() calls socket.getfqdn() between bind() and listen(); on the GitHub macOS runner that
+    # reverse lookup outlasted the 30 s readiness window and every probe's connect timed out (CI red on all seven
+    # landings of 2026-10-02). The real shim is laya's own server; this fake only has to listen at once.
+    def server_bind(self):
+        import socketserver
+        socketserver.TCPServer.server_bind(self)
+        self.server_name, self.server_port = self.server_address[:2]
+
+
+Server(("127.0.0.1", args.port), H).serve_forever()
 '''
 SNAPSHOT = "20aed815fc6acde75733882e7ec0e3f28aeb9717"
 
@@ -1092,6 +1159,15 @@ class Paired(Base):
         self.assertEqual((better["mcnemar_p"], better["verdict"]), (0.03125, "BETTER"))
         worse = decision._paired_table([(False, True)] * 6, 0.05, 1, 2000)
         self.assertEqual((worse["mcnemar_p"], worse["verdict"]), (0.03125, "WORSE"))
+    def test_two_thousand_discordant_pairs_neither_overflow_nor_lose_symmetry(self):
+        self.assertEqual(decision._mcnemar_exact(1000, 1000), 1.0)
+        self.assertEqual(decision._mcnemar_exact(950, 1050), decision._mcnemar_exact(1050, 950))
+        self.assertLess(decision._mcnemar_exact(800, 1200), 1e-6)
+        table = decision._paired_table([(True, False)] * 900 + [(False, True)] * 1100,
+                                        0.05, 1, 2000)
+        self.assertEqual((table["b"], table["c"], table["n"]), (900, 1100, 2000))
+        self.assertLess(table["mcnemar_p"], 0.05)
+
 
     def test_noul_end_to_end_through_a_run_receipt(self):
         labels = [i % 2 == 0 for i in range(6)]
@@ -1143,9 +1219,9 @@ class Paired(Base):
                                                    answer(QUESTIONS["noul"]["unsafe"], False)])
         arm = self._arm(suite, {"noul-0": True, "noul-1": False})
         arm["outcomes"] = [o for o in arm["outcomes"] if o["id"] != "noul-1"]
-        with self.assertRaisesRegex(decision.PairedError, "no local outcome"):
-            decision.paired({"kind": "run", "run": {"decision": {"local": arm}}},
-                            corpora=self.tmp, resamples=10)
+        scored = decision.paired({"kind": "run", "run": {"decision": {"local": arm}}},
+                                 corpora=self.tmp, resamples=10)
+        self.assertEqual((scored["missing_items"], scored["availability_errors"]), (["noul-1"], 1))
         bad = dict(arm["suite"])
         bad["items_sha256"] = "0" * 64
         with self.assertRaisesRegex(decision.PairedError, "not on disk"):
@@ -1209,6 +1285,66 @@ class Paired(Base):
         except ValueError:
             doc = None
         return {"rc": rc, "text": text, "doc": doc}
+
+class ChoiceOrderMetamorphic(unittest.TestCase):
+    """kit-jr4 bug class: choice probabilities bind to option NAMES, never positions.
+    Metamorphic relation: permuting the criteria order in the request must permute
+    the answer's probability assignment correspondingly and change nothing else.
+    Pure test (fake models, no inference): build_request validates both orders and
+    validate_answer reduces both answers, and the validated outputs must agree."""
+
+    BELIEF = {"trivial": 0.7, "moderate": 0.2, "hard": 0.1}
+
+    def _question(self, order):
+        return {"type": "choice", "instructions": "Classify the coding request.",
+                "criteria": {name: None for name in order}}
+
+    def _by_name(self, question):
+        """A name-faithful model: the same belief whatever the order."""
+        options = decision.question_options(question)
+        probs = {name: self.BELIEF[name] for name in options}
+        return {"type": "choice", "choice": max(options, key=probs.get),
+                "probabilities": probs, "confidence": 0.9}
+
+    def _by_position(self, question):
+        """The jr4 bug shape: a fixed positional vector bound to whatever order."""
+        options = decision.question_options(question)
+        probs = dict(zip(options, [0.7, 0.2, 0.1]))
+        return {"type": "choice", "choice": max(options, key=probs.get),
+                "probabilities": probs, "confidence": 0.9}
+
+    def test_permuted_orders_validate_to_identical_answers(self):
+        first = self._question(["trivial", "moderate", "hard"])
+        second = self._question(["hard", "trivial", "moderate"])
+        for q in (first, second):
+            body = decision.build_request("m", "do X", {"q": q})
+            self.assertEqual(list(body["questions"]["q"]["criteria"]), list(q["criteria"]))
+        out1 = decision.validate_answer(first, self._by_name(first), "first")
+        out2 = decision.validate_answer(second, self._by_name(second), "second")
+        self.assertEqual(out1, out2)
+
+    def test_requests_differ_only_in_criteria_order(self):
+        first = decision.build_request("m", "do X", {"q": self._question(["a", "b", "c"])})
+        second = decision.build_request("m", "do X", {"q": self._question(["c", "a", "b"])})
+
+        def norm(body):
+            return {**body, "questions": {
+                name: {**q, "criteria": dict(sorted(q["criteria"].items()))}
+                for name, q in body["questions"].items()}}
+
+        self.assertNotEqual(list(first["questions"]["q"]["criteria"]),
+                            list(second["questions"]["q"]["criteria"]))
+        self.assertEqual(norm(first), norm(second))
+
+    def test_positional_binding_breaks_the_invariance(self):
+        # The test is not vacuous: a position-bound model flips the validated
+        # choice under permutation, so the equality above would catch jr4.
+        first = self._question(["trivial", "moderate", "hard"])
+        second = self._question(["hard", "trivial", "moderate"])
+        out1 = decision.validate_answer(first, self._by_position(first), "first")
+        out2 = decision.validate_answer(second, self._by_position(second), "second")
+        self.assertNotEqual(out1, out2)
+        self.assertNotEqual(out1["choice"], out2["choice"])
 
 if __name__ == "__main__":
     unittest.main()

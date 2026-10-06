@@ -21,6 +21,7 @@ import tempfile
 import threading
 import time
 import uuid
+import venv
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -38,10 +39,28 @@ OLLAMA_ROOT = "http://127.0.0.1:11434"
 LABEL = "com.localbench.ollama-gateway"
 IDLE_SECONDS = 300.0
 REQUEST_BODY_TIMEOUT_SECONDS = 30.0
+GATEWAY_EXPORTS = "gateway-exports"
+GATEWAY_EXPORT_MARKER = ".localbench-gateway-export"
 RETRY_SECONDS = 15.0
 READINESS_TIMEOUT = 20.0
 MAX_BODY_BYTES = 128 * 1024 * 1024
+AUX_CONCURRENCY_ENV = "LOCALBENCH_GATEWAY_AUX_CONCURRENCY"
 MAX_GO_DURATION_NS = 2**63 - 1
+# proj-b's Clef-Flash decision server (kit-jtq2): proj-b owns serve.py on :8010; the gateway only fronts it, so its
+# requests are attributed (profile proj-b, feature proj-b-<route>) and yield to localbench's park windows. Never leased:
+# localbench does not load, unload or stop it.
+CLEF_ROOT = "http://127.0.0.1:8010"
+CLEF_PROFILE = "proj-b"
+CLEF_MODEL = "clef-flash"
+CLEF_CONCURRENCY = 2
+CLEF_BUSY_RETRY_S = 2
+CLEF_FENCED_RETRY_S = 60
+EXTERNAL_PROFILES = frozenset({CLEF_PROFILE})
+_CLEF_ROUTE = re.compile(r"[a-z0-9-]{1,64}")
+# Per-request rows (kit-8gh): bounded by age and count, so the contention analysis never grows the store.
+REQUESTS_RETENTION_S = 7 * 24 * 3600
+REQUESTS_MAX_ROWS = 200_000
+VACUUM_INTERVAL_S = 30 * 24 * 3600
 _DURATION_PART = re.compile(r"(\d+(?:\.\d*)?|\.\d+)(ns|us|µs|μs|ms|s|m|h)")
 _DURATION_UNIT_NS = {
     "ns": 1, "us": 1_000, "µs": 1_000, "μs": 1_000,
@@ -114,11 +133,27 @@ def _secure_dir(path: Path) -> None:
     path.chmod(0o700)
 
 
+def _pid_alive(pid: int) -> bool | None:
+    if pid <= 0:
+        return None
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    except OSError:
+        return None
+    return True
+
+
 @dataclass(frozen=True)
 class Route:
     kind: str
     profile: str | None = None
     upstream_path: str | None = None
+    upstream: str = "ollama"
+    feature: str = ""
 
 
 def route_request(method: str, path: str, profiles: set[str] | dict[str, str]) -> Route:
@@ -135,6 +170,8 @@ def route_request(method: str, path: str, profiles: set[str] | dict[str, str]) -
         # Unprofiled loopback route for local judges and the proj-b CLI: same lease,
         # fence and in-flight accounting as profiled chat, attributed to profile "".
         return Route("inference", profile=None, upstream_path="/v1/systemone")
+    if pathname == "/proj-b/clef-flash" or pathname.startswith("/proj-b/clef-flash/"):
+        return _clef_route(method, pathname.removeprefix("/proj-b/clef-flash").removeprefix("/"))
     prefix = "/omp-profile/"
     if not pathname.startswith(prefix):
         raise RouteError(404, "route is not managed by the Ollama residency gateway")
@@ -158,6 +195,25 @@ def route_request(method: str, path: str, profiles: set[str] | dict[str, str]) -
     if endpoint not in {"responses", "chat/completions", "completions", "embeddings", "systemone"}:
         raise RouteError(404, "unsupported OMP inference endpoint")
     return Route("inference", profile=profile, upstream_path=f"/v1/{endpoint}")
+
+
+def _clef_route(method: str, tail: str) -> Route:
+    """proj-b's Clef-Flash routes: GET /proj-b/clef-flash/ is serve.py's identity (unaccounted, like discovery);
+    POST /proj-b/clef-flash/<route> is one decision call, attributed to profile proj-b as feature proj-b-<route>, sent
+    to serve.py as /v1/systemone (serve.py answers any POST path; the name says what it serves). A trailing
+    /v1/systemone after <route> is accepted and stripped: omp's typesafe provider appends it to its baseUrl."""
+    if method == "GET":
+        if tail:
+            raise RouteError(404, "clef-flash GET serves only /proj-b/clef-flash/")
+        return Route("discovery", upstream_path="/", upstream="clef")
+    if method != "POST":
+        raise RouteError(405, "clef-flash decision calls require POST")
+    route = tail.removesuffix("/v1/systemone")
+    if not _CLEF_ROUTE.fullmatch(route):
+        raise RouteError(400, "clef-flash route must be 1-64 characters of [a-z0-9-]")
+    return Route("inference", profile=CLEF_PROFILE, upstream_path="/v1/systemone", upstream="clef",
+                 feature=f"proj-b-{route}")
+
 
 def decision_purpose(payload: dict) -> str:
     """Purpose key for a System One decision request: 'decision' plus the question names it carries.
@@ -189,6 +245,11 @@ def decision_purpose(payload: dict) -> str:
         digest = hashlib.sha256(joined.encode("utf-8")).hexdigest()[:16]
         joined = joined[:167] + "#" + digest
     return "decision" + (":" + joined if names else "")
+
+
+def auxiliary_purpose(purpose: str) -> bool:
+    """Return whether a forwarded inference purpose is auxiliary rather than measured work."""
+    return purpose != "main" and not purpose.startswith("decision")
 
 
 def request_purpose(route: Route, payload: dict) -> str:
@@ -330,6 +391,15 @@ class _ClosingConnection(sqlite3.Connection):
             self.close()
 
 
+def _evict_requests(db, now: float) -> None:
+    """Bound the requests table by age then count; the caller holds the write transaction."""
+    db.execute("DELETE FROM requests WHERE ended_at < ?", (now - REQUESTS_RETENTION_S,))
+    over = db.execute("SELECT COUNT(*) FROM requests").fetchone()[0] - REQUESTS_MAX_ROWS
+    if over > 0:
+        db.execute("""DELETE FROM requests WHERE request_id IN
+                   (SELECT request_id FROM requests ORDER BY ended_at, request_id LIMIT ?)""", (over,))
+
+
 class GatewayStore:
     """SQLite lease ledger; stores model/profile/timing metadata, never request or response content."""
 
@@ -380,6 +450,7 @@ class GatewayStore:
                     model TEXT NOT NULL,
                     profile TEXT NOT NULL,
                     started_at REAL NOT NULL,
+                    owner_pid INTEGER NOT NULL DEFAULT 0,
                     instance_id TEXT NOT NULL
                 );
                 CREATE INDEX IF NOT EXISTS active_requests_model ON active_requests(model);
@@ -397,10 +468,35 @@ class GatewayStore:
                     busy_s REAL NOT NULL DEFAULT 0.0,
                     PRIMARY KEY (profile, purpose, bucket_start)
                 );
+                CREATE TABLE IF NOT EXISTS requests (
+                    request_id TEXT PRIMARY KEY,
+                    profile TEXT NOT NULL,
+                    purpose TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    started_at REAL NOT NULL,
+                    first_byte_at REAL,
+                    ended_at REAL NOT NULL,
+                    status TEXT NOT NULL,
+                    feature TEXT NOT NULL DEFAULT '',
+                    abandon_reason TEXT
+                );
+                CREATE INDEX IF NOT EXISTS requests_ended ON requests(ended_at);
             """)
             columns = {row["name"] for row in db.execute("PRAGMA table_info(active_requests)")}
             if "purpose" not in columns:
                 db.execute("ALTER TABLE active_requests ADD COLUMN purpose TEXT NOT NULL DEFAULT ''")
+            if "first_byte_at" not in columns:
+                db.execute("ALTER TABLE active_requests ADD COLUMN first_byte_at REAL")
+            request_columns = {row["name"] for row in db.execute("PRAGMA table_info(requests)")}
+            if "feature" not in request_columns:
+                db.execute("ALTER TABLE requests ADD COLUMN feature TEXT NOT NULL DEFAULT ''")
+            if "abandon_reason" not in request_columns:
+                db.execute("ALTER TABLE requests ADD COLUMN abandon_reason TEXT")
+            active_columns = {row["name"] for row in db.execute("PRAGMA table_info(active_requests)")}
+            if "feature" not in active_columns:
+                db.execute("ALTER TABLE active_requests ADD COLUMN feature TEXT NOT NULL DEFAULT ''")
+            if "owner_pid" not in active_columns:
+                db.execute("ALTER TABLE active_requests ADD COLUMN owner_pid INTEGER NOT NULL DEFAULT 0")
 
     def profile_paths(self) -> dict[str, str]:
         with self._connect() as db:
@@ -466,11 +562,13 @@ class GatewayStore:
             db.commit()
 
     def start_request(self, profile: str, model: str, instance_id: str, now: float | None = None,
-                      purpose: str = "") -> str:
+                      purpose: str = "", feature: str = "") -> str:
         if not model or len(model) > 512 or "\x00" in model:
             raise GatewayError("request model name is missing or invalid")
         if "\x00" in purpose or len(purpose) > 256:
             raise GatewayError("request purpose is invalid")
+        if "\x00" in feature or len(feature) > 256:
+            raise GatewayError("request feature is invalid")
         now = time.time() if now is None else now
         request_id = uuid.uuid4().hex
         with self._connect() as db:
@@ -479,7 +577,10 @@ class GatewayStore:
             if accepting is None or accepting["value"] != "1":
                 db.rollback()
                 raise GatewayError("gateway is draining and will not accept inference requests")
-            fenced = db.execute("SELECT 1 FROM park_fences WHERE model=? LIMIT 1", (model,)).fetchone()
+            external = profile in EXTERNAL_PROFILES
+            # An external server (proj-b's Clef-Flash) shares the GPU with every model: any park fence holds it.
+            fenced = (db.execute("SELECT 1 FROM park_fences LIMIT 1") if external else
+                      db.execute("SELECT 1 FROM park_fences WHERE model=? LIMIT 1", (model,))).fetchone()
             if fenced is not None:
                 db.rollback()
                 raise GatewayError("model is fenced for park; retry after localbench unpark")
@@ -490,43 +591,145 @@ class GatewayStore:
                 raise GatewayError("model unload is in progress; retry the inference request")
             # The bare loopback inference routes (e.g. POST /v1/systemone) carry no profile;
             # they share the lease, fence and in-flight accounting under profile "".
-            if profile != "" and db.execute(
+            if profile != "" and not external and db.execute(
                     "SELECT 1 FROM profiles WHERE name=?", (profile,)).fetchone() is None:
                 db.rollback()
                 raise GatewayError("request profile is not registered")
-            db.execute("""INSERT INTO leases(model) VALUES(?) ON CONFLICT(model) DO UPDATE SET
-                       last_outcome=NULL, last_error=NULL, next_retry_at=NULL""", (model,))
-            db.execute("""INSERT INTO lease_profiles(model,profile,last_seen_at) VALUES(?,?,?)
-                       ON CONFLICT(model,profile) DO UPDATE SET last_seen_at=excluded.last_seen_at""",
-                       (model, profile, now))
-            db.execute("""INSERT INTO active_requests(request_id,model,profile,started_at,instance_id,purpose)
-                       VALUES(?,?,?,?,?,?)""",
-                       (request_id, model, profile, now, instance_id, purpose))
+            if not external:
+                # External servers are never leased, so expiry never tries to unload them.
+                db.execute("""INSERT INTO leases(model) VALUES(?) ON CONFLICT(model) DO UPDATE SET
+                           last_outcome=NULL, last_error=NULL, next_retry_at=NULL""", (model,))
+                db.execute("""INSERT INTO lease_profiles(model,profile,last_seen_at) VALUES(?,?,?)
+                           ON CONFLICT(model,profile) DO UPDATE SET last_seen_at=excluded.last_seen_at""",
+                           (model, profile, now))
+            db.execute("""INSERT INTO active_requests(request_id,model,profile,started_at,instance_id,purpose,feature,owner_pid)
+                       VALUES(?,?,?,?,?,?,?,?)""",
+                       (request_id, model, profile, now, instance_id, purpose, feature, os.getpid()))
             db.commit()
         return request_id
 
-    def finish_request(self, request_id: str, completed: bool, outcome: str, now: float | None = None) -> None:
+    def finish_request(
+        self,
+        request_id: str,
+        completed: bool,
+        outcome: str,
+        now: float | None = None,
+        abandon_reason: str | None = None,
+    ) -> None:
         now = time.time() if now is None else now
         with self._connect() as db:
+            last = db.execute("SELECT value FROM gateway_state WHERE key='requests_vacuum_at'").fetchone()
+            if now - (float(last[0]) if last is not None else 0.0) >= VACUUM_INTERVAL_S:
+                try:
+                    db.execute("VACUUM")
+                except sqlite3.OperationalError:
+                    pass    # another writer holds the lock; the next finish retries next month
+                else:
+                    db.execute("""INSERT INTO gateway_state(key,value) VALUES('requests_vacuum_at',?)
+                               ON CONFLICT(key) DO UPDATE SET value=excluded.value""", (str(now),))
+                db.commit()
             db.execute("BEGIN IMMEDIATE")
-            row = db.execute("SELECT model, profile, purpose, started_at FROM active_requests WHERE request_id=?",
-                             (request_id,)).fetchone()
+            row = db.execute("""SELECT model, profile, purpose, feature, started_at, first_byte_at FROM active_requests
+                             WHERE request_id=?""", (request_id,)).fetchone()
             if row is None:
                 db.commit()
                 return
             model = row["model"]
             db.execute("DELETE FROM active_requests WHERE request_id=?", (request_id,))
-            bucket = math.floor(row["started_at"] / 3600) * 3600
-            busy = max(0.0, now - row["started_at"])
-            db.execute("""INSERT INTO purpose_stats(profile,purpose,bucket_start,requests,busy_s)
-                       VALUES(?,?,?,1,?) ON CONFLICT(profile,purpose,bucket_start) DO UPDATE SET
-                       requests=purpose_stats.requests+1, busy_s=purpose_stats.busy_s+excluded.busy_s""",
-                       (row["profile"], row["purpose"] or "unspecified", bucket, busy))
+            if outcome != "abandoned":
+                # Reconciliation time is not the unknown request end time.
+                bucket = math.floor(row["started_at"] / 3600) * 3600
+                busy = max(0.0, now - row["started_at"])
+                db.execute("""INSERT INTO purpose_stats(profile,purpose,bucket_start,requests,busy_s)
+                           VALUES(?,?,?,1,?) ON CONFLICT(profile,purpose,bucket_start) DO UPDATE SET
+                           requests=purpose_stats.requests+1, busy_s=purpose_stats.busy_s+excluded.busy_s""",
+                           (row["profile"], row["purpose"] or "unspecified", bucket, busy))
+            db.execute("""INSERT INTO requests(request_id,profile,purpose,model,started_at,first_byte_at,
+                       ended_at,status,feature,abandon_reason) VALUES(?,?,?,?,?,?,?,?,?,?)""",
+                       (request_id, row["profile"], row["purpose"] or "unspecified", model, row["started_at"],
+                        row["first_byte_at"], now, outcome, row["feature"] or "", abandon_reason))
+            _evict_requests(db, now)
             if db.execute("SELECT 1 FROM active_requests WHERE model=? LIMIT 1", (model,)).fetchone() is None:
                 db.execute("""UPDATE leases SET last_completed_at=CASE WHEN ? THEN ? ELSE last_completed_at END,
-                           idle_expires_at=?,last_outcome=?,last_error=NULL,next_retry_at=NULL WHERE model=?""",
-                           (int(completed), now, now + IDLE_SECONDS, outcome, model))
+                           idle_expires_at=?,last_outcome=?,last_error=?,next_retry_at=NULL WHERE model=?""",
+                           (int(completed), now, now + IDLE_SECONDS, outcome, abandon_reason, model))
             db.commit()
+
+    def reconcile_abandoned_requests(
+        self, established_connections: int | None, now: float | None = None
+    ) -> int:
+        """Finish requests whose gateway owner is gone or whose client socket no longer exists."""
+        if established_connections is not None and established_connections < 0:
+            raise GatewayError("gateway connection count cannot be negative")
+        now = time.time() if now is None else now
+        with self._connect() as db:
+            rows = db.execute(
+                "SELECT request_id, owner_pid FROM active_requests ORDER BY started_at, request_id"
+            ).fetchall()
+
+        abandoned: list[tuple[str, str]] = []
+        for row in rows:
+            owner_pid = int(row["owner_pid"] or 0)
+            if owner_pid > 0 and _pid_alive(owner_pid) is False:
+                reason = f"owner gateway pid {owner_pid} is gone"
+            elif established_connections == 0:
+                reason = "no established gateway client connections"
+            else:
+                continue
+            abandoned.append((str(row["request_id"]), reason))
+
+        for request_id, reason in abandoned:
+            self.finish_request(request_id, completed=False, outcome="abandoned", now=now,
+                                abandon_reason=reason)
+        return len(abandoned)
+
+    def mark_first_byte(self, request_id: str, now: float | None = None) -> None:
+        """The upstream-forwarding timestamp: time from admission to response headers (gateway queue plus
+        upstream time-to-first-byte). Missing rows stay missing; never raises for an unknown id."""
+        now = time.time() if now is None else now
+        with self._connect() as db:
+            db.execute("UPDATE active_requests SET first_byte_at=? WHERE request_id=?", (now, request_id))
+            db.commit()
+
+    def refuse_request(self, profile: str, model: str, purpose: str = "", reason: str = "",
+                       now: float | None = None) -> str:
+        """Record an admission refusal (draining, fenced, unregistered, unload pending): no active row ever
+        existed, so this inserts directly with a NULL first byte. The future aux-cap A/B counts these."""
+        now = time.time() if now is None else now
+        status = "draining" if "draining" in (reason or "") else "refused"
+        request_id = uuid.uuid4().hex
+        with self._connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            db.execute("""INSERT INTO requests(request_id,profile,purpose,model,started_at,first_byte_at,
+                       ended_at,status,feature) VALUES(?,?,?,?,?,?,?,?,?)""",
+                       (request_id, profile, purpose or "unspecified", model, now, None, now, status, ""))
+            _evict_requests(db, now)
+            db.commit()
+        return request_id
+
+    def requests_report(self, since: float, until: float, *, purpose: str | None = None,
+                        profile: str | None = None, limit: int = 200) -> list[dict]:
+        """Per-request rows started in [since, until): status, wait, and abandonment reason. Busy duration is
+        unknown for abandoned rows. Newest first, bounded; request and response content is not stored."""
+        query = ("SELECT request_id, profile, purpose, model, started_at, first_byte_at, ended_at, status, feature, "
+                 "abandon_reason FROM requests WHERE started_at >= ? AND started_at < ?")
+        args: list = [since, until]
+        if purpose is not None:
+            query += " AND purpose=?"
+            args.append(purpose)
+        if profile is not None:
+            query += " AND profile=?"
+            args.append(profile)
+        query += " ORDER BY started_at DESC, request_id LIMIT ?"
+        args.append(max(1, min(int(limit), 5000)))
+        with self._connect() as db:
+            rows = db.execute(query, args).fetchall()
+        return [{"request_id": r[0], "profile": r[1], "purpose": r[2], "model": r[3], "started_at": r[4],
+                 "first_byte_at": r[5], "ended_at": r[6], "status": r[7],
+                 **({"feature": r[8]} if r[8] else {}),
+                 **({"abandon_reason": r[9]} if r[9] else {}),
+                 "queue_wait_s": (r[5] - r[4] if r[5] is not None else None),
+                 "busy_s": None if r[7] == "abandoned" else r[6] - r[4]} for r in rows]
 
     def set_manual_lease(self, model: str, expires_at: float, now: float | None = None) -> None:
         current = time.time() if now is None else now
@@ -593,6 +796,7 @@ class GatewayStore:
                        next_retry_at=NULL""")
 
     def lease(self, model: str) -> dict | None:
+        now = time.time()
         with self._connect() as db:
             row = db.execute("SELECT * FROM leases WHERE model=?", (model,)).fetchone()
             if row is None:
@@ -603,6 +807,11 @@ class GatewayStore:
             result = dict(row)
             result["profiles"] = profiles
             result["active_requests"] = int(active)
+            expires_at = max((value for value in (row["idle_expires_at"], row["manual_expires_at"])
+                              if value is not None), default=None)
+            expired = expires_at is not None and expires_at <= now
+            if active == 0 and expired and result["last_outcome"] in (None, "active"):
+                result["last_outcome"] = "expired"
             return result
 
     def leases(self) -> list[dict]:
@@ -786,7 +995,7 @@ class ExternalActivityProbe:
 
     def __init__(self, run=subprocess.run, clock: Callable[[], float] = time.monotonic,
                  gpu_reader: Callable[[], dict] = sysstats.gpu_time_by_pid):
-        self.run = run
+        self.runner = run
         self.clock = clock
         self.gpu_reader = gpu_reader
         try:
@@ -810,7 +1019,7 @@ class ExternalActivityProbe:
         binary = shutil.which("lsof")
         if not binary:
             raise GatewayError("lsof is unavailable; external Ollama clients cannot be ruled out")
-        result = self.run([binary, "-nP", "-iTCP:11434", "-sTCP:ESTABLISHED", "-Fpcn"],
+        result = self.runner([binary, "-nP", "-iTCP:11434", "-sTCP:ESTABLISHED", "-Fpcn"],
                           capture_output=True, text=True, timeout=5, check=False)
         if result.returncode not in (0, 1):
             raise GatewayError("lsof could not establish the Ollama client set")
@@ -875,21 +1084,52 @@ class ExternalActivityProbe:
         return True, None
 
 
+def _aux_concurrency() -> int:
+    raw = os.environ.get(AUX_CONCURRENCY_ENV, "0")
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise GatewayError(f"{AUX_CONCURRENCY_ENV} must be a non-negative integer") from exc
+    if value < 0:
+        raise GatewayError(f"{AUX_CONCURRENCY_ENV} must be a non-negative integer")
+    return value
+
+
 class GatewayHTTPServer(http.server.ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
     request_queue_size = 64
 
     def __init__(self, address, handler, policy: GatewayPolicy, store: GatewayStore,
-                 upstream_root: str, instance_id: str):
+                 upstream_root: str, instance_id: str, aux_concurrency: int | None = None,
+                 clef_root: str = CLEF_ROOT):
         if address[0] != HOST:
             raise GatewayError("the Ollama residency gateway may bind only to 127.0.0.1")
         self.policy = policy
         self.store = store
         self.upstream_root = upstream_root.rstrip("/")
         self.instance_id = instance_id
+        self.aux_concurrency = _aux_concurrency() if aux_concurrency is None else aux_concurrency
+        if self.aux_concurrency < 0:
+            raise GatewayError("auxiliary concurrency cap must be non-negative")
+        self._aux_slots = threading.BoundedSemaphore(self.aux_concurrency) if self.aux_concurrency else None
+        self.clef_root = clef_root.rstrip("/")
+        self._clef_slots = threading.BoundedSemaphore(CLEF_CONCURRENCY)
         super().__init__(address, handler)
         self.timeout = 0.5
+
+    def acquire_aux(self) -> bool:
+        return self._aux_slots is None or self._aux_slots.acquire(blocking=False)
+
+    def release_aux(self) -> None:
+        if self._aux_slots is not None:
+            self._aux_slots.release()
+
+    def acquire_clef(self) -> bool:
+        return self._clef_slots.acquire(blocking=False)
+
+    def release_clef(self) -> None:
+        self._clef_slots.release()
 
     def maintenance(self) -> None:
         now = time.monotonic()
@@ -907,11 +1147,16 @@ class GatewayRequestHandler(http.server.BaseHTTPRequestHandler):
         # Request paths, headers and bodies are not written to LaunchAgent logs.
         return
 
-    def _json_error(self, status: int, message: str) -> None:
-        body = json.dumps({"error": message}, separators=(",", ":")).encode()
+    def _json_error(self, status: int, message: str, code: str | None = None, retry_after: int | None = None,
+                    request_id: str | None = None) -> None:
+        body = json.dumps({"error": message, **({"code": code} if code else {})}, separators=(",", ":")).encode()
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
+        if retry_after is not None:
+            self.send_header("Retry-After", str(retry_after))
+        if request_id is not None:
+            self.send_header("X-Localbench-Request-Id", request_id)
         self.send_header("Connection", "close")
         self.end_headers()
         self.wfile.write(body)
@@ -964,22 +1209,49 @@ class GatewayRequestHandler(http.server.BaseHTTPRequestHandler):
         completed = False
         outcome = "interrupted"
         capture_meta: dict | None = None
+        aux_slot = False
+        clef = route.upstream == "clef"
+        clef_slot = False
         if route.kind == "inference":
             try:
                 payload = json.loads(body)
             except (UnicodeDecodeError, json.JSONDecodeError):
-                self._json_error(400, "inference request must contain a JSON model field")
+                self._json_error(400, "clef-flash request body must be JSON" if clef else
+                                 "inference request must contain a JSON model field")
                 return
-            model = payload.get("model") if isinstance(payload, dict) else None
-            if isinstance(model, str) and model.startswith("ollama/"):
-                model = model[len("ollama/"):]
-            if not isinstance(model, str) or not model.strip():
-                self._json_error(400, "inference request must contain a non-empty model field")
-                return
-            purpose = request_purpose(route, payload if isinstance(payload, dict) else {})
+            if clef:
+                model, purpose, feature = CLEF_MODEL, route.feature, route.feature
+                clef_slot = self.server.acquire_clef()
+                if not clef_slot:
+                    try:
+                        self.server.store.refuse_request(CLEF_PROFILE, model, purpose,
+                                                         "clef-flash concurrency cap reached")
+                    except Exception:  # noqa: BLE001 - a lost refusal row must not break the 503
+                        pass
+                    self._json_error(503, f"clef-flash already has {CLEF_CONCURRENCY} calls in flight",
+                                     code="busy", retry_after=CLEF_BUSY_RETRY_S)
+                    return
+            else:
+                model = payload.get("model") if isinstance(payload, dict) else None
+                if isinstance(model, str) and model.startswith("ollama/"):
+                    model = model[len("ollama/"):]
+                if not isinstance(model, str) or not model.strip():
+                    self._json_error(400, "inference request must contain a non-empty model field")
+                    return
+                purpose = request_purpose(route, payload if isinstance(payload, dict) else {})
+                aux_slot = auxiliary_purpose(purpose) and self.server.acquire_aux()
+                if auxiliary_purpose(purpose) and not aux_slot:
+                    try:
+                        self.server.store.refuse_request(route.profile or "", model, purpose,
+                                                         "auxiliary concurrency cap reached")
+                    except Exception:
+                        pass
+                    self._json_error(503, "auxiliary concurrency cap reached")
+                    return
+                feature = self.headers.get("X-Localbench-Feature", "")
             try:
                 request_id = self.server.store.start_request(
-                    route.profile or "", model, self.server.instance_id, purpose=purpose,
+                    route.profile or "", model, self.server.instance_id, purpose=purpose, feature=feature,
                 )
             except GatewayError as exc:
                 reason = str(exc)
@@ -988,9 +1260,19 @@ class GatewayRequestHandler(http.server.BaseHTTPRequestHandler):
                            if "fenced" in reason else
                            "OMP profile is not registered with the residency gateway" if "not registered" in reason
                            else reason)
-                self._json_error(503, message)
+                try:
+                    self.server.store.refuse_request(route.profile or "", model, purpose, reason)
+                except Exception:  # noqa: BLE001 - a lost refusal row must not break the 503
+                    pass
+                if clef_slot:
+                    self.server.release_clef()
+                if clef:
+                    self._json_error(503, message, code="fenced" if "fenced" in reason else "unavailable",
+                                     retry_after=CLEF_FENCED_RETRY_S)
+                else:
+                    self._json_error(503, message)
                 return
-            capture_meta = self._capture_meta(route, purpose, model)
+            capture_meta = None if clef else self._capture_meta(route, purpose, model)
             if capture_meta is not None:
                 capture_body(purpose=purpose, meta=capture_meta, body=body, kind="request")
         headers = {}
@@ -1000,7 +1282,7 @@ class GatewayRequestHandler(http.server.BaseHTTPRequestHandler):
                 headers[key] = value
         if body:
             headers["Content-Length"] = str(len(body))
-        request = Request(self.server.upstream_root + (route.upstream_path or "/"),
+        request = Request((self.server.clef_root if clef else self.server.upstream_root) + (route.upstream_path or "/"),
                           data=body if self.command in {"POST", "PUT", "PATCH"} else None,
                           headers=headers, method=self.command)
         terminal_tail = b""
@@ -1017,14 +1299,23 @@ class GatewayRequestHandler(http.server.BaseHTTPRequestHandler):
             status = int(getattr(upstream, "status", None) or upstream.getcode() or 502)
             response_headers = upstream.headers
             stream = "text/event-stream" in response_headers.get("Content-Type", "").lower()
+            if clef and status >= 500:
+                status = 502    # serve.py down or failing: proj-b records NOT_RUN
             self.send_response(status)
+            if request_id is not None:
+                self.send_header("X-Localbench-Request-Id", request_id)
             hop_headers = {"connection", "keep-alive", "proxy-authenticate", "proxy-authorization",
-                           "te", "trailers", "transfer-encoding", "upgrade"}
+                           "te", "trailers", "transfer-encoding", "upgrade", "x-localbench-request-id"}
             for key, value in response_headers.items():
                 if key.lower() not in hop_headers:
                     self.send_header(key, value)
             self.send_header("Connection", "close")
             self.end_headers()
+            if request_id is not None:
+                try:
+                    self.server.store.mark_first_byte(request_id)
+                except Exception:  # noqa: BLE001 - timing metadata must never break forwarding
+                    pass
             read_chunk = getattr(upstream, "read1", upstream.read)
             while True:
                 chunk = read_chunk(64 * 1024)
@@ -1056,14 +1347,24 @@ class GatewayRequestHandler(http.server.BaseHTTPRequestHandler):
             outcome = "client_or_upstream_disconnected"
             if not getattr(self, "_headers_buffer", None):
                 try:
-                    self._json_error(502, "Ollama upstream request failed")
+                    self._json_error(502, "clef-flash upstream request failed" if clef else
+                                     "Ollama upstream request failed", code="upstream" if clef else None,
+                                     request_id=request_id if clef else None)
                 except OSError:
                     pass
         finally:
-            if upstream is not None:
-                upstream.close()
-            if request_id is not None:
-                self.server.store.finish_request(request_id, completed, outcome)
+            try:
+                if upstream is not None:
+                    upstream.close()
+            finally:
+                try:
+                    if aux_slot:
+                        self.server.release_aux()
+                    if clef_slot:
+                        self.server.release_clef()
+                finally:
+                    if request_id is not None:
+                        self.server.store.finish_request(request_id, completed, outcome)
 
     def _dispatch(self) -> None:
         # Health and discovery routes resolve without the lease store, so a
@@ -1108,8 +1409,10 @@ class GatewayRequestHandler(http.server.BaseHTTPRequestHandler):
 
 
 def create_server(address: tuple[str, int], store: GatewayStore, policy: GatewayPolicy,
-                  upstream_root: str = OLLAMA_ROOT, instance_id: str = "test-instance") -> GatewayHTTPServer:
-    return GatewayHTTPServer(address, GatewayRequestHandler, policy, store, upstream_root, instance_id)
+                  upstream_root: str = OLLAMA_ROOT, instance_id: str = "test-instance",
+                  clef_root: str = CLEF_ROOT) -> GatewayHTTPServer:
+    return GatewayHTTPServer(address, GatewayRequestHandler, policy, store, upstream_root, instance_id,
+                             clef_root=clef_root)
 
 
 def _probe_health(timeout: float = 1.0) -> dict:
@@ -1140,21 +1443,140 @@ def _load_launchctl(run=subprocess.run) -> tuple[bool, str]:
     return result.returncode == 0, result.stdout or result.stderr
 
 
+def _file_sha(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _package_sha(package: Path) -> str:
+    digest = hashlib.sha256()
+    for path in sorted(p for p in package.rglob("*")
+                       if p.is_file() and "__pycache__" not in p.parts and p.suffix != ".pyc"):
+        digest.update(path.relative_to(package).as_posix().encode() + b"\0")
+        data = path.read_bytes()
+        digest.update(len(data).to_bytes(8, "big"))
+        digest.update(data)
+    return digest.hexdigest()
+
+
+def _export_manifest(root: Path) -> dict | None:
+    try:
+        manifest = json.loads((root / GATEWAY_EXPORT_MARKER).read_text())
+    except (OSError, ValueError):
+        return None
+    return manifest if isinstance(manifest, dict) else None
+
+
+def _valid_export(root: Path, package_sha: str, gateway_sha: str) -> bool:
+    manifest = _export_manifest(root)
+    interpreter = root / "venv" / "bin" / "python3"
+    package = root / "localbench"
+    return bool(
+        manifest
+        and manifest.get("package_sha") == package_sha
+        and manifest.get("gateway_sha") == gateway_sha
+        and manifest.get("python") == "venv/bin/python3"
+        and interpreter.is_file()
+        and os.access(interpreter, os.X_OK)
+        and package.is_dir()
+        and _package_sha(package) == package_sha
+        and _file_sha(package / "gateway.py") == gateway_sha
+    )
+
+
+def create_pinned_export(home: Path | None = None, source_root: Path | None = None) -> tuple[Path, str]:
+    """Copy the package into a content-addressed runtime export with a local venv entry point."""
+    home = home or Path.home()
+    source_root = source_root or Path(__file__).resolve().parent.parent
+    source_package = source_root / "localbench"
+    gateway_sha = _file_sha(source_package / "gateway.py")
+    package_sha = _package_sha(source_package)
+    parent = home / ".localbench" / GATEWAY_EXPORTS
+    target = parent / package_sha
+    if target.exists():
+        if not _valid_export(target, package_sha, gateway_sha):
+            raise GatewayError(f"pinned gateway export is corrupt: {target}")
+        return target, gateway_sha
+
+    _secure_dir(parent)
+    temporary = Path(tempfile.mkdtemp(prefix=f".{package_sha}.", dir=parent))
+    try:
+        shutil.copytree(source_package, temporary / "localbench",
+                        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        venv.EnvBuilder(with_pip=False, symlinks=True).create(temporary / "venv")
+        manifest = {"package_sha": package_sha, "gateway_sha": gateway_sha, "python": "venv/bin/python3"}
+        (temporary / GATEWAY_EXPORT_MARKER).write_text(json.dumps(manifest, sort_keys=True) + "\n")
+        if not _valid_export(temporary, package_sha, gateway_sha):
+            raise GatewayError(f"created gateway export failed verification: {temporary}")
+        try:
+            os.replace(temporary, target)
+        except OSError:
+            if not target.exists() or not _valid_export(target, package_sha, gateway_sha):
+                raise
+    finally:
+        if temporary.exists():
+            shutil.rmtree(temporary)
+    return target, gateway_sha
+
+
+def launch_agent_code_status(home: Path | None = None) -> dict:
+    """Compare the installed LaunchAgent pin with both the export and this loaded gateway module."""
+    current_sha = _file_sha(Path(__file__).resolve())
+    try:
+        document = _read_managed_launch_agent(home)
+        if document is None:
+            raise GatewayError("gateway LaunchAgent is not installed")
+        args = document["ProgramArguments"]
+        workdir = Path(document.get("WorkingDirectory", ""))
+        interpreter = Path(args[0])
+        env = document.get("EnvironmentVariables", {})
+        promoted_sha = env.get("LOCALBENCH_GATEWAY_SHA") if isinstance(env, dict) else None
+        manifest = _export_manifest(workdir)
+        package = workdir / "localbench"
+        package_sha = manifest.get("package_sha") if manifest else None
+        expected_interpreter = workdir / "venv" / "bin" / "python3"
+        valid = bool(
+            isinstance(promoted_sha, str)
+            and len(promoted_sha) == 64
+            and current_sha == promoted_sha
+            and manifest
+            and manifest.get("gateway_sha") == promoted_sha
+            and manifest.get("python") == "venv/bin/python3"
+            and interpreter.absolute() == expected_interpreter.absolute()
+            and interpreter.is_file()
+            and os.access(interpreter, os.X_OK)
+            and workdir.is_dir()
+            and package.is_dir()
+            and package_sha == workdir.name
+            and _package_sha(package) == package_sha
+            and _file_sha(package / "gateway.py") == promoted_sha
+        )
+        return {"ok": valid, "code_sha": current_sha, "promoted_sha": promoted_sha,
+                "export": str(workdir), "interpreter": str(interpreter),
+                "reason": None if valid else "gateway code SHA or pinned export does not match"}
+    except (GatewayError, OSError, ValueError, TypeError) as exc:
+        return {"ok": False, "code_sha": current_sha, "promoted_sha": None,
+                "reason": str(exc)}
+
+
 def launchd_plist(home: Path | None = None, python: str | None = None, port: int = PORT) -> dict:
     home = home or Path.home()
     base = state_dir(home)
-    interpreter = python or sys.executable
+    export, gateway_sha = create_pinned_export(home)
+    interpreter = export / "venv" / "bin" / "python3"
+    if python is not None and Path(python).absolute() != interpreter.absolute():
+        raise GatewayError("gateway LaunchAgent interpreter must come from its pinned export")
     return {
         "Label": LABEL,
-        "ProgramArguments": [interpreter, "-m", "localbench", "gateway", "serve",
+        "ProgramArguments": [str(interpreter), "-m", "localbench", "gateway", "serve",
                              "--host", HOST, "--port", str(port)],
-        "WorkingDirectory": str(Path(__file__).resolve().parent.parent),
+        "WorkingDirectory": str(export),
         "RunAtLoad": True,
         "KeepAlive": True,
         "ProcessType": "Background",
         "StandardOutPath": str(base / "service.log"),
         "StandardErrorPath": str(base / "service.log"),
-        "EnvironmentVariables": {"HOME": str(home)},
+        "EnvironmentVariables": {"HOME": str(home), "LOCALBENCH_HOME": str(Path(__file__).resolve().parent.parent),
+                                "LOCALBENCH_GATEWAY_SHA": gateway_sha},
     }
 
 
@@ -1295,7 +1717,7 @@ def stop_launch_agent(home: Path | None = None, run=subprocess.run,
     loaded, _ = _load_launchctl(run)
     if loaded:
         run(["launchctl", "bootout", launch_target()], capture_output=True, text=True, timeout=10, check=True)
-        _await_gateway_down(run, unload_timeout)
+    _await_gateway_down(run, unload_timeout)
     return True
 
 
@@ -1560,6 +1982,44 @@ def install(home: Path | None = None, port: int = PORT, run=subprocess.run,
     return {"profiles": sorted(manager.dirs), "port": port, "manifest": manifest, "readback": readback}
 
 
+def _gateway_established_connections(run=subprocess.run) -> int | None:
+    binary = shutil.which("lsof")
+    if not binary:
+        return None
+    try:
+        result = run([binary, "-nP", f"-iTCP:{PORT}", "-sTCP:ESTABLISHED", "-Fpcn"],
+                     capture_output=True, text=True, timeout=5, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if result.returncode not in (0, 1) or result.stderr.strip():
+        return None
+
+    connections = 0
+    for line in result.stdout.splitlines():
+        if not line.startswith("n"):
+            continue
+        endpoints = line[1:].split("->", 1)
+        if len(endpoints) != 2:
+            return None
+        local = ExternalActivityProbe._port(endpoints[0])
+        remote = ExternalActivityProbe._port(endpoints[1])
+        if local is None or remote is None:
+            return None
+        if local[1] == PORT:
+            connections += 1
+    return connections
+
+
+def stop_preflight(run=subprocess.run) -> str | None:
+    """Read-only stop guard; zero gateway client sockets makes stored rows reclaimable."""
+    connections = _gateway_established_connections(run=run)
+    if connections is None:
+        return "gateway client connection state is unknown; stop refused"
+    if connections:
+        return "gateway has established client connections; stop refused"
+    return None
+
+
 def start(home: Path | None = None, run=subprocess.run,
           wait_health: Callable[[float], bool] = _wait_health) -> bool:
     return start_launch_agent(home=home, run=run, wait_health=wait_health)
@@ -1572,10 +2032,16 @@ def stop(home: Path | None = None, run=subprocess.run) -> bool:
     store = _existing_store(home)
     if store is not None:
         store.set_accepting(False)
-        if store.active_requests():
-            store.set_accepting(True)
-            raise GatewayError("gateway has in-flight requests; stop refused")
     try:
+        connections = _gateway_established_connections(run=run)
+        if store is not None:
+            store.reconcile_abandoned_requests(connections)
+        if connections is None:
+            raise GatewayError("gateway client connection state is unknown; stop refused")
+        if connections:
+            raise GatewayError("gateway has established client connections; stop refused")
+        if store is not None and store.active_requests():
+            raise GatewayError("gateway has in-flight requests after stale reconciliation; stop refused")
         return stop_launch_agent(home=home, run=run)
     except BaseException:
         if store is not None:

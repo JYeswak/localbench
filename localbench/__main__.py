@@ -36,6 +36,7 @@ from . import (
     backends,
     gateway,
     golden,
+    heavyslot,
     memory,
     models,
     observe,
@@ -48,6 +49,8 @@ from . import (
     workloads,
 )
 from .backends import OMLX, MlxFast, MlxServe, Ollama, _first_line, _post, sha16, splash_pin
+from .client import RequestCancellation, RunAborted
+from .watchdog import RunWatchdog
 from .workloads import (
     AGENT_CONFIG,
     AGENT_DIR,
@@ -70,10 +73,12 @@ from .workloads import (
 
 RUNS = ROOT / "runs"
 RECEIPTS = ROOT / "docs" / "evidence" / "receipts"
+LOAD_COMMAND = "load"
+
 # Verbs that read nothing under ROOT: they run from any install. Every other verb needs a clone's data root. doctor
 # reports a missing root itself, as one FAIL row.
 ROOTLESS = frozenset({"stats", "memory", "keep", "pull", "create", "audit", "why", "validate", "doctor",
-                      "ollama-app", "gateway"})
+                      "ollama-app", "gateway", "slot", LOAD_COMMAND})
 
 EPILOG = """\
 exit status:
@@ -187,6 +192,35 @@ class Mutation:
 def _mut(args) -> Mutation:
     """The invocation's Mutation (main() attaches it); a handler called directly gets one that proceeds unrecorded."""
     return getattr(args, "mutation", None) or Mutation("direct", [], audited=False)
+
+
+def _held(verb, *, run_only: bool = False, inference: bool = True):
+    """Serialize heavy verbs on the machine slot (AGENTS.md Pacing): refuse naming the holder and the
+    readings, or --wait-slot queue instead; the admission lands in the audit row (--force-load included).
+    Dry runs plan without taking anything. run_only limits decision to its run action. inference=False
+    checks the load average only, for CPU-only verbs beside a permanently busy smol GPU."""
+    def wrap(fn):
+        def inner(args):
+            if run_only and getattr(args, "decision_action", "run") not in ("run", None):
+                return fn(args)
+            m = _mut(args)
+            if m.dry_run:
+                return fn(args)
+            try:
+                slot = heavyslot.acquire(verb, wait_s=max(0.0, float(getattr(args, "wait_slot", 0) or 0)),
+                                         force_load=bool(getattr(args, "force_load", False)),
+                                         needs_gpu=inference)
+            except heavyslot.SlotRefused as exc:
+                print(f"heavy slot: {exc}", file=sys.stderr)
+                m.record([], "refused", {"reason": f"heavy slot: {exc}"})
+                return 1
+            m.detail["heavy_slot"] = slot.admission
+            try:
+                return fn(args)
+            finally:
+                slot.release()
+        return inner
+    return wrap
 
 
 def _version() -> str:
@@ -419,7 +453,7 @@ def execute(backend, model: str, *, tiers: list[str], repeats: int, allow_busy: 
             label: str = "run", wait_idle_s: float = 0, mem_config: Path = MEM_CONFIG,
             mem_rounds: int = MEM_ROUNDS, e2e_case: str | None = None,
             evaluation_campaign: dict | None = None, smol_model: str | None = None,
-            side_regime: bool = False) -> dict:
+            side_regime: bool = False, watchdog_enabled: bool = False) -> dict:
     """One measurement of one model: preflight, isolate, tiers under the samplers, summary on disk. `smol_model`: a
     separate memory (smol-role) model for the mem and sess tiers' omp children, on the same ollama server; pinned
     as smol_model/smol_digest, warmed after isolation and watched by the sampler as the run's own second model.
@@ -457,19 +491,55 @@ def execute(backend, model: str, *, tiers: list[str], repeats: int, allow_busy: 
     emit({"event": "isolated", "evicted": evicted, "freed": freed, "purged": purged, "fingerprint": fp})
     tok_identity = backend.tokenizer_identity(model) if "replay" in tiers else None
 
+    cancellation = RequestCancellation() if watchdog_enabled else None
     ctx = Ctx(backend=backend, model=model, repeats=repeats, run_dir=run_dir, emit=emit, pins=pins,
               loaded_context=fp.get("loaded_context"), tok_identity=tok_identity,
-              mem_config=mem_config, mem_rounds=mem_rounds, e2e_case=e2e_case, smol_model=smol_model)
+              mem_config=mem_config, mem_rounds=mem_rounds, e2e_case=e2e_case, smol_model=smol_model,
+              cancellation=cancellation)
     results: list[Result] = []
     def on_contention(ev):
         emit({"event": "contention", **ev})
     target = (backend.name, model, *([smol_model] if smol_model else []))
+    watchdog = (RunWatchdog(target, pins["omp_sha"], lambda: sha16(pins["omp_path"]), GPU_BUSY_MAX_PCT)
+                if watchdog_enabled else None)
+    watchdog_state: dict[str, str | float | None] = {"reason": None, "t": None}
+
+    def on_sample(sample):
+        if watchdog is None or watchdog_state["reason"] is not None:
+            return
+        try:
+            violations = watchdog.violations(sample)
+        except Exception as exc:
+            violations = [f"watchdog_check_failed:{type(exc).__name__}:{exc}"]
+        if violations:
+            reason = "; ".join(violations)
+            watchdog_state["reason"] = reason
+            sample_time = sample.get("t")
+            watchdog_state["t"] = sample_time if isinstance(sample_time, (int, float)) else None
+            if cancellation:
+                cancellation.cancel(reason)
+            try:
+                emit({"event": "watchdog_abort", "reasons": violations})
+            except OSError:
+                pass
+
     with sysstats.Sampler(1.0, target=target, on_contention=on_contention,
-                          gpu_foreign_max_pct=GPU_BUSY_MAX_PCT) as smp, \
+                          gpu_foreign_max_pct=GPU_BUSY_MAX_PCT,
+                          on_sample=on_sample if watchdog_enabled else None) as smp, \
             sysstats.PowerSampler(1000) as pwr, sysstats.CpuSampler(2) as cpu:
-        for tier in tiers:
-            emit({"event": "tier", "tier": tier})
-            results += TIERS[tier](ctx)
+        try:
+            for tier in tiers:
+                if cancellation:
+                    cancellation.raise_if_cancelled()
+                emit({"event": "tier", "tier": tier})
+                results += TIERS[tier](ctx)
+        except RunAborted as exc:
+            if watchdog_state["reason"] is None:
+                watchdog_state["reason"] = str(exc)
+            if watchdog_state["t"] is None:
+                watchdog_state["t"] = time.time()
+    if cancellation and cancellation.reason is not None and watchdog_state["reason"] is None:
+        watchdog_state["reason"] = cancellation.reason
     after = sysstats.snapshot()
     # A pin that moved during the run (omp was upgraded in place mid-campaign on 2026-09-23) means part of the
     # run measured another generation; the start pins would be a false label for it.
@@ -485,7 +555,8 @@ def execute(backend, model: str, *, tiers: list[str], repeats: int, allow_busy: 
                        "tiers": tiers, "repeats": repeats, "label": label,
                        **({"regime": workloads.SIDE_REGIME} if side_regime else {})},
         "verdicts": {"contended": bool(smp.contention), "must_fail": must_fail,
-                     "preflight_problems": pre["problems"], "allow_busy": allow_busy, "pins_changed": pins_changed},
+                     "preflight_problems": pre["problems"], "allow_busy": allow_busy, "pins_changed": pins_changed,
+                     "watchdog_abort": watchdog_state["reason"]},
         "metrics": metrics, "conformance": conformance,
         "results": [r.__dict__ for r in results],
         "system": {"before": before, "after": after, "preflight": pre, "during": smp.summary(),
@@ -494,11 +565,17 @@ def execute(backend, model: str, *, tiers: list[str], repeats: int, allow_busy: 
     }
     if evaluation_campaign:
         summary["evaluation_campaign"] = evaluation_campaign
+    if watchdog_enabled:
+        summary["watchdog"] = {"enabled": True, "aborted": watchdog_state["reason"] is not None,
+                               "reason": watchdog_state["reason"], "sample_time": watchdog_state["t"]}
     (run_dir / "summary.json").write_text(json.dumps(summary, indent=2, default=str))
     (run_dir / "samples.jsonl").write_text("".join(json.dumps(s) + "\n" for s in ctx.samples))
     # 1 Hz machine series (GPU, memory, load, resident models on every local server): the contention evidence.
     (run_dir / "sampler.jsonl").write_text("".join(json.dumps(s) + "\n" for s in smp.series))
-    emit({"event": "done", "contended": bool(smp.contention), "must_fail": must_fail})
+    done = {"event": "done", "contended": bool(smp.contention), "must_fail": must_fail}
+    if watchdog_state["reason"] is not None:
+        done["watchdog_abort"] = watchdog_state["reason"]
+    emit(done)
     return summary
 
 
@@ -534,6 +611,8 @@ def unsound(summary: dict) -> list[str]:
         reasons.append(f"preflight: {'; '.join(v['preflight_problems'])}")
     if v.get("pins_changed"):
         reasons.append(f"PINS CHANGED mid-run (another generation measured part of it): {v['pins_changed']}")
+    if v.get("watchdog_abort"):
+        reasons.append(f"watchdog aborted run: {v['watchdog_abort']}")
     return reasons
 
 
@@ -607,11 +686,41 @@ def golden_states(host: dict) -> list[dict]:
     return goldens
 
 
+STATUS_SNAPSHOT = Path.home() / ".localbench" / "status-snapshot.json"
+STATUS_SNAPSHOT_TTL = 45.0
+
+
+def _status_snapshot_read(now: float | None = None, host_id: str | None = None) -> dict | None:
+    now = time.time() if now is None else now
+    try:
+        doc = json.loads(STATUS_SNAPSHOT.read_text())
+        sampled = float(doc["sampled_at"])
+        data = doc["data"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    age = max(0.0, now - sampled)
+    if age > STATUS_SNAPSHOT_TTL or (host_id is not None and data.get("host_id") != host_id):
+        return None
+    return {**data, "status_snapshot": {"sampled_at": sampled, "age_s": age,
+                                      "stale": False, "ttl_s": STATUS_SNAPSHOT_TTL}}
+
+
+def _status_snapshot_write(data: dict, sampled: float) -> None:
+    STATUS_SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
+    tmp = STATUS_SNAPSHOT.with_name(f".{STATUS_SNAPSHOT.name}.{os.getpid()}.tmp")
+    tmp.write_text(json.dumps({"sampled_at": sampled, "data": data}, sort_keys=True, default=str) + "\n")
+    os.replace(tmp, STATUS_SNAPSHOT)
+
+
 def status_report() -> dict:
     """The facts `localbench status` shows, as data: per golden either why it is UNAVAILABLE or its tiers grouped by
     the pins that moved (CURRENT when none did), replay fixtures against the running omp, park and quiet state,
     ollama residency and auto-update, the smol server, sessions started while parked, and GPU users over 3 s."""
     host = sysstats.host()
+    cached = _status_snapshot_read(host_id=host.get("host_id"))
+    if cached is not None:
+        return cached
+    sampled = time.time()
     goldens = golden_states(host)
     running = omp_pins()
     running_gen = (running["omp_version"], running["omp_sha"], running["omp_child_config"])
@@ -630,14 +739,55 @@ def status_report() -> dict:
                      "state": "up" if up else "parked" if _smol_parked() else "down"}
     before, t0 = sysstats.gpu_time_by_pid(), time.time()
     time.sleep(3)
-    return {"host_id": host["host_id"], "goldens": goldens,
+    data = {"host_id": host["host_id"], "goldens": goldens,
             "running_omp": {"omp_version": running_gen[0], "omp_sha": running_gen[1]}, "fixtures": fixtures,
             "parked": json.loads(park.STATE.read_text()) if park.STATE.exists() else [],
             "ollama_loaded": None if residents is None else [{"model": m, "until": u} for m, u in residents],
             "ollama_auto_update": sysstats.ollama_auto_update(), "smol": smol_view,
             "quiet_paused": quiet.paused(), "started_while_parked": park.stuck_sessions(sysstats.omp_processes()),
-            "gateway": gateway.status(resident_state=residents),
+            "gateway": gateway.status(resident_state=residents), "heavy_slot": heavyslot.holder(),
             "gpu_last_3s": sysstats.gpu_share(before, sysstats.gpu_time_by_pid(), time.time() - t0, min_pct=5.0)}
+    _status_snapshot_write(data, sampled)
+    return {**data, "status_snapshot": {"sampled_at": sampled, "age_s": 0.0, "stale": False, "ttl_s": STATUS_SNAPSHOT_TTL}}
+
+
+def cmd_slot(args) -> int:
+    """The heavy slot now: holder (pid, verb, repo, held-for, expected remaining = median wall_s of that verb's last 20
+    holds, unknown without history) and the --wait-slot queue in enqueue order with each waiter's estimated start."""
+    rep = heavyslot.report()
+    if args.json:
+        print(json.dumps(rep, indent=2, default=str))
+        return 0
+
+    def secs(v):
+        return "unknown" if v is None else f"{v:.0f}s"
+
+    h = rep["holder"]
+    print("holder: none (slot free)" if h is None else
+          f"holder: pid {h.get('pid')} {h.get('verb')} in {h.get('repo') or '?'}, held {secs(h.get('held_s'))}, "
+          f"expected remaining {secs(h.get('expected_remaining_s'))}")
+    if not rep["queue"]:
+        print("queue: empty")
+        return 0
+    print("\n".join(render.table(["pos", "pid", "verb", "repo", "waited", "est_start"],
+                                 [[str(t["position"]), str(t.get("pid")), str(t.get("verb")), str(t.get("repo") or "-"),
+                                   secs(t["waited_s"]), secs(t["estimated_start_s"])] for t in rep["queue"]])))
+    return 0
+
+
+def cmd_load(args) -> int:
+    """Read-only LOAD_COMMAND process attribution: CPU, scheduler/system calls, spawns, memory, and OMP session trees."""
+    from . import load
+
+    try:
+        report = load.collect(args.seconds)
+    except load.LoadError as exc:
+        return _fail(f"load: {exc}")
+    if args.json:
+        print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        print(load.render(report))
+    return 0
 
 
 def cmd_status(args) -> int:
@@ -702,6 +852,10 @@ def cmd_status(args) -> int:
               f"(pids {', '.join(str(r['pid']) for r in held)}); resume with `localbench quiet --resume`")
     for line in _stuck_lines(st["started_while_parked"]):
         print(line)
+    slot = st["heavy_slot"]
+    print("heavy slot: " + ("free" if slot is None else
+                            f"{slot.get('verb')} pid {slot.get('pid')} since {slot.get('started_at')}"
+                            + (f" in {slot['repo']}" if slot.get("repo") else "")))
     print("GPU, last 3 s: " + (", ".join(sysstats.proc_label(r) for r in st["gpu_last_3s"]) or "no process above 5%"))
     return rc
 
@@ -710,13 +864,14 @@ def cmd_gpu(args) -> int:
     """Who is using the GPU, and who can send it inference work: per-process GPU share over a window, models
     resident on each local server, processes connected to those servers, and, for each omp client, the features
     its profile routes to a local model (from omp's own resolved settings)."""
-    before, conn0, t0 = sysstats.gpu_time_by_pid(), sysstats.connection_bytes(), time.time()
-    time.sleep(args.seconds)
-    after, conn1 = sysstats.gpu_time_by_pid(), sysstats.connection_bytes()
-    report = {"window_s": args.seconds,
-              "gpu_by_process": sysstats.gpu_share(before, after, time.time() - t0),
-              "device": sysstats.gpu_utilization(), "resident": sysstats.resident_models(),
-              "clients": sysstats.inference_clients()}
+    conn0 = sysstats.connection_bytes()
+    traffic_t0 = time.monotonic()
+    device = sysstats.gpu_window(args.seconds)
+    conn1 = sysstats.connection_bytes()
+    traffic_window_s = time.monotonic() - traffic_t0
+    report = {"window_s": device["window_s"], "traffic_window_s": traffic_window_s,
+              "gpu_by_process": device["gpu_by_process"], "device": device,
+              "resident": sysstats.resident_models(), "clients": sysstats.inference_clients()}
     for c in report["clients"]:
         c["traffic"] = sysstats.traffic(conn0, conn1, c["conns"])
     for s in park.stuck_sessions(report["clients"]):
@@ -730,14 +885,23 @@ def cmd_gpu(args) -> int:
     if args.json:
         print(json.dumps(report, indent=2))
         return 0
-    print(f"GPU by process over {args.seconds:g} s (% of wall time the process kept the GPU busy; a runner with several "
-          f"queues can pass 100%; device {report['device'].get('device_pct')}% busy now):")
+    device_pct = device.get("device_pct")
+    coverage = device.get("coverage")
+    unattributed = device.get("unattributed_pct")
+    device_text = "unavailable" if device_pct is None else f"{device_pct:.1f}%"
+    coverage_text = ("n/a" if device["status"] == "IDLE" else "unavailable") if coverage is None else f"{coverage:.1f}%"
+    unattributed_text = "n/a" if unattributed is None and device["status"] == "IDLE" else (
+        "unavailable" if unattributed is None else f"{unattributed:.1f}%")
+    print(f"GPU by process over {report['window_s']:g} s (% of wall time the process kept the GPU busy; a runner with several "
+          f"queues can pass 100%; client traffic window {report['traffic_window_s']:g} s; "
+          f"device {device_text} average, status {device['status']}, coverage {coverage_text}, "
+          f"unattributed {unattributed_text} ({device['io_report_samples']} macmon IOReport samples):")
     for r in report["gpu_by_process"] or [{"pct": 0, "pid": "-", "name": "(nothing above 0.5%)", "cmd": ""}]:
         what = f"model {r['model']}" if r.get("model") else r["cmd"][:90]
         print(f"  {r['pct']:6.1f}%  pid {r['pid']:<6} {r['name']:<18} {what}")
     print("Resident models: " + "; ".join(f"{srv}: {', '.join(m) if m else '(none)' if m is not None else '(no answer)'}"
                                           for srv, m in report["resident"].items()))
-    print(f"Clients of local inference servers (open connections; bytes sent up / received down in the {args.seconds:g} s):")
+    print(f"Clients of local inference servers (open connections; bytes sent up / received down in the {report['traffic_window_s']:g} s):")
     for c in report["clients"]:
         if c.get("agent_dir"):
             who = f"omp agent_dir={c['agent_dir']}"
@@ -783,9 +947,12 @@ def _since(text: str) -> float:
 def cmd_report(args) -> int:
     """What used local models over `--since` (e.g. 90m, 24h, 7d): GPU-seconds by process/model, residency, clients.
     A window with no samples is an empty answer, not an error: exit 0, and the same shape under --json.
-    `--by-purpose` / `--by-profile` instead sum the gateway's request counts and busy seconds (no request content)."""
+    `--by-purpose` / `--by-profile` instead sum the gateway's request counts and busy seconds (no request content);
+    `--requests` lists its per-request rows (purpose, model, start/end, status, queue wait; never content)."""
     if args.by_purpose or args.by_profile:
         return _report_purposes(args)
+    if args.requests:
+        return _report_requests(args)
     r = observe.report(args.since)
     if args.json:
         print(json.dumps(r, indent=2))
@@ -813,6 +980,28 @@ def cmd_report(args) -> int:
               f"-> {t['server']} ({t['while_resident']})")
     if not r["traffic"]:
         print("  none recorded (traffic is sampled since this watcher version; restart `localbench watch`)")
+    return 0
+
+
+def _report_requests(args) -> int:
+    """Gateway per-request rows: status, wait, and abandonment reason. Busy duration is shown only when known.
+    Metadata only; an empty window is an empty answer, not an error."""
+    until = time.time()
+    since = until - args.since
+    path = gateway.database_path()
+    rows = gateway.GatewayStore(path).requests_report(
+        since, until, purpose=args.req_purpose, profile=args.req_profile, limit=args.limit) if path.is_file() else []
+    if args.json:
+        print(json.dumps({"since": since, "until": until, "rows": rows}, indent=2))
+        return 0
+    if not path.is_file():
+        print(f"no gateway database at {path}; `localbench gateway start` records requests", file=sys.stderr)
+    print("\n".join(render.table(
+        ["started", "purpose", "model", "profile", "status", "abandon_reason", "queue_wait_s", "busy_s"],
+        [[time.strftime("%m-%d %H:%M:%S", time.localtime(r["started_at"])), r["purpose"], r["model"],
+          r["profile"] or "-", r["status"], r.get("abandon_reason") or "-",
+          f"{r['queue_wait_s']:.2f}" if r["queue_wait_s"] is not None else "-",
+          f"{r['busy_s']:.1f}" if r["busy_s"] is not None else "-"] for r in rows])))
     return 0
 
 
@@ -884,6 +1073,7 @@ def cmd_models(args) -> int:
 DECISION_BASE = "http://127.0.0.1:11434"   # the Ollama runtime itself, like every backend; never the gateway
 
 
+@_held("decision run", run_only=True)
 def cmd_decision(args) -> int:
     """`decision run ollama:<model> --suite <role|path>`: every suite item, `--repeats` times, against Ollama's POST
     /v1/systemone on loopback (localbench/decision.py), under a Sampler that records co-resident load. Side-model law:
@@ -1187,13 +1377,16 @@ def cmd_features(args) -> int:
     if args.json:
         print(json.dumps({"profiles": names, "features": rows}, default=str))
     else:
+        from . import generation
         print("\n".join(features.lines(rows, names)))
+        print("\n".join(generation.corpus_progress_lines()))
         for level, message, fix in found:
             if level != "PASS":
                 print(f"{level}  {message}" + (f"\n      fix: {fix}" if fix else ""), file=sys.stderr)
     return 1 if any(level == "FAIL" for level, _, _ in found) else 0
 
 
+@_held("prove")
 def cmd_prove(args) -> int:
     """Run declarative proof specs (localbench/prove.py): `prove <spec>` runs one spec end to end
     (pre-reg commit, dataset pin, every candidate through its kind tier, assertions, banking,
@@ -1201,6 +1394,9 @@ def cmd_prove(args) -> int:
     Audited mutation with a dry run that plans without inference or writes."""
     from . import prove
 
+    if (getattr(args, "omp_frozen", False) and not getattr(args, "_omp_frozen_ready", False)
+            and not _mut(args).dry_run):
+        return _with_frozen_omp(cmd_prove, args, preserve_flag=True)
     if bool(args.spec) == bool(args.due):
         _usage("localbench prove <spec> | --due: exactly one")
     if args.due:
@@ -1227,12 +1423,34 @@ def cmd_prove(args) -> int:
         commit = prove.spec_commit(args.spec)
     except prove.ProveError as exc:
         return _fail(f"prove {args.spec}: {exc}")
-    steps = [Step(action, why) for action, why in prove.plan_steps(spec, commit)]
+    if spec.get("blocked"):
+        return _fail(f"prove {args.spec}: spec is blocked ({spec['blocked'].get('reason')})")
     m = _mut(args)
+    if m.dry_run:
+        try:
+            prove._refuse_rejected_screen(spec, args.spec)
+        except prove.ProveError as exc:
+            return _fail(str(exc))
+
+    if m.dry_run and spec["kind"] == "generation":
+        try:
+            prove._generation_corpus(spec)
+        except prove.ProveError as exc:
+            return _fail(
+                f"prove {args.spec}: {exc}; pinned corpus ids are write-once. "
+                "Restore the registered bytes, or register a new corpus id and "
+                "commit its matching hash.")
+    try:
+        steps = [Step(action, why) for action, why in
+                 prove.plan_steps(spec, commit, omp_frozen=getattr(args, "omp_frozen", False))]
+    except prove.ProveError as exc:
+        return _fail(f"prove {args.spec}: {exc}")
+
     if (code := m.gate(steps)) is not None:
         return code
     try:
-        report = prove.prove_spec(args.spec)
+        buffered_br = getattr(args, "_frozen_proof_br", None)
+        report = prove.prove_spec(args.spec, br=buffered_br) if buffered_br else prove.prove_spec(args.spec)
     except prove.ProveError as exc:
         return _fail(f"prove {args.spec}: {exc}")
     m.detail.update({c["route"]: c["grade"] for c in report.get("candidates", [])} or {"ran": True})
@@ -1253,14 +1471,26 @@ def _mimic(args, **overrides):
 
 def cmd_watch_releases(args) -> int:
     """Upstream release watch (localbench/releasewatch.py). Bare: the queue of screens it filed (read-only). `--once`:
-    one watch pass now (files beads, queues screens, marks seen); `--install-agent`: the daily LaunchAgent. Both
-    change state, so they are audited mutations with a dry run."""
+    one watch pass now (files beads, queues screens, marks seen); `--digest [--since 7d]`: the weekly new-model
+    digest (files `screen <model> for <role>` beads, queue-capped); `--install-agent`: the weekly digest LaunchAgent
+    (Monday 09:00 local); `--install-daily`: the daily `--once` one. State-changing verbs are audited mutations
+    with a dry run."""
     from . import releasewatch
 
-    if args.once or args.install_agent:
+    if args.digest:
+        try:
+            since_days = releasewatch.parse_since(args.since)
+        except releasewatch.WatchError as exc:
+            _usage(f"watch-releases {exc}")
+    else:
+        since_days = None
+    if args.once or args.install_agent or args.digest or args.install_daily:
         steps, refuse = [], None
         try:
             if args.install_agent:
+                steps.append(Step(f"write {releasewatch.digest_plist_path()} and (re)load it with launchctl",
+                                  "a weekly Monday 09:00 local digest pass; launchctl bootout and rm undo it"))
+            if args.install_daily:
                 steps.append(Step(f"write {releasewatch.plist_path()} and (re)load it with launchctl",
                                   f"a daily {releasewatch.SCHEDULE['Hour']:02d}:"
                                   f"{releasewatch.SCHEDULE['Minute']:02d} watch pass; launchctl bootout and rm undo it"))
@@ -1268,12 +1498,18 @@ def cmd_watch_releases(args) -> int:
                 steps.append(Step(f"one watch pass now: fetch upstream releases, file a bead per new release, queue "
                                   f"its screen and mark it seen under {releasewatch.watch_dir()}",
                                   "new releases of the model families in use become screen work, never an install"))
+            if args.digest:
+                steps.append(Step(f"one digest pass now: fetch the publishers' last-{args.since} models, file "
+                                  f"`screen <model> for <role>` beads and mark them seen under "
+                                  f"{releasewatch.watch_dir()}",
+                                  "new models of any family become screen work, never an install"))
         except releasewatch.WatchError as exc:   # e.g. a watch dir inside the repo: refused, never written
             refuse = f"watch-releases: {exc}"
         if (rc := _mut(args).gate(steps, refuse=refuse)) is not None:
             return rc
-    rc = releasewatch.cli(once=args.once, install=args.install_agent, as_json=args.json)
-    if args.once:
+    rc = releasewatch.cli(once=args.once, install=args.install_agent, as_json=args.json, digest_days=since_days,
+                          install_daily=args.install_daily, replay_window=args.replay_window)
+    if args.once or args.digest:
         from . import proofqueue
         try:
             queued = proofqueue.queue()
@@ -1379,6 +1615,61 @@ def _gates(values: list[dict]) -> dict:
             _usage(f"--gate {sorted(dup)[0]} given twice; one bound per metric")
         out |= g
     return out
+@_held("generation replay")
+def cmd_generation(args) -> int:
+    """Replay a generation corpus through one arm (localbench/generation.py run_candidate):
+    `generation replay --corpus <dir> --candidate route:ollama/<model>|builtin:<kind>`
+    re-sends each captured body with the model set per arm (builtin arms reproduce omp's
+    no-model fallback with no model call), runs FEATURE_CHECKS, and reports violations
+    with latencies. Evidence only: prove.py banks and grades. Audited mutation with a
+    dry run that plans without inference."""
+    from . import generation
+
+    if args.generation_action != "replay":
+        _usage(f"generation {args.generation_action}: only replay")
+    root = Path(args.corpus).expanduser()
+    manifest_path = root / "manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, UnicodeDecodeError) as exc:
+        return _fail(f"generation replay: no readable corpus manifest ({manifest_path}: {exc})")
+    if manifest.get("kind") != "generation":
+        return _fail(f"generation replay: {manifest_path} is not a generation corpus")
+    candidate = args.candidate
+    if candidate.startswith("route:"):
+        candidate = {"route": candidate[len("route:"):]}
+    elif candidate.startswith("builtin:"):
+        candidate = {"builtin": candidate[len("builtin:"):]}
+    else:
+        return _fail("generation replay --candidate: route:ollama/<model> or builtin:<kind>")
+    try:
+        items = [json.loads(line) for line in (root / "items.jsonl").read_text(
+            encoding="utf-8").splitlines() if line.strip()]
+    except (OSError, ValueError, UnicodeDecodeError) as exc:
+        return _fail(f"generation replay: unreadable corpus items ({exc})")
+    if args.max_items is not None:
+        items = items[:args.max_items]
+    m = _mut(args)
+    steps = [Step(f"replay {len(items)} {manifest.get('feature')} requests through {args.candidate}",
+                   "captured messages byte-faithful, model set per arm, through the managed gateway")]
+    if (rc := m.gate(steps)) is not None:
+        return rc
+    try:
+        out = generation.run_candidate({"kind": "generation", "feature": manifest.get("feature")},
+                                       candidate, items)
+    except generation.corpus.CorpusError as exc:
+        return _fail(f"generation replay: {exc}")
+    m.detail.update({"candidate": args.candidate, "items": len(items),
+                     "violated": sum(1 for o in out["outcomes"] if o["violations"])})
+    if args.json:
+        print(json.dumps(out, indent=2, default=str))
+        return 0
+    bad = sum(1 for o in out["outcomes"] if o["violations"])
+    lats = sorted(o["latency_s"] for o in out["outcomes"] if o["latency_s"] >= 0)
+    p50 = lats[len(lats) // 2] if lats else float("nan")
+    print(f"generation replay {args.candidate} on {len(items)} items: "
+          f"{len(items) - bad} clean, {bad} with violations, latency p50 {p50:.2f} s")
+    return 0
 
 
 def cmd_corpus(args) -> int:
@@ -1557,11 +1848,58 @@ def _omp_freeze(args, m: Mutation) -> int:
     return 0
 
 
-def _with_frozen_omp(handler, args) -> int:
-    """`run|ab --omp-frozen`: freeze the omp omp_bin() resolves (or reuse its snapshot), then run the whole invocation
-    with LOCALBENCH_OMP at the frozen entry, so every leg pins one omp_version and omp_sha even when uca updates omp
-    mid-run (2026-10-02: 18.4.9 -> 18.4.10 between legs voided a memory A/B). ab --b-omp still overrides its B legs.
-    The freeze writes its own audit row (verb `omp freeze`); the snapshot is held, so no other freeze prunes it."""
+def _prove_receipts_snapshot() -> dict[str, bytes]:
+    return {path.name: path.read_bytes() for path in RECEIPTS.glob("prove__*.json") if path.is_file()}
+
+
+def _mark_prove_pin_drift(before: dict[str, bytes], message: str) -> None:
+    for path in sorted(RECEIPTS.glob("prove__*.json")):
+        if not path.is_file() or before.get(path.name) == path.read_bytes():
+            continue
+        if path.is_symlink():
+            raise RuntimeError(f"refusing symlink proof receipt {path}")
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        problems = doc.get("problems")
+        if not isinstance(problems, list):
+            raise RuntimeError(f"proof receipt {path} has no problems list")
+        if message not in problems:
+            problems.append(message)
+        tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+        try:
+            tmp.write_text(json.dumps(doc, ensure_ascii=False, indent=1, sort_keys=True, default=str) + "\n",
+                           encoding="utf-8")
+            tmp.replace(path)
+        finally:
+            if tmp.exists():
+                tmp.unlink()
+
+
+def _buffer_proof_bead_actions(actions: list[list[str]]):
+    from . import proofqueue
+
+    def run(argv: list[str]) -> tuple[int, str, str]:
+        if argv and argv[0] == "list":
+            return proofqueue._br(argv)
+        actions.append(list(argv))
+        return 0, "", ""
+
+    return run
+
+
+def _flush_proof_bead_actions(actions: list[list[str]]) -> None:
+    from . import proofqueue
+
+    for argv in actions:
+        rc, _out, err = proofqueue._br(argv)
+        if rc:
+            raise RuntimeError(f"br {' '.join(argv[:2])} failed rc={rc}: {err.strip()[-300:]}")
+
+
+def _with_frozen_omp(handler, args, *, preserve_flag: bool = False) -> int:
+    """Freeze and verify OMP before invocation; prove also rechecks at return before bead writes.
+
+    The snapshot is held for the whole invocation. A changed proof snapshot annotates its receipts and discards
+    buffered bead closes/comments instead of publishing a proof from a changed dependency closure."""
     from . import ompfreeze
 
     try:
@@ -1585,9 +1923,39 @@ def _with_frozen_omp(handler, args) -> int:
                   "pruned": pruned, **({} if manifest.get("created") else {"noop": "snapshot reused"})})
     print(f"omp {p.version} {'frozen' if manifest.get('created') else 'snapshot reused'}: LOCALBENCH_OMP={entry} "
           "for every leg", file=sys.stderr)
-    args.omp_frozen = False
+    if preserve_flag:
+        args._omp_frozen_ready = True
+    else:
+        args.omp_frozen = False
+    receipts_before = _prove_receipts_snapshot() if preserve_flag else {}
+    pending_bead_actions: list[list[str]] = []
+    if preserve_flag:
+        args._frozen_proof_br = _buffer_proof_bead_actions(pending_bead_actions)
     with ompfreeze.hold(p.snapshot_id), _binaries_for_leg({"LOCALBENCH_OMP": entry}):
-        return handler(args)
+        try:
+            ompfreeze.verify_snapshot(p.target, manifest)
+        except RuntimeError as exc:
+            audit.record("omp freeze", [args.cmd, "--omp-frozen"], [], "failed", {"error": str(exc)})
+            return _fail(f"{args.cmd} --omp-frozen: {exc}")
+        rc = handler(args)
+        if preserve_flag:
+            try:
+                ompfreeze.verify_snapshot(p.target, manifest)
+            except RuntimeError as exc:
+                message = f"PINS CHANGED: frozen OMP changed while prove was running: {exc}"
+                try:
+                    _mark_prove_pin_drift(receipts_before, message)
+                except (OSError, ValueError, RuntimeError) as write_exc:
+                    return _fail(f"{message}; could not annotate receipt: {write_exc}")
+                audit.record("omp freeze", [args.cmd, "--omp-frozen"], [], "failed", {"error": message})
+                print(message, file=sys.stderr)
+                return rc or 1
+        if preserve_flag:
+            try:
+                _flush_proof_bead_actions(pending_bead_actions)
+            except RuntimeError as exc:
+                return _fail(f"prove --omp-frozen: could not apply bead updates: {exc}")
+        return rc
 
 
 def cmd_omp(args) -> int:
@@ -1874,9 +2242,13 @@ def cmd_keep(args) -> int:
     try:
         backends._post(Ollama().root + "/api/generate", body, timeout=900)
     except urllib.error.HTTPError as exc:
+        try:
+            error_body = exc.read().decode(errors='replace')[:200]
+        finally:
+            exc.close()
         if keep > 0:
             gateway.clear_manual_lease(model)
-        return _fail(f"ollama refused {model}: HTTP {exc.code} {exc.read().decode(errors='replace')[:200]}")
+        return _fail(f"ollama refused {model}: HTTP {exc.code} {error_body}")
     residents = sysstats.ollama_residents(Ollama().root, timeout=120.0)
     if residents is None:
         return _fail(f"{model}: requested, but ollama did not answer /api/ps within 120 s; loaded state unknown")
@@ -1970,10 +2342,11 @@ def cmd_gateway(args) -> int:
         elif args.action == "stop":
             if not service["plist_installed"]:
                 noop = "gateway LaunchAgent is not installed"
-            elif gateway.active_request_count():
-                refuse = "gateway has in-flight requests; stop refused"
+            elif args.dry_run:
+                refuse = gateway.stop_preflight()
             steps = [Step("drain and stop the managed Ollama gateway LaunchAgent",
-                          "new inference requests are rejected before launchd stops the process")]
+                          "new requests are rejected; stale rows are abandoned only when their gateway PID is gone "
+                          "or lsof finds no established client, otherwise stop is refused")]
         elif args.action == "remove":
             manifest_path = gateway.state_dir() / omp_profiles.MANIFEST_NAME
             if not manifest_path.exists() and not service["plist_installed"]:
@@ -2326,14 +2699,17 @@ def cmd_pull(args) -> int:
     if _run_alive():
         return m.gate([], refuse="a localbench run is alive; pull after it ends")
     if hf:
-        plan = _plan_pull_hf(repo, args.to)
+        plan = _plan_pull_hf(repo, args.to, hub_cache=args.hub_cache)
+        tool = (f"with `hf download --cache-dir {plan['root']}`" if args.hub_cache else "with `hf download`")
+        shape = ("hub layout models--<org>--<name>/snapshots/<sha>, which the laya: backend reads offline"
+                 if args.hub_cache else "plain files")
         steps = [Step(f"download {repo} @ {plan['sha'][:12]} ({plan['stored'] / 1e9:.1f} GB stored, "
-                      f"{plan['need'] / 1e9:.1f} GB to fetch) into {plan['dest']} with `hf download`",
-                      "the revision is pinned to the sha the API reports now; resumable: a rerun continues"),
+                      f"{plan['need'] / 1e9:.1f} GB to fetch) into {plan['dest']} {tool}",
+                      f"the revision is pinned to the sha the API reports now ({shape}); resumable: a rerun continues"),
                  Step(f"write {plan['dest'] / '.localbench-source.json'}", "records the repo and revision the files are")]
         if (rc := m.gate(steps, refuse=plan["refuse"])) is not None:
             return rc
-        return _pull_hf(repo, plan)
+        return _pull_hf(repo, plan, hub_cache=args.hub_cache)
     step = Step(f"download ollama {model} through ollama's /api/pull",
                 "an installed tag is checked against its registry and updated; the tag and digest are confirmed after")
     if (rc := m.gate([step])) is not None:
@@ -2368,44 +2744,71 @@ def cmd_pull(args) -> int:
 # so point it at a subdirectory there.
 HF_DIR = Path(os.environ.get("LOCALBENCH_HF_DIR") or Path.home() / ".cache" / "localbench" / "hf").expanduser()
 HF_HEADROOM_GB = 20
+# The Hugging Face hub cache the laya: backend reads offline (HF_HUB_OFFLINE=1): the shim inherits this process's
+# environment, so it sees $HF_HUB_CACHE when set, else this default. pull --hub-cache writes the same layout.
+HF_HUB_CACHE = Path(os.environ.get("HF_HUB_CACHE")
+                     or Path.home() / ".cache" / "huggingface" / "hub").expanduser()
 
 
-def _plan_pull_hf(repo: str, to: Path | None) -> dict:
+def _plan_pull_hf(repo: str, to: Path | None, hub_cache: bool = False) -> dict:
     """What `pull hf:<repo>` would fetch and where, from the Hugging Face API (a read): {dest, sha, stored, need,
-    gated, refuse}. `refuse` is set when the volume lacks the repo's stored size (the API's usedStorage, an upper
-    bound) less what is already there, plus HF_HEADROOM_GB."""
-    dest = (to or HF_DIR / repo).expanduser().absolute()
+    gated, refuse} plus, for --hub-cache, {root, snapshot}. Plain mode writes files into dest (default
+    HF_DIR/<org>/<repo>); hub-cache mode targets the hub layout root/models--<org>--<name>/snapshots/<sha> (default
+    $HF_HUB_CACHE, else ~/.cache/huggingface/hub), which the laya: backend reads offline. `refuse` is set when the
+    volume lacks the repo's stored size (the API's usedStorage, an upper bound) less what is already in the snapshot
+    (hub-cache) or dest (plain), plus HF_HEADROOM_GB."""
+    root = (to or HF_HUB_CACHE).expanduser().absolute() if hub_cache else None
+    dest = (root / ("models--" + repo.replace("/", "--")) if hub_cache
+            else (to or HF_DIR / repo).expanduser().absolute())
     info = backends._get(f"https://huggingface.co/api/models/{repo}?expand[]=usedStorage&expand[]=sha&expand[]=gated",
                          timeout=30)
     sha, stored = info["sha"], info.get("usedStorage") or 0
-    have = sum(f.stat().st_size for f in dest.rglob("*") if f.is_file()) if dest.exists() else 0
+    snapshot = dest / "snapshots" / sha if hub_cache else None
+    have_dir = snapshot if hub_cache else dest
+    have = sum(f.stat().st_size for f in have_dir.rglob("*") if f.is_file()) if have_dir.exists() else 0
     need = max(stored - have, 0)
     anchor = next(p for p in (dest, *dest.parents) if p.exists())
     free = shutil.disk_usage(anchor).free
     refuse = None
     if free < need + HF_HEADROOM_GB * 1e9:
+        where = ("--to or HF_HUB_CACHE picks another cache root" if hub_cache
+                 else "--to or LOCALBENCH_HF_DIR picks another volume")
         refuse = (f"{repo}: needs {need / 1e9:.1f} GB plus {HF_HEADROOM_GB} GB headroom on {anchor}; "
-                  f"{free / 1e9:.1f} GB free (--to or LOCALBENCH_HF_DIR picks another volume)")
-    return {"dest": dest, "sha": sha, "stored": stored, "need": need, "gated": bool(info.get("gated")), "refuse": refuse}
+                  f"{free / 1e9:.1f} GB free ({where})")
+    return {"dest": dest, "sha": sha, "stored": stored, "need": need, "gated": bool(info.get("gated")),
+            "refuse": refuse, "root": root, "snapshot": snapshot, "default_cache": to is None}
 
 
-def _pull_hf(repo: str, plan: dict) -> int:
-    """Download a Hugging Face repo with the `hf` CLI (resumable: rerun to continue) as `plan` (_plan_pull_hf) says:
-    into its dest, default HF_DIR/<org>/<repo> (LOCALBENCH_HF_DIR, else ~/.cache/localbench/hf), the revision pinned
-    to the sha the API reported and recorded in .localbench-source.json. A gated repo needs a token in the caller's
-    environment, e.g. `HF_TOKEN=<token> localbench pull hf:<org>/<repo>`: `hf` reads it, localbench never reads or
-    prints it."""
+def _pull_hf(repo: str, plan: dict, hub_cache: bool = False) -> int:
+    """Download a Hugging Face repo with the `hf` CLI (resumable: rerun to continue) as `plan` (_plan_pull_hf) says,
+    the revision pinned to the sha the API reported and recorded in .localbench-source.json. Plain mode writes files
+    into dest with --local-dir; hub-cache mode writes the hub layout with --cache-dir and fail-closes when
+    snapshots/<sha> is missing afterwards (never claim a pinned layout the download did not produce). A hub-cache
+    pull outside the default cache needs HF_HUB_CACHE set to its root for laya: runs to see it. A gated repo needs a
+    token in the caller's environment, e.g. `HF_TOKEN=<token> localbench pull hf:<org>/<repo>`: `hf` reads it,
+    localbench never reads or prints it."""
     dest, sha = plan["dest"], plan["sha"]
     print(f"{repo} @ {sha[:12]}: {plan['stored'] / 1e9:.1f} GB stored{' (gated)' if plan['gated'] else ''} -> {dest}",
           flush=True)
-    dest.mkdir(parents=True, exist_ok=True)
-    rc = subprocess.run(["hf", "download", repo, "--revision", sha, "--local-dir", str(dest)],
-                        env={**os.environ, "HF_HUB_DISABLE_UPDATE_CHECK": "1"}, check=False).returncode
+    if hub_cache:
+        argv = ["hf", "download", repo, "--revision", sha, "--cache-dir", str(plan["root"])]
+    else:
+        dest.mkdir(parents=True, exist_ok=True)
+        argv = ["hf", "download", repo, "--revision", sha, "--local-dir", str(dest)]
+    rc = subprocess.run(argv, env={**os.environ, "HF_HUB_DISABLE_UPDATE_CHECK": "1"}, check=False).returncode
     if rc:
         return _fail(f"hf download failed (rc {rc}); a gated repo needs HF_TOKEN from an account that was granted access")
+    if hub_cache:
+        snapshot = plan["snapshot"]
+        if not snapshot.is_dir() or not any(f.is_file() for f in snapshot.rglob("*")):
+            return _fail(f"hf download wrote no files under snapshots/{sha} in {dest}; not claiming a hub-cache pull")
+        if not plan["default_cache"]:
+            print(f"note: laya: runs read $HF_HUB_CACHE (default ~/.cache/huggingface/hub); "
+                  f"export HF_HUB_CACHE={plan['root']} to use this pull")
     files = [f for f in dest.rglob("*") if f.is_file() and ".cache" not in f.relative_to(dest).parts]
     (dest / ".localbench-source.json").write_text(json.dumps(
-        {"repo": repo, "revision": sha, "downloaded": datetime.now(UTC).isoformat(timespec="seconds")}) + "\n")
+        {"repo": repo, "revision": sha, "layout": "hub-cache" if hub_cache else "plain",
+         "downloaded": datetime.now(UTC).isoformat(timespec="seconds")}) + "\n")
     print(f"downloaded {repo} @ {sha[:12]}: {len(files)} files, {sum(f.stat().st_size for f in files) / 1e9:.1f} GB "
           f"in {dest}")
     return 0
@@ -2764,6 +3167,7 @@ def _e2e_case_status(summary: dict, case_id: str) -> str:
     return "VOID" if voided else correctness.get("verdict", "ERROR")
 
 
+@_held("eval run")
 def cmd_eval_run(args) -> int:
     """Run missing, identity-matched omp cases; no prior timings are reused."""
     from .evaluation import CampaignError, EvaluationCampaign
@@ -2801,7 +3205,14 @@ def cmd_eval_run(args) -> int:
                           "case_id": case_id, "identity_sha256": campaign.identity_sha256}
                 summary = execute(backend, model, tiers=["e2e"], repeats=1, allow_busy=False, purge=False,
                                   label=f"eval-{case_id}-{time.time_ns()}", wait_idle_s=args.wait_idle,
-                                  e2e_case=case_id, evaluation_campaign=marker)
+                                  e2e_case=case_id, evaluation_campaign=marker,
+                                  watchdog_enabled=args.watchdog)
+                if summary.get("watchdog", {}).get("aborted"):
+                    print(f"localbench eval run: watchdog aborted {case_id}; completed campaign cases remain "
+                          f"checkpointed under identical pins at {path.relative_to(ROOT)}; resume with "
+                          f"`localbench eval run {args.backend} --resume {path.relative_to(ROOT)} --watchdog`",
+                          file=sys.stderr)
+                    return 1
                 run_dir = ROOT / summary["run_dir"]
                 status = _e2e_case_status(summary, case_id)
 
@@ -2834,6 +3245,7 @@ def cmd_eval(args) -> int:
     return cmd_eval_rescore(args)
 
 
+@_held("run")
 def cmd_run(args) -> int:
     if getattr(args, "omp_frozen", False):
         return _with_frozen_omp(cmd_run, args)
@@ -2921,10 +3333,14 @@ def cmd_show(args) -> int:
             sys.exit(f"show: `git show {args.diff}:{label}` failed: {old.stderr.strip()}")
         print(render.golden_diff(json.loads(old.stdout), doc, label, args.diff), end="")
         return 0
-    print(render.show(doc, label, cursor=args.cursor, limit=args.limit), end="")
+    if getattr(args, "json", False):
+        print(json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True, default=str))
+    else:
+        print(render.show(doc, label, cursor=args.cursor, limit=args.limit), end="")
     return 0
 
 
+@_held("aa")
 def cmd_aa(args) -> int:
     """Run one config twice; bank the pair as a receipt and (with --write-golden) derive the golden from it. An unsound
     pair banks its receipt (verdict UNSOUND, with its problems) but leaves the golden unwritten and exits 1; a pair
@@ -3004,6 +3420,7 @@ def ab_order(pairs: int) -> list[tuple[str, str]]:
     return [leg for i in range(1, pairs + 1) for leg in (("A", f"ab_a{i}"), ("B", f"ab_b{i}"))] + [("A", f"ab_a{pairs + 1}")]
 
 
+@_held("ab")
 def cmd_ab(args) -> int:
     """Same invocation, interleaved: A,B,...,A (`--pairs`). A's legs are the A/A null; each arm is the median of its
     legs. On a machine in use, more pairs spread bursts of activity across both arms."""
@@ -3249,12 +3666,17 @@ def cmd_validate(args) -> int:
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         return _fail(f"INVALID {path}: not JSON ({exc})")
     reasons = validate_doc(doc)
+    kind = render.kind_of(doc) if isinstance(doc, dict) else "json"
+    if args.json:
+        print(json.dumps({"valid": not reasons, "kind": kind, "path": str(path), "reasons": reasons},
+                         ensure_ascii=False, sort_keys=True))
+        return 1 if reasons else 0
     if reasons:
-        print(f"INVALID {path} ({render.kind_of(doc) if isinstance(doc, dict) else 'json'})", file=sys.stderr)
+        print(f"INVALID {path} ({kind})", file=sys.stderr)
         for r in reasons:
             print(f"  {r}", file=sys.stderr)
         return 1
-    print(f"valid {render.kind_of(doc)}: {path}")
+    print(f"valid {kind}: {path}")
     return 0
 
 
@@ -3336,6 +3758,21 @@ def cmd_ollama_auto_update(args) -> int:
     return 0
 
 
+def cmd_capabilities(args) -> int:
+    """Machine-readable CLI contract: verbs, exit codes and structured-output guidance."""
+    doc = {"success": True, "version": _version(), "output_format": "json",
+           "exit_codes": {"0": "success", "1": "unsound_or_refused", "2": "usage_or_safety", "141": "stdout_closed"},
+           "read_json": ["stats", "status", "slot", LOAD_COMMAND, "gpu", "memory", "models", "report", "features", "show", "validate", "audit", "why"],
+           "mutation_contract": "state-changing verbs accept --dry-run and --explain"}
+    print(json.dumps(doc, sort_keys=True))
+    return 0
+
+
+def cmd_robot_docs(args) -> int:
+    print("localbench agent guide: use capabilities --json; stdout is data, stderr diagnostics; exit 1 means refusal/unsound, 2 usage, 141 closed stdout.")
+    return 0
+
+
 def cmd_doctor(args) -> int:
     """One row per subsystem localbench depends on (localbench/doctor.py): PASS, WARN or FAIL, what was found, and the
     command that fixes it. `--fix` performs only the safe, reversible, idempotent repairs, each recorded in the audit
@@ -3357,6 +3794,8 @@ def main(argv: list[str] | None = None) -> int:
     marks a stream omp abandoned as `aborted`, the rpc driver reads a dead omp as EOF. A process-wide SIG_DFL (as
     here until 2026-09-23) turned the first of those into a silent kill (exit 141): the sess tier died when omp
     aborted a classifier stream queued behind a 10 s memory extraction. Only stdout gets the Unix-filter treatment."""
+    from .lifecycle import install_cancel_handlers
+    install_cancel_handlers()
     ap = argparse.ArgumentParser(prog="localbench", description=__doc__, epilog=EPILOG,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--version", action="version", version=f"%(prog)s {_version()}")
@@ -3365,6 +3804,14 @@ def main(argv: list[str] | None = None) -> int:
     st.add_argument("--json", action="store_true", help="accepted; stats always prints JSON")
     sta = sub.add_parser("status", help="which configs have a live golden (generation check), park state, GPU users")
     sta.add_argument("--json", action="store_true", help="one JSON document instead of the text view")
+    slt = sub.add_parser("slot", help="heavy slot: holder, held-for, expected remaining, the wait queue with ETAs")
+    slt.add_argument("--json", action="store_true", help="one JSON document instead of the table")
+    from . import load as load_cmd
+    ld = sub.add_parser(LOAD_COMMAND, help="read-only CPU, syscall, spawn and OMP-session attribution")
+    ld.add_argument("--seconds", type=int, choices=range(1, load_cmd.MAX_SECONDS + 1),
+                    default=load_cmd.DEFAULT_SECONDS,
+                    help=f"top delta window in seconds (1–{load_cmd.MAX_SECONDS})")
+    ld.add_argument("--json", action="store_true", help="one JSON report instead of the text view")
     gp = sub.add_parser("gpu", help="who is using the GPU now, and which sessions/features can send it work")
     gp.add_argument("--seconds", type=float, default=10.0, help="attribution window")
     gp.add_argument("--json", action="store_true")
@@ -3384,6 +3831,11 @@ def main(argv: list[str] | None = None) -> int:
                     help="gateway request counts and busy seconds per purpose (no request content)")
     rp.add_argument("--by-profile", action="store_true",
                     help="the same per omp profile; with --by-purpose, per profile and purpose")
+    rp.add_argument("--requests", action="store_true",
+                    help="gateway per-request rows: purpose, model, start/end, status, queue wait (never content)")
+    rp.add_argument("--req-purpose", help="with --requests: only this purpose")
+    rp.add_argument("--req-profile", help="with --requests: only this profile")
+    rp.add_argument("--limit", type=int, default=200, help="with --requests: newest rows to show (default 200)")
     dec = sub.add_parser("decision", help="side-model decision suites on Ollama's /v1/systemone: run (banks a receipt)")
     dec_sub = dec.add_subparsers(dest="decision_action", required=True)
     dec_run = dec_sub.add_parser("run", help="run a decision suite against a local model; bank the receipt")
@@ -3399,6 +3851,10 @@ def main(argv: list[str] | None = None) -> int:
     dec_run.add_argument("--allow-evict", action="store_true", dest="allow_evict",
                          help="load even when Ollama's loaded-model cap would evict an in-use resident (recorded; "
                               "the eviction is still a problem)")
+    dec_run.add_argument("--wait-slot", type=float, default=0, metavar="SECONDS",
+                         help="queue for the heavy-job slot up to SECONDS instead of refusing when held or busy")
+    dec_run.add_argument("--force-load", action="store_true",
+                         help="take the heavy-job slot past a busy admission (recorded in the audit row)")
     dec_derive = dec_sub.add_parser("derive", help="a model FROM an ollama decision model with num_ctx N (audited)")
     dec_derive.add_argument("spec", help="ollama:<base model>, e.g. ollama:tev1:latest (never modified)")
     dec_derive.add_argument("--num-ctx", type=int, required=True, help="the context the derived model ships")
@@ -3412,20 +3868,44 @@ def main(argv: list[str] | None = None) -> int:
     feat.add_argument("--json", action="store_true")
     feat.add_argument("--queue", action="store_true",
                       help="file or update one open proof bead per unproven local route (audited)")
-    wr = sub.add_parser("watch-releases", help="upstream release watch: queued screens; --once a pass; --install-agent")
+    wr = sub.add_parser("watch-releases", help="upstream release watch: queued screens; --once a pass; --digest new models; --install-agent")
     wr.add_argument("--once", action="store_true", help="one watch pass now (files beads, queues screens; audited)")
-    wr.add_argument("--install-agent", action="store_true", help="install the daily LaunchAgent (audited)")
+    wr.add_argument("--digest", action="store_true", help="one weekly-style new-model digest pass now (files `screen <model> for <role>` beads; audited)")
+    wr.add_argument("--since", default="7d", help="digest window: Nd or Nh of days/hours back (default 7d)")
+    wr.add_argument("--replay-window", action="store_true", help="print already-seen in-window digest models without refiling")
+    wr.add_argument("--install-agent", action="store_true", help="install the weekly digest LaunchAgent (Monday 09:00 local; audited)")
+    wr.add_argument("--install-daily", action="store_true", help="install the daily --once LaunchAgent (audited)")
     wr.add_argument("--json", action="store_true", help="the queue or the pass report as JSON; with --dry-run the plan")
     pv = sub.add_parser("prove", help="run declarative proof specs (no orchestrator one-offs)")
     pv.add_argument("spec", nargs="?", help="registries/proofs/<feature>__<slug>.json")
     pv.add_argument("--due", action="store_true", help="run every spec with an open bead whose regime allows it")
     pv.add_argument("--json", action="store_true", help="the report as one JSON document")
+    pv.add_argument("--wait-slot", type=float, default=0, metavar="SECONDS",
+                    help="queue for the heavy-job slot up to SECONDS instead of refusing when held or busy")
+    pv.add_argument("--force-load", action="store_true",
+                    help="take the heavy-job slot past a busy admission (recorded in the audit row)")
+    pv.add_argument("--omp-frozen", action="store_true",
+                    help="required for memory proof planning; pin the omp binary before live legs")
+    gn = sub.add_parser("generation", help="generation-proof corpora: replay captured requests per arm")
+    gn_sub = gn.add_subparsers(dest="generation_action", required=True)
+    gn_replay = gn_sub.add_parser("replay", help="replay a generation corpus through one arm (audited)")
+    gn_replay.add_argument("--corpus", required=True, help="generation corpus directory")
+    gn_replay.add_argument("--candidate", required=True,
+                           help="route:ollama/<model> or builtin:<kind>")
+    gn_replay.add_argument("--max-items", type=int, default=None, metavar="N",
+                           help="replay only the first N items")
+    gn_replay.add_argument("--json", action="store_true", help="per-item outcomes as one JSON document")
+    gn_replay.add_argument("--wait-slot", type=float, default=0, metavar="SECONDS",
+                           help="queue for the heavy-job slot up to SECONDS instead of refusing when held or busy")
+    gn_replay.add_argument("--force-load", action="store_true",
+                           help="take the heavy-job slot past a busy admission (recorded in the audit row)")
     pre = sub.add_parser("preset", help="omp config presets: list, show, plan, apply, rollback, drift")
     pre_sub = pre.add_subparsers(dest="preset_action", required=True)
     pre_list = pre_sub.add_parser("list", help="the presets in registries/presets.json")
     pre_list.add_argument("--json", action="store_true")
     pre_show = pre_sub.add_parser("show", help="one preset's ops")
     pre_show.add_argument("name")
+    pre_show.add_argument("--json", action="store_true", help="the preset object as JSON")
     pre_plan = pre_sub.add_parser("plan", help="what apply would change, read from omp now (writes nothing)")
     pre_apply = pre_sub.add_parser("apply", help="apply a preset: backed up, read back, restored on mismatch (audited)")
     for p in (pre_plan, pre_apply):
@@ -3491,6 +3971,10 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--server-arg", action="append", help="extra mlx-serve flag (repeatable)")
         p.add_argument("--wait-idle", type=float, default=0, metavar="SECONDS",
                        help="re-check a busy machine every 30 s for up to SECONDS before refusing")
+        p.add_argument("--wait-slot", type=float, default=0, metavar="SECONDS",
+                       help="queue for the heavy-job slot up to SECONDS instead of refusing when held or busy")
+        p.add_argument("--force-load", action="store_true",
+                       help="take the heavy-job slot past a busy admission (recorded in the audit row)")
         p.add_argument("--mem-config", type=_overlay, default=MEM_CONFIG, metavar="OVERLAY",
                        help="omp config overlay for the mem tier's children (default fixtures/omp/child-config-mem.yml)")
         p.add_argument("--mem-rounds", type=_mem_rounds, default=MEM_ROUNDS, metavar="N",
@@ -3506,9 +3990,16 @@ def main(argv: list[str] | None = None) -> int:
     ev_run = evs.add_parser("run", help="run missing exact-identity cases on the real omp local path")
     ev_run.add_argument("backend", help="backend spec: ollama:<model> | mlx-serve:<model dir> | omlx:<model dir>")
     ev_run.add_argument("--resume", metavar="CAMPAIGN", help="resume only cases with matching runtime and input pins")
+    ev_run.add_argument("--watchdog", action="store_true",
+                        help="abort on sampled run-invariant violations; completed cases remain identity-pinned "
+                             "and resumable with --resume")
     ev_run.add_argument("--server-arg", action="append", help="extra backend server flag (repeatable)")
     ev_run.add_argument("--wait-idle", type=float, default=1800, metavar="SECONDS",
                         help="wait for local model conditions before refusing (default 1800)")
+    ev_run.add_argument("--wait-slot", type=float, default=0, metavar="SECONDS",
+                        help="queue for the heavy-job slot up to SECONDS instead of refusing when held or busy")
+    ev_run.add_argument("--force-load", action="store_true",
+                        help="take the heavy-job slot past a busy admission (recorded in the audit row)")
     ev_varied = evs.add_parser("varied", help="changing-value read/edit campaign; not performance-golden evidence")
     ev_varied.add_argument("backend", help="one local backend spec, held fixed within this campaign")
     ev_varied.add_argument("--phase", choices=("exploratory", "heldout"), required=True)
@@ -3521,6 +4012,7 @@ def main(argv: list[str] | None = None) -> int:
     ev_varied.add_argument("--wait-idle", type=float, default=1800, metavar="SECONDS")
     ev_score = evs.add_parser("rescore", help="offline re-score an existing campaign from its preserved traces")
     ev_score.add_argument("campaign", help="a runs/eval-* campaign directory")
+    ev_score.add_argument("--json", action="store_true", help="the score object as JSON")
 
     aa = measured(sub.add_parser("aa", help="A/A pair: banked receipt, optionally the golden"), "backend")
     aa.add_argument("--write-golden", action="store_true")
@@ -3562,6 +4054,7 @@ def main(argv: list[str] | None = None) -> int:
     sh.add_argument("--diff", metavar="REV", help="golden only: rows, pins and tiers changed since git revision REV")
     sh.add_argument("--cursor", type=int, default=0, help="first row or entry (a paged view names the next cursor)")
     sh.add_argument("--limit", type=int, default=render.PAGE, help="rows or entries per page")
+    sh.add_argument("--json", action="store_true", help="the parsed receipt/golden/run document as JSON")
     rec = sub.add_parser("record", help="record omp's request body + sidecar into fixtures/omp/")
     rec.add_argument("backend", help="backend spec: ollama:<model> | mlx-serve:<model dir> | omlx:<model dir>")
     rec.add_argument("--label", required=True)
@@ -3589,7 +4082,11 @@ def main(argv: list[str] | None = None) -> int:
                                      "Face repo's files (hf:<org>/<repo>; token from HF_TOKEN in the environment)")
     pl.add_argument("spec", help="ollama:<model> | hf:<org>/<repo>")
     pl.add_argument("--to", type=Path, help="hf: download directory (default $LOCALBENCH_HF_DIR/<org>/<repo>, "
-                                            "LOCALBENCH_HF_DIR defaulting to ~/.cache/localbench/hf)")
+                                            "LOCALBENCH_HF_DIR defaulting to ~/.cache/localbench/hf; with --hub-cache, "
+                                            "the cache root, default $HF_HUB_CACHE or ~/.cache/huggingface/hub)")
+    pl.add_argument("--hub-cache", action="store_true", help="hf: write the Hugging Face hub cache layout "
+                    "(root/models--<org>--<name>/snapshots/<sha>) the laya: backend reads offline, instead of plain "
+                    "files")
     cr = sub.add_parser("create", help="build an ollama model from a safetensors dir (import + quantize, e.g. nvfp4)")
     cr.add_argument("spec", help="ollama:<new name>")
     cr.add_argument("--from", dest="src", type=Path, required=True, help="safetensors model directory (config.json)")
@@ -3615,12 +4112,17 @@ def main(argv: list[str] | None = None) -> int:
     wh.add_argument("--json", action="store_true")
     va = sub.add_parser("validate", help="check a receipt, golden or run dir: parses, has what `show` needs, pins present")
     va.add_argument("file", help="a receipt or golden .json, or a runs/<dir>")
+    va.add_argument("--json", action="store_true", help="validation result as one JSON object")
     oa = sub.add_parser("ollama-app", help="Ollama.app, the supervisor of ollama serve: status, restart, auto-update")
     oa.add_argument("action", choices=["status", "restart", "auto-update"])
     oa.add_argument("state", nargs="?", choices=["on", "off", "status"],
                     help="auto-update only: turn Ollama.app's own updater on or off, or show it (default status)")
     oa.add_argument("--json", action="store_true",
                     help="status, auto-update status: one JSON object; restart/auto-update --dry-run: the plan")
+    cap = sub.add_parser("capabilities", help="stable machine-readable CLI contract")
+    cap.add_argument("--json", action="store_true", help="contract as JSON (default)")
+    rd = sub.add_parser("robot-docs", help="paste-ready agent operating guide")
+    rd.set_defaults()
     dr = sub.add_parser("doctor", help="PASS/WARN/FAIL per subsystem with the command that fixes each")
     dr.add_argument("--fix", action="store_true", help="perform the safe, reversible repairs (each is audited)")
     dr.add_argument("--json", action="store_true", help="the rows as one JSON array")
@@ -3646,15 +4148,17 @@ def main(argv: list[str] | None = None) -> int:
     mut = args.mutation = None if verb is None else Mutation(
         verb, list(sys.argv[1:] if argv is None else argv), dry_run=args.dry_run, explain=args.explain,
         as_json=args.json, audited=not (args.cmd == "aa" and not args.write_golden))
-    handler = {"stats": cmd_stats, "status": cmd_status, "gpu": cmd_gpu, "run": cmd_run, "eval": cmd_eval,
+    handler = {"stats": cmd_stats, "status": cmd_status, "slot": cmd_slot,
+               LOAD_COMMAND: cmd_load, "gpu": cmd_gpu, "run": cmd_run, "eval": cmd_eval,
                "aa": cmd_aa, "ab": cmd_ab,
                "record": cmd_record, "memory": cmd_memory, "models": cmd_models, "watch": cmd_watch,
                "report": cmd_report, "compare": cmd_compare, "bank": cmd_bank, "park": cmd_park, "unpark": cmd_unpark,
                "show": cmd_show, "keep": cmd_keep, "pull": cmd_pull, "create": cmd_create, "smol": cmd_smol,
                "quiet": cmd_quiet, "audit": cmd_audit, "why": cmd_why, "validate": cmd_validate,
-               "doctor": cmd_doctor, "ollama-app": cmd_ollama_app, "gateway": cmd_gateway,
+               "doctor": cmd_doctor, "capabilities": cmd_capabilities, "robot-docs": cmd_robot_docs,
+               "ollama-app": cmd_ollama_app, "gateway": cmd_gateway,
                "decision": cmd_decision, "features": cmd_features, "watch-releases": cmd_watch_releases,
-               "prove": cmd_prove,
+               "prove": cmd_prove, "generation": cmd_generation,
                "preset": cmd_preset, "corpus": cmd_corpus, "memory-verdict": cmd_memory_verdict,
                "omp": cmd_omp}[args.cmd]
     try:
@@ -3729,6 +4233,8 @@ def _mutation_verb(args) -> str | None:
         return "aa --write-golden" if args.write_golden else c
     if c == "prove":
         return "prove"
+    if c == "generation":
+        return "generation replay"
     return c if c in ("unpark", "keep", "pull", "create", "bank", "record") else None
 
 

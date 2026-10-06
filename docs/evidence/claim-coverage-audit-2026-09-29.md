@@ -30,7 +30,7 @@ The six registered-but-unproven README assertions are at README.md:66,118,144,14
 
 ## Residual technical-doc survey (separate denominator)
 
-Pane `%30` audited additional assertion types not counted in the 129 material public/comment units above. Current
+Pane `%pane` audited additional assertion types not counted in the 129 material public/comment units above. Current
 technical documentation: **0/13** matching registry rows and proof — docs/port/INTERFACES.md:37-40 (one
 Python-dependency statement), :44-78 (nine independently falsifiable porting constraints), :120-124 (one test-map
 contract), and active docs/evidence/DISCREPANCIES.md DISC-001/DISC-003 at :23-34,:50-62 (two status statements).

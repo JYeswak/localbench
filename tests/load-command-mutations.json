@@ -1,0 +1,56 @@
+[
+  {
+    "label": "paging uses the interval sample, not the initial snapshot",
+    "file": "localbench/load.py",
+    "old": "current = rows[-1]",
+    "new": "current = rows[0]",
+    "tests": [
+      "tests.test_load_command.LoadParsing.test_vm_stat_separates_interval_events_from_current_pages"
+    ]
+  },
+  {
+    "label": "process display uses full argv despite truncated ps comm",
+    "file": "localbench/load.py",
+    "old": "    return Path(argv0.strip(\"\\\"'\")).name or Path(proc.comm).name or proc.comm",
+    "new": "    return proc.comm",
+    "tests": [
+      "tests.test_load_command.LoadParsing.test_process_display_name_uses_full_argv_when_ps_comm_is_truncated"
+    ]
+  },
+  {
+    "label": "spawn events retain PIDs that exit before the final ps snapshot",
+    "file": "localbench/load.py",
+    "old": "return events",
+    "new": "return []",
+    "tests": [
+      "tests.test_load_command.LoadReport.test_spawns_include_pid_seen_between_top_tables_even_if_absent_from_final_ps"
+    ]
+  },
+  {
+    "label": "probe cost counts successful process starts, not invocations",
+    "file": "localbench/load.py",
+    "old": "\"spawns\": len(commands.pids)",
+    "new": "\"spawns\": len(commands.invocations)",
+    "tests": [
+      "tests.test_load_command.LoadReport.test_probe_cost_counts_started_pids_not_runner_invocations"
+    ]
+  },
+  {
+    "label": "consumer CPU units are labelled explicitly",
+    "file": "localbench/load.py",
+    "old": "\"process_percent\": \"one logical core = 100%\",",
+    "new": "\"process_percent\": \"machine-wide percent\",",
+    "tests": [
+      "tests.test_load_command.LoadReport.test_reports_process_owners_io_paging_pressure_and_probe_cost"
+    ]
+  },
+  {
+    "label": "top timeout scales with the requested sample window",
+    "file": "localbench/load.py",
+    "old": "seconds * 3 + 10,",
+    "new": "seconds + 4,",
+    "tests": [
+      "tests.test_load_command.LoadReport.test_sample_window_maximum_and_rejection_boundary"
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "label": "cache hits cannot count latency evidence",
+    "file": "localbench/response_cache.py",
+    "old": "cache_hit=True, latency_eligible=False,",
+    "new": "cache_hit=True, latency_eligible=True,",
+    "tests": [
+      "tests.test_response_cache.ResponseCacheContract.test_hit_is_quality_only_not_latency_or_availability"
+    ]
+  },
+  {
+    "label": "response keys include model digest",
+    "file": "localbench/response_cache.py",
+    "old": "request_bytes, model_digest, backend_version, suite_pin, repeat_namespace, template_bytes",
+    "new": "request_bytes, backend_version, suite_pin, repeat_namespace, template_bytes",
+    "tests": [
+      "tests.test_response_cache.ResponseCacheContract.test_exact_key_includes_every_semantic_input"
+    ]
+  }
+]

@@ -116,7 +116,7 @@
     "old": "band = max(max(c_vals) - min(c_vals), max(b_vals) - min(b_vals))",
     "new": "band = max(c_vals) - min(c_vals)",
     "tests": [
-      "tests.test_memory_study.MemoryVerdict.test_recall_drop_inside_the_baselines_own_spread_is_not_a_loss"
+      "tests.test_memory_study.MemoryVerdict.test_band_counts_both_arms_spreads_on_conformance_rates"
     ]
   },
   {
@@ -125,7 +125,7 @@
     "old": "\"gain\" if gain > band + eps else \"loss\" if gain < -(band + eps) else \"within_noise\"",
     "new": "\"gain\" if gain > band + eps else \"within_noise\"",
     "tests": [
-      "tests.test_memory_study.MemoryVerdict.test_recall_drop_beyond_noise_is_worse_with_a_problem"
+      "tests.test_memory_study.MemoryVerdict.test_conformance_loss_beyond_noise_is_worse"
     ]
   },
   {
@@ -134,7 +134,7 @@
     "old": "\"judgement\": \"gain\" if gain > band + eps else",
     "new": "\"judgement\": \"gain\" if gain >= band else",
     "tests": [
-      "tests.test_memory_study.MemoryVerdict.test_a_tie_is_not_better"
+      "tests.test_memory_study.MemoryVerdict.test_delta_equal_to_the_band_is_a_tie_not_a_win"
     ]
   },
   {
@@ -149,11 +149,9 @@
   {
     "label": "a hit rate over zero attempts is unmeasured, not 0.0",
     "file": "localbench/workloads.py",
-    "old": "return None if m.get(\"void\") or m.get(\"n\") == 0 else _real_value(m.get(\"value\"))",
-    "new": "return None if m.get(\"void\") else _real_value(m.get(\"value\"))",
-    "tests": [
-      "tests.test_memory_study.MemoryVerdict.test_unmeasured_recall_cannot_be_better"
-    ]
+    "old": "        if value is None or not isinstance(n, int) or isinstance(n, bool) or n < 1:\n            return None",
+    "new": "        if value is None or not isinstance(n, int) or isinstance(n, bool):\n            return None",
+    "tests": ["tests.test_memory_study.MemoryVerdict.test_unmeasured_recall_cannot_be_better"]
   },
   {
     "label": "a VOID MUST counts as failed",
@@ -1079,5 +1077,26 @@
     "tests": [
       "tests.test_memory_study.SideRegimeAb.test_the_side_preflight_refuses_only_on_unreadable_signals_or_swap"
     ]
+  },
+  {
+    "label": "recall quality is a pooled-facts test, not a band",
+    "file": "localbench/workloads.py",
+    "old": "            \"test\": test, \"judgement\": \"loss\" if test[\"p\"] < STATS_ALPHA else \"within_noise\"}",
+    "new": "            \"test\": test, \"judgement\": \"within_noise\"}",
+    "tests": ["tests.test_memory_study.MemoryVerdict.test_recall_drop_beyond_noise_is_worse_with_a_problem"]
+  },
+  {
+    "label": "drift-paired wins need the paired test",
+    "file": "localbench/workloads.py",
+    "old": "            return {**row, **base, \"test\": {\"method\": \"drift-paired-t\", **test},\n                    \"judgement\": \"gain\" if test[\"p\"] < STATS_ALPHA else \"within_noise\"}",
+    "new": "            return {**row, **base, \"test\": {\"method\": \"drift-paired-t\", **test},\n                    \"judgement\": \"within_noise\"}",
+    "tests": ["tests.test_memory_study.MemoryVerdict.test_drift_paired_gain_fires_on_a_baseline_first_chain"]
+  },
+  {
+    "label": "unpaired latency wins need the welch test",
+    "file": "localbench/workloads.py",
+    "old": "    return {**row, **base, \"test\": {\"method\": \"welch-t-log\", **test},\n            \"judgement\": \"gain\" if test[\"p\"] < STATS_ALPHA else \"within_noise\"}",
+    "new": "    return {**row, **base, \"test\": {\"method\": \"welch-t-log\", **test},\n            \"judgement\": \"within_noise\"}",
+    "tests": ["tests.test_memory_study.MemoryVerdict.test_equal_quality_and_faster_is_better_and_grades_proven"]
   }
 ]

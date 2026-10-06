@@ -1,0 +1,29 @@
+[
+  {
+    "label": "hub-cache pulls use --cache-dir, never --local-dir",
+    "file": "localbench/__main__.py",
+    "old": "        argv = [\"hf\", \"download\", repo, \"--revision\", sha, \"--cache-dir\", str(plan[\"root\"])]",
+    "new": "        argv = [\"hf\", \"download\", repo, \"--revision\", sha, \"--local-dir\", str(plan[\"dest\"])]",
+    "tests": [
+      "tests.test_keep_pull.PullHubCache.test_the_download_uses_cache_dir_and_lands_in_snapshot_layout"
+    ]
+  },
+  {
+    "label": "a missing snapshot after download fails, never claims a pull",
+    "file": "localbench/__main__.py",
+    "old": "        if not snapshot.is_dir() or not any(f.is_file() for f in snapshot.rglob(\"*\")):",
+    "new": "        if False:",
+    "tests": [
+      "tests.test_keep_pull.PullHubCache.test_a_missing_snapshot_after_download_is_a_failure_not_a_pull"
+    ]
+  },
+  {
+    "label": "the source record names the hub-cache layout",
+    "file": "localbench/__main__.py",
+    "old": "        {\"repo\": repo, \"revision\": sha, \"layout\": \"hub-cache\" if hub_cache else \"plain\",",
+    "new": "        {\"repo\": repo, \"revision\": sha, \"layout\": \"plain\",",
+    "tests": [
+      "tests.test_keep_pull.PullHubCache.test_the_download_uses_cache_dir_and_lands_in_snapshot_layout"
+    ]
+  }
+]

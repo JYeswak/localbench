@@ -22,7 +22,7 @@ from collections.abc import Callable
 from functools import cache
 from pathlib import Path
 
-from . import backends, golden, ollama_app, park, smol, sysstats, workloads
+from . import backends, golden, heavyslot, ollama_app, park, smol, sysstats, workloads
 
 MUTATION_LOCK = workloads.ROOT / "runs" / ".mutation.lock"
 WRITE_GOLDEN = "localbench aa <spec> --write-golden"
@@ -272,6 +272,63 @@ def _free(path: Path) -> tuple[Path, int]:
     return anchor, shutil.disk_usage(anchor).free
 
 
+def check_gateway(_fix: bool, *, home: Path | None = None) -> dict:
+    try:
+        from . import gateway
+        pin = gateway.launch_agent_code_status(home)
+        state = gateway.service_status(home)
+        healthy = bool(state.get("health"))
+        status = "FAIL" if not pin["ok"] else ("PASS" if healthy else "WARN")
+        fix = ("after `lsof -nP -iTCP:11300 -sTCP:ESTABLISHED` shows no connections: "
+               "localbench gateway remove && localbench gateway install"
+               if not pin["ok"] else "localbench gateway start")
+        return _row(status, json.dumps({"service": state, "code": pin}, sort_keys=True), fix)
+    except Exception as exc:  # noqa: BLE001
+        return _row("WARN", f"gateway status unreadable: {type(exc).__name__}: {exc}",
+                    "localbench gateway status")
+
+
+def check_named_path(label: str, path: Path, fix: str) -> dict:
+    """Read-only presence probe for foundational localbench proj-c artifacts."""
+    if path.exists():
+        return _row("PASS", str(path))
+    return _row("WARN", f"missing {path}", fix)
+
+
+def check_heavyslot(_fix: bool) -> dict:
+    return check_named_path("heavyslot", heavyslot.lock_path(),
+                            "localbench prove --wait-slot 1800")
+
+
+def check_launch_agents(_fix: bool) -> dict:
+    root = Path.home() / "Library" / "LaunchAgents"
+    missing = [name for name in ("com.localbench.watch-releases.plist", "dev.localbench.omp-update.plist")
+               if not (root / name).exists()]
+    return _row("WARN" if missing else "PASS", "missing: " + ", ".join(missing) if missing else str(root),
+                "localbench watch-releases --install-agent; localbench omp watch install" if missing else None)
+
+
+def check_omp_frozen(_fix: bool) -> dict:
+    root = Path.home() / ".localbench" / "omp-frozen"
+    return _row("PASS" if root.exists() else "WARN", str(root),
+                "localbench omp freeze")
+
+
+def check_tick_driver(_fix: bool) -> dict:
+    return check_named_path("tick driver", workloads.ROOT / "scripts" / "tick_driver.py",
+                            "python3 scripts/tick_driver.py --help")
+
+
+def check_public_export(_fix: bool) -> dict:
+    return check_named_path("public export", workloads.ROOT / "scripts" / "export_public.py",
+                            "python3 scripts/export_public.py --help")
+
+
+def check_hooks(_fix: bool) -> dict:
+    return check_named_path("hooks", workloads.ROOT / ".githooks" / "pre-commit",
+                            "am guard install ~/Developer/localbench ~/Developer/localbench")
+
+
 def check_disk(_fix: bool) -> dict:
     cli = _cli()
     floor = cli.HF_HEADROOM_GB * 1e9
@@ -286,11 +343,24 @@ def check_disk(_fix: bool) -> dict:
     return _row("WARN", "; ".join(parts) + f": under {cli.HF_HEADROOM_GB} GB free", fix)
 
 
+REQUIRED_SUBSYSTEMS = ("heavyslot", "gateway", "digest/omp-update LaunchAgents", "omp-frozen snapshots",
+                      "tick driver", "public export", "hooks")
+
+
+def missing_required_subsystems() -> list[str]:
+    """Return foundational probes omitted from CHECKS; keeps doctor coverage mechanically auditable."""
+    present = {name for name, _ in CHECKS}
+    return [name for name in REQUIRED_SUBSYSTEMS if name not in present]
+
+
 CHECKS: list[tuple[str, Callable[[bool], dict]]] = [
     ("platform", check_platform), ("python", check_python), ("data root", check_data_root), ("omp", check_omp),
     ("ollama", check_ollama), ("mlx-serve/oMLX/mlxfast", check_mlx), ("sudoers", check_sudoers), ("park", check_park),
     ("smol server", check_smol), ("mutation lock", check_mutation_lock), ("goldens", check_goldens), ("disk", check_disk),
-    ("omp features", check_features),
+    ("omp features", check_features), ("heavyslot", check_heavyslot),
+    ("gateway", check_gateway), ("digest/omp-update LaunchAgents", check_launch_agents),
+    ("omp-frozen snapshots", check_omp_frozen), ("tick driver", check_tick_driver),
+    ("public export", check_public_export), ("hooks", check_hooks),
 ]
 
 

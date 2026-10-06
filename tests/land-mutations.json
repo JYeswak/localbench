@@ -1,0 +1,66 @@
+[
+ {
+  "file": "scripts/land.py",
+  "label": "stale lock proceeds without refusal",
+  "new": "    return None",
+  "old": "    return (f\"refusing: stale {lock} ({age:.0f}s old, no holder). A human must remove it:\\n\"",
+  "tests": [
+   "tests.test_land"
+  ]
+ },
+ {
+  "file": "scripts/land.py",
+  "label": "mutation gate ignores bad content",
+  "new": "    return returncode != 0",
+  "old": "    return returncode != 0 or bool(bad)",
+  "tests": [
+   "tests.test_land.GateHelpers"
+  ]
+ },
+ {
+  "file": "scripts/land.py",
+  "label": "own reservation holds block landing",
+  "new": "        if True:",
+  "old": "        if agent is None or parts[1].lower() != agent.lower():",
+  "tests": [
+   "tests.test_land"
+  ]
+ },
+ {
+  "file": "scripts/land.py",
+  "label": "hunk verification skipped",
+  "new": "        if False:",
+  "old": "        if lines[at:at + count] != removed:",
+  "tests": [
+   "tests.test_land"
+  ]
+ },
+ {
+  "file": "scripts/land.py",
+  "label": "empty gate output IndexError",
+  "new": "    return lines[-1]",
+  "old": "    return lines[-1] if lines else \"(empty)\"",
+  "tests": [
+   "tests.test_land"
+  ]
+ },
+ {
+  "label": "CAS failure must not reset or report success",
+  "file": "scripts/land.py",
+  "old": "    if update.returncode != 0:",
+  "new": "    if False:",
+  "tests": [
+   "tests.test_land.AdvanceMain.test_real_race_after_ancestry_check_is_rejected_by_cas"
+  ]
+ }
+ ,
+ {
+  "label": "selector treats regex metacharacters literally",
+  "file": "scripts/land.py",
+  "old": "        if any(pattern in ln for ln in removed + added):",
+  "new": "        if any(re.search(pattern, ln) for ln in removed + added):",
+  "tests": [
+   "tests.test_land.EnvAndSpecs.test_selector_treats_regex_metacharacters_as_literal_text"
+  ]
+ }
+]

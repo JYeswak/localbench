@@ -1,22 +1,56 @@
 [
-  {"label": "the plant is restored over another agent's edit (the 2026-10-01 clobber)",
-   "file": "scripts/mutate.py",
-   "old": "        if now == planted:\n            path.write_bytes(src)",
-   "new": "        if True:\n            path.write_bytes(src)",
-   "tests": ["tests.test_mutate.RunCase.test_an_edit_made_while_the_plant_is_in_place_is_kept_not_restored_over"]},
-  {"label": "an edit during the known-good run is planted over",
-   "file": "scripts/mutate.py",
-   "old": "    if now != src:   # edited during the known-good run",
-   "new": "    if False:   # edited during the known-good run",
-   "tests": ["tests.test_mutate.RunCase.test_an_edit_made_during_the_known_good_run_voids_the_case_before_any_plant"]},
-  {"label": "a concurrent edit exits like an escaped plant",
-   "file": "scripts/mutate.py",
-   "old": "    return 2 if conflicts else 0 if ok else 1",
-   "new": "    return 0 if ok else 1",
-   "tests": ["tests.test_mutate.Main.test_a_concurrent_edit_exits_2_and_names_where_the_versions_are"]},
-  {"label": "the lock does not name the planted files",
-   "file": "scripts/mutate.py",
-   "old": "    with held(LOCK, files=sorted({c[\"file\"] for c in cases})):",
-   "new": "    with held(LOCK):",
-   "tests": ["tests.test_mutate.Main.test_the_lock_names_the_files_the_cases_plant_in"]}
+  {
+    "label": "the plant is restored over another agent's edit (the 2026-10-01 clobber)",
+    "file": "scripts/mutate.py",
+    "old": "        if now == planted:\n            path.write_bytes(src)",
+    "new": "        if True:\n            path.write_bytes(src)",
+    "tests": [
+      "tests.test_mutate.RunCase.test_an_edit_made_while_the_plant_is_in_place_is_kept_not_restored_over"
+    ]
+  },
+  {
+    "label": "an edit during the known-good run is planted over",
+    "file": "scripts/mutate.py",
+    "old": "    if now != src:   # edited during the known-good run",
+    "new": "    if False:   # edited during the known-good run",
+    "tests": [
+      "tests.test_mutate.RunCase.test_an_edit_made_during_the_known_good_run_voids_the_case_before_any_plant"
+    ]
+  },
+  {
+    "label": "a concurrent edit exits like an escaped plant",
+    "file": "scripts/mutate.py",
+    "old": "    return 2 if conflicts else 0 if ok else 1",
+    "new": "    return 0 if ok else 1",
+    "tests": [
+      "tests.test_mutate.Main.test_a_concurrent_edit_exits_2_and_names_where_the_versions_are"
+    ]
+  },
+  {
+    "label": "the lock does not name the planted files",
+    "file": "scripts/mutate.py",
+    "old": "    with held(LOCK, files=sorted({c[\"file\"] for c in cases})):",
+    "new": "    with held(LOCK):",
+    "tests": [
+      "tests.test_mutate.Main.test_the_lock_names_the_files_the_cases_plant_in"
+    ]
+  },
+  {
+    "label": "dead owner journal recovery is removed",
+    "file": "scripts/mutate.py",
+    "old": "                    recover_journal(lock.parent.parent)\n                    (lock / \"owner\").unlink(missing_ok=True)",
+    "new": "                    (lock / \"owner\").unlink(missing_ok=True)",
+    "tests": [
+      "tests.test_mutate.JournalRecovery.test_held_reclaims_dead_owner_after_journal_restore"
+    ]
+  },
+  {
+    "label": "plant journal is written before bytes change",
+    "file": "scripts/mutate.py",
+    "old": "        write_journal(root, case, src, planted)\n        path.write_bytes(planted)",
+    "new": "        path.write_bytes(planted)",
+    "tests": [
+      "tests.test_mutate.JournalRecovery.test_run_case_writes_journal_before_plant"
+    ]
+  }
 ]

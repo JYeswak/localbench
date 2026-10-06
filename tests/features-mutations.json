@@ -330,5 +330,23 @@
     "tests": [
       "tests.test_prove.Prove.test_installed_digest_resolves_laya_snapshot"
     ]
+  },
+  {
+    "label": "missing proof stage cannot grade PROVEN",
+    "file": "localbench/features.py",
+    "old": "        stage = _dict(proof_spec).get(\"stage\")",
+    "new": "        stage = \"proof\"",
+    "tests": [
+      "tests.test_features.FeatureMap.test_screen_stamped_receipt_is_not_proven"
+    ]
+  },
+  {
+    "label": "generation proof requires sealed gold-set pin",
+    "file": "localbench/features.py",
+    "old": "    if run.get(\"label\") == \"generation\" and any(",
+    "new": "    if False and any(",
+    "tests": [
+      "tests.test_features.FeatureMap.test_generation_judge_receipt_requires_sealed_gold_set"
+    ]
   }
 ]

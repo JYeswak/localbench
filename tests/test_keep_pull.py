@@ -4,6 +4,7 @@ report, and that none of them touches ollama while a localbench run is alive."""
 import contextlib
 import io
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -123,13 +124,22 @@ class CliAgainstFake(unittest.TestCase):
 
 class Keep(CliAgainstFake):
     def test_default_keep_is_five_minutes_and_records_a_finite_lease(self):
-        rc, out = self.run_cli("keep", "ollama:qwen3.6:35b-mlx")
+        previous_tz = os.environ.get("TZ")
+        os.environ["TZ"] = "America/Denver"   # the fake expiry is 10:30 MDT; CI runs at UTC
+        time.tzset()
+        try:
+            rc, out = self.run_cli("keep", "ollama:qwen3.6:35b-mlx")
+        finally:
+            if previous_tz is None:
+                del os.environ["TZ"]
+            else:
+                os.environ["TZ"] = previous_tz
+            time.tzset()
         self.assertEqual(FakeOllama.requests, [
             ("/api/generate", {"model": "qwen3.6:35b-mlx", "keep_alive": "5m"})])
         self.assertEqual((rc, out.strip()),
                          (0, "qwen3.6:35b-mlx: loaded until 09-24 10:30"))
         lease = gateway.GatewayStore(gateway.database_path()).lease("qwen3.6:35b-mlx")
-        self.assertIsNotNone(lease)
         assert lease is not None
         self.assertGreater(lease["manual_expires_at"], time.time())
 
@@ -148,7 +158,20 @@ class Keep(CliAgainstFake):
     def test_an_unload_that_leaves_the_model_resident_fails(self):
         FakeOllama.loaded, FakeOllama.sticky = {"m:1": FOREVER}, {"m:1"}
         rc, out = self.run_cli("keep", "ollama:m:1", "0")
-        self.assertEqual((rc, out, self.err.strip()), (1, "", "m:1: still loaded"))
+        self.assertEqual((rc, out), (1, ""))
+        self.assertIn("m:1: still loaded", self.err.splitlines())
+
+    def test_keep_closes_http_error_response(self):
+        from urllib.error import HTTPError
+
+        FakeOllama.loaded = {"m:1": FOREVER}
+        response = io.BytesIO(b"unavailable")
+        error = HTTPError("http://127.0.0.1/api/generate", 503, "unavailable", {}, response)
+        with mock.patch.object(cli.backends, "_post", side_effect=error):
+            rc, out = self.run_cli("keep", "ollama:m:1", "0")
+        self.assertEqual((rc, out), (1, ""))
+        self.assertIn("ollama refused m:1: HTTP 503 unavailable", self.err.splitlines())
+        self.assertTrue(response.closed)
 
     def test_external_activity_uncertainty_refuses_unload(self):
         FakeOllama.loaded = {"m:1": FOREVER}
@@ -308,6 +331,64 @@ class PullHF(CliAgainstFake):
         rc, out, calls = self.run_pull(free_bytes=100e9)
         self.assertEqual(rc, 0, out)
         self.assertEqual(calls[0][:5], ["hf", "download", "bottlecapai/TC-MLX", "--revision", self.INFO["sha"]])
+
+
+class PullHubCache(CliAgainstFake):
+    INFO = {"sha": "93944fefc63a6c6eb3f649bb003286691e78a40c", "usedStorage": 322_000_000, "gated": False}
+    REPO = "aac6fef/laya-multilingual-mlx"
+
+    def setUp(self):
+        super().setUp()
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+
+    def run_pull(self, free_bytes, write_snapshot=True):
+        calls = []
+        real_get = cli.backends._get
+
+        def fake_run(argv, **_):
+            calls.append(argv)
+            if write_snapshot:
+                root = Path(argv[argv.index("--cache-dir") + 1])
+                snap = root / ("models--" + self.REPO.replace("/", "--")) / "snapshots" / self.INFO["sha"]
+                snap.mkdir(parents=True, exist_ok=True)
+                (snap / "config.json").write_text("{}")
+            return subprocess.CompletedProcess(argv, 0)
+
+        tmp = Path(self.tmp.name) / "hub"
+        with mock.patch.object(cli.backends, "_get", lambda url, timeout=10: self.INFO if "huggingface.co" in url
+                                else real_get(url, timeout)), \
+                mock.patch.object(cli.shutil, "disk_usage", return_value=mock.Mock(free=free_bytes)), \
+                mock.patch.object(cli.subprocess, "run", fake_run):
+            rc, out = self.run_cli("pull", f"hf:{self.REPO}", "--hub-cache", "--to", str(tmp))
+            dest = tmp / ("models--" + self.REPO.replace("/", "--"))
+            return rc, out, calls, dest if rc == 0 else None
+
+    def test_the_download_uses_cache_dir_and_lands_in_snapshot_layout(self):
+        from localbench import decision
+        rc, out, calls, dest = self.run_pull(free_bytes=100e9)
+        self.assertEqual(rc, 0, out)
+        self.assertEqual(calls[0][:5], ["hf", "download", self.REPO, "--revision", self.INFO["sha"]])
+        self.assertIn("--cache-dir", calls[0])
+        self.assertNotIn("--local-dir", calls[0])
+        snap = dest / "snapshots" / self.INFO["sha"]
+        self.assertTrue((snap / "config.json").is_file())
+        self.assertEqual(decision.snapshot_sha(str(snap / "config.json"), self.REPO), self.INFO["sha"])
+        source = json.loads((dest / ".localbench-source.json").read_text())
+        self.assertEqual((source["repo"], source["revision"], source["layout"]),
+                         (self.REPO, self.INFO["sha"], "hub-cache"))
+
+    def test_a_missing_snapshot_after_download_is_a_failure_not_a_pull(self):
+        rc, out, calls, dest = self.run_pull(free_bytes=100e9, write_snapshot=False)
+        self.assertEqual(rc, 1)
+        self.assertIsNone(dest)
+        self.assertIn(f"snapshots/{self.INFO['sha']}", self.err)
+
+    def test_too_little_space_refuses_before_downloading(self):
+        rc, out, calls, dest = self.run_pull(free_bytes=1e9)
+        self.assertEqual(rc, 1)
+        self.assertEqual(calls, [])
+        self.assertIn("plus 20 GB headroom", self.err)
 
 
 if __name__ == "__main__":

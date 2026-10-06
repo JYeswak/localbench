@@ -13,25 +13,25 @@
 Run 2026-09-22 21:07 MDT (2026-09-23T03:06:47Z) on `mac-studio-apple-m3-ultra-512gb`, read-only
 (tmux list-panes, ps, lsof, config/session file reads; no keys sent, no model loaded).
 
-Pane ids confirmed first; they match the packet (%12 = omp on `ollama/qwen3.8:27b-mlx`, %10 = omp on a
+Pane ids confirmed first; they match the packet (%pane = omp on `ollama/qwen3.8:27b-mlx`, %pane = omp on a
 cloud Muse model, default profile):
 
 ```
 $ tmux list-panes -s -t omp-test -F '#{pane_id} #{pane_title}'
-%9 omp-test__user_0
-%10 omp-test__omp_1
-%15 omp-test__omp_4
-%12 omp-test__omp_3_ollama/qwen3.8
+%pane omp-test__user_0
+%pane omp-test__omp_1
+%pane omp-test__omp_4
+%pane omp-test__omp_3_ollama/qwen3.8
 ```
 
-### Known-bad: %12, omp launched with `--model ollama/qwen3.8:27b-mlx` — must exit 1
+### Known-bad: %pane, omp launched with `--model ollama/qwen3.8:27b-mlx` — must exit 1
 
 ```
-$ sh scripts/check-monitor-pane.sh %12; echo $?
-pane %12 shell_pid=4782 omp_pid=6547 title='omp-test__omp_3_ollama/qwen3.8'
+$ sh scripts/check-monitor-pane.sh %pane; echo $?
+pane %pane shell_pid=4782 omp_pid=6547 title='omp-test__omp_3_ollama/qwen3.8'
   argv: bun ~/.bun/bin/omp --model ollama/qwen3.8:27b-mlx
   profile: ~/.omp/agent (lsof agent.db)
-  session: ~/.omp/agent/sessions/-Developer-omp-test/2026-09-20T23-32-55-019Z_01a0c12a-606b-7088-a66c-64f9b9053c39.jsonl current=ollama/qwen3.8:27b-mlx
+  session: ~/.omp/agent/sessions/-Developer-omp-test/2026-09-20T23-32-55-019Z_<session-id>.jsonl current=ollama/qwen3.8:27b-mlx
   config: modelRoles.default=anthropic/claude-opus-5-5:xhigh modelRoles.smol=ollama/qwen3.8:27b-mlx mnemopi.llmMode=smol
 WARNING: smol role is LOCAL (ollama/qwen3.8:27b-mlx) and mnemopi.llmMode=smol: titles and memory work hit the local model even when the main model is cloud
 LOCAL MODEL: ollama/qwen3.8:27b-mlx
@@ -40,14 +40,14 @@ LOCAL MODEL: ollama/qwen3.8:27b-mlx
 
 Fired: exit 1, argv and session file agree.
 
-### Cloud main model: %10, omp on Muse, default profile — exit recorded, smol WARNING expected
+### Cloud main model: %pane, omp on Muse, default profile — exit recorded, smol WARNING expected
 
 ```
-$ sh scripts/check-monitor-pane.sh %10; echo $?
-pane %10 shell_pid=22573 omp_pid=23710 title='omp-test__omp_1'
+$ sh scripts/check-monitor-pane.sh %pane; echo $?
+pane %pane shell_pid=22573 omp_pid=23710 title='omp-test__omp_1'
   argv: bun ~/.bun/bin/omp --auto-approve
   profile: ~/.omp/agent (lsof agent.db)
-  session: ~/.omp/agent/sessions/-Developer-omp-test/2026-09-20T21-48-16-492Z_01a0c0ca-92ec-747b-a476-969ce2113db2.jsonl current=muse-code/muse-spark-1.3-contributor
+  session: ~/.omp/agent/sessions/-Developer-omp-test/2026-09-20T21-48-16-492Z_<session-id>.jsonl current=muse-code/muse-spark-1.3-contributor
   config: modelRoles.default=anthropic/claude-opus-5-5:xhigh modelRoles.smol=ollama/qwen3.8:27b-mlx mnemopi.llmMode=smol
 WARNING: smol role is LOCAL (ollama/qwen3.8:27b-mlx) and mnemopi.llmMode=smol: titles and memory work hit the local model even when the main model is cloud
 NON-LOCAL MODEL: muse-code/muse-spark-1.3-contributor
@@ -63,24 +63,24 @@ sees runtime switches, which is why it outranks argv/config in the script.
 ### Known-bad: bogus pane ids — must exit 2
 
 ```
-$ sh scripts/check-monitor-pane.sh %999; echo $?
-UNDETERMINED: no tmux pane %999 (tmux list-panes -a)
+$ sh scripts/check-monitor-pane.sh %pane; echo $?
+UNDETERMINED: no tmux pane %pane (tmux list-panes -a)
 2
 $ sh scripts/check-monitor-pane.sh bogus; echo $?
-usage: scripts/check-monitor-pane.sh <tmux-pane-id like %12> (got 'bogus')
+usage: scripts/check-monitor-pane.sh <tmux-pane-id like %pane> (got 'bogus')
 UNDETERMINED: not a tmux pane id
 2
 ```
 
-Why the pane list and not `tmux display`: `tmux display -p -t %999 '#{pane_pid}'` printed nothing and
+Why the pane list and not `tmux display`: `tmux display -p -t %pane '#{pane_pid}'` printed nothing and
 exited 0 in this run, and inside tmux a failed target can resolve to the caller's own pane, so a
 `display`-based check could certify the watcher's own pane under a bogus id.
 
 ### Extra cases observed in the same run
 
 ```
-$ sh scripts/check-monitor-pane.sh %15; echo $?
-pane %15 shell_pid=43462 omp_pid=52772 title='omp-test__omp_4'
+$ sh scripts/check-monitor-pane.sh %pane; echo $?
+pane %pane shell_pid=43462 omp_pid=52772 title='omp-test__omp_4'
   argv: bun ~/.bun/bin/omp
   profile: ~/.omp/agent (lsof agent.db)
   session: none open current=?
@@ -88,14 +88,14 @@ pane %15 shell_pid=43462 omp_pid=52772 title='omp-test__omp_4'
 WARNING: smol role is LOCAL (ollama/qwen3.8:27b-mlx) and mnemopi.llmMode=smol: titles and memory work hit the local model even when the main model is cloud
 NON-LOCAL MODEL: anthropic/claude-opus-5-5:xhigh
 0
-$ sh scripts/check-monitor-pane.sh %9; echo $?
-pane %9 shell_pid=22555 title='omp-test__user_0'
-UNDETERMINED: no omp process under pane %9
+$ sh scripts/check-monitor-pane.sh %pane; echo $?
+pane %pane shell_pid=22555 title='omp-test__user_0'
+UNDETERMINED: no omp process under pane %pane
 2
 ```
 
-%15 holds no session file open, so its verdict rests on argv + config only (the launch-time limit
-applies in full). %9 runs no omp; its child is `/Applications/Ollama.app/Contents/Resources/ollama serve`
+%pane holds no session file open, so its verdict rests on argv + config only (the launch-time limit
+applies in full). %pane runs no omp; its child is `/Applications/Ollama.app/Contents/Resources/ollama serve`
 (pid 78482) — the ollama daemon lives in this pane.
 
 ## lb-10 — claim-discipline gate and its canary (2026-09-22)
@@ -658,7 +658,7 @@ claim-discipline gate still exits 1: 0 enforced of 13 registered claims.
 
 After the owner authorized pausing the verified proj-a clients, their three OMP
 agent processes exited while the tmux shells remained. A separate
-user-owned `ollama run nimble` client (PID 85093, localbench pane `%19`)
+user-owned `ollama run nimble` client (PID 85093, localbench pane `%pane`)
 then held a direct Ollama socket. `localbench gpu --seconds 5` identified
 that client and `localbench park --dry-run` exited 1 with
 `cannot park qwen3.8:27b-mlx: established non-gateway Ollama client connection remains`.

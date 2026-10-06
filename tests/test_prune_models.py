@@ -209,6 +209,14 @@ class CheckDelete(unittest.TestCase):
         self.assertEqual([t["name"] for t in targets], [NEMOTRON["name"]])
         self.assertEqual([r.split(": ")[0] for r in refusals], ["qwen3.8:27b-mlx", "minimax-m2.5:cloud", "nope:1"])
 
+    def test_a_journaled_parked_alias_is_refused_with_unpark_guidance(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(pm.park, "STATE", journaled_state(tmp)):
+                targets, refusals = pm.check_delete(
+                    [{**SIBLING, "keep": [], "last_seen": None}], [SIBLING["name"]])
+        self.assertEqual(targets, [])
+        self.assertEqual(len(refusals), 1)
+        self.assertIn("localbench unpark", refusals[0])
 
 def journaled_state(tmp, name=SIBLING["name"]):
     """A PARKED.json journaling `name` as a parked alias with a fence id only the journal knows."""
@@ -218,16 +226,6 @@ def journaled_state(tmp, name=SIBLING["name"]):
          "role": "fallback", "_park_fence_id": "fence-for-prune-test"}]))
     return state
 
-
-class CheckDelete(unittest.TestCase):
-    def test_a_journaled_parked_alias_is_refused_with_unpark_guidance(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            with mock.patch.object(pm.park, "STATE", journaled_state(tmp)):
-                targets, refusals = pm.check_delete(
-                    [{**SIBLING, "keep": [], "last_seen": None}], [SIBLING["name"]])
-        self.assertEqual(targets, [])
-        self.assertEqual(len(refusals), 1)
-        self.assertIn("localbench unpark", refusals[0])
 
 class Delete(unittest.TestCase):
     def test_deleting_an_unjournaled_parked_copy_leaves_the_journal_alone(self):

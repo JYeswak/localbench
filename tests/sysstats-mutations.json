@@ -12,5 +12,41 @@
     "old": "or bool(re.search(r\"\\b(omlx|splash) serve\\b|(?:^|/)omlx-server(?:\\s|$)\", row.get(\"cmd\") or \"\")))",
     "new": "or bool(re.search(r\"\\b(omlx|splash) serve\\b\", row.get(\"cmd\") or \"\")))",
     "tests": ["tests.test_sysstats.RunnerAttribution.test_foreign_omlx_python_worker_voids_an_ollama_run"]
+  },
+  {
+    "label": "watch must add CPU busy samples",
+    "file": "localbench/observe.py",
+    "old": "cpu_busy = sysstats.cpu_busy_pct()",
+    "new": "cpu_busy = None",
+    "tests": [
+      "tests.test_sysstats.ObservationSamples.test_watch_migrates_legacy_database_and_records_cpu_busy"
+    ]
+  },
+  {
+    "label": "watch must migrate the legacy samples table",
+    "file": "localbench/observe.py",
+    "old": "        _ensure_cpu_busy_column(con)",
+    "new": "        pass",
+    "tests": [
+      "tests.test_sysstats.ObservationSamples.test_watch_migrates_legacy_database_and_records_cpu_busy"
+    ]
+  },
+  {
+    "label": "report must not migrate a legacy samples table",
+    "file": "localbench/observe.py",
+    "old": "    con.executescript(SCHEMA)\n    return con",
+    "new": "    con.executescript(SCHEMA)\n    _ensure_cpu_busy_column(con)\n    return con",
+    "tests": [
+      "tests.test_sysstats.ObservationSamples.test_report_does_not_migrate_legacy_samples"
+    ]
+  },
+  {
+    "label": "GPU idle threshold must not classify active device as idle",
+    "file": "localbench/sysstats.py",
+    "old": "GPU_IDLE_THRESHOLD_PCT = 5.0",
+    "new": "GPU_IDLE_THRESHOLD_PCT = 50.0",
+    "tests": [
+      "tests.test_sysstats.GPUWindowAccounting.test_active_device_window_is_not_idle"
+    ]
   }
 ]

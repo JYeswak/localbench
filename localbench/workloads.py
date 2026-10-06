@@ -19,6 +19,7 @@ import contextlib
 import functools
 import hashlib
 import json
+import math
 import os
 import queue
 import random
@@ -33,8 +34,10 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from .client import Sample, chat_stream
+from .client import RequestCancellation, Sample, chat_stream, run_cancellable
 from .render import clip
+from .stats import ALPHA as STATS_ALPHA
+from .stats import drift_paired, holm_reject, recall_test, welch_t_lower
 
 # The data root: a clone's fixtures/, goldens/, runs/ and docs/evidence/. By default the checkout this module was loaded
 # from (`uv tool install -e .`); LOCALBENCH_HOME points any other install at a clone. __main__ refuses a root without
@@ -76,10 +79,12 @@ class Ctx:
     smol_model: str | None = None
     e2e_case: str | None = None
     samples: list[dict] = field(default_factory=list)
+    cancellation: RequestCancellation | None = None
 
     def chat(self, label: str, body: dict) -> Sample:
         body = {"model": self.model, "temperature": 0, **body}
-        s = chat_stream(self.backend.base_url, body, backend=self.backend.name, label=label)
+        s = chat_stream(self.backend.base_url, body, backend=self.backend.name, label=label,
+                        cancellation=self.cancellation)
         row = s.to_dict()
         row["text"] = row["text"][:400]
         row["reasoning"] = row["reasoning"][:400]
@@ -724,9 +729,9 @@ def e2e(ctx: Ctx) -> list[Result]:
                     ctx.emit({"event": "isolated", "reason": f"e2e.{task} first run must be cold"})
                 t0 = time.perf_counter()
                 started = time.time()
-                proc = subprocess.run([omp_bin(), "-p", prompt, *child_flags(ctx.model)], cwd=work,
-                                      capture_output=True, text=True, timeout=1800, env=child_env(),
-                                      stdin=subprocess.DEVNULL, check=False)
+                proc = run_cancellable([omp_bin(), "-p", prompt, *child_flags(ctx.model)], cwd=work,
+                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=1800,
+                                       env=child_env(), stdin=subprocess.DEVNULL, cancellation=ctx.cancellation)
                 wall = time.perf_counter() - t0
                 trace = ctx.run_dir / f"e2e.{task}.{attempt}.omp.jsonl"
                 trace.write_text(proc.stdout)
@@ -1513,7 +1518,7 @@ def _memory_leg_value(leg: dict, key: str) -> float | None:
             return 1.0
         return {"PASS": 1.0, "FAIL": 0.0}.get(entry.get("verdict"))
     m = (leg.get("metrics") or {}).get(key) or {}
-    return None if m.get("void") or m.get("n") == 0 else _real_value(m.get("value"))
+    return None if m.get("void") else _real_value(m.get("value"))
 
 
 # sess.turns_complete's reason when every turn completed but the main model did not reply exactly NOTED.
@@ -1705,6 +1710,104 @@ def _loop_gate(candidate_legs: list[dict], baseline_legs: list[dict], label) -> 
     return failures, unmeasured
 
 
+# Pre-registered leg-test assignment (bead kit-v8t; PowerPlan kit-memory-study-vce
+# comment 204): recall-side latencies pair neighbours on the log scale (drift cancels);
+# post-retain and everything else compare unpaired, because pairing needs more pairs
+# there, not fewer. All latency tests run on natural logs (lognormal leg medians).
+_PAIRED_WINS = {"mem.recall.pre_main_s"}
+_FISHER_QUALITY = ("mem.recall.hit_rate", "mem.derail.ok_rate")
+
+
+def _memory_fact_counts(legs: list[dict], key: str) -> list[tuple[int, int]] | None:
+    """Per-leg (hits, n) for a rate metric, or None when any leg lacks value/n. Hits
+    round from the banked rate (rates round to 4 decimals; the < 0.5-count error is
+    negligible next to Fisher discreteness)."""
+    out = []
+    for leg in legs:
+        m = (leg.get("metrics") or {}).get(key) or {}
+        value = _real_value(m.get("value"))
+        n = m.get("n")
+        if value is None or not isinstance(n, int) or isinstance(n, bool) or n < 1:
+            return None
+        out.append((min(n, max(0, int(round(value * n)))), n))
+    return out
+
+
+def _leg_created(leg: dict) -> str | None:
+    created = (leg.get("provenance") or {}).get("created")
+    return created if isinstance(created, str) and created else None
+
+
+def _memory_quality_row(key: str, candidate_legs: list[dict], baseline_legs: list[dict]) -> dict:
+    """Fisher/CMH pooled-facts quality row (kit-v8t): loss when the candidate rate is
+    worse at alpha 0.05 (stats.recall_test: pooled Fisher at low ICC, CMH across matched
+    pairs above it); never a gain; unmeasured when a leg lacks value/n."""
+    c_vals = [_memory_leg_value(leg, key) for leg in candidate_legs]
+    b_vals = [_memory_leg_value(leg, key) for leg in baseline_legs]
+    row: dict = {"class": "quality", "candidate_legs": c_vals, "baseline_legs": b_vals,
+                 "better": "higher", "judgement": "unmeasured"}
+    c_counts = _memory_fact_counts(candidate_legs, key)
+    b_counts = _memory_fact_counts(baseline_legs, key)
+    if c_counts is None or b_counts is None or not c_counts or not b_counts:
+        return row
+    test = recall_test(b_counts, c_counts)
+    pooled_c = sum(h for h, _ in c_counts) / sum(n for _, n in c_counts)
+    pooled_b = sum(h for h, _ in b_counts) / sum(n for _, n in b_counts)
+    return {**row, "candidate": pooled_c, "baseline": pooled_b, "delta": pooled_c - pooled_b,
+            "test": test, "judgement": "loss" if test["p"] < STATS_ALPHA else "within_noise"}
+
+
+def _memory_win_row(key: str, candidate_legs: list[dict], baseline_legs: list[dict]) -> dict:
+    """Paired/unpaired log-scale latency row (kit-v8t): gain when the candidate is faster
+    at alpha 0.05. Paired keys use the drift-paired test on a baseline-first A,B,A chain;
+    without that chain (equal counts, missing stamps) the same values compare unpaired
+    (fewer assumptions, less power on drift). Unmeasured with < 2 values per arm or a
+    missing/non-positive value. Wins never judge losses."""
+    c_vals = [_memory_leg_value(leg, key) for leg in candidate_legs]
+    b_vals = [_memory_leg_value(leg, key) for leg in baseline_legs]
+    row: dict = {"class": "win", "candidate_legs": c_vals, "baseline_legs": b_vals,
+                 "better": "lower", "judgement": "unmeasured"}
+    if len(c_vals) < 2 or len(b_vals) < 2 or any(v is None for v in c_vals + b_vals):
+        return row
+    assert all(v is not None for v in c_vals + b_vals)
+    if any(v <= 0 for v in c_vals + b_vals):
+        return row
+    base = {"candidate": statistics.median(c_vals), "baseline": statistics.median(b_vals),
+            "delta": statistics.median(c_vals) - statistics.median(b_vals)}
+    if key in _PAIRED_WINS:
+        pairing = None
+        if all(_leg_created(leg) is not None for leg in candidate_legs + baseline_legs):
+            order_c = sorted(range(len(candidate_legs)),
+                             key=lambda i: (_leg_created(candidate_legs[i]), i))
+            order_b = sorted(range(len(baseline_legs)),
+                             key=lambda i: (_leg_created(baseline_legs[i]), i))
+            c_seq = [c_vals[i] for i in order_c]
+            b_seq = [b_vals[i] for i in order_b]
+            first_c = _leg_created(candidate_legs[order_c[0]])
+            first_b = _leg_created(baseline_legs[order_b[0]])
+            assert first_c is not None and first_b is not None
+            if len(b_seq) == len(c_seq) + 1 and first_b <= first_c:
+                pairing = (c_seq, b_seq)
+            elif len(c_seq) == len(b_seq) + 1 and first_c <= first_b:
+                pairing = (b_seq, c_seq)
+        # Without the baseline-first A,B,A chain there is nothing to pair against drift:
+        # the same values compare unpaired (fewer assumptions, less power on drift).
+        if pairing is not None:
+            bb_meds, a_meds = pairing
+            try:
+                test = drift_paired(bb_meds, a_meds)
+            except ValueError:
+                return row
+            return {**row, **base, "test": {"method": "drift-paired-t", **test},
+                    "judgement": "gain" if test["p"] < STATS_ALPHA else "within_noise"}
+    try:
+        test = welch_t_lower([math.log(v) for v in c_vals], [math.log(v) for v in b_vals])
+    except ValueError:
+        return row
+    return {**row, **base, "test": {"method": "welch-t-log", **test},
+            "judgement": "gain" if test["p"] < STATS_ALPHA else "within_noise"}
+
+
 def _memory_row(c_vals: list, b_vals: list, better: str, eps: float) -> dict:
     """decision.compare's A/A rule on leg values: each arm's median; the band is the wider of the two arms' spreads
     (max - min over legs); a gain or loss must clear it. Fewer than two legs per arm, or a leg without the value, is
@@ -1759,19 +1862,25 @@ def memory_verdict(candidate_legs: list[dict], baseline_legs: list[dict], *, fea
                         f"baseline {len(baseline_legs)})")
     deltas, losses, wins, unmeasured = {}, [], [], []
     for key in MEMORY_QUALITY:
-        deltas[key] = {"class": "quality", **_memory_row([_memory_leg_value(leg, key) for leg in candidate_legs],
-                                                         [_memory_leg_value(leg, key) for leg in baseline_legs],
-                                                         "higher", EPS)}
+        if key in _FISHER_QUALITY:
+            deltas[key] = _memory_quality_row(key, candidate_legs, baseline_legs)
+        else:
+            deltas[key] = {"class": "quality", **_memory_row(
+                [_memory_leg_value(leg, key) for leg in candidate_legs],
+                [_memory_leg_value(leg, key) for leg in baseline_legs], "higher", EPS)}
         if deltas[key]["judgement"] == "loss":
             losses.append(key)
         elif deltas[key]["judgement"] == "unmeasured":
             unmeasured.append(key)
     for key, label in MEMORY_WINS:
-        deltas[key] = {"class": "win", **_memory_row([_memory_leg_value(leg, key) for leg in candidate_legs],
-                                                     [_memory_leg_value(leg, key) for leg in baseline_legs],
-                                                     "lower", EPS)}
+        deltas[key] = _memory_win_row(key, candidate_legs, baseline_legs)
         if deltas[key]["judgement"] == "gain":
             wins.append(label)
+    benefit_p = {label: deltas[key].get("test", {}).get("p") for key, label in MEMORY_WINS
+                 if label in wins and deltas[key].get("test", {}).get("p") is not None}
+    if benefit_p:
+        accepted = holm_reject(benefit_p)
+        wins = [label for label in wins if label not in benefit_p or accepted[label]]
     computed = "WORSE" if losses else "BETTER" if wins and not unmeasured else "NOT_BETTER"
     if losses:
         problems.append(f"quality loss beyond A/A noise: {', '.join(losses)}")
@@ -1943,7 +2052,7 @@ def memory_verdict(candidate_legs: list[dict], baseline_legs: list[dict], *, fea
     comparison = {"verdict": verdict, "computed": computed, "void": void, "quality_losses": losses, "wins": wins,
                   "baseline": baseline,
                   "unmeasured_quality": unmeasured,
-                  "noise": "aa_spread_over_legs", "deltas": deltas}
+                  "noise": "pre-registered-leg-tests", "deltas": deltas}
 
     def check(failed, level: str = "MUST", **values) -> dict:
         return {"level": level, "verdict": "FAIL" if failed else "PASS", **values}

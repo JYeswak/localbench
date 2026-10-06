@@ -17,7 +17,7 @@ Installation edits profile files but does not reload already-running OMP process
 
 - Configured user OMP profiles that can issue a local Ollama request are intended to route through the gateway after the relevant process loads the new configuration. The isolated localbench-owned benchmark child is excluded because its private `models.yml` exposes only the localbench provider, not built-in Ollama.
 - Gateway status is intended to distinguish configured profiles, requests in flight, last request completion, next expiry, Ollama residency, and expiry/unload failures. A status snapshot is not proof that subsequent requests have drained.
-- On gateway restart, persisted lease state must be recovered; stale in-flight markers may be cleared only after the prior gateway process is proven dead. The live stopped-gateway/restart transition remains unverified.
+- On gateway restart, persisted lease state must be recovered. Stale in-flight rows may be reconciled only when their recorded gateway PID is gone or no established gateway client socket remains; each request history row is marked abandoned with the applicable reason. Legacy rows without an owner PID rely on the no-client check. The live stopped-gateway/restart transition remains unverified.
 - The `localbench keep` CLI must reject unbounded retention and default to a finite lease. Explicit finite retention must be represented in status/audit; affected callsites and docs using `forever` must be migrated.
 - Before unloading, the gateway must defer when an established non-gateway Ollama client is observed or safety is uncertain. The current socket probe is a point-in-time check, not exclusive control over new direct clients; it cannot guarantee that no direct request starts between probe and unload.
 
@@ -57,7 +57,7 @@ The active OMP profile directories contain `models.yml`; the local OMP kit’s f
 - Concurrent requests prevent unload until all finish; each completion resets the five-minute deadline; expiry unloads once and reports confirmed absence.
 - A non-gateway client or uncertain client state defers unload; injected unload failure remains visible and does not claim success.
 - Exercise direct-client arrival between the last external-client probe and native unload; either prevent unload under that race or keep this safety invariant uncertified. Also verify that an existing direct socket causes live unload refusal without disrupting that client.
-- Gateway restart recovers expired leases and safely clears only stale process-owned in-flight state.
+- Gateway restart recovers expired leases and safely reconciles stale in-flight rows when the recorded gateway PID is gone or no established gateway client socket remains; the post-restart in-flight count must match established gateway client sockets.
 - Exercise a stopped gateway and subsequent restart with an actual OMP request and persisted lease: verify no direct fallback, observable failure/exit, stale process-owned request recovery, and expiry/unowned handling after restart. Profile readback or a single zero-active-requests snapshot does not satisfy this acceptance.
 - `localbench keep forever` and equivalent negative/unbounded values are rejected; default/explicit finite keeps expire. Existing CLI callers/tests/docs are migrated.
 - Exercise nonfinite numeric durations through the internal lease API as well as `localbench keep`; a CLI-only rejection does not establish the infinite-lease invariant.

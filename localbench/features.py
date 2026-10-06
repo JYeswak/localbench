@@ -12,6 +12,8 @@ Proof is read from receipts under docs/evidence/receipts/*.json, indexed by thei
 (FEATURE_FIELD). The PROOF CONTRACT (grade()) a receipt must meet to prove a feature on one profile's route:
   kind == "run"; run.label in PROOF_LABELS (decision, memory, generation); feature == the row's feature;
   omp_module_sha (SHA_FIELD) == sha256 of the feature's omp module as installed now; problems empty;
+  generation judge receipts additionally need run.gold_set with a SHA-256, positive pair count, order seed, two independent
+  labelers, kappa and agreement >= 0.90; malformed calibration or missing/invalid pin remains UNPROVEN.
   verdict.compare == "BETTER" with verdict.baseline {kind, id} naming this profile's incumbent route: the route it had
   before the local preset of the feature's family was applied (that apply's recorded `before` settings), or, with no
   local preset applied, its current route (a proof graded before the flip); hosted -> the hosted model id,
@@ -77,7 +79,7 @@ NATIVE_APIS = ("typesafe", "openrouter-decisions")
 LOOPBACK = ("127.0.0.1", "localhost", "::1", "0.0.0.0")
 
 _SLUG = re.compile(r"[a-z0-9][a-z0-9.-]*")
-_CHAIN = re.compile(r"[a-z]+(?:>[a-z]+)*")
+_CHAIN = re.compile(r"[a-z]++(?:>[a-z]++)*+")
 _CONDITION = re.compile(r"([A-Za-z][\w.]*)(!=|=)([^&|=!]+)")
 
 
@@ -299,6 +301,30 @@ def _dict(value) -> dict:
     return value if isinstance(value, dict) else {}
 
 
+def _valid_gold_set(value: object) -> bool:
+    """Validate the summary pin copied from the spec-verified generation gold-set file."""
+    if not isinstance(value, dict):
+        return False
+    digest = value.get("sha256")
+    if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+        return False
+    n_pairs = value.get("n_pairs")
+    if not isinstance(n_pairs, int) or isinstance(n_pairs, bool) or n_pairs < 1:
+        return False
+    order_seed = value.get("order_seed")
+    labeler = value.get("labeler")
+    if not isinstance(order_seed, str) or not order_seed.strip():
+        return False
+    if (not isinstance(labeler, list) or len(labeler) != 2
+            or any(not isinstance(name, str) or not name.strip() for name in labeler)
+            or labeler[0] == labeler[1]):
+        return False
+    kappa, agreement = value.get("kappa"), value.get("agreement")
+    return (isinstance(kappa, (int, float)) and not isinstance(kappa, bool) and -1 <= kappa <= 1
+            and isinstance(agreement, (int, float)) and not isinstance(agreement, bool)
+            and 0.90 <= agreement <= 1)
+
+
 def same_digest(a, b) -> bool:
     """Two model digests name the same build: `sha256:` dropped, case folded, and the shorter (at least 12 hex, the
     length run pins record) a prefix of the longer."""
@@ -383,6 +409,22 @@ def grade(receipt: dict, sha: str | None, model: str | None = None, digest: str 
         return "UNPROVEN", "no verdict.compare"
     if verdict["compare"] != "BETTER":
         return "BAD", f"verdict.compare is {verdict['compare']}, not BETTER"
+    proof_spec = receipt.get("proof_spec")
+    if proof_spec is not None:
+        stage = _dict(proof_spec).get("stage")
+        if stage != "proof":
+            return "UNPROVEN", f"receipt proof_spec.stage is {stage!r}, not 'proof'"
+    if run.get("label") == "generation" and any(
+            field in run for field in ("judge_calibration", "raw_win_rate", "win_rate")):
+        from . import generation
+        if "judge_calibration" in run and run["judge_calibration"] is None:
+            return "UNPROVEN", "invalid generation judge calibration: missing calibration"
+        try:
+            generation.require_pairwise_calibration(run)
+        except ValueError as exc:
+            return "UNPROVEN", f"invalid generation judge calibration: {exc}"
+        if not _valid_gold_set(run.get("gold_set")):
+            return "UNPROVEN", "generation proof lacks a valid sealed gold_set pin"
     baseline = _dict(verdict.get("baseline"))
     if not baseline.get("kind") or not baseline.get("id"):
         return "UNPROVEN", "verdict names no baseline"

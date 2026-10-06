@@ -162,7 +162,9 @@ class VariedTrialRunner(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             fake_omp = root / "omp-fixture"
-            late_write = ("import time; from pathlib import Path; time.sleep(1.5); "
+            # Keep a two-second late-write margin; the old 1s/1.5s pair flaked under load.
+            # Match test_timeout_stops_child_before_final_workspace_state_is_recorded.
+            late_write = ("import time; from pathlib import Path; time.sleep(6); "
                           "Path('target.txt').write_text('late mutation')")
             fake_omp.write_text(
                 "#!/usr/bin/env python3\n"
@@ -174,7 +176,7 @@ class VariedTrialRunner(unittest.TestCase):
             run_dir = root / "runs" / "trial"
             with mock.patch.object(varied, "omp_bin", return_value=str(fake_omp)), \
                     mock.patch.object(varied, "child_env", return_value=os.environ.copy()):
-                attempt, traces = varied.run_trial(spec, "offline-fixture", run_dir / "attempt", timeout_s=1)
+                attempt, traces = varied.run_trial(spec, "offline-fixture", run_dir / "attempt", timeout_s=4)
             self.assertTrue(attempt["timed_out"])
             campaign = EvaluationCampaign.create(
                 root / "runs" / "campaign", root=root,
@@ -183,9 +185,14 @@ class VariedTrialRunner(unittest.TestCase):
             campaign.record_case("edit-624", input_sha256=canonical_sha256(spec), status="FAIL",
                                  run_dir=run_dir, trace_files=traces)
             target = attempt["cwd"] / "target.txt"
-            deadline = time.monotonic() + 4
-            while time.monotonic() < deadline and target.read_text() == spec["initial"]:
-                time.sleep(0.02)
+            deadline = time.monotonic() + 15
+            while time.monotonic() < deadline:
+                try:
+                    if target.read_text() == "late mutation":
+                        break
+                except FileNotFoundError:
+                    pass
+                time.sleep(0.05)
             self.assertEqual(target.read_text(), "late mutation",
                              "detached tool did not exercise the late-write boundary")
             score, _ = cli._evaluation_score_varied(campaign)

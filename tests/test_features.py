@@ -173,7 +173,8 @@ class FeatureMap(unittest.TestCase):
         DROP deletes) to plant one missing or contradicting field."""
         doc = {"kind": "run", "feature": feature, "omp_module_sha": self.sha(package, rel), "problems": [],
                "verdict": {"compare": "BETTER", "baseline": baseline or {"kind": "hosted", "id": "proj-b-latest"}},
-               "run": {"label": label, "provenance": {"pins": {"model": "nimble:latest", "model_digest": digest}}}}
+               "run": {"label": label, "provenance": {"pins": {"model": "nimble:latest", "model_digest": digest}}},
+               "proof_spec": {"stage": "proof"}}
         for path, value in changes.items():
             *parents, last = path.split(".")
             node = doc
@@ -265,6 +266,52 @@ class FeatureMap(unittest.TestCase):
                 self.proof(f"gen-{label}", label=label)
                 row = self.report(["default"])["auto-thinking"]
                 self.assertEqual((row["status"], row["receipt"]), ("PROVEN", f"gen-{label}.json"))
+
+    def test_generation_judge_receipt_requires_sealed_gold_set(self):
+        calibration = {
+            "n": 2, "raw_win_rate": 0.75, "length_adjusted_win_rate": 0.75,
+            "verbosity": {
+                "candidate": {"mean_tokens": 2.0, "median_tokens": 2.0, "total_tokens": 4},
+                "baseline": {"mean_tokens": 2.0, "median_tokens": 2.0, "total_tokens": 4}},
+            "swap_consistency": {"n": 2, "consistent": 2, "rate": 1.0}}
+        pin = {"sha256": "a" * 64, "n_pairs": 100, "order_seed": "blind-seed",
+               "labeler": ["reviewer-a", "reviewer-b"], "kappa": 0.91, "agreement": 0.95}
+        invalid = (("missing", None), ("bad-hash", {**pin, "sha256": "bad"}),
+                   ("missing-labeler", {**pin, "labeler": ["reviewer-a"]}))
+        for name, gold_set in invalid:
+            with self.subTest(name=name):
+                for receipt in self.receipts.glob("*.json"):
+                    receipt.unlink()
+                changes = {"run.judge_calibration": calibration}
+                if gold_set is not None:
+                    changes["run.gold_set"] = gold_set
+                self.proof(f"generation-{name}", label="generation", **changes)
+                graded = self.report(["default"])["auto-thinking"]["proofs"]["default"]
+                self.assertEqual(graded["proof"], "UNPROVEN")
+                self.assertIn("sealed gold_set", graded["reason"])
+
+        for receipt in self.receipts.glob("*.json"):
+            receipt.unlink()
+        self.proof("generation-with-gold", label="generation",
+                   **{"run.judge_calibration": calibration, "run.gold_set": pin})
+        graded = self.report(["default"])["auto-thinking"]["proofs"]["default"]
+        self.assertEqual((graded["proof"], graded["receipt"]), ("PROVEN", "generation-with-gold.json"))
+
+        for receipt in self.receipts.glob("*.json"):
+            receipt.unlink()
+        self.proof("generation-raw-win", label="generation",
+                   **{"run.raw_win_rate": 0.75, "run.gold_set": pin})
+        graded = self.report(["default"])["auto-thinking"]["proofs"]["default"]
+        self.assertEqual(graded["proof"], "UNPROVEN")
+        self.assertIn("raw judge win rate", graded["reason"])
+
+        for receipt in self.receipts.glob("*.json"):
+            receipt.unlink()
+        self.proof("generation-null-calibration", label="generation",
+                   **{"run.judge_calibration": None, "run.gold_set": pin})
+        graded = self.report(["default"])["auto-thinking"]["proofs"]["default"]
+        self.assertEqual(graded["proof"], "UNPROVEN")
+        self.assertIn("judge calibration", graded["reason"])
 
     def test_each_missing_or_contradicting_contract_field_denies_proof_with_its_reason(self):
         cases = {
@@ -455,6 +502,12 @@ class FeatureMap(unittest.TestCase):
         self.assertEqual([f[0] for f in found], ["FAIL"])
 
 
+    def test_screen_stamped_receipt_is_not_proven(self):
+        self.proof("screen", proof_spec={"stage": "screen"})
+        row = self.report(["default"])["auto-thinking"]
+        self.assertEqual(row["proofs"]["default"]["proof"], "UNPROVEN")
+        self.assertIn("stage", row["proofs"]["default"]["reason"])
+
 class Registry(unittest.TestCase):
     def setUp(self):
         self.path = Path(tempfile.mkdtemp(prefix="features-reg-")) / "features.tsv"
@@ -489,6 +542,7 @@ class Registry(unittest.TestCase):
              "recall-embeddings", "titles", "skill-description-compression", "commit-messages", "edit-auto-repair",
              "scout-agent", "sonic-agent"},
             {r["feature"] for r in rows})
+
 
 
 if __name__ == "__main__":

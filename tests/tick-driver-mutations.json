@@ -1,0 +1,37 @@
+[
+  {
+    "label": "progress ignores uncommitted edits (only HEAD counts)",
+    "file": "scripts/tick_driver.py",
+    "old": "b\"\\0\" + diff.encode() + b\"\\0\"",
+    "new": "b\"\\0\" + b\"\\0\"",
+    "tests": ["tests.test_tick_driver.Decide.test_uncommitted_edits_and_bead_claims_keep_an_edit_only_worker_alive"]
+  },
+  {
+    "label": "progress ignores the bead graph",
+    "file": "scripts/tick_driver.py",
+    "old": "b\"\\0\" + beads).hexdigest()",
+    "new": "b\"\\0\").hexdigest()",
+    "tests": ["tests.test_tick_driver.Decide.test_uncommitted_edits_and_bead_claims_keep_an_edit_only_worker_alive"]
+  },
+  {
+    "label": "progress ignores new untracked files",
+    "file": "scripts/tick_driver.py",
+    "old": "hashlib.sha256(status.encode() + b\"\\0\"",
+    "new": "hashlib.sha256(b\"\\0\"",
+    "tests": ["tests.test_tick_driver.Decide.test_uncommitted_edits_and_bead_claims_keep_an_edit_only_worker_alive"]
+  },
+  {
+    "label": "progress mark is not deterministic, so the driver never exits stale",
+    "file": "scripts/tick_driver.py",
+    "old": "    return f\"{head}:{tree}\"",
+    "new": "    return f\"{head}:{tree}:{time.time()}\"",
+    "tests": ["tests.test_tick_driver.Decide.test_a_team_that_moves_nothing_still_ends_the_driver"]
+  },
+  {
+    "label": "a proof run does not hold wakes",
+    "file": "scripts/tick_driver.py",
+    "old": "record|prove|decision",
+    "new": "record|decision",
+    "tests": ["tests.test_tick_driver.Measurements.test_proof_decision_and_generation_runs_hold_every_wake"]
+  }
+]

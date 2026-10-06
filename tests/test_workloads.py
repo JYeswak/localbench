@@ -1,6 +1,8 @@
 """Interval math behind the call splits (busy seconds, memory-LLM overlap with main calls) and the omp child flags."""
 
+import functools
 import json
+import signal
 import subprocess
 import sys
 import tempfile
@@ -19,10 +21,10 @@ from localbench.workloads import (
     THINK_MAX_TOKENS,
     THINK_TASKS,
     Ctx,
-    _Rpc,
     _busy_s,
     _leaked,
     _overlap_s,
+    _Rpc,
     answer_call,
     child_flags,
     e2e,
@@ -35,6 +37,34 @@ from localbench.workloads import (
     sess,
     think,
 )
+
+
+def _missing_omp(root: str | Path) -> str:
+    path = Path(root) / "nonexistent-omp-for-test"
+    if path.exists():
+        raise AssertionError(f"test OMP guard unexpectedly exists: {path}")
+    return str(path)
+
+
+def _bounded_test(seconds: float):
+    def decorate(test):
+        @functools.wraps(test)
+        def wrapped(*args, **kwargs):
+            previous_handler = signal.getsignal(signal.SIGALRM)
+
+            def expired(_signum, _frame):
+                raise TimeoutError(f"{test.__name__} exceeded {seconds:g}s")
+
+            signal.signal(signal.SIGALRM, expired)
+            signal.setitimer(signal.ITIMER_REAL, seconds)
+            try:
+                return test(*args, **kwargs)
+            finally:
+                signal.setitimer(signal.ITIMER_REAL, 0)
+                signal.signal(signal.SIGALRM, previous_handler)
+
+        return wrapped
+    return decorate
 
 
 def r(a: float, b: float) -> dict:
@@ -117,7 +147,7 @@ class MemRounds(unittest.TestCase):
                       loaded_context=1024, mem_rounds=1)
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
-                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
+                    mock.patch("localbench.workloads.omp_bin", return_value=_missing_omp(tmp)), \
                     mock.patch("localbench.workloads.subprocess.run",
                                return_value=subprocess.CompletedProcess([], 0, "", "")), \
                     mock.patch("localbench.memory.banks", return_value=[]), \
@@ -151,7 +181,7 @@ class MemRounds(unittest.TestCase):
                       loaded_context=1024, mem_rounds=1)
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
-                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
+                    mock.patch("localbench.workloads.omp_bin", return_value=_missing_omp(tmp)), \
                     mock.patch("localbench.workloads.subprocess.run", side_effect=run), \
                     mock.patch("localbench.memory.banks", return_value=[]), \
                     mock.patch("localbench.memory.remove_banks"):
@@ -189,7 +219,7 @@ class MemTurns(unittest.TestCase):
                   loaded_context=1024, mem_rounds=1)
         with mock.patch("localbench.proxy.Proxy", _Proxy), \
                 mock.patch("localbench.workloads.ensure_localbench_model"), \
-                mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
+                mock.patch("localbench.workloads.omp_bin", return_value=_missing_omp(tmp)), \
                 mock.patch("localbench.workloads.subprocess.run", side_effect=omp_turn), \
                 mock.patch("localbench.workloads._mem_facts",
                            return_value=[(n, f"PLANT {n}", f"QUESTION {n}", f"ZEBRA-{n}") for n in "abc"]), \
@@ -355,7 +385,7 @@ class MemTurns(unittest.TestCase):
                       loaded_context=1024, mem_rounds=1)
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
-                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
+                    mock.patch("localbench.workloads.omp_bin", return_value=_missing_omp(tmp)), \
                     mock.patch("localbench.workloads.subprocess.run",
                                return_value=subprocess.CompletedProcess([], 0, "", "")), \
                     mock.patch("localbench.memory.banks", return_value=[]), \
@@ -416,7 +446,7 @@ class MemTurns(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             self.run_mem(omp_turn, tmp)
-        with mock.patch.object(cli, "omp_bin", return_value="omp"), \
+        with mock.patch.object(cli, "omp_bin", return_value=_missing_omp(tmp)), \
                 mock.patch.object(cli, "_first_line", return_value="omp/18.3.1"), \
                 mock.patch.object(cli, "sha16", return_value="s"):
             pin = cli.omp_pins()["omp_mem_tools"]
@@ -488,7 +518,7 @@ class SessTurns(unittest.TestCase):
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads._Rpc", _Rpc), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
-                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
+                    mock.patch("localbench.workloads.omp_bin", return_value=_missing_omp(root)), \
                     mock.patch("localbench.memory.banks", return_value=[]), \
                     mock.patch("localbench.memory.remove_banks"):
                 results = sess(ctx)
@@ -560,7 +590,7 @@ class SessTurns(unittest.TestCase):
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads._Rpc", _Rpc), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
-                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
+                    mock.patch("localbench.workloads.omp_bin", return_value=_missing_omp(root)), \
                     mock.patch("localbench.memory.banks", return_value=[]), \
                     mock.patch("localbench.memory.remove_banks"):
                 return {r.case: r for r in sess(ctx)}
@@ -721,6 +751,15 @@ def _omp_stdout(text: str) -> str:
 
 class AnswerReachesTheVerdict(unittest.TestCase):
 
+    def test_per_test_deadline_interrupts_a_hung_call(self):
+        @_bounded_test(0.01)
+        def hang():
+            time.sleep(1)
+
+        with self.assertRaisesRegex(TimeoutError, "hang exceeded 0.01s"):
+            hang()
+
+    @_bounded_test(15)
     def test_wrong_expected_answer_rejects_correct_e2e_output(self):
         class _Proxy:
             def __init__(self, *args, **kwargs):
@@ -743,8 +782,8 @@ class AnswerReachesTheVerdict(unittest.TestCase):
                       loaded_context=8192, e2e_case="ok")
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
-                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
-                    mock.patch("localbench.workloads.subprocess.run",
+                    mock.patch("localbench.workloads.omp_bin", return_value=_missing_omp(tmp)), \
+                    mock.patch("localbench.workloads.run_cancellable",
                                return_value=subprocess.CompletedProcess([], 0, _omp_stdout("OK"), "")):
                 rows = e2e(ctx)
 
@@ -753,6 +792,7 @@ class AnswerReachesTheVerdict(unittest.TestCase):
         self.assertEqual(correct.detail["answers"], ["OK", "OK"])
 
 
+    @_bounded_test(15)
     def test_campaign_case_runs_only_that_task_and_retains_each_exit_code(self):
         class _Proxy:
             def __init__(self, *args, **kwargs):
@@ -780,8 +820,8 @@ class AnswerReachesTheVerdict(unittest.TestCase):
 
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
-                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
-                    mock.patch("localbench.workloads.subprocess.run", side_effect=run):
+                    mock.patch("localbench.workloads.omp_bin", return_value=_missing_omp(tmp)), \
+                    mock.patch("localbench.workloads.run_cancellable", side_effect=run):
                 rows = e2e(ctx)
             self.assertEqual([row.case for row in rows], ["e2e.ok", "e2e.ok.correct"])
             self.assertEqual(rows[1].verdict, "FAIL")
@@ -790,6 +830,7 @@ class AnswerReachesTheVerdict(unittest.TestCase):
             self.assertEqual(repeat["returncode"], 7)
 
 
+    @_bounded_test(15)
     def test_pre_warmed_first_call_voids_first_timing_metrics(self):
         class _Proxy:
             def __init__(self, *args, **kwargs):
@@ -820,8 +861,8 @@ class AnswerReachesTheVerdict(unittest.TestCase):
 
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
-                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
-                    mock.patch("localbench.workloads.subprocess.run", side_effect=run):
+                    mock.patch("localbench.workloads.omp_bin", return_value=_missing_omp(tmp)), \
+                    mock.patch("localbench.workloads.run_cancellable", side_effect=run):
                 rows = e2e(ctx)
 
         timing = next(row for row in rows if row.case == "e2e.ok")
@@ -835,6 +876,7 @@ class AnswerReachesTheVerdict(unittest.TestCase):
 
     FAIL = "WRONG " + ("x" * 400)
 
+    @_bounded_test(15)
     def test_a_pass_and_a_fail_reach_e2e_and_rel_details(self):
         """Restored after 8b2ad07 dropped it: no other test reaches the rel tier, so a rel that kept only passing
         answers, or lost a failed attempt from `wrong`, would bank a receipt that hides the wrong answers it measured."""
@@ -873,7 +915,8 @@ class AnswerReachesTheVerdict(unittest.TestCase):
                       loaded_context=8192)
             with mock.patch("localbench.proxy.Proxy", _Proxy), \
                     mock.patch("localbench.workloads.ensure_localbench_model"), \
-                    mock.patch("localbench.workloads.omp_bin", return_value="omp"), \
+                    mock.patch("localbench.workloads.omp_bin", return_value=_missing_omp(tmp)), \
+                    mock.patch("localbench.workloads.run_cancellable", side_effect=run), \
                     mock.patch("localbench.workloads.subprocess.run", side_effect=run):
                 e2e_rows = e2e(ctx)
                 ok_attempt["n"] = 0

@@ -1,9 +1,9 @@
-"""Local-model use over time: a once-a-minute record of GPU time by process and model, models loaded on each local
-server, and the processes connected to them — and a report over any window of it.
+"""Local-model use over time: a once-a-minute record of GPU time by process and model, CPU busy percentage, models
+loaded on each local server, and the processes connected to them — and a report over any window of it.
 
 `localbench gpu` answers "what is using the GPU now"; this answers "what used it today, for how long, and who was
-connected". The watcher reads ioreg, the servers' model lists, and lsof — no model is touched, so it may run during
-measurements (the measurement law forbids local inference by monitors, not observation).
+connected". The watcher reads ioreg, the servers' model lists, CPU busy from `top`, and lsof — no model is touched,
+so it may run during measurements (the measurement law forbids local inference by monitors, not observation).
 
 Store: runs/observe.db (stdlib sqlite3, WAL; one writer — see the fsqlite SURVEY row for why not fsqlite).
 """
@@ -20,7 +20,8 @@ from .workloads import ROOT
 
 DB = ROOT / "runs" / "observe.db"
 SCHEMA = """
-create table if not exists samples (t real primary key, window_s real, device_pct int, free_pct int, swap_mb real);
+create table if not exists samples (t real primary key, window_s real, device_pct int, free_pct int, swap_mb real,
+                                    cpu_busy real);
 create table if not exists gpu (t real, pid int, name text, model text, pct real);
 create table if not exists resident (t real, server text, model text);
 create table if not exists clients (t real, pid int, name text, omp_profile text, cwd text, servers text);
@@ -39,11 +40,23 @@ def connect(path: Path = DB) -> sqlite3.Connection:
     return con
 
 
+def _ensure_cpu_busy_column(con: sqlite3.Connection) -> None:
+    """Migrate only when the single watch writer starts, never from a report/read connection."""
+    con.execute("begin immediate")
+    try:
+        columns = {row[1] for row in con.execute("pragma table_info(samples)")}
+        if "cpu_busy" not in columns:
+            con.execute("alter table samples add column cpu_busy real")
+        con.commit()
+    except Exception:
+        con.rollback()
+        raise
+
+
 def record(con: sqlite3.Connection, before: dict, t0: float, commands: dict[int, str],
            conn_before: dict | None = None) -> tuple[dict, float, dict]:
-    """Write one sample covering (t0, now]; returns the GPU counters, the connection byte counters, and the time the
-    next window starts from. Traffic needs the previous sample's counters, so a watch's first sample writes none.
-    A traffic row keeps what its server had loaded then: bytes down while one model was resident are that model's."""
+    """Write one GPU, CPU-busy and client-traffic sample covering (t0, now]; return counters for the next window."""
+    cpu_busy = sysstats.cpu_busy_pct()
     after, conn_after, t1 = sysstats.gpu_time_by_pid(), sysstats.connection_bytes(), time.time()
     window = t1 - t0
     live = sysstats.live()
@@ -53,8 +66,10 @@ def record(con: sqlite3.Connection, before: dict, t0: float, commands: dict[int,
         for c in clients for srv, t in sysstats.traffic(conn_before, conn_after, c["conns"]).items()
         if t["up"] or t["down"]]
     with con:
-        con.execute("insert into samples values (?, ?, ?, ?, ?)",
-                    (t1, window, live.get("gpu_device_pct"), live.get("free_pct"), live.get("swap_used_mb")))
+        con.execute("insert into samples (t, window_s, device_pct, free_pct, swap_mb, cpu_busy) "
+                    "values (?, ?, ?, ?, ?, ?)",
+                    (t1, window, live.get("gpu_device_pct"), live.get("free_pct"), live.get("swap_used_mb"),
+                     cpu_busy))
         con.executemany("insert into gpu values (?, ?, ?, ?, ?)",
                         [(t1, r["pid"], r["name"], r.get("model"), r["pct"])
                          for r in sysstats.gpu_share(before, after, window, commands)])
@@ -71,6 +86,7 @@ def watch(interval: float = 60.0, samples: int | None = None, path: Path = DB) -
     """Record every `interval` seconds until interrupted (or `samples` times)."""
     con = connect(path)
     try:
+        _ensure_cpu_busy_column(con)
         commands: dict[int, str] = {}
         before, conn, t0 = sysstats.gpu_time_by_pid(), sysstats.connection_bytes(), time.time()
         n = 0

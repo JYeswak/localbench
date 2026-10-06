@@ -6,3 +6,4 @@ __pycache__/
 .ntm/
 .beads/beads.db-*
 .beads/beads.db.*
+var/agent-tmp/

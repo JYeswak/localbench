@@ -1,0 +1,20 @@
+[
+  {
+    "label": "ownerless scratch is reported",
+    "file": "scripts/scratch-audit.py",
+    "old": "if not (subtree / \".owner\").is_file():",
+    "new": "if False:",
+    "tests": [
+      "tests.test_scratch_audit.ScratchAudit.test_ownerless_and_nested_git_fail"
+    ]
+  },
+  {
+    "label": "nested git scratch is reported",
+    "file": "scripts/scratch-audit.py",
+    "old": "for git in subtree.rglob(\".git\"):",
+    "new": "for git in ():",
+    "tests": [
+      "tests.test_scratch_audit.ScratchAudit.test_ownerless_and_nested_git_fail"
+    ]
+  }
+]

@@ -59,9 +59,9 @@ class Decide(unittest.TestCase):
         self.assertEqual(step(s, now=10_899.0, head="h2")[0], "wait")
         self.assertEqual(step(s, now=10_901.0, head="h2")[0], "send-tick")
 
-    def ticks(self, heads):
-        """Deliver the handoff at h1, then one tick per later head; return the action at the check after them."""
-        s = td.sent(td.State(), now=0.0, head="h1")
+    def ticks(self, heads, first="h1"):
+        """Deliver the handoff at `first`, then one tick per later head; return the action at the check after them."""
+        s = td.sent(td.State(), now=0.0, head=first)
         t = 0.0
         for head in heads:
             t += 1000
@@ -80,6 +80,31 @@ class Decide(unittest.TestCase):
     def test_the_stop_file_wins_over_an_idle_pane(self):
         s = td.sent(td.State(idle_checks=9), now=0.0, head="h0")
         self.assertEqual(step(s, stop=True, now=99_999.0)[0], "stop")
+
+    def mark(self, status=" M localbench/stats.py", diff="diff --git a b\n+x\n", beads=b'{"id":"kit-1"}\n'):
+        return td.progress_mark("h1", status, diff, beads)
+
+    def test_uncommitted_edits_and_bead_claims_keep_an_edit_only_worker_alive(self):
+        """Workers edit without committing (the orchestrator lands in batches): HEAD alone would call them stale."""
+        for field, values in {"diff": ["d1", "d2", "d3"], "status": ["?? a", "?? a b", "?? a b c"],
+                              "beads": [b"open", b"in_progress", b"closed"]}.items():
+            with self.subTest(moved=field):
+                m = [self.mark(**{field: v}) for v in values]
+                self.assertEqual(self.ticks([m[1], m[1], m[2], m[2]], first=m[0]), "send-tick")
+
+    def test_a_team_that_moves_nothing_still_ends_the_driver(self):
+        m = self.mark()
+        self.assertEqual(self.ticks([self.mark(), self.mark()], first=m), "exit-stale")
+
+
+class Measurements(unittest.TestCase):
+    def test_proof_decision_and_generation_runs_hold_every_wake(self):
+        for cmd in ("/Users/x/.local/bin/localbench prove registries/proofs/find__screen.json",
+                    "python3 -m localbench decision run nimble", "localbench generation replay titles",
+                    "localbench ab ollama:a ollama:b"):
+            with self.subTest(cmd=cmd):
+                self.assertRegex(cmd, td.RUN_PATTERN)
+        self.assertNotRegex("localbench status", td.RUN_PATTERN)
 
 
 if __name__ == "__main__":

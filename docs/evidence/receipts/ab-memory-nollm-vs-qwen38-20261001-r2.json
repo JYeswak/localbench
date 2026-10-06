@@ -5080,7 +5080,7 @@
               "retention_provenance": "extraction",
               "recall_answer": "ZEBRA-2362",
               "plant_answer": "NOTED",
-              "control_answer": "Found it in `.memory/03f41b5d-89d7-40e2-adbe-3d4c7e7a8b4f`:\n\n> \"Falcon project h",
+              "control_answer": "Found it in `.memory/<session-id>`:\n\n> \"Falcon project h",
               "rcs": [
                 0,
                 0,

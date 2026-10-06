@@ -19,13 +19,16 @@ two levels inside the frozen package, so park.omp_package(<snapshot>/omp) finds 
 and backends.sha16(<snapshot>/omp) hashes that script, whose text names the snapshot id: one omp_sha per snapshot.
 
 Build is atomic (copy into a hidden temp dir beside the target, then rename) and idempotent (an existing snapshot with
-the same id is reused). Snapshots are read-only after the copy. Retention keeps the newest KEEP snapshots that carry the
-marker; a snapshot a run holds (hold(), a shared flock under .locks/) is never removed."""
+the same id is reused only after its file-tree digest verifies). The marker stores a digest and per-path fingerprints
+for the full snapshot closure; prove verifies before launch and after completion, marking new receipts `PINS CHANGED` on
+end drift. Snapshots are read-only after the copy. Retention keeps the newest KEEP snapshots that carry the marker; a
+snapshot a run holds (hold(), a shared flock under .locks/) is never removed."""
 
 from __future__ import annotations
 
 import contextlib
 import fcntl
+import hashlib
 import json
 import os
 import shutil
@@ -137,6 +140,62 @@ def _manifest(target: Path) -> dict | None:
     return doc if isinstance(doc, dict) and doc.get("snapshot_id") == target.name else None
 
 
+def _closure_entries(path: Path) -> dict[str, list]:
+    """Stable fingerprints for every file, directory, and symlink in a snapshot, excluding its marker."""
+    entries = {".": ["d", stat.S_IMODE(path.stat().st_mode) & ~0o222]}
+    for dirpath, dirs, files in os.walk(path, followlinks=False):
+        dirs.sort()
+        files.sort()
+        base = Path(dirpath)
+        for name in tuple(dirs):
+            item = base / name
+            rel = item.relative_to(path).as_posix()
+            if item.is_symlink():
+                entries[rel] = ["l", os.readlink(item)]
+                dirs.remove(name)
+            else:
+                entries[rel] = ["d", stat.S_IMODE(item.stat().st_mode) & ~0o222]
+        for name in files:
+            item = base / name
+            rel = item.relative_to(path).as_posix()
+            if rel == MARKER:
+                continue
+            if item.is_symlink():
+                entries[rel] = ["l", os.readlink(item)]
+                continue
+            digest = hashlib.sha256()
+            with item.open("rb") as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    digest.update(chunk)
+            entries[rel] = ["f", stat.S_IMODE(item.stat().st_mode) & ~0o222, digest.hexdigest()]
+    return entries
+
+
+def _closure_digest(entries: dict[str, list]) -> str:
+    digest = hashlib.sha256()
+    for name in sorted(entries):
+        record = json.dumps([name, *entries[name]], separators=(",", ":"), ensure_ascii=False).encode()
+        digest.update(len(record).to_bytes(8, "big"))
+        digest.update(record)
+    return digest.hexdigest()
+
+
+def verify_snapshot(target: Path, manifest: dict | None = None) -> str:
+    """Fail closed on missing or changed closure records; name the first changed path."""
+    doc = manifest if manifest is not None else _manifest(target)
+    if not isinstance(doc, dict) or not isinstance(doc.get("closure_entries"), dict) \
+            or not isinstance(doc.get("closure_sha256"), str):
+        raise RuntimeError(f"{target}: frozen OMP manifest lacks a closure digest; refusing reuse")
+    current = _closure_entries(target)
+    actual = _closure_digest(current)
+    if actual != doc["closure_sha256"]:
+        expected = {name: value for name, value in doc["closure_entries"].items()}
+        changed = sorted(name for name in set(expected) | set(current) if expected.get(name) != current.get(name))
+        path = changed[0] if changed else MARKER
+        raise RuntimeError(f"{target}: frozen OMP closure changed at {path}")
+    return actual
+
+
 def plan(binary: str | None = None) -> Plan:
     """What freezing the omp at `binary` (default omp_bin()) would do; reads only."""
     package = park.omp_package(binary or omp_bin())
@@ -227,7 +286,11 @@ def freeze(p: Plan) -> dict:
     if p.refuse:
         raise RuntimeError(p.refuse)
     if p.exists:
-        return {**(_manifest(p.target) or {}), "created": False}
+        manifest = _manifest(p.target)
+        if manifest is None:
+            raise RuntimeError(f"{p.target} has no valid frozen OMP manifest; refusing reuse")
+        verify_snapshot(p.target, manifest)
+        return {**manifest, "created": False}
     base = root()
     base.mkdir(parents=True, exist_ok=True)
     tmp = base / f".tmp-{p.snapshot_id}-{os.getpid()}"
@@ -253,18 +316,22 @@ def freeze(p: Plan) -> dict:
         script.write_text(_entry_script(p.target, entry_rel, p))
         script.chmod(0o755)
         (tmp / "omp").symlink_to(Path("node_modules") / package_rel / ENTRY_DIR / "omp")
+        closure_entries = _closure_entries(tmp)
         manifest = {"snapshot_id": p.snapshot_id, "omp_version": p.version, "entry_sha16": sha16(str(copied)),
                     "source_package": str(p.package), "source_install": str(p.install),
                     "packages": [str(r) for r in p.packages], "bun_source": str(p.bun),
                     "bun_version": bun, "bun_sha16": sha16(str(tmp / "bin" / "bun")),
-                    "size_bytes": _tree_bytes(tmp, False), "made_at": time.time()}
+                    "size_bytes": _tree_bytes(tmp, False), "closure_sha256": _closure_digest(closure_entries),
+                    "closure_entries": closure_entries, "made_at": time.time()}
         (tmp / MARKER).write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
         _read_only(tmp)
         try:
             os.rename(tmp, p.target)
         except OSError:
-            if _manifest(p.target) is not None:   # a concurrent freeze of the same omp won the rename
-                return {**(_manifest(p.target) or {}), "created": False}
+            manifest = _manifest(p.target)
+            if manifest is not None:   # a concurrent freeze of the same omp won the rename
+                verify_snapshot(p.target, manifest)
+                return {**manifest, "created": False}
             raise
     finally:
         if tmp.exists():
@@ -274,6 +341,7 @@ def freeze(p: Plan) -> dict:
         _remove(p.target)
         raise RuntimeError(f"frozen omp {entry_path(p.target)} --version printed {got!r}, not {p.version}; "
                            "snapshot removed")
+    verify_snapshot(p.target, manifest)
     return {**manifest, "created": True}
 
 

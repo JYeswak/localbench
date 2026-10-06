@@ -1,0 +1,29 @@
+[
+  {
+    "label": "unreviewed dynamic regexes are rejected",
+    "file": "tests/test_regex_safety.py",
+    "old": "return sorted(key for key in set(dynamic) if _site_key(key) not in DYNAMIC_ALLOWLIST)",
+    "new": "return []",
+    "tests": [
+      "tests.test_regex_safety.RegexSafety.test_dynamic_regexes_are_reviewed"
+    ]
+  },
+  {
+    "label": "quadratic growth threshold is enforced",
+    "file": "tests/test_regex_safety.py",
+    "old": "large / max(small, 0.001) > 8",
+    "new": "large / max(small, 0.001) > 80",
+    "tests": [
+      "tests.test_regex_safety.RegexSafety.test_harness_detects_quadratic_growth"
+    ]
+  },
+  {
+    "label": "new quadratic literal is timed",
+    "file": "localbench/decision.py",
+    "old": "GIT_SHA = re.compile(r\"[0-9a-f]{40}\")",
+    "new": "GIT_SHA = re.compile(r\"[0-9a-f]{40}\")\nNEW_QUADRATIC = re.compile(r\"^(a+)+b$\")",
+    "tests": [
+      "tests.test_regex_safety.RegexSafety.test_external_literal_regexes_have_linear_near_miss_growth"
+    ]
+  }
+]

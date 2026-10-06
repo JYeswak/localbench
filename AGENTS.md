@@ -58,6 +58,7 @@ Three load-bearing rules sit above the list:
   checks a receipt or golden without running anything.
 - Which configs have a live regression gate right now: `localbench status` (each golden CURRENT /
   GENERATION-MISMATCH / UNAVAILABLE against current pins, park state, GPU users; exit 1 on any mismatch).
+- Heavy slot holder, its expected remaining time and the --wait-slot queue with ETAs: `localbench slot [--json]`.
 - Who is using the GPU now, and which sessions/omp features can send it work: `localbench gpu` (per-process GPU %,
   resident models, clients of ollama/mlx-serve/the proxy, local-routed features per omp profile). Runs record the same
   per second and are CONTENDED when a non-backend process uses >25% GPU.
@@ -146,10 +147,13 @@ Three load-bearing rules sit above the list:
 ### Pacing (the owner, 2026-10-02: "computer running really slow ... do this a little slower")
 
 - One heavy job at a time across ALL localbench agents: a local-inference run (ab, run, decision run, prove, generation
-  replay, judge pass) OR a full suite / mutate.py landing gate, never two at once. The orchestrator (pane %55) grants
+  replay, judge pass) OR a full suite / mutate.py landing gate, never two at once. The orchestrator (pane %pane) grants
   the slot; workers ask before starting one. Single test modules, edits and reads need no slot.
-- Before starting a heavy job: `uptime` load average under 40 and `localbench gpu --seconds 5` device busy under 80%;
-  otherwise wait. No large filesystem scans (`find ~`, `du ~`) while another heavy job runs.
+- Before starting a heavy job: at nice 10, `uptime` load average must be under 40 and
+  `localbench gpu --seconds 5` must report device <80% with either `IDLE` (device and process
+  each <5%) or `ATTRIBUTED` (coverage >=90%). `UNATTRIBUTED`, `UNALIGNED`, or `UNAVAILABLE` means wait;
+  instantaneous ioreg utilization is not an admission signal.
+  No large filesystem scans (`find ~`, `du ~`) while another heavy job runs.
 - Unload what a run loaded when it ends (`localbench keep ollama:<m> 0`); never leave a 20+ GB model resident for later.
 - On the owner's "slow" signal: stop localbench inference first, unload its models, report; restart only on his go.
 
@@ -219,7 +223,7 @@ it. A tick that changes neither scores nothing.
    Three ticks in a row that move nothing: stop and report.
 6. When two agents share this tree, the other agent grades each `[test]`/`[mutation]` commit: plant your own
    defects through scripts/mutate.py, run the smoke, append a row (PASS, or FIX naming the defect; the fix gets
-   its own row) to docs/evidence/reviews/<date>-cross-grades.md. Name agents and panes by tmux id (`%20`), never
+   its own row) to docs/evidence/reviews/<date>-cross-grades.md. Name agents and panes by tmux id (`%pane`), never
    by pane number. One owner per file; the hook runs the suite on the shared tree, so commit small and green.
    With no second agent, the commit still gets a row, UNGRADED, and stays unclaimed until graded. A grade by a
    fresh-context subagent on the author's own model is recorded as that, never as a cross-model grade.
@@ -227,8 +231,18 @@ it. A tick that changes neither scores nothing.
    agent would see. A planted side effect no test claims to watch is out of scope, or it shows the claim
    overreaches, and then the fix narrows the claim. Without this bar, grading never ends: some write always
    lands where a finite test does not look.
-   `scripts/tick_driver.py` (a hub process) wakes an idle loop pane, never during a run; `touch runs/LOOP-STOP`
-   stops it.
+   `scripts/tick_driver.py` (a hub process, one per pane: pids in runs/tick-drivers.pids, wake texts
+   runs/tick-<lane>.md) wakes an idle pane, never during a run. HEAD, working-tree and bead changes count as
+   movement; three wakes that move nothing end the driver, and `--notify %<orchestrator>` reports that exit.
+   `touch runs/LOOP-STOP` stops them all.
+7. Queued work exists only as beads. Every item a pane is asked to do is a bead with a lane label (`lane-infra`,
+   `lane-measure`, `lane-review`) and a parent, filed before the dispatch that names it. An idle pane pulls: its own
+   in_progress bead, then its lane's ready beads, then any ready bead whose files it can reserve, then a review of
+   another pane's diff; it never files queue-empty or marker beads. Heavy jobs run in the background with
+   `--wait-slot` while the pane takes another edit-only bead. Reports go through `scripts/report.sh` (file in
+   runs/inbox/, pointer verified in the orchestrator's pane); a report not delivered is not a close. (2026-10-02:
+   panes idled while their queues lived in chat, parked their turns on the heavy slot under load 47-53, filed
+   queue-empty marker beads, and a 9-leap report typed into a busy pane was lost while its bead was closed.)
 
 ## Honesty machinery (how to use it)
 

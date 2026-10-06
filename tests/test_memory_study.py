@@ -932,11 +932,22 @@ class MemoryVerdict(unittest.TestCase):
         self.assertIn("is not this profile's route", reason)
 
     def test_recall_drop_beyond_noise_is_worse_with_a_problem(self):
-        receipt = verdict([leg("b1", post=2.06, hit=0.6667), leg("b2", post=2.10, hit=0.6667)])
+        # Four legs per arm: enough matched pairs for the cluster-robust CMH call.
+        receipt = verdict([leg(f"b{i}", post=2.06, hit=0.6667) for i in (1, 2, 3, 4)],
+                          [leg(f"a{i}", smol=QWEN, digest=QWEN_DIGEST, post=8.38) for i in (1, 2, 3, 4)])
         self.assertEqual(receipt["verdict"]["compare"], "WORSE")
         self.assertEqual(receipt["run"]["memory"]["compare"]["quality_losses"], ["mem.recall.hit_rate"])
         self.assertTrue(any("mem.recall.hit_rate" in p for p in receipt["problems"]))
         self.assertEqual(graded(receipt)[0], "BAD")
+
+    def test_two_leg_pilot_cannot_call_a_clustered_recall_loss(self):
+        # F1: CMH on 2 matched pairs called WORSE on what is effectively 2
+        # observations; the design-effect fallback holds it to within noise.
+        receipt = verdict([leg("b1", post=2.06, hit=0.6667), leg("b2", post=2.10, hit=0.6667)])
+        row = receipt["run"]["memory"]["compare"]["deltas"]["mem.recall.hit_rate"]
+        self.assertEqual(row["judgement"], "within_noise")
+        self.assertEqual(row["test"]["method"], "deff-fisher")
+        self.assertTrue(row["test"]["few_clusters"])
 
     def test_recall_drop_inside_the_baselines_own_spread_is_not_a_loss(self):
         base = [leg("a1", smol=QWEN, digest=QWEN_DIGEST, post=8.38, hit=1.0),
@@ -950,6 +961,46 @@ class MemoryVerdict(unittest.TestCase):
         receipt = verdict([leg("b1", post=8.38), leg("b2", post=8.44)])
         self.assertEqual(receipt["verdict"]["compare"], "NOT_BETTER")
         self.assertIn("not better than route ollama/qwen3.8:27b-mlx: NOT_BETTER", receipt["problems"])
+
+    def test_drift_paired_gain_fires_on_a_baseline_first_chain(self):
+        base = [leg("a1", smol=QWEN, digest=QWEN_DIGEST, pre_main=8.0, created="20261001T150001Z"),
+                leg("a2", smol=QWEN, digest=QWEN_DIGEST, pre_main=8.0, created="20261001T150003Z"),
+                leg("a3", smol=QWEN, digest=QWEN_DIGEST, pre_main=8.0, created="20261001T150005Z")]
+        cand = [leg("b1", pre_main=2.0, created="20261001T150002Z"),
+                leg("b2", pre_main=2.0, created="20261001T150004Z")]
+        receipt = verdict(cand, base)
+        row = receipt["run"]["memory"]["compare"]["deltas"]["mem.recall.pre_main_s"]
+        self.assertEqual(row["test"]["method"], "drift-paired-t")
+        self.assertEqual(row["judgement"], "gain")
+        self.assertIn("recall_latency", receipt["run"]["memory"]["compare"]["wins"])
+        self.assertEqual(receipt["verdict"]["compare"], "BETTER")
+
+    def test_clustered_recall_falls_back_to_cmh(self):
+        cand = [leg(f"b{i}", hit=h) for i, h in enumerate([1.0, 1.0, 0.0, 0.0])]
+        base = [leg(f"a{i}", smol=QWEN, digest=QWEN_DIGEST, hit=1.0) for i in range(4)]
+        receipt = verdict(cand, base)
+        row = receipt["run"]["memory"]["compare"]["deltas"]["mem.recall.hit_rate"]
+        self.assertEqual(row["test"]["method"], "cmh")
+        self.assertEqual(row["judgement"], "loss")
+        self.assertEqual(receipt["verdict"]["compare"], "WORSE")
+
+    def test_band_counts_both_arms_spreads_on_conformance_rates(self):
+        base = [leg("a1", smol=QWEN, digest=QWEN_DIGEST, calls="PASS"),
+                leg("a2", smol=QWEN, digest=QWEN_DIGEST, calls="FAIL")]
+        receipt = verdict(qwen_legs(), base)
+        self.assertEqual(receipt["run"]["memory"]["compare"]["deltas"]["sess.memory_calls_ok"]["judgement"],
+                         "within_noise")
+
+    def test_conformance_loss_beyond_noise_is_worse(self):
+        bad = [leg("b1", no_leak="FAIL"), leg("b2", no_leak="FAIL")]
+        receipt = verdict(bad)
+        self.assertEqual(receipt["run"]["memory"]["compare"]["deltas"]["mem.no_leak"]["judgement"], "loss")
+        self.assertEqual(receipt["verdict"]["compare"], "WORSE")
+
+    def test_delta_equal_to_the_band_is_a_tie_not_a_win(self):
+        receipt = verdict(qwen_legs(), baseline())
+        self.assertEqual(receipt["run"]["memory"]["compare"]["deltas"]["sess.memory_calls_ok"]["judgement"],
+                         "within_noise")
 
     def test_any_must_not_passing_is_a_problem_even_when_faster(self):
         for failed in ("FAIL", "VOID"):

@@ -15,6 +15,7 @@ map sees every launch.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from pathlib import Path
 
@@ -105,11 +106,23 @@ def _status_rank(status: str) -> int:
 
 
 def _br(argv: list[str]) -> tuple[int, str, str]:
-    """Run one br argv list against the repo beads (releasewatch._br discipline)."""
+    """Run br against the main Beads root; reject path drift before every operation."""
+    beads_root = Path(os.environ.get("LOCALBENCH_BEADS_ROOT") or REPO_ROOT).expanduser().resolve()
     try:
-        proc = subprocess.run(["br", *argv], cwd=REPO_ROOT, capture_output=True, text=True,
+        if os.environ.get("LOCALBENCH_BEADS_ROOT"):
+            check = subprocess.run(["br", "where", "--json"], cwd=beads_root,
+                                   capture_output=True, text=True, timeout=BR_TIMEOUT, check=False)
+            if check.returncode:
+                return check.returncode, check.stdout, check.stderr
+            actual = Path(json.loads(check.stdout)["path"]).expanduser().resolve()
+            expected = (beads_root / ".beads").resolve()
+            if actual != expected:
+                return 1, "", f"br resolves Beads to {actual}; expected {expected}"
+        export_root = str(REPO_ROOT.resolve())
+        command = [argument.replace(export_root, str(beads_root)) for argument in argv]
+        proc = subprocess.run(["br", *command], cwd=beads_root, capture_output=True, text=True,
                               timeout=BR_TIMEOUT, check=False)
-    except (OSError, subprocess.TimeoutExpired) as exc:
+    except (OSError, subprocess.TimeoutExpired, ValueError, KeyError, TypeError) as exc:
         return 127, "", str(exc)
     return proc.returncode, proc.stdout, proc.stderr
 

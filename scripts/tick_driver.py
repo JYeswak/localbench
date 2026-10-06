@@ -6,18 +6,22 @@ Anti-ceremony (A12):
 - Gate: AGENTS.md tick law step 5 ("three ticks in a row that move nothing: stop and report") and the measurement law
   (no message may start an agent turn, a redraw WindowServer composites, while a localbench run is alive).
 - Defect class: an idle agent nobody wakes (the loop silently stops at the end of a turn); a wake that lands mid-run
-  (2026-09-23: both dense A/A re-banks voided while agent panes were mid-turn); a driver that pesters a halted pane.
+  (2026-09-23: both dense A/A re-banks voided while agent panes were mid-turn); a driver that pesters a halted pane;
+  an edit-only worker read as stale because only HEAD counted, and a stale exit nobody hears (2026-10-02: three worker
+  panes idled for hours while their queues lived in chat and no driver ran).
 - Delete when: the agent harness can wake an idle session on a timer and applies the same run, idle and stale gates.
 
 Replaces runs/loop-nudger.sh (untracked, untested). Every decision is `decide()`/`sent()`, pure functions tested in
 tests/test_tick_driver.py; `main()` only reads facts, sends, and logs one JSON line per action.
 
-    scripts/tick_driver.py --session localbench --pane %21 --first runs/handoff.md --tick runs/tick-nudge.md
+    scripts/tick_driver.py --session localbench --pane %pane --first runs/handoff.md --tick runs/tick-nudge.md \
+        --notify %pane
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -26,7 +30,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-RUN_PATTERN = "localbench (aa|run|ab|record)"
+RUN_PATTERN = "localbench (aa|run|ab|record|prove|decision|generation)"
 # omp's footer while a turn runs: a braille spinner then the elapsed time ("⠼ 5m >"), or "⎋ Working…".
 SPINNER = re.compile(r"^ *[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] |Working")
 
@@ -44,6 +48,13 @@ def pane_working(capture: str) -> bool:
     """The pane is mid-turn when its footer (last three non-blank lines) shows omp's spinner or "Working"."""
     footer = [ln for ln in capture.splitlines() if ln.strip()][-3:]
     return any(SPINNER.search(ln) for ln in footer)
+
+
+def progress_mark(head: str, status: str, diff: str, beads: bytes) -> str:
+    """What a tick must move: HEAD, the working tree (status and diff) or the bead graph. Edit-only workers and bead
+    claims count as movement; a tick that changed none of them moved nothing."""
+    tree = hashlib.sha256(status.encode() + b"\0" + diff.encode() + b"\0" + beads).hexdigest()[:12]
+    return f"{head}:{tree}"
 
 
 def decide(s: State, *, now: float, run_alive: bool, working: bool, stop: bool, head: str, idle_needed: int = 2,
@@ -80,13 +91,15 @@ def _out(*cmd: str) -> str:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=(__doc__ or "").split("\n\n")[0])
     ap.add_argument("--session", required=True)
-    ap.add_argument("--pane", required=True, help="tmux pane id, e.g. %%21")
+    ap.add_argument("--pane", required=True, help="tmux pane id, e.g. %%pane")
     ap.add_argument("--first", type=Path, required=True, help="message sent once, at the first idle point")
     ap.add_argument("--tick", type=Path, required=True, help="message sent at every later idle point")
     ap.add_argument("--interval", type=float, default=60)
     ap.add_argument("--cooldown", type=float, default=900)
     ap.add_argument("--stop", type=Path, default=ROOT / "runs" / "LOOP-STOP")
     ap.add_argument("--log", type=Path, default=ROOT / "runs" / "tick-driver.jsonl")
+    ap.add_argument("--stale-limit", type=int, default=3, help="sends in a row that move nothing before the driver exits")
+    ap.add_argument("--notify", help="pane told when the driver exits stale (AGENTS.md: stop and report)")
     a = ap.parse_args(argv)
     state = State()
 
@@ -94,22 +107,36 @@ def main(argv: list[str] | None = None) -> int:
         with a.log.open("a") as fh:
             fh.write(json.dumps({"t": round(time.time(), 1), **row}) + "\n")
 
+    def send(pane: str, text: str) -> int:
+        return subprocess.run(["ntm", "send", a.session, f"--panes={pane}", "--no-cass-check",
+                               "--force-non-interactive", text],
+                              capture_output=True, text=True, timeout=60, check=False).returncode
+
     log(action="start", pane=a.pane, first=str(a.first), tick=str(a.tick))
     print("tick driver started", flush=True)
+    beads = ROOT / ".beads" / "issues.jsonl"
     while True:
-        head = _out("git", "-C", str(ROOT), "rev-parse", "--short", "HEAD").strip()
+        head = progress_mark(_out("git", "-C", str(ROOT), "rev-parse", "--short", "HEAD").strip(),
+                             _out("git", "-C", str(ROOT), "status", "--porcelain", "-uall"),
+                             _out("git", "-C", str(ROOT), "diff", "HEAD"),
+                             beads.read_bytes() if beads.is_file() else b"")
         run_alive = subprocess.run(["pgrep", "-f", RUN_PATTERN], capture_output=True, check=False).returncode == 0
         working = pane_working(_out("tmux", "capture-pane", "-p", "-t", a.pane))
         action, state = decide(state, now=time.time(), run_alive=run_alive, working=working,
-                               stop=a.stop.exists(), head=head, cooldown_s=a.cooldown)
+                               stop=a.stop.exists(), head=head, cooldown_s=a.cooldown, stale_limit=a.stale_limit)
         if action in ("stop", "exit-stale"):
             log(action=action, head=head, stale=state.stale)
+            if action == "exit-stale" and a.notify:
+                rc = send(a.notify, f"[tick-driver {a.pane} -> {a.notify}] EXIT-STALE: {a.stale_limit} wakes of "
+                                    f"{a.pane} in a row moved nothing (HEAD, working tree, beads); the driver stopped. "
+                                    "Refill the lane or restart the driver.")
+                log(action="notified", pane=a.notify, rc=rc)
             return 0
         if action.startswith("send"):
             msg = a.first if action == "send-first" else a.tick
-            op = msg.read_text().split()[0]
-            rc = subprocess.run(["ntm", "send", a.session, f"--pane={a.pane}", f"--file={msg}", "--no-cass-check"],
-                                capture_output=True, text=True, timeout=60, check=False).returncode
+            words = msg.read_text().split(maxsplit=1)
+            op = f"{words[0]}-{int(time.time())}"    # unique per send: an old delivery in scrollback is not a receipt
+            rc = send(a.pane, " ".join([op, *words[1:]]))
             time.sleep(10)
             received = op in _out("tmux", "capture-pane", "-p", "-J", "-t", a.pane, "-S", "-600")
             if rc == 0 and received:

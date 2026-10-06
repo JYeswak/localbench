@@ -35,11 +35,14 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
+from fractions import Fraction
 from pathlib import Path
 
-from localbench import backends, sysstats
+from localbench import backends, stats, sysstats
+
+from . import lifecycle
 
 TYPES = ("choice", "noul", "score")
 ROLES = {                       # role -> question types its items may ask (rank = top-1 among 2-26 candidates)
@@ -330,7 +333,7 @@ def post(url: str, body: dict, *, api_key: str | None = None, timeout: float = 1
     req = urllib.request.Request(url, encode(body), headers, method="POST")
     t0 = time.perf_counter()
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
+        with backends.urlopen(req, timeout=timeout) as r:
             raw = r.read()
     except urllib.error.HTTPError as exc:
         detail = _error_text(exc)
@@ -825,6 +828,7 @@ def compare(candidate: dict, baseline: dict, *, seed: int = BOOTSTRAP_SEED,
             lo, hi = _ci(boots[k])
             row["ci95"] = [lo, hi]
             g_lo, g_hi = sorted((sign * lo, sign * hi))
+            row["p_value"] = (sum(sign * value <= 0 for value in boots[k]) + 1) / (len(boots[k]) + 1)
             row["judgement"] = "gain" if g_lo > EPS else "loss" if g_hi < -EPS else "within_noise"
         return row
 
@@ -846,6 +850,13 @@ def compare(candidate: dict, baseline: dict, *, seed: int = BOOTSTRAP_SEED,
         cv, bv = cm[k]["value"], bm[k]["value"]
         deltas[k] = {"class": "reported", "candidate": cv, "baseline": bv, "better": cm[k]["better"],
                      "delta": None if cv is None or bv is None else cv - bv}
+    benefit_p = {label: deltas[key].get("p_value") for key, label in ((LATENCY_P95, "p95_latency"),
+                                                        (ERROR_RATE, "error_rate"))
+                 if label in wins and deltas.get(key, {}).get("p_value") is not None}
+    if benefit_p:
+        from .stats import holm_reject
+        accepted = holm_reject(benefit_p)
+        wins = [label for label in wins if label not in benefit_p or accepted[label]]
     verdict = "WORSE" if losses else ("BETTER" if wins else "NOT_BETTER")
     return {"verdict": verdict, "quality_losses": losses, "wins": wins,
             "noise": "aa_spread" if aa else {"bootstrap": resamples, "seed": seed, "paired_over": "items"},
@@ -876,11 +887,12 @@ def _paired_correct(kind: str, options: list[str], label, answer: dict) -> bool:
 
 
 def _mcnemar_exact(b: int, c: int) -> float:
-    """Exact two-sided McNemar p on discordant pairs: b local-only wins, c hosted-only (doubled lower tail)."""
+    """Exact two-sided McNemar p on discordant pairs: b local-only wins, c hosted-only (doubled lower tail).
+    Exact integer ratio (no float conversion of 2**n, which overflows past ~1023 pairs)."""
     n = b + c
     if n == 0:
         return 1.0
-    return min(1.0, 2.0 * sum(math.comb(n, i) for i in range(min(b, c) + 1)) / 2 ** n)
+    return min(1.0, float(Fraction(2 * sum(math.comb(n, i) for i in range(min(b, c) + 1)), 1 << n)))
 
 
 def _paired_table(pairs: list[tuple[bool, bool]], alpha: float, seed: int, resamples: int) -> dict:
@@ -961,18 +973,19 @@ def paired(receipt: dict, *, alpha: float = 0.05, seed: int = PAIRED_SEED,
         if outcome.get("repeat", 0) == 0 and outcome["id"] not in outs:
             outs[outcome["id"]] = outcome
     by_type: dict[str, list[tuple[bool, bool]]] = {}
+    missing_items: list[str] = []
     for item in suite.items:
         outcome = outs.get(item["id"])
         if outcome is None:
-            raise PairedError(f"item {item['id']}: no local outcome (no silent drops)")
-        if "ok" not in outcome:
+            missing_items.append(item["id"])
+        if outcome is not None and "ok" not in outcome:
             raise PairedError(f"item {item['id']}: local outcome has no ok flag")
         for name, question in item["questions"].items():
             label = item["labels"][name]
             ref = (item.get("reference") or {}).get(name)
             if ref is None:
                 raise PairedError(f"item {item['id']} question {name}: no hosted reference")
-            if not outcome["ok"]:
+            if outcome is None or not outcome["ok"]:
                 local_ok = False
             else:
                 answers = outcome.get("answers")
@@ -990,13 +1003,15 @@ def paired(receipt: dict, *, alpha: float = 0.05, seed: int = PAIRED_SEED,
     return {"suite": {"name": suite.name, "manifest": str(suite.manifest),
                       "items_sha256": suite.items_sha256, "n_items": len(suite.items)},
             "alpha": alpha, "seed": seed,
+            "missing_items": missing_items,
+            "availability_errors": len(missing_items),
             "types": {kind: _paired_table(by_type[kind], alpha, seed, resamples) for kind in sorted(by_type)}}
 
 # ---------------------------------------------------------------- run
 
 def _json_get(url: str, timeout: float = 10.0):
     try:
-        with urllib.request.urlopen(url, timeout=timeout) as r:
+        with backends.urlopen(url, timeout=timeout) as r:
             return json.load(r)
     except (OSError, ValueError, http.client.HTTPException):
         return None
@@ -1505,7 +1520,7 @@ class LayaShim:
         # a+b: the child appends; _tail reads the end back for a ShimError.
         self._log = open(self.log_path, "a+b") if self.log_path else tempfile.TemporaryFile()  # noqa: SIM115
         try:
-            self.proc = subprocess.Popen(argv, env=env, stdin=subprocess.DEVNULL, stdout=self._log,
+            self.proc = lifecycle.spawn(argv, env=env, stdin=subprocess.DEVNULL, stdout=self._log,
                                          stderr=subprocess.STDOUT, start_new_session=True)
             self._wait_ready()
         except BaseException:
@@ -1528,19 +1543,48 @@ class LayaShim:
 
     def _wait_ready(self) -> None:
         name, deadline = self.spec.name, time.monotonic() + self.ready_timeout
+        start, last = time.monotonic(), "no probe attempted"
         while True:
             rc = self.proc.poll()
             if rc is not None:
                 raise ShimError(f"laya shim for {name} exited with status {rc} before it was ready: {self._tail()}")
-            h = _json_get(self.url + "/health", timeout=2.0)
+            try:
+                with backends.urlopen(self.url + "/health", timeout=2.0) as r:
+                    h = json.load(r)
+            except Exception as exc:  # noqa: BLE001 — diagnosis only; the loop still enforces the deadline
+                last, h = f"{type(exc).__name__}: {exc}", None
             if isinstance(h, dict):
                 if h.get("ready") is not True or h.get("model") != name or not _count(h.get("max_len")):
                     raise ShimError(f"{self.url}/health answers {json.dumps(h)[:300]}, not a ready shim for {name}")
                 self.health = h
                 return
             if time.monotonic() >= deadline:
-                raise ShimError(f"laya shim for {name} not ready within {self.ready_timeout:g}s: {self._tail()}")
+                connect = self._connect_state()
+                listener = self._listener_state()
+                raise ShimError(f"laya shim for {name} not ready within {self.ready_timeout:g}s "
+                                f"(up {time.monotonic() - start:.1f}s, last probe: {last}, "
+                                f"connect 127.0.0.1:{self.port}: {connect}, listener: {listener}): {self._tail()}")
             time.sleep(0.2)
+
+    def _connect_state(self) -> str:
+        """One-shot TCP probe distinguishing a refused listener from a blackholed one in timeout reports."""
+        try:
+            with socket.create_connection(("127.0.0.1", self.port), timeout=2.0):
+                return "open"
+        except OSError as exc:
+            return f"{type(exc).__name__}: {exc}"
+
+    def _listener_state(self) -> str:
+        """Bind-probe census for timeout reports: free means the child never bound; held plus a
+        connect timeout means the platform drops loopback SYNs to a live listener."""
+        probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            probe.bind(("127.0.0.1", self.port))
+            return "port free (no listener)"
+        except OSError as exc:
+            return f"port held ({type(exc).__name__}: {exc})"
+        finally:
+            probe.close()
 
     def alive(self) -> bool:
         return self.proc is not None and self.proc.poll() is None
@@ -1742,12 +1786,68 @@ def run_suite(base_url: str, model: str, suite: Suite, *, repeats: int = 1, host
     created = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     before = ollama_pins(base_url, model) if laya is None else laya.pins()
     t0 = time.perf_counter()
+    early_stop: dict | None = None
+    obf_gate: tuple[str, float] | None = None
+    obf_points: dict[int, float] = {}
+    if repeats == 1:
+        # Reject-only O'Brien-Fleming interim looks (kit-v8t): at 25/50/75% of items,
+        # stop a screen whose accuracy already fails beyond the nominal boundary. The
+        # final look is the suite gate itself. Multi-repeat runs always complete.
+        for metric in sorted(suite.gate):
+            parts = metric.split(".")
+            bound = suite.gate[metric]
+            if len(parts) == 3 and parts[0] == "decision" and parts[2] == "accuracy" \
+                    and set(bound) == {"min"}:
+                obf_gate = (parts[1], float(bound["min"]))
+                break
+        if obf_gate is not None and len(suite.items) > 0:
+            total = len(suite.items)
+            obf_points = {n: f for f in sorted(stats.OBF_ALPHA) if (n := math.ceil(f * total)) < total}
+    items_by_id = {it["id"]: it for it in suite.items}
+
+    def _interim_correct() -> tuple[int, int]:
+        """Correct/total gate cells, excluding infrastructure failures."""
+        assert obf_gate is not None
+        kind = obf_gate[0]
+        correct = total = 0
+        for o in arms[0].outcomes:
+            if not o.get("ok") and o.get("error") in {"http", "timeout", "unavailable"}:
+                continue
+            it = items_by_id[o["id"]]
+            ref = {n: _reduced_reference(a) for n, a in (it.get("reference") or {}).items()}
+            for name, meta in it["questions"].items():
+                if meta["type"] != kind:
+                    continue
+                total += 1
+                ans = o["answers"][name] if o.get("ok") else None
+                cell = _cell(name, {**meta, "options": question_options(meta)},
+                             it["labels"][name], ref.get(name), ans)
+                if cell["correct"]:
+                    correct += 1
+        return correct, total
+
     with sampler if sampler is not None else contextlib.nullcontext():
         for r in range(repeats):
             for item in suite.items:
                 for arm in arms:
                     arm.ask(item, r, timeout)
+                if (repeats == 1 and obf_gate is not None
+                        and len(arms[0].outcomes) in obf_points):
+                    look = obf_points[len(arms[0].outcomes)]
+                    correct, total = _interim_correct()
+                    if total > 0 and stats.obf_reject(correct, total, obf_gate[1], look):
+                        early_stop = {"look": look, "asked": len(arms[0].outcomes),
+                                      "items": len(suite.items), "correct": correct,
+                                      "cells": total, "gate": f"decision.{obf_gate[0]}.accuracy",
+                                      "gate_min": obf_gate[1]}
+                if early_stop is not None:
+                    break
+            if early_stop is not None:
+                break
     wall = time.perf_counter() - t0
+    if early_stop is not None:
+        asked = {o["id"] for o in arms[0].outcomes}
+        suite = replace(suite, items=tuple(it for it in suite.items if it["id"] in asked))
     local, *rest = [a.doc(suite, repeats) for a in arms]
     hosted_doc = rest[0] if rest else None
     if laya is None:
@@ -1812,6 +1912,8 @@ def run_suite(base_url: str, model: str, suite: Suite, *, repeats: int = 1, host
         kinds[o["error"]] = kinds.get(o["error"], 0) + 1
     details = {"decision.suite": {k: v for k, v in suite.pin().items() if k != "sources"},
                "decision.context": {k: v for k, v in context.items() if k != "estimate"}}
+    if early_stop is not None:
+        details["decision.early_stop"] = early_stop
     if errors:
         details["decision.errors"] = {"count": len(errors), "by_kind": kinds,
                                       "first": [{"id": o["id"], "repeat": o["repeat"], "error": o["error"],
@@ -1825,7 +1927,13 @@ def run_suite(base_url: str, model: str, suite: Suite, *, repeats: int = 1, host
         metrics |= {f"hosted.{k}": v for k, v in hosted_doc["metrics"].items()}
         comparison, against = compare(local, hosted_doc), {"kind": "hosted", "id": hosted.model}
     elif baseline is not None:
-        comparison, against = compare(local, baseline.receipt), {"kind": baseline.kind, "id": baseline.id}
+        try:
+            comparison, against = compare(local, baseline.receipt), {"kind": baseline.kind, "id": baseline.id}
+        except ValueError as exc:
+            if early_stop is None:
+                raise
+            problems.append(f"early stop at {early_stop['asked']}/{early_stop['items']} items: "
+                            f"baseline comparison skipped ({exc})")
     if comparison is not None:
         details["decision.compare"] = {"verdict": comparison["verdict"], "wins": comparison["wins"],
                                        "quality_losses": comparison["quality_losses"], "baseline": against}

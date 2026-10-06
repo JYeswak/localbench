@@ -76,6 +76,17 @@ class FreshBytecode(Tree):
         self.assertEqual(fails, ["FAIL: test_x"])
 
 
+class CacheKey(Tree):
+    def test_case_key_changes_when_target_or_test_changes(self):
+        first = mut.case_key(CASE, self.root)
+        (self.root / "m.py").write_text("X = 2\n")
+        second = mut.case_key(CASE, self.root)
+        self.assertNotEqual(first, second)
+        (self.root / "m.py").write_text("X = 1\n")
+        (self.root / "test_m.py").write_text((self.root / "test_m.py").read_text() + "\n# dependency change\n")
+        self.assertNotEqual(first, mut.case_key(CASE, self.root))
+
+
 class RunCase(Tree):
     def test_a_plant_the_tests_catch_is_caught_and_restored(self):
         before = self.sha()
@@ -139,6 +150,33 @@ class Main(Tree):
             rc = mut.main([str(path)])
         return rc, [json.loads(ln) for ln in buf.getvalue().splitlines()]
 
+    def test_cached_main_reuses_a_stable_verdict(self):
+        path = self.root / "cases.json"
+        path.write_text(json.dumps([CASE]))
+        cached = self.root / "runs" / ".mutation-cache.json"
+        cached.parent.mkdir()
+        key = mut.case_key(CASE, self.root)
+        cached.write_text(json.dumps({"schema": 1, "entries": {key: {"caught": True, "restored": True,
+                                                                    "good_rc": 0, "bad_rc": 1, "fails": []}}}))
+        buf = io.StringIO()
+        with (mock.patch.object(mut, "ROOT", self.root),
+              mock.patch.object(mut, "LOCK", self.root / ".mutation.lock"),
+              mock.patch.object(mut, "run_case", side_effect=AssertionError("cached case was replanted")),
+              contextlib.redirect_stdout(buf)):
+            rc = mut.main([str(path), "--cached"])
+        row = json.loads(buf.getvalue())
+        self.assertEqual((rc, row["reused"], row["caught"]), (0, True, True))
+
+    def test_lock_parent_is_created_in_a_fresh_worktree(self):
+        path = self.root / "cases.json"
+        path.write_text(json.dumps([CASE]))
+        with (mock.patch.object(mut, "ROOT", self.root),
+              mock.patch.object(mut, "LOCK", self.root / "runs" / ".mutation.lock"),
+              mock.patch.object(mut, "unittest_runner", return_value=self.detects)):
+            rc = mut.main([str(path)])
+        self.assertEqual(rc, 0)
+        self.assertFalse((self.root / "runs" / ".mutation.lock").exists())
+
     def test_exit_0_only_when_every_plant_is_caught(self):
         rc, rows = self.main(self.detects)
         self.assertEqual((rc, rows[0]["caught"]), (0, True))
@@ -197,10 +235,11 @@ class Main(Tree):
         # The refusal must not wait on the lock: inside held() an empty file would sit out another grader's run.
         lock = self.root / ".mutation.lock"
         lock.mkdir()                                               # another grader holds it
-        (lock / "owner").write_text("pid 4242 grok (%21) since Wed Sep 23 20:40:00 2026\n")
+        (lock / "owner").write_text("pid 4242 grok (%pane) since Wed Sep 23 20:40:00 2026\n")
         path = self.root / "cases.json"
         path.write_text("[]")
-        snapshot = lambda: {p.name: p.read_bytes() for p in sorted(lock.iterdir())}
+        def snapshot():
+            return {p.name: p.read_bytes() for p in sorted(lock.iterdir())}
         before = snapshot()
         real = mut.held
         with mock.patch.object(mut, "LOCK", lock), \
@@ -251,6 +290,68 @@ class Lock(unittest.TestCase):
             with self.assertRaises(ValueError), mut.held(lock):
                 raise ValueError
             self.assertFalse(lock.exists())
+
+
+class JournalRecovery(unittest.TestCase):
+    def test_dead_owner_journal_restores_the_exact_plant(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "runs").mkdir()
+            target = root / "m.py"
+            original, planted = b"X = 1\n", b"X = 2\n"
+            target.write_bytes(planted)
+            case = {"file": "m.py", "label": "journal", "old": "X = 1", "new": "X = 2", "tests": []}
+            with mock.patch.object(mut, "JOURNAL", root / "runs" / ".mutation-journal.json"):
+                mut.write_journal(root, case, original, planted)
+                self.assertTrue(mut.recover_journal(root))
+                self.assertEqual(target.read_bytes(), original)
+                self.assertFalse(mut.JOURNAL.exists())
+
+    def test_kill9_after_journal_is_recoverable(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); (root / "runs").mkdir(); target = root / "m.py"
+            target.write_bytes(b"A\n")
+            journal = root / "runs" / ".mutation-journal.json"
+            code = ("import os,sys; sys.path.insert(0, %r); import scripts.mutate as m; "
+                    "from pathlib import Path; root=Path(%r); target=root/'m.py'; "
+                    "case={'file':'m.py','label':'kill9','old':'A','new':'B','tests':[]}; "
+                    "m.JOURNAL=Path(%r); m.write_journal(root,case,b'A\\n',b'B\\n'); target.write_bytes(b'B\\n'); os.kill(os.getpid(),9)"
+                    % (str(Path(__file__).resolve().parents[1]), str(root), str(journal)))
+            subprocess.run([sys.executable, '-c', code], check=False)
+            with mock.patch.object(mut, 'JOURNAL', journal):
+                self.assertTrue(mut.recover_journal(root))
+            self.assertEqual(target.read_bytes(), b"A\n")
+
+    def test_run_case_writes_journal_before_plant(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); (root / "runs").mkdir(); target = root / "m.py"; target.write_text("A = 1\n")
+            case = {"file": "m.py", "label": "journal-before-plant", "old": "A = 1", "new": "A = 2", "tests": []}
+            calls = []
+            def runner(_tests):
+                calls.append(True)
+                if len(calls) == 2:
+                    self.assertTrue(mut.JOURNAL.exists())
+                return (0, []) if len(calls) == 1 else (1, ["FAIL: planted"])
+            with mock.patch.object(mut, "JOURNAL", root / "runs" / ".mutation-journal.json"):
+                result = mut.run_case(case, root, runner)
+            self.assertTrue(result["caught"])
+            self.assertTrue(result["restored"])
+
+    def test_held_reclaims_dead_owner_after_journal_restore(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runs = root / "runs"; runs.mkdir()
+            lock = runs / ".mutation.lock"; lock.mkdir()
+            (lock / "owner").write_text("pid 99999999 since old\n")
+            target = root / "m.py"; original, planted = b"A\n", b"B\n"; target.write_bytes(planted)
+            case = {"file": "m.py", "label": "journal", "old": "A", "new": "B", "tests": []}
+            with mock.patch.object(mut, "JOURNAL", runs / ".mutation-journal.json"):
+                mut.write_journal(root, case, original, planted)
+                with mut.held(lock, wait_s=0, poll_s=0):
+                    self.assertEqual(target.read_bytes(), original)
+                    self.assertTrue(lock.exists())
+                self.assertFalse(lock.exists())
+
 
 
 if __name__ == "__main__":

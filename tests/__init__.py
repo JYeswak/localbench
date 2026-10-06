@@ -38,8 +38,16 @@ smol.STATE_DIR = Path(tempfile.mkdtemp(prefix="smol-"))
 # Same for the LaunchAgent: a test that removed or rewrote it would unload the live server.
 smol.LAUNCH_AGENTS = Path(tempfile.mkdtemp(prefix="launchagents-"))
 
-from localbench import audit
+from localbench import audit, heavyslot
 
 # The mutation ledger (localbench audit / why): a test that parks, keeps or reverts through the CLI appends a row; it
 # must land in a scratch file, never in the user's ~/.localbench/audit.jsonl.
 audit.AUDIT_PATH = Path(tempfile.mkdtemp(prefix="audit-")) / "audit.jsonl"
+
+# The heavy-job slot (AGENTS.md Pacing): decorated commands take it on every run. Tests use a scratch lock and
+# calm sensors so they never touch ~/.localbench/heavy.lock or refuse on the live machine.
+heavyslot.HOME = Path(tempfile.mkdtemp(prefix="heavy-slot-"))
+heavyslot.LOAD_FN = lambda: (1.0, 1.0, 1.0)  # noqa: E731 - suite-wide diagnostic load stub
+heavyslot.CPU_FN = lambda: 1.0  # noqa: E731 - suite-wide calm-CPU stub
+heavyslot.MEMORY_FN = lambda: {"pressure_level": "normal"}  # noqa: E731 - suite-wide calm-memory stub
+heavyslot.GPU_FN = lambda: {"device_pct": 1, "process_pct": 0.5, "coverage": None, "unattributed_pct": 0.0, "status": "IDLE"}  # noqa: E731 - suite-wide calm-GPU stub

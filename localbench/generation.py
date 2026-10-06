@@ -22,6 +22,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from . import corpus, sysstats
+from .heavyslot import held as _held
 
 GENERATION_DIR = "generation"
 MIN_ITEMS = 100
@@ -117,11 +118,7 @@ def _write_private(path: Path, text: str) -> None:
 
 def assemble(feature: str, records: list[dict], directory: Path | str, *, seed: int,
              version: int = 1) -> dict:
-    """Write a generation corpus: items.jsonl (one {id, feature, body, source, profile}
-    per record; profile routes the replay through the gateway) plus manifest.json
-    pinning the items sha256, the gate (MIN_ITEMS real requests), every source capture
-    path, and the manifest seed (int, master sampling seed for order/swap subseeds)
-    and format version."""
+    """Build a write-once generation corpus with a manifest pinning its contents."""
     if feature not in {name for name, _ in FEATURE_SIGNATURES}:
         raise corpus.CorpusError(f"generation feature {feature!r} has no request signature")
     if not isinstance(seed, int) or isinstance(seed, bool):
@@ -129,7 +126,14 @@ def assemble(feature: str, records: list[dict], directory: Path | str, *, seed: 
     if not isinstance(version, int) or isinstance(version, bool) or version < 1:
         raise corpus.CorpusError(f"corpus version {version!r} must be an int starting at 1")
     d = Path(directory).expanduser()
-    corpus.secure_dir(d)
+    corpus.refuse_repo_path(d)
+    corpus.secure_dir(d.parent)
+    try:
+        d.mkdir(mode=0o700)
+    except FileExistsError:
+        raise corpus.CorpusError(
+            f"generation corpus directory {d} already exists; choose a new corpus id") from None
+    corpus.refuse_repo_path(d.resolve())
     items, skipped = [], 0
     for record in records:
         body = record["body"]
@@ -151,10 +155,75 @@ def assemble(feature: str, records: list[dict], directory: Path | str, *, seed: 
                 "sources": sorted({it["source"] for it in items}),
                 "gate": {"min_items": MIN_ITEMS}, "n_items": len(items),
                 "seed": seed, "version": version}
-    _write_private(d / "manifest.json", json.dumps(manifest, indent=1) + "\n")
+    manifest_path = d / "manifest.json"
+    _write_private(manifest_path, json.dumps(manifest, indent=1) + "\n")
+    items_path.chmod(0o400)
+    manifest_path.chmod(0o400)
+    d.chmod(0o500)
     return {"feature": feature, "directory": str(d), "items": len(items),
             "items_sha256": manifest["items_sha256"], "gate": manifest["gate"],
             "seed": seed, "version": version, "skipped_unanswerable": skipped}
+
+
+def corpus_progress(capture_root: Path | str | None = None,
+                    generation_root: Path | str | None = None) -> list[dict]:
+    """Weekly drip readout per generation feature: built corpus items vs the MIN_ITEMS
+    gate, captured pool size, oldest/newest capture dates. Newest corpus wins per
+    feature (later builds superset earlier ones). Dates are capture times (meta t,
+    else the source file mtime), UTC YYYY-MM-DD; None when the pool is empty."""
+    grouped = collect(capture_root)
+    gen = Path(generation_root).expanduser() if generation_root is not None \
+        else corpus.CORPORA / "generation"
+    built: dict[str, int] = {}
+    if gen.is_dir():
+        for manifest_path in sorted(gen.glob("*/manifest.json")):
+            try:
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except (ValueError, OSError, UnicodeDecodeError):
+                continue
+            if manifest.get("kind") != "generation" or not manifest.get("feature"):
+                continue
+            n = manifest.get("n_items")
+            if not isinstance(n, int):
+                try:
+                    n = sum(1 for line in (manifest_path.parent / "items.jsonl").read_text(
+                        encoding="utf-8").splitlines() if line.strip())
+                except OSError:
+                    continue
+            built[manifest["feature"]] = n
+    rows = []
+    for feature, _ in FEATURE_SIGNATURES:
+        stamps = []
+        for record in grouped.get(feature, []):
+            meta = record.get("meta") or {}
+            stamp = meta.get("t") if isinstance(meta.get("t"), (int, float)) else None
+            if stamp is None:
+                try:
+                    stamp = Path(record["source"]).stat().st_mtime
+                except OSError:
+                    continue
+            stamps.append(stamp)
+        dates = sorted(time.gmtime(s)[:3] for s in stamps)
+        def fmt(d):
+            return f"{d[0]:04d}-{d[1]:02d}-{d[2]:02d}"
+        rows.append({"feature": feature, "corpus": built.get(feature, 0),
+                     "gate": MIN_ITEMS, "ready": built.get(feature, 0) >= MIN_ITEMS,
+                     "captured": len(stamps),
+                     "oldest": fmt(dates[0]) if dates else None,
+                     "newest": fmt(dates[-1]) if dates else None})
+    return rows
+
+
+def corpus_progress_lines(rows: list[dict] | None = None, **kwargs) -> list[str]:
+    """Text form of corpus_progress, one line per generation feature, for the
+    features command: built items vs the gate, captured pool, capture date span."""
+    out = []
+    for row in rows if rows is not None else corpus_progress(**kwargs):
+        span = (f", {row['oldest']}..{row['newest']}" if row["oldest"] else "")
+        out.append(f"corpus {row['feature']}: {row['corpus']}/{row['gate']} "
+                   f"(captured {row['captured']}{span})"
+                   f"{' READY' if row['ready'] else ''}")
+    return out
 
 
 # --- builtin arms: what omp produces with no model role set (deterministic, no model).
@@ -383,7 +452,7 @@ FEATURE_CHECKS: dict[str, Callable[[str, dict], list[str]]] = {
 }
 
 # --- judge hook: order assignment and win bounds. The model call itself belongs to the
-# runner (%48 prove.py); this module fixes the randomization contract both arms share.
+# runner (%pane prove.py); this module fixes the randomization contract both arms share.
 
 PAIRWISE_JUDGE_MODEL = "gemma3:27b"
 PAIRWISE_JUDGE_DIGEST = "a418f5838eaf"  # localbench pull; the runner refuses any other digest
@@ -436,6 +505,124 @@ def win_lower_bound(wins: int, ties: int, n: int) -> float:
         return 0.0
     point = (wins + 0.5 * ties) / n
     return point - 1.96 * math.sqrt(point * (1.0 - point) / n)
+
+
+def _median(values: list[int]) -> float:
+    ordered = sorted(values)
+    middle = len(ordered) // 2
+    return float(ordered[middle]) if len(ordered) % 2 else (ordered[middle - 1] + ordered[middle]) / 2
+
+
+def pairwise_calibration(pairs: list[dict]) -> dict:
+    """Summarize blind pairwise labels without treating raw preference as calibrated.
+
+    Length adjustment is the candidate win-score intercept from an OLS model with
+    log(candidate token count / baseline token count) as its sole covariate; this is
+    the predicted preference at equal verbosity. Scores are candidate win=1, tie=.5,
+    baseline win=0. An out-of-range intercept is refused, never clipped into a rate.
+    `swap_winner` is already normalized back to candidate/baseline semantics.
+    """
+    if not isinstance(pairs, list) or not pairs:
+        raise ValueError("judge calibration needs at least one pair")
+    ids: set[str] = set()
+    scores, gaps, candidate_lengths, baseline_lengths = [], [], [], []
+    swaps = []
+    for pair in pairs:
+        if not isinstance(pair, dict):
+            raise ValueError(f"judge pair is not an object: {pair!r}")
+        item_id = pair.get("item_id")
+        if not isinstance(item_id, str) or not item_id or item_id in ids:
+            raise ValueError(f"judge pair item_id is missing or duplicated: {item_id!r}")
+        ids.add(item_id)
+        for arm in ("candidate", "baseline"):
+            if not isinstance(pair.get(f"{arm}_text"), str):
+                raise ValueError(f"judge pair {item_id}: missing {arm}_text")
+        winner = pair.get("winner")
+        if winner not in ("candidate", "baseline", "tie"):
+            raise ValueError(f"judge pair {item_id}: invalid winner {winner!r}")
+        candidate_n = len(pair["candidate_text"].split())
+        baseline_n = len(pair["baseline_text"].split())
+        candidate_lengths.append(candidate_n)
+        baseline_lengths.append(baseline_n)
+        scores.append(1.0 if winner == "candidate" else 0.5 if winner == "tie" else 0.0)
+        gaps.append(math.log((candidate_n + 0.5) / (baseline_n + 0.5)))
+        swap_winner = pair.get("swap_winner")
+        if swap_winner is not None:
+            if swap_winner not in ("candidate", "baseline", "tie"):
+                raise ValueError(f"judge pair {item_id}: invalid swap winner {swap_winner!r}")
+            swaps.append(winner == swap_winner)
+    if not swaps:
+        raise ValueError("judge calibration needs at least one swap outcome")
+
+    mean_score = math.fsum(scores) / len(scores)
+    mean_gap = math.fsum(gaps) / len(gaps)
+    variance = math.fsum((gap - mean_gap) ** 2 for gap in gaps)
+    slope = (math.fsum((gap - mean_gap) * (score - mean_score)
+                       for gap, score in zip(gaps, scores)) / variance if variance else 0.0)
+    adjusted = mean_score - slope * mean_gap
+    if not 0.0 <= adjusted <= 1.0:
+        raise ValueError(f"length-adjusted win rate is out of [0, 1]: {adjusted!r}")
+    return {
+        "n": len(scores),
+        "raw_win_rate": mean_score,
+        "length_adjusted_win_rate": adjusted,
+        "length_adjustment": {
+            "method": "OLS candidate win score ~ log((candidate_tokens+0.5)/(baseline_tokens+0.5)); "
+                      "intercept at equal verbosity",
+            "log_length_ratio_slope": slope,
+        },
+        "verbosity": {
+            "candidate": {"mean_tokens": math.fsum(candidate_lengths) / len(candidate_lengths),
+                          "median_tokens": _median(candidate_lengths), "total_tokens": sum(candidate_lengths)},
+            "baseline": {"mean_tokens": math.fsum(baseline_lengths) / len(baseline_lengths),
+                         "median_tokens": _median(baseline_lengths), "total_tokens": sum(baseline_lengths)},
+        },
+        "swap_consistency": {"n": len(swaps), "consistent": sum(swaps),
+                             "rate": sum(swaps) / len(swaps)},
+    }
+
+
+def require_pairwise_calibration(receipt: dict) -> None:
+    """Refuse receipts with a raw judge win rate but missing calibration evidence."""
+    if not isinstance(receipt, dict):
+        raise ValueError("judge calibration receipt must be an object")
+    calibration = receipt.get("judge_calibration")
+    has_raw = "raw_win_rate" in receipt or "win_rate" in receipt
+    if calibration is None:
+        if has_raw:
+            raise ValueError("raw judge win rate is refused without judge calibration")
+        return
+    if not isinstance(calibration, dict):
+        raise ValueError("judge calibration must be an object")
+    rate_names = ("raw_win_rate", "length_adjusted_win_rate")
+    if any(not isinstance(calibration.get(name), (int, float))
+           or isinstance(calibration.get(name), bool)
+           or not math.isfinite(calibration[name]) or not 0.0 <= calibration[name] <= 1.0
+           for name in rate_names):
+        raise ValueError("judge calibration needs finite rates in [0, 1]")
+    n = calibration.get("n")
+    verbosity = calibration.get("verbosity")
+    if not isinstance(n, int) or isinstance(n, bool) or n < 1 or not isinstance(verbosity, dict):
+        raise ValueError("judge calibration needs a positive n and per-arm verbosity")
+    for arm in ("candidate", "baseline"):
+        values = verbosity.get(arm)
+        if not isinstance(values, dict):
+            raise ValueError(f"judge calibration needs {arm} verbosity")
+        for field in ("mean_tokens", "median_tokens", "total_tokens"):
+            value = values.get(field)
+            if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                    or not math.isfinite(value) or value < 0):
+                raise ValueError(f"judge calibration needs valid {arm} {field}")
+    swap = calibration.get("swap_consistency")
+    if not isinstance(swap, dict):
+        raise ValueError("judge calibration needs swap consistency")
+    swap_n, consistent, swap_rate = swap.get("n"), swap.get("consistent"), swap.get("rate")
+    if (not isinstance(swap_n, int) or isinstance(swap_n, bool) or swap_n < 1
+            or not isinstance(consistent, int) or isinstance(consistent, bool)
+            or not 0 <= consistent <= swap_n
+            or not isinstance(swap_rate, (int, float)) or isinstance(swap_rate, bool)
+            or not math.isfinite(swap_rate) or swap_rate != consistent / swap_n):
+        raise ValueError("judge calibration needs a measured swap-consistency rate")
 
 
 # --- replay: local model arms re-send captured messages through the loopback route.
@@ -499,3 +686,113 @@ def post_loopback(url: str, body: dict, timeout: float = 120.0) -> dict:
                     "latency_s": latency}
     except (HTTPError, URLError, OSError, TimeoutError) as exc:
         return {"error": f"{type(exc).__name__}: {exc}", "latency_s": latency}
+
+# --- runner entry point: what prove.py calls per candidate (mirrors run_decision_candidate).
+# A screen replays hundreds of items through a local model: one heavy job at a time.
+
+
+@_held("generation-replay")
+def run_candidate(spec: dict, candidate: dict, items: list[dict], *,
+                  post=post_loopback, timeout: float = 120.0) -> dict:
+    """Run one generation candidate over corpus items and return evidence (no banking).
+    A {"route": "ollama:<model>"} candidate replays each body with that model through its
+    gateway profile route; a {"builtin": ...} candidate reproduces omp's no-model fallback
+    with no model call (titles: unnamed without session context; commit: typed error).
+    Per-item outcomes carry text (judge_view span extraction is the runner's job),
+    violations from FEATURE_CHECKS, and latencies."""
+    feature = spec.get("feature")
+    if feature not in {name for name, _ in FEATURE_SIGNATURES}:
+        raise corpus.CorpusError(f"generation spec feature {feature!r} has no request signature")
+    check = FEATURE_CHECKS[feature]
+    server = None
+    pins = None
+    if isinstance(candidate, dict) and "route" in candidate:
+        route = candidate["route"]
+        if not isinstance(route, str):
+            raise corpus.CorpusError(f"generation candidate route {route!r}: expected string")
+        if route.startswith("ollama:") and route[len("ollama:"):]:
+            model = route[len("ollama:"):]
+            builtin = None
+        elif route.startswith("mlx-serve:") and route[len("mlx-serve:"):]:
+            from .backends import MlxServe
+            server = MlxServe(route[len("mlx-serve:"):])
+            model, builtin = None, None
+        else:
+            raise corpus.CorpusError(
+                f"generation candidate route {route!r}: ollama:<model> or mlx-serve:<model dir> only")
+    elif isinstance(candidate, dict) and "builtin" in candidate:
+        model, builtin = None, candidate["builtin"]
+    else:
+        raise corpus.CorpusError(f"generation candidate needs route or builtin: {candidate!r}")
+    outcomes = []
+    try:
+        if server is not None:
+            server.start()
+            model = server.model_id()
+            pins = server.fingerprint(model)
+        for item in items:
+            body = item["body"]
+            context = _check_context(feature, body)
+            if builtin is not None:
+                outcomes.append({**_builtin_outcome(feature, body, item["id"]), "context": context})
+                continue
+            profile = item.get("profile")
+            if server is None and (not isinstance(profile, str) or not profile):
+                outcomes.append({"id": item["id"], "text": None, "context": context,
+                                 "violations": ["item carries no replay profile"],
+                                 "latency_s": 0.0, "error": "no-profile"})
+                continue
+            try:
+                if server is None:
+                    url = gateway_url(profile, body)
+                else:
+                    url = server.base_url + "/chat/completions"
+                reply = post(url, replay_body(body, model), timeout=timeout)
+            except Exception as exc:  # noqa: BLE001 - record, never stop the screen
+                reply = {"error": f"{type(exc).__name__}: {exc}", "latency_s": -1.0}
+            text = response_text(reply.get("body")) if "error" not in reply else None
+            outcomes.append({
+                "id": item["id"], "text": text, "context": context,
+                "violations": (check(text, context) if text is not None
+                               else [f"no extractable text ({reply.get('error', 'empty')[:100]})"]),
+                "latency_s": reply.get("latency_s", -1.0),
+                **({"error": reply["error"]} if "error" in reply else {})})
+    finally:
+        if server is not None:
+            server.stop()
+    return {"candidate": candidate, "model": model, "builtin": builtin,
+            "pins": pins, "outcomes": outcomes, "n": len(outcomes)}
+
+
+def _check_context(feature: str, body: dict) -> dict:
+    """The context FEATURE_CHECKS needs beyond the answer text: the source description
+    for skill retention; an empty diff list for commits (scope without a recorded diff
+    fails closed)."""
+    if feature == "skill-description-compression":
+        return {"description": _skill_description(body) or ""}
+    if feature == "commit-messages":
+        return {"diff_files": []}
+    return {}
+
+
+def _builtin_outcome(feature: str, body: dict, item_id: str) -> dict:
+    """One builtin outcome without a model call: preview text, label, or typed error."""
+    if feature == "skill-description-compression":
+        description = _skill_description(body)
+        if description is None:
+            return {"id": item_id, "text": None,
+                    "violations": ["no description in prompt"], "latency_s": 0.0,
+                    "error": "no-description"}
+        text = builtin_skill_description(description)
+        return {"id": item_id, "text": text,
+                "violations": check_skill_compression(text, description), "latency_s": 0.0}
+    if feature == "titles":
+        return {"id": item_id, "text": None,
+                "violations": ["no title produced (session unnamed)"], "latency_s": 0.0,
+                "error": "unnamed"}
+    try:
+        builtin_commit()
+    except BuiltinUnavailable as exc:
+        return {"id": item_id, "text": None, "violations": [f"builtin unavailable ({exc})"],
+                "latency_s": 0.0, "error": "builtin-unavailable"}
+    raise AssertionError("unreachable")

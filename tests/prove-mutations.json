@@ -2,7 +2,7 @@
   {
     "label": "a dirty spec refuses before planning anything",
     "file": "localbench/prove.py",
-    "old": "    if out:\n        raise ProveError(f\"{target}: spec modified since its commit; commit it for %20's review first\")",
+    "old": "    if out:\n        raise ProveError(f\"{target}: spec modified since its commit; commit it for %pane's review first\")",
     "new": "    pass",
     "tests": [
       "tests.test_prove.Prove.test_prove_spec_refuses_blocked_and_dirty"
@@ -96,6 +96,339 @@
     "new": "    family = model.split(\":\")[0] if isinstance(doc, dict) else None",
     "tests": [
       "tests.test_prove.Prove.test_judge_family_from_runtime_show"
+    ]
+  },
+  {
+    "label": "bead actions match exact titles, never lookalikes",
+    "file": "localbench/prove.py",
+    "old": "    by_title = {issue.get(\"title\", \"\"): issue for issue in issues}",
+    "new": "    by_title = {issue.get(\"title\", \"\").split(\" on \")[0]: issue for issue in issues}",
+    "tests": [
+      "tests.test_prove.Prove.test_update_beads_and_due_match_exact_titles"
+    ]
+  },
+  {
+    "label": "due needs an exact route title, not a substring",
+    "file": "localbench/prove.py",
+    "old": "        wanted = {f\"prove {spec['feature']} on {r}\" for r in routes}",
+    "new": "        wanted = {f\"prove {spec['feature']} on\"}",
+    "tests": [
+      "tests.test_prove.Prove.test_update_beads_and_due_match_exact_titles"
+    ]
+  },
+  {
+    "label": "wins_needed is an int >= 1",
+    "file": "localbench/prove.py",
+    "old": "        if isinstance(need, bool) or not isinstance(need, int) or need < 1:",
+    "new": "        if need < 1:",
+    "tests": [
+      "tests.test_prove.Prove.test_wins_needed_must_be_a_satisfiable_int"
+    ]
+  },
+  {
+    "label": "the declared wins can satisfy wins_needed",
+    "file": "localbench/prove.py",
+    "old": "        if not isinstance(wins, list) or need > len(wins):",
+    "new": "        if False:",
+    "tests": [
+      "tests.test_prove.Prove.test_wins_needed_must_be_a_satisfiable_int"
+    ]
+  },
+  {
+    "label": "assertions without an evaluator refuse at load",
+    "file": "localbench/prove.py",
+    "old": "        why = _unknown_assertion(doc[\"kind\"], doc[\"feature\"], assertion)\n        if why is not None:\n            raise _fail(target, f\"assertion {assertion['id']!r} has no evaluator: {why}\")",
+    "new": "        pass",
+    "tests": [
+      "tests.test_prove.Prove.test_unknown_assertion_is_a_load_error"
+    ]
+  },
+  {
+    "label": "memory verdicts evaluate their assertions",
+    "file": "localbench/prove.py",
+    "old": "            problems, passed = evaluate_memory_entry(spec, verdict, by_arm)",
+    "new": "            problems, passed = [], []",
+    "tests": [
+      "tests.test_prove.Prove.test_prove_spec_memory_evaluates_assertions"
+    ]
+  },
+  {
+    "label": "generation checks run the named check",
+    "file": "localbench/prove.py",
+    "old": "    fn = generation.FEATURE_CHECKS[check]",
+    "new": "    fn = lambda text, context: []",
+    "tests": [
+      "tests.test_prove.Prove.test_generation_check_assertions_evaluate_outputs"
+    ]
+  },
+  {
+    "label": "beats-builtin needs a strictly lower rate",
+    "file": "localbench/prove.py",
+    "old": "            elif cand_rate < base_rate:",
+    "new": "            elif cand_rate <= base_rate:",
+    "tests": [
+      "tests.test_prove.Prove.test_generation_check_assertions_evaluate_outputs"
+    ]
+  },
+  {
+    "label": "sized-design enforces every size",
+    "file": "localbench/prove.py",
+    "old": "        if have < want:",
+    "new": "        if False:",
+    "tests": [
+      "tests.test_prove.Prove.test_sized_design_counts_legs_and_facts"
+    ]
+  },
+  {
+    "label": "bead filing uses the report route",
+    "file": "localbench/prove.py",
+    "old": "    report[\"beads\"] = update_beads(spec, [{\"route\": c.get(\"route\") or _candidate_slug(c.get(\"candidate\", c)),",
+    "new": "    report[\"beads\"] = update_beads(spec, [{\"route\": _candidate_slug(c.get(\"candidate\", c)),",
+    "tests": [
+      "tests.test_prove.Prove.test_prove_spec_memory_evaluates_assertions"
+    ]
+  },
+  {
+    "label": "replay violations pass through to the evaluator",
+    "file": "localbench/prove.py",
+    "old": "        if isinstance(output.get(\"violations\"), list):\n            rows.append({\"item_id\": item_id, \"violations\": list(output[\"violations\"]),\n                         \"answerable\": answerable})\n            continue",
+    "new": "        if isinstance(output.get(\"violations\"), list):\n            rows.append({\"item_id\": item_id, \"violations\": [], \"answerable\": answerable})\n            continue",
+    "tests": [
+      "tests.test_prove.Prove.test_replay_outputs_route_arm_posts_through_loopback"
+    ]
+  },
+  {
+    "label": "blocked spec bypasses plan",
+    "file": "localbench/prove.py",
+    "old": "    if spec.get(\"blocked\"):\n        raise ProveError(f\"spec is blocked: {spec['blocked'].get('reason', spec['blocked'])}\")\n    if spec.get(\"kind\") == \"memory\" and not omp_frozen:",
+    "new": "    if False:\n        raise ProveError(f\"spec is blocked: {spec['blocked'].get('reason', spec['blocked'])}\")\n    if spec.get(\"kind\") == \"memory\" and not omp_frozen:",
+    "tests": [
+      "tests.test_prove.Prove.test_plan_refuses_blocked_and_unfrozen_memory_before_steps"
+    ]
+  },
+  {
+    "label": "builtin candidate rejected by resolver",
+    "file": "localbench/prove.py",
+    "old": "    if \"builtin\" in candidate:\n        builtin = candidate[\"builtin\"]",
+    "new": "    if False:",
+    "tests": [
+      "tests.test_prove.Prove.test_resolve_candidate"
+    ]
+  },
+  {
+    "label": "unfrozen memory plan allowed",
+    "file": "localbench/prove.py",
+    "old": "    if spec.get(\"kind\") == \"memory\" and not omp_frozen:\n        raise ProveError(\"memory proof planning requires --omp-frozen\")",
+    "new": "    if False:\n        pass",
+    "tests": [
+      "tests.test_prove.Prove.test_plan_refuses_blocked_and_unfrozen_memory_before_steps"
+    ]
+  },
+  {
+    "label": "unsupported proof backend reaches runner",
+    "file": "localbench/prove.py",
+    "old": "        if resolved[\"backend\"] not in capabilities.get(spec[\"kind\"], set()):",
+    "new": "        if False:",
+    "tests": [
+      "tests.test_prove.Prove.test_plan_refuses_unsupported_generation_backend_with_typed_reason"
+    ]
+  },
+  {
+    "label": "mlx-serve generation plans require mlx-serve capability",
+    "file": "localbench/prove.py",
+    "old": "\"generation\": {\"ollama\", \"builtin\", \"mlx-serve\"},",
+    "new": "\"generation\": {\"ollama\", \"builtin\"},",
+    "tests": [
+      "tests.test_prove.Prove.test_plan_accepts_mlx_serve_generation_backend"
+    ]
+  },
+  {
+    "label": "due specs use successive-halving cost order",
+    "file": "localbench/prove.py",
+    "old": "return sorted(due, key=_due_order_key)",
+    "new": "return due",
+    "tests": [
+      "tests.test_prove.Prove.test_due_specs_orders_cheaper_rounds_first"
+    ]
+  },
+  {
+    "label": "analysis pin mismatch is refused",
+    "file": "localbench/prove.py",
+    "old": "if pinned != actual:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_prove.AnalysisPin.test_changed_analysis_hash_is_refused"
+    ]
+  },
+  {
+    "label": "proof specs require analysis pins",
+    "file": "localbench/prove.py",
+    "old": "if doc.get(\"stage\") == \"proof\":",
+    "new": "if False:",
+    "tests": [
+      "tests.test_prove.AnalysisPin.test_proof_without_analysis_hash_is_refused"
+    ]
+  },
+  {
+    "label": "generation receipts pin the route model digest",
+    "file": "localbench/prove.py",
+    "old": "        \"model_digest\": runtime_pins.get(\"model_digest\") or model_digest,",
+    "new": "        \"model_digest\": None,",
+    "tests": [
+      "tests.test_prove.Prove.test_generation_default_grade_requires_complete_proof_contract"
+    ]
+  },
+  {
+    "label": "generation proof baseline names the incumbent route",
+    "file": "localbench/prove.py",
+    "old": "        return {\"kind\": \"route\" if inc[\"local\"] else \"hosted\", \"id\": inc[\"selector\"]}",
+    "new": "        return {\"kind\": \"route\", \"id\": \"ollama/qwen3.1:wrong\"}",
+    "tests": [
+      "tests.test_prove.Prove.test_generation_default_grade_requires_complete_proof_contract"
+    ]
+  },
+  {
+    "label": "proof-stage generation requires calibrated judge pairs",
+    "file": "localbench/prove.py",
+    "old": "                if key not in calibrations:\n                    problems.append(\"proof generation requires calibrated judge pairs\")",
+    "new": "                if False:\n                    problems.append(\"proof generation requires calibrated judge pairs\")",
+    "tests": [
+      "tests.test_prove.Prove.test_generation_default_grade_requires_complete_proof_contract"
+    ]
+  },
+  {
+    "label": "proof-stage generation requires a sealed gold set",
+    "file": "localbench/prove.py",
+    "old": "                if gold_set is None:\n                    problems.append(\"proof generation requires a sealed gold set\")",
+    "new": "                if False:\n                    problems.append(\"proof generation requires a sealed gold set\")",
+    "tests": [
+      "tests.test_prove.Prove.test_generation_default_grade_requires_complete_proof_contract"
+    ]
+  },
+  {
+    "label": "generation comparison requires accepted checks and no problems",
+    "file": "localbench/prove.py",
+    "old": "            compare = \"BETTER\" if passed and not problems else \"NOT_BETTER\"",
+    "new": "            compare = \"BETTER\" if passed else \"NOT_BETTER\"",
+    "tests": [
+      "tests.test_prove.Prove.test_generation_default_grade_requires_complete_proof_contract"
+    ]
+  },
+  {
+    "label": "generation receipts keep run provenance",
+    "file": "localbench/prove.py",
+    "old": "                \"provenance\": _generation_provenance(\n                    resolved, key, backend_pins, created=created, host=host,\n                    rev=rev, module_sha=module_sha, model_digest=pinned_digest,\n                ),",
+    "new": "                **{},",
+    "tests": [
+      "tests.test_prove.Prove.test_generation_default_grade_requires_complete_proof_contract"
+    ]
+  },
+  {
+    "label": "every Ollama candidate is admitted before the first run",
+    "file": "localbench/prove.py",
+    "old": "admission = _proof_ollama_preflight(spec, suite, DECISION_BASE)",
+    "new": "admission = None",
+    "tests": [
+      "tests.test_prove.Prove.test_prove_spec_preflights_unadmittable_later_candidate"
+    ]
+  },
+  {
+    "label": "a refused guarded unload never unloads the resident",
+    "file": "localbench/prove.py",
+    "old": "if safe is not True:",
+    "new": "if False:",
+    "tests": [
+      "tests.test_prove.Prove.test_prove_refuses_unload_when_gateway_guard_blocks"
+    ]
+  },
+  {
+    "label": "screen infrastructure errors at the allowed cap do not void",
+    "file": "localbench/prove.py",
+    "old": "row.get(\"infra_error_rate\", 0.0) > allow_errors",
+    "new": "row.get(\"infra_error_rate\", 0.0) >= allow_errors",
+    "tests": [
+      "tests.test_prove.Prove.test_screen_verdict_respects_infrastructure_error_budget"
+    ]
+  },
+  {
+    "label": "over-budget infrastructure errors void the screen",
+    "file": "localbench/prove.py",
+    "old": "if any(row.get(\"infra_error_rate\", 0.0) > allow_errors for row in error_kinds.values()):\n        return \"VOID\"",
+    "new": "if False:\n        return \"VOID\"",
+    "tests": [
+      "tests.test_prove.Prove.test_prove_screen_verdict_uses_infrastructure_error_budget"
+    ]
+  },
+  {
+    "label": "failed quality gates reject screens",
+    "file": "localbench/prove.py",
+    "old": "return \"REJECT\" if problems else \"ADVANCE\"",
+    "new": "return \"ADVANCE\"",
+    "tests": [
+      "tests.test_prove.Prove.test_failed_paired_or_metric_gate_rejects_when_musts_pass"
+    ]
+  },
+  {
+    "label": "a passing screen advances",
+    "file": "localbench/prove.py",
+    "old": "return \"REJECT\" if problems else \"ADVANCE\"",
+    "new": "return \"REJECT\"",
+    "tests": [
+      "tests.test_prove.Prove.test_screen_verdict_is_reported_and_comments_instead_of_closing"
+    ]
+  },
+  {
+    "label": "screens with a PROVEN grade are never closed",
+    "file": "localbench/prove.py",
+    "old": "if outcome[\"grade\"] == \"PROVEN\" and not screen_verdict:",
+    "new": "if outcome[\"grade\"] == \"PROVEN\":",
+    "tests": [
+      "tests.test_prove.Prove.test_screen_verdict_is_reported_and_comments_instead_of_closing"
+    ]
+  },
+  {
+    "label": "stripping Git stdout truncates the first dirty path",
+    "file": "localbench/prove.py",
+    "old": "    return proc.returncode, proc.stdout.strip() if strip_stdout else proc.stdout",
+    "new": "    return proc.returncode, proc.stdout.strip()",
+    "tests": [
+      "tests.test_run_plan.RunPlan.test_prove_spec_refuses_dirty_localbench_before_live_work"
+    ]
+  },
+  {
+    "label": "same rejected screen digest must be refused",
+    "file": "localbench/prove.py",
+    "old": "    _refuse_rejected_screen(spec, spec_path)",
+    "new": "    pass",
+    "tests": [
+      "tests.test_prove.Prove.test_prove_spec_refuses_matching_rejected_screen_by_installed_digest"
+    ]
+  },
+  {
+    "label": "CLI prove dry-run must enforce rejected-screen guard",
+    "file": "localbench/__main__.py",
+    "old": "            prove._refuse_rejected_screen(spec, args.spec)",
+    "new": "            pass",
+    "tests": [
+      "tests.test_prove.Prove.test_prove_cli_dry_run_refuses_matching_rejected_screen"
+    ]
+  },
+  {
+    "label": "rejected screen identity uses the pinned items hash across suite renames",
+    "file": "localbench/prove.py",
+    "old": "        if not names_feature(heading) or heading == retry_heading:",
+    "new": "        if not names_feature(heading) or spec[\"dataset\"][\"suite\"] not in section or heading == retry_heading:",
+    "tests": [
+      "tests.test_prove.Prove.test_rejected_screen_identity_uses_items_hash_across_suite_renames"
+    ]
+  },
+  {
+    "label": "retry_of whitespace normalization exempts its own rejected row",
+    "file": "localbench/prove.py",
+    "old": "        if not names_feature(heading) or heading == retry_heading:",
+    "new": "        if not names_feature(heading) or heading == retry_of:",
+    "tests": [
+      "tests.test_prove.Prove.test_rejected_screen_retry_of_ignores_surrounding_whitespace"
     ]
   }
 ]

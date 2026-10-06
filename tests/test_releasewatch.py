@@ -12,10 +12,11 @@ import subprocess
 import tempfile
 import unittest
 import urllib.parse
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from localbench import models, releasewatch as rw
+from localbench import models
+from localbench import releasewatch as rw
 
 NOW = datetime(2026, 9, 30, 6, 17, tzinfo=UTC)
 GB = 10**9
@@ -39,6 +40,11 @@ class World:
         self.mismatch: set[str] = set()        # manifest keys whose registry body differs from the library page
         self.html_url: dict[str, str] = {}     # tag -> release page URL override
         self.asset_url: dict[str, str] = {}    # tag -> mlx-serve asset URL override
+        self.hf_dates: dict[str, str] = {}     # repo -> createdAt override (default: in-window 2026-09-29)
+        self.hf_touched: dict[str, str] = {}   # repo -> lastModified override on the expanded query
+        self.hf_nodates: set[str] = set()      # repos listed with no date at all
+        self.hf_pipes: dict[str, str] = {}     # repo -> pipeline_tag override (default text-generation)
+        self.hf_meta: dict[str, dict] = {}     # repo -> model-info overrides (siblings, tags, gated)
         self.down: list[str] = []
         self.calls: list[str] = []
 
@@ -75,18 +81,32 @@ class World:
             return 200, self.manifest(key, size, served=True)
         if url.startswith(models.HF_API + "?"):
             q = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
-            author, search = q["author"][0], q["search"][0].lower()
-            rows = [{"id": r, "sha": s, "lastModified": "2026-09-29T00:00:00.000Z", "pipeline_tag": "text-generation"}
-                    for r, s, _ in self.hf.get(author, []) if search in r.lower()]
+            author, search = q["author"][0], q.get("search", [""])[0].lower()
+            if "expand[]" in q:
+                # The expanded serializer carries only id + the expanded fields (verified live 2026-10-02).
+                rows = [{"id": r, **({} if r in self.hf_nodates else
+                                     {"lastModified": self.hf_touched.get(r, "2026-09-01T00:00:00.000Z")})}
+                        for r, s, _ in self.hf.get(author, [])]
+                return 200, json.dumps(rows).encode()
+            rows = []
+            for r, s, _ in self.hf.get(author, []):
+                if search not in r.lower():
+                    continue
+                row = {"id": r, "sha": s, "pipeline_tag": self.hf_pipes.get(r, "text-generation")}
+                if r not in self.hf_nodates:
+                    row["createdAt"] = self.hf_dates.get(r, "2026-09-29T00:00:00.000Z")
+                rows.append(row)
             return 200, json.dumps(rows).encode()
         if url.startswith(models.HF_API + "/"):
             repo = url[len(models.HF_API) + 1:].removesuffix("?blobs=true")
             for r, sha, size in (x for rows in self.hf.values() for x in rows):
                 if r == repo:
-                    return 200, json.dumps({"id": r, "sha": sha, "siblings": [
+                    meta = {"id": r, "sha": sha, "tags": ["license:apache-2.0"], "gated": False, "siblings": [
                         {"rfilename": "config.json", "size": 2000},
                         {"rfilename": "model-00001-of-00002.safetensors", "size": size - size // 2},
-                        {"rfilename": "model-00002-of-00002.safetensors", "size": size // 2}]}).encode()
+                        {"rfilename": "model-00002-of-00002.safetensors", "size": size // 2}]}
+                    meta.update(self.hf_meta.get(r, {}))
+                    return 200, json.dumps(meta).encode()
             return 404, b""
         if url.startswith(rw.GITHUB_API + "/"):
             repo, _, rest = url[len(rw.GITHUB_API) + 1:].partition("/releases")
@@ -127,6 +147,9 @@ class Home:
 
     def run(self, world: World, br: FakeBr, **kw) -> dict:
         return rw.run_once(fetch=world, br=br, now=NOW, home=self.path, publishers=("mlx-community",), **kw)
+
+    def digest(self, world: World, br: FakeBr, publishers=("google",), **kw) -> dict:
+        return rw.digest_once(fetch=world, br=br, now=NOW, home=self.path, publishers=publishers, **kw)
 
     def files(self) -> dict[str, bytes | None]:
         names = ("seen.json", "queue.json")
@@ -456,5 +479,281 @@ class LaunchAgent(unittest.TestCase):
             self.assertEqual(plistlib.loads(path.read_bytes())["Label"], "com.example.other")
 
 
+class Digest(WatchCase):
+    PUBS = ("google", "Qwen")
+
+    def make_world(self) -> World:
+        world = World()
+        world.hf["google"] = [("google/Gemma4-9B", "c" * 40, 9 * GB),
+                              ("google/Gemma4-27B-MLX", "d" * 40, 20 * GB),
+                              ("google/OldModel-7B", "e" * 40, 7 * GB),
+                              ("google/PlainText-7B", "f" * 40, 7 * GB),
+                              ("google/Huge-100B", "1" * 40, 50 * GB),
+                              ("google/NoDates-7B", "2" * 40, 7 * GB),
+                              ("google/PicGen-7B", "3" * 40, 7 * GB),
+                              ("google/RewardRM-8B", "4" * 40, 8 * GB)]
+        world.hf["Qwen"] = [("Qwen/Qwen3-8B-GGUF", "5" * 40, 8 * GB), ("Qwen/qwen3.8", "6" * 40, 17 * GB)]
+        world.hf_dates["google/OldModel-7B"] = "2026-09-01T00:00:00.000Z"
+        world.hf_nodates.add("google/NoDates-7B")
+        world.hf_pipes["google/PicGen-7B"] = "text-to-image"
+        world.hf_pipes["Qwen/Qwen3-8B-GGUF"] = "text-generation"
+        world.hf_meta["Qwen/Qwen3-8B-GGUF"] = {
+            "siblings": [{"rfilename": "config.json", "size": 2000},
+                         {"rfilename": "qwen3-8b.gguf", "size": 8 * GB}],
+            "tags": ["license:apache-2.0", "gguf"], "gated": False}
+        world.hf_meta["google/RewardRM-8B"] = {
+            "siblings": [{"rfilename": "config.json", "size": 2000},
+                         {"rfilename": "model.safetensors", "size": 8 * GB}],
+            "tags": ["license:gemma", "mlx"], "gated": True}
+        world.ollama["judgebot"] = {"latest": ("judgebot-7b", 7 * GB)}
+        return world
+
+    def baseline(self, world: World, expect: int = 8) -> None:
+        first = self.home.digest(world, FakeBr(), publishers=self.PUBS)
+        self.assertTrue(first["ok"], first["errors"])
+        self.assertEqual(first["baselined"], expect)   # full world: 5 google + 2 Qwen + judgebot
+        self.assertEqual(first["filed"], [])
+
+    def test_baseline_prints_in_window_rows_and_replay_lists_seen_rows(self):
+        world = self.make_world()
+        first = self.home.digest(world, FakeBr(), publishers=self.PUBS)
+        self.assertTrue(first["ok"], first["errors"])
+        self.assertEqual(first["filed"], [])
+        rows = {r["id"]: r for r in first["rows"]}
+        self.assertIn("hf:google/Gemma4-9B", rows)
+        self.assertEqual((rows["hf:google/Gemma4-9B"]["role"],
+                          rows["hf:google/Gemma4-9B"]["formats"],
+                          rows["hf:google/Gemma4-9B"]["license"]),
+                         ("generation", [], "apache-2.0"))
+        normal = self.home.digest(world, FakeBr(), publishers=self.PUBS)
+        self.assertEqual((normal["filed"], normal["rows"]), ([], []))
+        replay = self.home.digest(world, FakeBr(), publishers=self.PUBS, replay_window=True)
+        self.assertTrue(replay["ok"], replay["errors"])
+        self.assertEqual(replay["filed"], [])
+        replay_rows = {r["id"]: r for r in replay["rows"]}
+        self.assertIn("hf:google/Gemma4-9B", replay_rows)
+        self.assertEqual(replay_rows["hf:google/Gemma4-9B"]["outcome"], "already handled")
+
+    def test_replay_lists_filed_candidate_without_refiling_or_state_change(self):
+        world = self.make_world()
+        self.baseline(world)
+        world.hf["google"].append(("google/Gemma4-70B-MLX", "7" * 40, 30 * GB))
+        world.hf_meta["google/Gemma4-70B-MLX"] = {"siblings": [{"rfilename": "model.safetensors", "size": 30 * GB}],
+                                                        "tags": ["license:apache-2.0"], "gated": False}
+        first = self.home.digest(world, FakeBr(), publishers=self.PUBS)
+        self.assertEqual([e["id"] for e in first["filed"]], ["hf:google/Gemma4-70B-MLX"])
+        before = self.home.files()
+        br = FakeBr()
+        replay = self.home.digest(world, br, publishers=self.PUBS, replay_window=True)
+        self.assertTrue(replay["ok"], replay["errors"])
+        self.assertEqual((br.calls, replay["filed"]), ([], []))
+        self.assertEqual(self.home.files(), before)
+        row = next(r for r in replay["rows"] if r["id"] == "hf:google/Gemma4-70B-MLX")
+        self.assertEqual(row["outcome"], "already handled")
+
+    def test_oversize_candidate_is_printed_with_detail_without_being_seen(self):
+        world = self.make_world()
+        self.baseline(world)
+        name = "Qwen/Qwen3-8B-New-GGUF"
+        world.hf["Qwen"].append((name, "9" * 40, 8 * GB))
+        world.hf_pipes[name] = "feature-extraction"
+        world.hf_meta[name] = {"siblings": [{"rfilename": "new.gguf", "size": 8 * GB}],
+                               "tags": ["license:apache-2.0", "gguf"], "gated": False}
+        report = self.home.digest(world, FakeBr(), publishers=self.PUBS, max_bytes=GB)
+        row = next(r for r in report["rows"] if r["id"] == "hf:" + name)
+        self.assertTrue(row["outcome"].startswith("oversize:"))
+        self.assertEqual((row["size"], row["formats"], row["role"]), (8 * GB, ["GGUF"], "embedding"))
+        self.assertEqual(self.home.seen()["hf:" + name]["outcome"], "oversize")
+
+    def test_baseline_then_new_models_filed_with_screen_titles_and_spec_skeletons(self):
+        world = self.make_world()
+        self.baseline(world)
+        world.hf["google"].append(("google/Gemma4-70B-MLX", "7" * 40, 30 * GB))
+        world.hf["google"].append(("google/Zeta-7B", "8" * 40, 7 * GB))
+        world.hf_meta["google/Zeta-7B"] = {
+            "siblings": [{"rfilename": "config.json", "size": 2000},
+                         {"rfilename": "zeta-7b.gguf", "size": 7 * GB}],
+            "tags": ["license:apache-2.0"], "gated": False}
+        br = FakeBr()
+        second = self.home.digest(world, br, publishers=self.PUBS)
+        self.assertTrue(second["ok"], second["errors"])
+        self.assertEqual([e["id"] for e in second["filed"]],
+                         ["hf:google/Gemma4-70B-MLX", "hf:google/Zeta-7B"])
+        entry = second["filed"][0]
+        self.assertEqual(entry["status"], "filed")   # generation has no screen tier: filed, not queued
+        titles = [c[c.index("--title") + 1] for c in br.calls]
+        self.assertIn("screen google/Gemma4-70B-MLX for generation", titles)
+        self.assertIn("screen google/Zeta-7B for generation", titles)
+        spec = entry["row"]["spec"]
+        self.assertEqual((spec["kind"], spec["stage"], spec["candidates"], spec["assertions"]),
+                         ("generation", "screen", [{"route": "hf:google/Gemma4-70B-MLX"}], []))
+        rows = {r["id"]: r for r in second["rows"]}
+        self.assertEqual(rows["hf:google/Gemma4-70B-MLX"]["license"], "apache-2.0")
+        self.assertEqual(rows["hf:google/Zeta-7B"]["formats"], ["GGUF"])
+        self.assertTrue(rows["hf:google/Zeta-7B"]["new_family"])
+        self.assertFalse(rows["hf:google/Gemma4-70B-MLX"]["new_family"])
+        self.assertEqual(second["rows"][0]["id"], "hf:google/Zeta-7B")
+        self.assertIn("NEW FAMILY hf:google/Zeta-7B", "\n".join(rw.digest_lines(second)))
+
+    def test_old_undated_and_wrong_pipeline_models_are_never_filed(self):
+        world = self.make_world()
+        world.hf["google"] = [r for r in world.hf["google"] if r[0] in
+                              ("google/OldModel-7B", "google/NoDates-7B", "google/PicGen-7B")]
+        home = Home("stale")
+        self.addCleanup(home.close)
+        first = home.digest(world, FakeBr(), publishers=("google",))
+        self.assertTrue(first["ok"], first["errors"])
+        self.assertEqual((first["filed"], first["undated"]), ([], 1))
+        second = home.digest(world, FakeBr(), publishers=("google",))
+        self.assertTrue(second["ok"], second["errors"])
+        self.assertEqual((second["filed"], second["skipped"], second["undated"]), ([], [], 1))
+
+    def test_stale_model_added_after_baseline_is_dropped_not_filed(self):
+        # The date gate must drop it before filing: with the gate planted out it files (servable GGUF).
+        world = self.make_world()
+        self.hold_back(world, "google/OldModel-7B")
+        self.baseline(world)
+        world.hf["google"].append(("google/OldModel-7B", "e" * 40, 7 * GB))
+        world.hf_meta["google/OldModel-7B"] = {
+            "siblings": [{"rfilename": "config.json", "size": 2000},
+                         {"rfilename": "oldmodel-7b.gguf", "size": 7 * GB}],
+            "tags": ["license:apache-2.0"], "gated": False}
+        second = self.home.digest(world, FakeBr(), publishers=self.PUBS)
+        self.assertTrue(second["ok"], second["errors"])
+        self.assertNotIn("hf:google/OldModel-7B", [e["id"] for e in second["filed"]])
+        self.assertNotIn("hf:google/OldModel-7B", [s["id"] for s in second["skipped"]])
+
+    def hold_back(self, world, *repos):
+        """Remove rows from the world for the baseline; the test re-adds them after to file them."""
+        held = []
+        for author, rows in world.hf.items():
+            keep = []
+            for r in rows:
+                (held if r[0] in repos else keep).append(r)
+            world.hf[author] = keep
+        return held
+
+    def test_fit_and_format_gates(self):
+        world = self.make_world()
+        held = self.hold_back(world, "google/Gemma4-27B-MLX", "google/RewardRM-8B", "Qwen/Qwen3-8B-GGUF",
+                              "Qwen/qwen3.8", "google/Huge-100B", "google/PlainText-7B", "google/Gemma4-9B")
+        self.baseline(world, expect=1)   # judgebot only; every other row is held back or dateless
+        for author, rows in (("google", [r for r in held if r[0].startswith("google/")]),
+                             ("Qwen", [r for r in held if r[0].startswith("Qwen/")])):
+            world.hf[author].extend(rows)
+        br = FakeBr()
+        second = self.home.digest(world, br, publishers=self.PUBS)
+        by_id = {e["id"]: e for e in second["filed"]}
+        self.assertEqual(by_id["hf:Qwen/Qwen3-8B-GGUF"]["row"]["formats"], ["GGUF"])
+        self.assertEqual(by_id["hf:google/Gemma4-27B-MLX"]["row"]["formats"], ["MLX"])
+        self.assertEqual(by_id["hf:Qwen/qwen3.8"]["row"]["formats"], ["ollama"])
+        skipped = {s["id"]: s["reason"] for s in second["skipped"]}
+        self.assertIn("oversize", skipped["hf:google/Huge-100B"])
+        self.assertIn("no GGUF, MLX or Ollama build", skipped["hf:google/PlainText-7B"])
+        self.assertIn("no GGUF, MLX or Ollama build", skipped["hf:google/Gemma4-9B"])
+
+    def test_role_tagging_judge_and_embedding(self):
+        world = self.make_world()
+        world.hf_pipes["google/Gemma4-9B"] = "feature-extraction"
+        world.hf_meta["google/Gemma4-9B"] = {
+            "siblings": [{"rfilename": "config.json", "size": 2000},
+                         {"rfilename": "gemma4-9b.gguf", "size": 9 * GB}],
+            "tags": ["license:gemma"], "gated": False}
+        held = self.hold_back(world, "google/Gemma4-9B", "google/RewardRM-8B")
+        self.baseline(world, expect=6)   # 27B-MLX, PlainText, Huge + 2 Qwen + judgebot
+        world.hf["google"].extend(held)
+        world.ollama["judgebot"]["0.8b"] = ("judgebot-08b", 7 * GB)   # a new tag after baseline: filed, not baselined
+        br = FakeBr()
+        second = self.home.digest(world, br, publishers=self.PUBS)
+        by_id = {e["id"]: e for e in second["filed"]}
+        self.assertEqual(by_id["hf:google/RewardRM-8B"]["role"], "judge candidate")
+        self.assertEqual(by_id["hf:google/RewardRM-8B"]["row"]["license"], "gemma (gated)")
+        self.assertEqual(by_id["hf:google/Gemma4-9B"]["role"], "embedding")
+        titles = [c[c.index("--title") + 1] for c in br.calls]
+        self.assertIn("screen judgebot for judge candidate", titles)
+        self.assertIn("screen google/Gemma4-9B for embedding", titles)
+
+    def test_any_to_any_counts_as_generation(self):
+        self.assertEqual(rw.digest_role("any-to-any", "google/gemma-4-12B-it-qat-q4_0-gguf"), "generation")
+        self.assertIsNone(rw.digest_role("image-text-to-text", "google/diffusiongemma-26B-A4B-it"))
+
+    def test_modified_only_recency_keeps_old_created_rows(self):
+        world = self.make_world()
+        cutoff = NOW - timedelta(days=7)
+        stale = [u for u in rw._digest_units(world, ("google",), cutoff) if not u.error]
+        self.assertNotIn("hf:google/OldModel-7B", [i["id"] for u in stale for i in u.items])
+        world.hf_touched["google/OldModel-7B"] = "2026-09-29T12:00:00.000Z"
+        units = [u for u in rw._digest_units(world, ("google",), cutoff) if not u.error]
+        by_id = {i["id"]: i for u in units for i in u.items}
+        self.assertIn("hf:google/OldModel-7B", by_id)
+        self.assertEqual(by_id["hf:google/OldModel-7B"]["modified"], "2026-09-29T12:00:00+00:00")
+
+    def test_captured_mlx_listing_parses_to_generation_items(self):
+        raw = (Path(__file__).parent / "fixtures" / "hf-mlx-community-listing.json").read_bytes()
+
+        def fetch(url, headers=None, timeout=15):
+            if "expand" in url:
+                return 200, b"[]"
+            return 200, raw
+
+        cutoff = datetime(2026, 9, 25, 6, 17, tzinfo=UTC)
+        (unit,) = [u for u in rw._digest_units(fetch, ("mlx-community",), cutoff) if not u.error]
+        by_id = {i["id"]: i for i in unit.items}
+        self.assertEqual(by_id["hf:mlx-community/K2-Horizon-7B-bf16"]["role"], "generation")
+        self.assertNotIn("hf:mlx-community/clef-8bit", by_id)   # zero-shot-classification: out of scope
+        self.assertNotIn("hf:mlx-community/phartakos-mlx", by_id)   # audio-to-audio: out of scope
+
+    def test_failed_modified_query_degrades_with_an_error(self):
+        world = self.make_world()
+        self.baseline(world)
+        world.hf["google"].append(("google/Gemma4-70B-MLX", "7" * 40, 30 * GB))
+
+        def fetch(url, headers=None, timeout=15):
+            if "expand" in url:
+                return 0, b""
+            return world(url)
+
+        report = rw.digest_once(fetch=fetch, br=FakeBr(), now=NOW, home=self.home.path, publishers=self.PUBS)
+        self.assertTrue(any("lastModified unavailable" in e for e in report["errors"]), report["errors"])
+        self.assertIn("hf:google/Gemma4-70B-MLX", [e["id"] for e in report["filed"]])
+
+    def test_parse_since(self):
+        self.assertEqual(rw.parse_since("7d"), 7.0)
+        self.assertEqual(rw.parse_since("24h"), 1.0)
+        for bad in ("", "week", "7", "7w", "-3d"):
+            with self.assertRaises(rw.WatchError):
+                rw.parse_since(bad)
+
+    def test_weekly_digest_agent_runs_digest_monday_morning(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            doc = rw.digest_launchd_plist(home, "/py")
+            self.assertEqual(doc["Label"], rw.DIGEST_LABEL)
+            self.assertEqual(doc["ProgramArguments"], ["/py", "-m", "localbench", "watch-releases", "--digest"])
+            self.assertEqual(doc["StartCalendarInterval"], {"Weekday": 1, "Hour": 9, "Minute": 0})
+            calls = []
+
+            def run(argv, **kw):
+                calls.append(argv)
+                return subprocess.CompletedProcess(argv, 0, "", "")
+
+            path = rw.install_digest_agent(home, "/py", run=run)
+            self.assertEqual(plistlib.loads(path.read_bytes()), doc)
+            self.assertEqual(calls[-1][:2], ["launchctl", "bootstrap"])
+
+
 if __name__ == "__main__":
     unittest.main()
+
+
+class DraftSpecs(unittest.TestCase):
+    def test_screen_candidate_writes_uncommitted_draft(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            item = {"name": "acme/model", "tag": "q4", "source": "ollama", "role": "judge candidate"}
+            draft = rw.write_draft_spec(home, item, "2026-10-03T00:00:00Z")
+            self.assertTrue(draft.is_file())
+            payload = json.loads(draft.read_text())
+            self.assertEqual(payload["status"], "DRAFT")
+            self.assertEqual(payload["spec"]["candidates"], [{"route": "ollama:acme/model:q4"}])
+            self.assertFalse((home / ".git").exists())

@@ -1,0 +1,47 @@
+[
+  {
+    "label": "tree verdict archives the requested tree, not HEAD",
+    "file": "scripts/suite_verdict.sh",
+    "old": "git archive \"$tree\" | tar -x -C \"$snap\"",
+    "new": "git archive HEAD | tar -x -C \"$snap\"",
+    "tests": [
+      "tests.test_suite_verdict.SuiteVerdict.test_unstaged_red_worktree_does_not_change_index_tree_verdict"
+    ]
+  },
+  {
+    "label": "python version changes the cache namespace",
+    "file": "scripts/suite_verdict.sh",
+    "old": "key=\"$tree-$pyver\"",
+    "new": "key=\"$tree\"",
+    "tests": [
+      "tests.test_suite_verdict.SuiteVerdict.test_python_version_is_part_of_cache_key"
+    ]
+  },
+  {
+    "label": "failed suite never writes a passing cache",
+    "file": "scripts/suite_verdict.sh",
+    "old": "rc=$?\nif [ \"$rc\" -eq 0 ]; then",
+    "new": "rc=0\nif [ \"$rc\" -eq 0 ]; then",
+    "tests": [
+      "tests.test_suite_verdict.SuiteVerdict.test_red_tree_fails_and_is_not_cached"
+    ]
+  },
+  {
+    "label": "a busy slot reads as a FAIL",
+    "file": "scripts/suite_verdict.sh",
+    "old": "if [ \"$rc\" -eq 75 ]; then",
+    "new": "if false; then",
+    "tests": [
+      "tests.test_suite_verdict.SuiteVerdict.test_busy_slot_is_not_a_verdict_and_is_not_cached"
+    ]
+  },
+  {
+    "label": "a busy slot exits 0",
+    "file": "scripts/suite_verdict.sh",
+    "old": "  exit 75\n",
+    "new": "  exit 0\n",
+    "tests": [
+      "tests.test_suite_verdict.SuiteVerdict.test_busy_slot_is_not_a_verdict_and_is_not_cached"
+    ]
+  }
+]

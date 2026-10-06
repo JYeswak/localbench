@@ -1,0 +1,89 @@
+{
+  "analysis_sha": "760a973aa245a0fa1d51d86165f8494305c94741fdaf623ef7fdfc3b6453d3a4",
+  "arms": {
+    "ab_a": {
+      "description": "incumbent extraction: default child config, mnemopi extraction through the smol route (qwen3.8:27b-mlx)",
+      "mem_config": "fixtures/omp/child-config-mem.yml",
+      "mem_config_sha256": "019eef862b65ed03c3446ab12ed94c6ab37e86db04d57d1f7ea818cdf5b40210"
+    },
+    "ab_b": {
+      "description": "challenger: no LLM extraction (mnemopi llmMode none); recall served from FTS plus injected context only",
+      "mem_config": "fixtures/omp/child-config-mem-nollm.yml",
+      "mem_config_sha256": "f34298dcc76789a1de2438512eb28b7e954946733f54a382c5b27db3672458ac"
+    }
+  },
+  "assertions": [
+    {
+      "id": "recall-no-loss",
+      "params": {
+        "direction": "not-worse",
+        "margin": 0.1,
+        "metric": "mem.recall.hit_rate",
+        "test": "fisher-pooled"
+      },
+      "type": "metric"
+    },
+    {
+      "id": "derail-no-loss",
+      "params": {
+        "direction": "not-worse",
+        "margin": 0.1,
+        "metric": "mem.derail.ok_rate",
+        "test": "fisher-pooled"
+      },
+      "type": "metric"
+    },
+    {
+      "candidate": "ab_b",
+      "id": "extract-faster",
+      "params": {
+        "direction": "lower",
+        "metric": "sess.turn.post_retain_wall_s",
+        "test": "unpaired-t-log"
+      },
+      "type": "metric"
+    },
+    {
+      "id": "sized-design",
+      "params": {
+        "min_derail_facts_b": 120,
+        "min_pairs": 12,
+        "min_recall_facts_b": 72
+      },
+      "type": "deterministic"
+    }
+  ],
+  "candidates": [
+    {
+      "route": "ollama:qwen3.6:35b-mlx"
+    }
+  ],
+  "dataset": {
+    "items_sha256": "4a013d0f0caf93998a0b9f78ebb4b7aa9c746887281cfccc95a8b4a6eed70587",
+    "suite": "mem-configs/child-config-mem.yml+child-config-mem-nollm.yml"
+  },
+  "description": "Pre-registration for the mnemopi-extraction proof (kit-memory-study-vce comment 204 section D: --pairs 12 --mem-rounds 4 --repeats 2 = 25 legs, B 144 facts / A 156 facts, about 8 h, one heavy-slot job). Same main model both arms; the contrast is the mem config only. Facts are drawn fresh per round by design (no stable suite exists), so the dataset pins the ordered concatenation of the two arm configs; the runner refuses when either config on disk differs. Run with --omp-frozen (LOCALBENCH_OMP entry) so all 25 legs pin one omp_version/omp_sha; an omp update between legs voids the study. Quality gates are the kit-v8t verdict tests: Fisher-pooled non-inferiority at margin 0.10 (the powered MDD) on recall hit_rate and derail ok_rate, both directions; the latency win (post_retain, unpaired t on log scale per PowerPlan B: pairing does not help there) is asserted only for candidate ab_b. Verdicts bank one receipt per direction. Evaluated by prove.evaluate_memory_metric (judgement plus delta-vs-margin over the verdict row; unmeasured fails) and prove.evaluate_sized_design; the candidate-scoped win runs only on its verdict direction. Alpha lives in the verdict row (STATS_ALPHA), not the spec.",
+  "feature": "mnemopi-extraction",
+  "kind": "memory",
+  "mem_rounds": 4,
+  "pairs": 12,
+  "regime": "side",
+  "repeats": 2,
+  "stage": "proof",
+  "tiers": [
+    "mem",
+    "sess"
+  ],
+  "verdicts": [
+    {
+      "bank": "prove__memory__mnemopi-extraction__ab_a",
+      "baseline": "ab_b",
+      "candidate": "ab_a"
+    },
+    {
+      "bank": "prove__memory__mnemopi-extraction__ab_b",
+      "baseline": "ab_a",
+      "candidate": "ab_b"
+    }
+  ]
+}

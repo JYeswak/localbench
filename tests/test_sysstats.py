@@ -229,7 +229,8 @@ class ReportMergesOldAndNewRows(Models):
         con = observe.connect(db)
         t = time.time()
         with con:
-            con.executemany("insert into samples values (?, ?, ?, ?, ?)", [(t - 120, 60, 90, 50, 0), (t - 60, 60, 90, 50, 0)])
+            con.executemany("insert into samples (t, window_s, device_pct, free_pct, swap_mb) values (?, ?, ?, ?, ?)",
+                            [(t - 120, 60, 90, 50, 0), (t - 60, 60, 90, 50, 0)])
             con.executemany("insert into gpu values (?, ?, ?, ?, ?)", [
                 (t - 120, 214, "llama-server", self.blob(WEIGHTS[:58]), 50.0),   # recorded before the lookup
                 (t - 60, 214, "llama-server", "qwen3.8-uncensored:latest", 100.0)])
@@ -371,7 +372,8 @@ class ReportTraffic(Models):
         con = observe.connect(db)
         t = time.time()
         with con:
-            con.executemany("insert into samples values (?, ?, ?, ?, ?)", [(t - 120, 60, 90, 50, 0), (t - 60, 60, 90, 50, 0)])
+            con.executemany("insert into samples (t, window_s, device_pct, free_pct, swap_mb) values (?, ?, ?, ?, ?)",
+                            [(t - 120, 60, 90, 50, 0), (t - 60, 60, 90, 50, 0)])
             con.executemany("insert into clients values (?, ?, ?, ?, ?, ?)", [
                 (t - 120, 2779, "bun", "default", "/cp", '{"ollama": 2}'),
                 (t - 60, 2779, "bun", "default", "/cp", '{"ollama": 2}'),
@@ -387,6 +389,138 @@ class ReportTraffic(Models):
             {"who": "default", "cwd": "/lb", "server": "ollama",
              "while_resident": "several: qwen3.8-uncensored:latest, qwen3.8:27b-mlx", "up": 10, "down": 700}])
 
+
+
+
+class ObservationSamples(unittest.TestCase):
+    def test_watch_migrates_legacy_database_and_records_cpu_busy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "observe.db"
+            with sqlite3.connect(db) as legacy:
+                legacy.execute("create table samples (t real primary key, window_s real, device_pct int, "
+                               "free_pct int, swap_mb real)")
+                legacy.execute("insert into samples values (1, 60, 90, 50, 0)")
+
+            con = observe.connect(db)
+            try:
+                columns = {row[1] for row in con.execute("pragma table_info(samples)")}
+                self.assertNotIn("cpu_busy", columns)
+            finally:
+                con.close()
+
+            live = {"gpu_device_pct": 10, "free_pct": 80, "swap_used_mb": 0,
+                    "resident": {"ollama": []}}
+            with mock.patch.object(observe.sysstats, "gpu_time_by_pid", return_value={}), \
+                    mock.patch.object(observe.sysstats, "connection_bytes", return_value={}), \
+                    mock.patch.object(observe.sysstats, "live", return_value=live), \
+                    mock.patch.object(observe.sysstats, "inference_clients", return_value=[]), \
+                    mock.patch.object(observe.sysstats, "gpu_share", return_value=[]), \
+                    mock.patch.object(observe.sysstats, "cpu_busy_pct", return_value=42.5):
+                observe.watch(interval=0.01, samples=1, path=db)
+
+            with sqlite3.connect(db) as con:
+                columns = {row[1] for row in con.execute("pragma table_info(samples)")}
+                self.assertIn("cpu_busy", columns)
+                self.assertEqual(con.execute("select cpu_busy from samples where t=1").fetchone(), (None,))
+                self.assertEqual(
+                    con.execute("select cpu_busy from samples where t=(select max(t) from samples)").fetchone(),
+                    (42.5,))
+
+    def test_report_does_not_migrate_legacy_samples(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "observe.db"
+            with sqlite3.connect(db) as legacy:
+                legacy.execute("create table samples (t real primary key, window_s real, device_pct int, "
+                               "free_pct int, swap_mb real)")
+                legacy.execute("insert into samples values (?, 60, 90, 50, 0)", (time.time() - 30,))
+
+            self.assertEqual(observe.report(3600, db)["samples"], 1)
+            with sqlite3.connect(db) as con:
+                columns = {row[1] for row in con.execute("pragma table_info(samples)")}
+            self.assertNotIn("cpu_busy", columns)
+
+class GPUWindowAccounting(unittest.TestCase):
+    def test_ioreg_device_utilization_is_not_an_instant_window_measurement(self):
+        with mock.patch.object(sysstats, "_run", return_value='\"Device Utilization %\"=95'):
+            result = sysstats.gpu_utilization()
+        self.assertIsNone(result["device_pct"])
+        self.assertEqual(result["status"], "WINDOW_REQUIRED")
+
+    def test_macmon_fraction_is_a_device_busy_percentage(self):
+        sample = sysstats._parse_macmon_sample(json.dumps({
+            "gpu_usage": [738, 0.0558], "timestamp": "2026-10-06T03:41:55Z"}))
+        self.assertEqual(sample["frequency_mhz"], 738.0)
+        self.assertEqual(sample["device_pct"], 5.6)
+        self.assertIsNone(sysstats._parse_macmon_sample('{"gpu_usage": [738, "bad"]}'))
+
+    def test_idle_window_uses_absolute_noise_rule(self):
+        result = sysstats.gpu_coverage_summary([0.4, 1.5], 0.9)
+        self.assertEqual(result["status"], "IDLE")
+        self.assertLess(result["device_pct"], 2)
+        self.assertIsNone(result["coverage"])
+        self.assertEqual(result["unattributed_pct"], 0.0)
+
+    def test_near_idle_absolute_noise_does_not_create_unaligned_status(self):
+        result = sysstats.gpu_coverage_summary([2.2, 2.2], 4.1)
+        self.assertEqual((result["status"], result["device_pct"], result["process_pct"]),
+                         ("IDLE", 2.2, 4.1))
+        self.assertIsNone(result["coverage"])
+        self.assertEqual(result["unattributed_pct"], 0.0)
+
+    def test_active_device_window_is_not_idle(self):
+        result = sysstats.gpu_coverage_summary([40.0, 40.0], 40.0)
+        self.assertEqual(result["status"], "ATTRIBUTED")
+        self.assertEqual(result["coverage"], 100.0)
+
+    def test_terminal_only_window_meets_coverage_floor(self):
+        result = sysstats.gpu_coverage_summary([7.5, 8.5], 7.6)
+        self.assertEqual(result["status"], "ATTRIBUTED")
+        self.assertEqual(result["device_pct"], 8.0)
+        self.assertEqual(result["coverage"], 95.0)
+        self.assertEqual(result["unattributed_pct"], 5.0)
+
+    def test_planted_95_device_10_process_is_unattributed(self):
+        result = sysstats.gpu_coverage_summary([95.0, 95.0], 10.0)
+        self.assertEqual(result["status"], "UNATTRIBUTED")
+        self.assertAlmostEqual(result["coverage"], 10.5, places=1)
+        self.assertAlmostEqual(result["unattributed_pct"], 89.5, places=1)
+
+    def test_process_time_over_device_total_is_capped_and_unaligned(self):
+        result = sysstats.gpu_coverage_summary([10.0, 10.0], 11.52)
+        self.assertEqual(result["status"], "UNALIGNED")
+        self.assertEqual(result["device_pct"], 10.0)
+        self.assertEqual(result["process_pct"], 11.5)
+        self.assertEqual(result["coverage"], 100.0)
+        self.assertEqual(result["unattributed_pct"], 0.0)
+
+    def test_device_window_mean_weights_irregular_sample_gaps(self):
+        samples = [{"device_pct": 10.0, "sample_time": 100.0},
+                   {"device_pct": 30.0, "sample_time": 103.0},
+                   {"device_pct": 50.0, "sample_time": 104.0}]
+        self.assertEqual(sysstats._device_window_mean(samples), 25.0)
+
+    def test_gpu_window_aligns_longer_process_counter_span_to_device_window(self):
+        before = {42: {"name": "Terminal", "ns": 0}}
+        after = {42: {"name": "Terminal", "ns": 1_900_000_000}}
+        samples = [{"device_pct": 9.5, "timestamp": "start", "sample_time": 100.5},
+                   {"device_pct": 10.5, "timestamp": "end", "sample_time": 105.5}]
+        points = [(100.0, before), (120.0, after)]
+        with mock.patch.object(sysstats, "_collect_macmon_window", return_value=(samples, points)):
+            with mock.patch.object(sysstats, "_run", return_value=""):
+                result = sysstats.gpu_window(5.0)
+        self.assertEqual(result["window_s"], 5.0)
+        self.assertEqual(result["device_pct"], 10.0)
+        self.assertEqual(result["process_pct"], 9.5)
+        self.assertEqual(result["coverage"], 95.0)
+
+    def test_one_io_report_sample_does_not_claim_window_coverage(self):
+        samples = [{"device_pct": 8.0, "timestamp": "only", "sample_time": 102.5}]
+        with mock.patch.object(sysstats, "_collect_macmon_window", return_value=(samples, [])):
+            result = sysstats.gpu_window(5.0)
+        self.assertEqual(result["status"], "UNAVAILABLE")
+        self.assertIsNone(result["device_pct"])
+        self.assertIsNone(result["process_pct"])
+        self.assertEqual(result["io_report_samples"], 1)
 
 
 if __name__ == "__main__":

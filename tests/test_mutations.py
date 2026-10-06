@@ -61,7 +61,7 @@ class SuiteIsolation(unittest.TestCase):
 
         ledger = Path(SCRATCH_HOME) / ".localbench" / "audit.jsonl"
         before = len(ledger.read_text().splitlines()) if ledger.exists() else 0
-        p = subprocess_cli("aa", "ollama:no-such-model", "--mem-rounds", "9", "--write-golden")
+        p = subprocess_cli("aa", "ollama:no-such-model", "--mem-rounds", "9", "--write-golden", "--force-load")
         self.assertEqual(p.returncode, 1, p.stderr)
         rows = [json.loads(line) for line in ledger.read_text().splitlines()]
         self.assertEqual(len(rows), before + 1)

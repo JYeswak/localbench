@@ -68,6 +68,11 @@ read its golden-comparison statuses; A/A and A/B legs need not have one.
 
 Events include `start`, `preflight_wait`, `isolated`, `tier`, `sample`, `e2e`,
 `contention`, `done` (field list: see the progress contract in the lb-09 packet).
+An aborted run still terminates with `done`; when the watchdog triggered,
+`done.watchdog_abort` contains the reason also recorded in
+`summary.json` at `verdicts.watchdog_abort`. `done` marks stream completion,
+not a passing verdict.
+
 
 ## 3. What to flag (each with its timestamp)
 

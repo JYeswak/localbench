@@ -1,13 +1,35 @@
 # localbench
 
 Local-model measurements and two fixed OMP end-to-end task-case checks on macOS; banked goldens are host-specific.
+It also maps every omp feature that can route to a local model, and proves each route with a banked receipt:
+`localbench features` shows the live route per profile and the receipt proving it (PROVEN, CARRIED, BAD, STALE,
+UNPROVEN); `localbench prove` runs a declarative proof spec (`registries/proofs/*.json`: dataset pin, candidates,
+assertions) end to end and files the receipt. Memory-route proofs run under the side-model regime: co-resident load
+is recorded, never used to void; quality gates are unchanged.
+
+A screen matching a banked REJECT for the same feature, installed model digest and dataset items hash is refused.
+An intentional retry requires `retry_of` with the exact ledger heading and a non-empty `new_hypothesis` rationale.
+Decision proofs preflight every Ollama candidate before item 1; successful runs restore pre-run Ollama residency by unloading only proof-loaded runners after the gateway guard. Pre-existing residents are preserved.
+
+Decision proof screens are `VOID` only when a per-question-type infrastructure error rate exceeds the spec's
+`allow_errors` budget (default 0, maximum 0.05); within-budget infrastructure errors do not void. Failed
+paired/metric assertions, early stops, or MUST-conformance failures are `REJECT`; otherwise the result is
+`ADVANCE`. The verdict is included in the report and proof-bead comment; screens never close a bead, even when
+the grade is `PROVEN`.
+
+
+Generation judge receipts are consumable only with a sealed gold-set pin: its SHA-256 commits the item IDs and labels,
+and the receipt carries the order seed, independent labelers, agreement and kappa.
 
 localbench records machine state alongside measurements, compares runs with host goldens, and reports observed GPU
 use. These are tool capabilities, not a certified speedup, reliability rate, or guarantee of an uncontended run.
 
 ## Requirements
 
-- macOS on Apple Silicon only (GPU counters come from ioreg; machine state from sysctl, pmset, memory_pressure).
+- macOS on Apple Silicon; `macmon` must be on `PATH` for GPU windows. Device utilization comes from
+  macmon IOReport samples averaged over the same interval as accumulated GPUTime deltas; `localbench gpu` reports
+  process coverage. Device and aggregate process activity both below 5% is `IDLE` because the ratio is noise.
+  Machine state comes from sysctl, pmset, memory_pressure.
 - Python >= 3.12 and [uv](https://docs.astral.sh/uv/); no third-party Python packages. A local server:
   [ollama](https://ollama.com), mlx-serve, oMLX or mlxfast (Layr-Labs' `mlx-server` from the MLX.FAST Bonsai 2 engine;
   localbench starts and stops the last three).
@@ -68,6 +90,8 @@ are in [docs/evidence/incumbents.md](docs/evidence/incumbents.md) and the fixtur
 Lean flags: `--no-skills --no-rules --no-lsp --no-title --tools=read,bash,edit,write,grep,glob,todo`.
 "Memory off" is `--config fixtures/omp/child-config.yml`; the reason is in the ledger (2026-09-23 rows).
 
+- The auto-thinking screen rejected nimble:latest at 0.6724 agreement (gate 0.9).
+
 Not claimed yet:
 
 - Current-version prefill speedup versus the dense incumbent and cold first-turn wall: prior receipts used earlier
@@ -86,17 +110,18 @@ Not claimed yet:
 ```sh
 localbench stats                                         # machine snapshot
 localbench status                                        # which goldens are live, per tier; fixture freshness; GPU
-localbench gpu [--seconds N]                             # GPU % by process, loaded models, who can send work, why
+localbench gpu [--seconds N]                             # windowed IOReport device %, GPUTime coverage (<5% device and process = IDLE; over-100% is capped and UNALIGNED), loaded models, clients/routes
+localbench load [--seconds N] [--json]                   # machine-wide system CPU; per-process CPU per core; 1s intervals; starts, RSS, pane/session/job roll-ups; 15s default (1–32)
 localbench memory [--prune]                              # omp memory banks; --prune removes localbench's own
 localbench models [--days 14]                            # installed models: freshness, who routes to them, releases
-localbench watch  |  report --since 24h                  # record local-model use each minute | what used it, how long
+localbench watch  |  report --since 24h                  # record GPU, CPU-busy, model and client usage each minute | what used it, how long
 localbench park | unpark                                 # move omp's local smol model out of reach while measuring
 localbench keep ollama:<m> [5m|30m|2h|0]               # finite default 5m; 0 unloads only when safe
 localbench gateway status|install|start|stop|remove     # OMP loopback gateway and reversible profile routing
 localbench pull ollama:<m>                               # download a library tag or hf.co/<org>/<repo>:<quant>
 localbench quiet [--resume]                              # pause omp's managed browser for a run; resume after
 localbench run <spec>                                    # conf,micro,replay,e2e vs the golden
-localbench eval run <spec> [--resume runs/eval-...] --wait-idle 1800 # versioned omp behavioral campaign
+localbench eval run <spec> [--resume runs/eval-...] [--watchdog] --wait-idle 1800 # versioned omp behavioral campaign
 localbench eval varied <spec> --phase heldout --seed N --trials 2 --dry-run # planned read/edit cases only; live model trial evidence UNVERIFIED
 localbench eval rescore runs/eval-...                      # offline re-score from saved traces
 localbench aa  <spec> --write-golden                     # A/A pair -> banked receipt + golden (the only way)
@@ -113,10 +138,45 @@ localbench record --label lean <spec> -- <omp flags>     # record omp's request 
 uv run python scripts/prune_models.py [--delete NAME]    # why each model is kept; deletes only named unused ones
 localbench doctor [--fix] [--json]                       # PASS/WARN/FAIL per subsystem, with the command that fixes it
 localbench validate <receipt|golden|run dir>             # parses; receipt legs need commit, worker and pins (exit 1 if invalid)
-localbench audit [--since 24h] [--json]  |  why <id>     # the mutation ledger | one row in full
+localbench features [--json]                            # every omp feature that can route local, per profile, and its proof
+localbench decision run <spec> --suite S [--feature F]  # decision suite vs a local model; banks the receipt the proof cites
+localbench memory-verdict --candidate R --baseline R --feature F --bank N  # bank a memory proof receipt (mem+sess legs)
+localbench preset list|plan|apply|rollback|drift         # named reversible omp-setting switches (live local needs PROVEN proof)
+localbench corpus list|stats|import|proj-b-build|capture    # private decision corpora under ~/.localbench/corpora, never in git
+localbench watch-releases [--once|--install-agent]      # upstream model/runtime watch: files screen beads, queues argv
+localbench prove <spec>|--due [--dry-run]              # generation dry-run verifies the corpus pin, then prints the plan only
+localbench generation replay                         # replay a generation corpus through one arm (audited)
+localbench gateway fence|unfence                         # refuse/release inference for named models (agreed windows)
+uv run python scripts/profile_cli.py run <profile.json> --output runs/perf/<id> [--resume] [--wait-slot N] # resumable command samples
+uv run python scripts/profile_cli.py report runs/perf/<id>              # rank rc=0 and rc!=0 cohorts separately
 ```
 
-Campaign runs are barred from performance and golden evidence; they resume only when model, runtime, and test-input pins match, and can be re-scored offline from saved traces.
+Generation corpora are write-once: `assemble` refuses an existing id and locks the directory (`0500`) and its manifest/items (`0400`). Rebuilds require a new corpus id.
+Proof dry-runs refuse stale generation pins before planning and name the restore-or-new-corpus-id recovery path.
+
+Profile JSON defines `samples`, optional `warmups`, and named commands as `argv` arrays. Each command's complete
+sample set, including stdout, stderr, elapsed time, and exit class, is written atomically; `--resume` validates the
+profile identity and skips commands with complete records.
+
+For example:
+```json
+{
+  "schema_version": "localbench.cli-profile.v1",
+  "name": "read-only",
+  "samples": 20,
+  "warmups": 2,
+  "commands": [
+    {"id": "status", "argv": ["uv", "run", "--quiet", "python", "-m", "localbench", "status", "--json"]}
+  ]
+}
+```
+
+Campaign runs are barred from performance and golden evidence; they resume only when model, runtime, and test-input pins
+match, and can be re-scored offline from saved traces.
+
+`--watchdog` is opt-in: each sampler tick aborts on unknown or foreign residency/GPU state, an absent expected model, or
+a changed pinned omp executable hash. It cancels the active request or local process. The interrupted case is not
+checkpointed; completed cases remain resumable only under the unchanged campaign identity.
 
 ## Mutations, dry runs and the audit ledger
 The following describes the CLI's intended mutation contract, not a banked live safety or reliability result.
@@ -151,9 +211,13 @@ can reconcile a partial operation, verify the restored digest, and only then rel
 not control direct Ollama clients: the existing socket/telemetry probe fails closed for activity it can observe, but a
 new direct client can race that probe. Exclusive control of non-gateway clients is not claimed.
 
-`localbench gateway install` points configured OMP profiles at a loopback-only LaunchAgent. Gateway configuration
-is intended to fail closed rather than send OMP requests directly to port 11434; a clean live OMP outage/restart
-proof is still pending. `stop` leaves profiles pointed at the stopped gateway; installation does not reload existing
+`localbench gateway install` points configured OMP profiles at a loopback-only LaunchAgent. The daemon runs from a
+content-addressed export under `~/.localbench/gateway-exports`; `localbench doctor --json` verifies the export and
+fails when the gateway code SHA differs from its promoted SHA. Migration from a legacy LaunchAgent that points at the
+shared checkout requires `lsof -nP -iTCP:11300 -sTCP:ESTABLISHED` to show no established connections before
+removal/reinstall. The request ledger can retain stale active rows, so its counter is not proof of live traffic and may still block lifecycle commands.
+Gateway configuration is intended to fail closed rather than send OMP requests directly to port 11434; a clean live OMP
+outage/restart proof is still pending. `stop` leaves profiles pointed at the stopped gateway; installation does not reload existing
 OMP processes, so restart existing sessions before relying on the new route.
 `remove` is designed to restore only the exact managed provider block and preserve manual edits. Direct non-OMP
 clients can still call Ollama directly and are outside this policy.
@@ -163,6 +227,21 @@ claim that an open socket is actively doing inference. Gateway-owned leases reta
 Inbound POST bodies have a 128 MiB limit and a 30-second total read deadline; incomplete bodies are not forwarded. This
 does not bound upstream inference or response streaming. Existing residents without a gateway lease remain unowned and are
 never unloaded by profile migration.
+proj-b's Clef-Flash server (proj-b's `serve.py` on 127.0.0.1:8010, started and stopped by proj-b) is reached through the gateway
+at `POST /proj-b/clef-flash/<route>` (`route` is 1-64 characters of `[a-z0-9-]`; anything else is a 400; a trailing
+`/v1/systemone`, which omp's typesafe provider appends to its baseUrl, is accepted). The body passes
+through unchanged; the call is recorded as profile `proj-b`, model `clef-flash`, feature `proj-b-<route>`, and the reply
+carries `X-Localbench-Request-Id`. At most two calls are in flight (a third gets 503 `{"code":"busy"}` with
+`Retry-After`); any park fence holds every call (503 `{"code":"fenced"}` with `Retry-After`); a down or failing
+`serve.py` is a 502. `GET /proj-b/clef-flash/` returns its identity. The gateway never leases, unloads or stops it.
+`localbench report --by-profile` shows proj-b's calls and busy seconds; calls made straight to :8010 are not attributed.
+
+## Pacing
+
+One heavy job at a time across localbench: a local-inference run (run, aa, ab, decision run, generation replay,
+memory legs) or a full suite / mutate.py gate, never two at once. Ask the orchestrator for the slot first; start only
+with machine load average under 40 and GPU device busy under 80%; unload models the job loaded when it ends. Single
+test modules, edits and reads need no slot.
 
 ## How it measures
 These measurement and isolation rules describe the harness contract, not independent current-generation proof of

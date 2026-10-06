@@ -525,8 +525,8 @@
   {
     "label": "McNemar p is the doubled lower tail",
     "file": "localbench/decision.py",
-    "old": "return min(1.0, 2.0 * sum(math.comb(n, i) for i in range(min(b, c) + 1)) / 2 ** n)",
-    "new": "return max(1.0, 2.0 * sum(math.comb(n, i) for i in range(min(b, c) + 1)) / 2 ** n)",
+    "old": "float(Fraction(2 * sum(math.comb(n, i) for i in range(min(b, c) + 1)), 1 << n))",
+    "new": "float(Fraction(sum(math.comb(n, i) for i in range(min(b, c) + 1)), 1 << n))",
     "tests": [
       "tests.test_decision.Paired.test_exact_mcnemar_p_is_known"
     ]
@@ -538,6 +538,33 @@
     "new": "\"bootstrap\": {\"mean_pp\": mean * 100, \"lo_pp\": hi * 100, \"hi_pp\": lo * 100,",
     "tests": [
       "tests.test_decision.Paired.test_bootstrap_ci_is_deterministic_and_ordered"
+    ]
+  },
+  {
+    "label": "mcnemar stays exact past float range",
+    "file": "localbench/decision.py",
+    "old": "    return min(1.0, float(Fraction(2 * sum(math.comb(n, i) for i in range(min(b, c) + 1)), 1 << n)))",
+    "new": "    return min(1.0, 2.0 * sum(math.comb(n, i) for i in range(min(b, c) + 1)) / float(2 ** n))",
+    "tests": [
+      "tests.test_decision.Paired.test_two_thousand_discordant_pairs_neither_overflow_nor_lose_symmetry"
+    ]
+  },
+  {
+    "label": "hopeless screens stop at the obrien-fleming look",
+    "file": "localbench/decision.py",
+    "old": "                    if total > 0 and stats.obf_reject(correct, total, obf_gate[1], look):",
+    "new": "                    if False:",
+    "tests": [
+      "tests.test_decision.EarlyStop.test_hopeless_screen_stops_at_an_interim_look_with_problems"
+    ]
+  },
+  {
+    "label": "screen interim look excludes infrastructure errors",
+    "file": "localbench/decision.py",
+    "old": "            if not o.get(\"ok\") and o.get(\"error\") in {\"http\", \"timeout\", \"unavailable\"}:",
+    "new": "            if False:",
+    "tests": [
+      "tests.test_decision.EarlyStop.test_infrastructure_errors_are_excluded_from_interim_screen_look"
     ]
   }
 ]

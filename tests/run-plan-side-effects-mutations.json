@@ -1,0 +1,9 @@
+[
+  {
+    "label": "receipt paths in proof comments and close reasons resolve in the main repo",
+    "file": "localbench/proofqueue.py",
+    "old": "command = [argument.replace(export_root, str(beads_root)) for argument in argv]",
+    "new": "command = list(argv)",
+    "tests": ["tests.test_run_plan_side_effects.RunPlanSideEffects.test_execute_keeps_bead_updates_and_artifacts_in_main_repo"]
+  }
+]

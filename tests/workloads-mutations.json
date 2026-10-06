@@ -1,0 +1,11 @@
+[
+  {
+    "label": "per-test deadline interrupts a hung workload test",
+    "file": "tests/test_workloads.py",
+    "old": "            signal.setitimer(signal.ITIMER_REAL, seconds)",
+    "new": "            pass",
+    "tests": [
+      "tests.test_workloads.AnswerReachesTheVerdict.test_per_test_deadline_interrupts_a_hung_call"
+    ]
+  }
+]

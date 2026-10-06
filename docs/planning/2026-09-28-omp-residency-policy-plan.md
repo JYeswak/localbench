@@ -5,7 +5,7 @@
 ## Constraints and existing ownership
 
 - The approved spec is `docs/planning/omp-residency-policy.md`.
-- The initial pane-2 busy warning was superseded by Agent Mail thread 42964's asynchronous assignment to the current pane (%30). No second NTM prompt was sent; the existing shared-tree changes were inspected and preserved.
+- The initial pane-2 busy warning was superseded by Agent Mail thread 42964's asynchronous assignment to the current pane (%pane). No second NTM prompt was sent; the existing shared-tree changes were inspected and preserved.
 - The tree contains unrelated uncommitted evaluation work in README, localbench/__main__.py, localbench/proxy.py, localbench/workloads.py, and tests. Those hunks were preserved. The user prohibited staging/committing this shared tree; no commit evidence is claimed. Target paths are reserved through Agent Mail.
 - Use localbench’s existing profile/LaunchAgent conventions in `localbench/smol.py` (`profile_dirs`, `omp_bin`, `omp_env`, `plistlib`, `launchctl`, backup/rollback markers). Use existing native Ollama operations in `localbench/backends.py` / `localbench.__main__` rather than adding a dependency. Keep gateway state under `~/.localbench`, outside the clone.
 - The built-in Ollama override was verified against the installed OMP version 18.4.2. The isolated default/named-profile smoke passed through the profile path prefix, including a separate direct fallback trap; no live profiles were edited before that proof.

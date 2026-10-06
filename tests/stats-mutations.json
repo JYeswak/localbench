@@ -1,0 +1,95 @@
+[
+  {
+    "file": "localbench/stats.py",
+    "label": "few clustered pairs fall back to CMH instead of shrinking",
+    "new": "    if len(pairs) >= min_clusters or True:",
+    "old": "    if len(pairs) >= min_clusters:",
+    "tests": [
+      "tests.test_stats.IccCmh.test_few_clustered_legs_shrink_to_deff_fisher",
+      "tests.test_stats.IccCmh.test_three_clustered_pairs_still_shrink"
+    ]
+  },
+  {
+    "file": "localbench/stats.py",
+    "label": "design effect ignores cluster size",
+    "new": "    return 1.0 + (1.0 - 1.0) * icc",
+    "old": "    return 1.0 + (math.fsum(sizes) / len(sizes) - 1.0) * icc",
+    "tests": [
+      "tests.test_stats.IccCmh.test_design_effect_is_one_without_clustering",
+      "tests.test_stats.IccCmh.test_few_clustered_legs_shrink_to_deff_fisher"
+    ]
+  },
+  {
+    "file": "localbench/stats.py",
+    "label": "shrunk candidate counts round up instead of down",
+    "new": "    a_eff = [int(a_hits / deff) + 1, int(a_n / deff) + 1]",
+    "old": "    a_eff = [int(a_hits / deff), int(a_n / deff)]",
+    "tests": [
+      "tests.test_stats.IccCmh.test_few_clustered_legs_shrink_to_deff_fisher"
+    ]
+  },
+  {
+    "label": "drift factor fixed at 1.2 regardless of arm variances",
+    "file": "localbench/stats.py",
+    "old": "    factor = (var_y + var_x / 2) / denom if denom > 0 else 1.2",
+    "new": "    factor = 1.2",
+    "tests": [
+      "tests.test_stats.DriftPaired.test_factor_grows_with_a_noisier_baseline",
+      "tests.test_stats.DriftPaired.test_factor_shrinks_with_a_noisier_candidate"
+    ]
+  },
+  {
+    "label": "betting mixture sums instead of averaging",
+    "file": "localbench/stats.py",
+    "old": "        log_mix = peak + math.log(math.fsum(math.exp(c - peak) for c in log_cap)\n",
+    "new": "        log_mix = peak + math.log(math.fsum(math.exp(c - peak) for c in log_cap) + 1)\n",
+    "tests": [
+      "tests.test_stats.BettingCs.test_null_holds_size_under_continuous_monitoring"
+    ]
+  },
+  {
+    "label": "mixture SPRT drops the null coin flips",
+    "file": "localbench/stats.py",
+    "old": "    log_m = (n * math.log(2.0) + math.lgamma(b + a) + math.lgamma(n - b + b_)",
+    "new": "    log_m = (math.lgamma(b + a) + math.lgamma(n - b + b_)",
+    "tests": [
+      "tests.test_stats.MixtureSprt.test_uniform_mixture_is_exact_on_five_of_five"
+    ]
+  },
+  {
+    "label": "PPI subtracts its rectifier",
+    "file": "localbench/stats.py",
+    "old": "    estimate = mean_u + rectifier",
+    "new": "    estimate = mean_u - rectifier",
+    "tests": [
+      "tests.test_stats.Ppi.test_rectifier_corrects_a_biased_judge"
+    ]
+  },
+  {
+    "label": "normal quantile mirrored",
+    "file": "localbench/stats.py",
+    "old": "    q = p - 0.5",
+    "new": "    q = 0.5 - p",
+    "tests": [
+      "tests.test_stats.NormalQuantile.test_spot_values"
+    ]
+  },
+  {
+    "label": "betting mixture exponentiates raw log-capitals",
+    "file": "localbench/stats.py",
+    "old": "        peak = max(log_cap)\n        log_mix = peak + math.log(math.fsum(math.exp(c - peak) for c in log_cap)\n                                  / len(lambdas))",
+    "new": "        mix = math.fsum(math.exp(c) for c in log_cap) / len(lambdas)\n        log_mix = math.log(mix)",
+    "tests": [
+      "tests.test_stats.BettingCs.test_find_scale_all_pass_stays_finite"
+    ]
+  },
+  {
+    "label": "Holm rejects benefit family not nominal endpoints",
+    "file": "localbench/stats.py",
+    "old": "ordered = sorted(pvalues.items(), key=lambda item: item[1])",
+    "new": "ordered = list(pvalues.items())",
+    "tests": [
+      "tests.test_stats.HolmMultiplicity.test_holm_controls_two_benefit_endpoints"
+    ]
+  }
+]

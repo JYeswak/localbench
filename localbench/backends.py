@@ -15,6 +15,7 @@ import subprocess
 import tempfile
 import threading
 import time
+import urllib.parse
 import urllib.request
 from functools import cache
 from pathlib import Path
@@ -54,6 +55,19 @@ def _loaded_prestate(url: str) -> list[str] | None:
                 return None
             ids.append(model_id)
     return sorted(ids)
+
+
+_NO_PROXY_OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
+
+def urlopen(request, timeout: float = 10):
+    """urlopen that never sends loopback (127.0.0.1/localhost/::1) through a proxy: proxy env vars
+    otherwise break gateway/shim health checks and replay on machines with a proxy configured.
+    Remote URLs use the default opener (env proxies honored). Accepts a URL or a Request."""
+    url = request.full_url if isinstance(request, urllib.request.Request) else request
+    if urllib.parse.urlsplit(url).hostname in ("127.0.0.1", "localhost", "::1"):
+        return _NO_PROXY_OPENER.open(request, timeout=timeout)
+    return urllib.request.urlopen(request, timeout=timeout)
 
 
 def _get(url: str, timeout: float = 10) -> dict:

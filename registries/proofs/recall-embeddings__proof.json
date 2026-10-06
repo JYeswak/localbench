@@ -1,0 +1,84 @@
+{
+  "analysis_sha": "760a973aa245a0fa1d51d86165f8494305c94741fdaf623ef7fdfc3b6453d3a4",
+  "arms": {
+    "ab_a": {
+      "description": "incumbent recall: default child config with the local embedding sidecar (fast-bge-base-en-v1.5)",
+      "mem_config": "fixtures/omp/child-config-mem.yml",
+      "mem_config_sha256": "019eef862b65ed03c3446ab12ed94c6ab37e86db04d57d1f7ea818cdf5b40210"
+    },
+    "ab_b": {
+      "description": "challenger: FTS-only recall, no embedding sidecar",
+      "mem_config": "fixtures/omp/child-config-mem-fts.yml",
+      "mem_config_sha256": "3f3912800dc922f93d6ab8639709e536bd15a2a1a13a7aa3c091e4fb8d724d68"
+    }
+  },
+  "assertions": [
+    {
+      "id": "recall-no-loss",
+      "params": {
+        "direction": "not-worse",
+        "margin": 0.1,
+        "metric": "mem.recall.hit_rate",
+        "test": "fisher-pooled"
+      },
+      "type": "metric"
+    },
+    {
+      "id": "derail-no-loss",
+      "params": {
+        "direction": "not-worse",
+        "margin": 0.1,
+        "metric": "mem.derail.ok_rate",
+        "test": "fisher-pooled"
+      },
+      "type": "metric"
+    },
+    {
+      "candidate": "ab_a",
+      "id": "recall-faster",
+      "params": {
+        "direction": "lower",
+        "metric": "mem.recall.pre_main_s",
+        "test": "drift-paired-t"
+      },
+      "type": "metric"
+    },
+    {
+      "id": "sized-design",
+      "params": {
+        "min_derail_facts_b": 120,
+        "min_pairs": 12,
+        "min_recall_facts_b": 72
+      },
+      "type": "deterministic"
+    }
+  ],
+  "candidates": [
+    {
+      "route": "ollama:qwen3.6:35b-mlx"
+    }
+  ],
+  "dataset": {
+    "items_sha256": "dbd9353c2ca2dd70dffa5bc9128a5f68365c1279d2e5a4a6503d5f15fbfb6901",
+    "suite": "mem-configs/child-config-mem.yml+child-config-mem-fts.yml"
+  },
+  "description": "Pre-registration for the recall-embeddings proof (kit-memory-study-vce comment 204 section D: --pairs 12 --mem-rounds 4 --repeats 2 = 25 legs, B 144 facts / A 156 facts, about 8 h, one heavy-slot job). Same main model both arms; the contrast is embeddings vs FTS recall only. The one sound receipt so far (ab-memory-embeddings-vs-fts-20261002-side) is a 5-leg pilot: recall at ceiling both arms, FTS numerically faster on pre_main but within noise. This proof asserts the kit-v8t gates for candidate ab_a (embeddings): Fisher-pooled non-inferiority at margin 0.10 on recall and derail, plus a drift-paired t win on recall pre_main_s (PowerPlan B: neighbour pairing cancels the within-run drift and needs 6-8 pairs; 12 are run). If the data says FTS is faster, the recall-faster assertion fails and the proof refutes: that is a valid close. Dataset, frozen-omp, and verdict conventions are the same as mnemopi-extraction__proof. Single direction only: nobody claims FTS wins, so no reverse receipt. Evaluated by prove.evaluate_memory_metric and prove.evaluate_sized_design; alpha lives in the verdict row (STATS_ALPHA), not the spec.",
+  "feature": "recall-embeddings",
+  "kind": "memory",
+  "mem_rounds": 4,
+  "pairs": 12,
+  "regime": "side",
+  "repeats": 2,
+  "stage": "proof",
+  "tiers": [
+    "mem",
+    "sess"
+  ],
+  "verdicts": [
+    {
+      "bank": "prove__memory__recall-embeddings__ab_a",
+      "baseline": "ab_b",
+      "candidate": "ab_a"
+    }
+  ]
+}

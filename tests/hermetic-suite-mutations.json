@@ -1,0 +1,65 @@
+[
+  {
+    "label": "external network egress remains denied",
+    "file": "scripts/hermetic_suite.py",
+    "old": "NETWORK_DENY = \"(deny network-outbound)\"",
+    "new": "NETWORK_DENY = \"(allow network-outbound)\"",
+    "tests": [
+      "tests.test_hermetic_suite.HermeticSuitePolicy.test_external_egress_is_blocked_and_loopback_fixtures_work"
+    ]
+  },
+  {
+    "label": "loopback fixtures remain permitted",
+    "file": "scripts/hermetic_suite.py",
+    "old": "LOCALHOST_ALLOW = '(allow network-outbound (remote ip \"localhost:*\"))'",
+    "new": "LOCALHOST_ALLOW = '(deny network-outbound (remote ip \"localhost:*\"))'",
+    "tests": [
+      "tests.test_hermetic_suite.HermeticSuitePolicy.test_external_egress_is_blocked_and_loopback_fixtures_work"
+    ]
+  },
+  {
+    "label": "model service ports remain denied",
+    "file": "scripts/hermetic_suite.py",
+    "old": "    rules.extend(f'(deny network-outbound (remote ip \"localhost:{port}\"))' for port in ports)",
+    "new": "    rules.extend(f'(allow network-outbound (remote ip \"localhost:{port}\"))' for port in ports)",
+    "tests": [
+      "tests.test_hermetic_suite.HermeticSuitePolicy.test_external_egress_is_blocked_and_loopback_fixtures_work"
+    ]
+  },
+  {
+    "label": "hermetic isolation still denies mlx-smol port 11235",
+    "file": "scripts/hermetic_suite.py",
+    "old": "MODEL_SERVICE_PORTS = tuple(INFERENCE_PORTS)",
+    "new": "MODEL_SERVICE_PORTS = tuple(port for port in INFERENCE_PORTS if port != 11235)",
+    "tests": [
+      "tests.test_hermetic_suite.HermeticSuitePolicy.test_model_service_ports_cover_inference_servers"
+    ]
+  },
+  {
+    "label": "CI suite temporary files stay outside checkout",
+    "file": "scripts/hermetic_suite.py",
+    "old": "        return root",
+    "new": "        return SCRATCH_ROOT",
+    "tests": [
+      "tests.test_hermetic_suite.HermeticSuitePolicy.test_ci_suite_temporary_files_use_runner_temp_outside_checkout"
+    ]
+  },
+  {
+    "label": "model executables stay off the child PATH",
+    "file": "scripts/hermetic_suite.py",
+    "old": "    return os.pathsep.join((str(Path(python_executable).parent), *SYSTEM_PATHS))",
+    "new": "    return os.environ.get(\"PATH\", \"\")",
+    "tests": [
+      "tests.test_hermetic_suite.HermeticSuitePolicy.test_child_path_omits_model_tools_even_if_parent_path_has_them"
+    ]
+  },
+  {
+    "label": "service-dependent skips and expected failures fail the gate",
+    "file": "scripts/hermetic_suite.py",
+    "old": "    return test_id == REPORT_JSON_TEST and reason == REPORT_JSON_SKIP",
+    "new": "    return True",
+    "tests": [
+      "tests.test_hermetic_suite.HermeticSuitePolicy.test_service_skips_and_expected_failures_are_not_allowed"
+    ]
+  }
+]

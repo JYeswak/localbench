@@ -41,10 +41,11 @@ def _sysctl(name: str) -> str:
 
 
 def gpu_utilization() -> dict:
+    """Ancillary ioreg fields; device activity is measured by gpu_window()."""
     out = _run("ioreg", "-r", "-d", "1", "-w", "0", "-c", "IOAccelerator")
-    stats = {}
-    for key, field in (("device_pct", "Device Utilization %"), ("renderer_pct", "Renderer Utilization %"),
-                       ("tiler_pct", "Tiler Utilization %"), ("in_use_mem_bytes", "In use system memory")):
+    stats = {"device_pct": None, "device_source": "windowed macmon IOReport", "status": "WINDOW_REQUIRED"}
+    for key, field in (("renderer_pct", "Renderer Utilization %"), ("tiler_pct", "Tiler Utilization %"),
+                       ("in_use_mem_bytes", "In use system memory")):
         m = re.search(rf'"{re.escape(field)}"=(\d+)', out)
         if m:
             stats[key] = int(m.group(1))
@@ -53,6 +54,7 @@ def gpu_utilization() -> dict:
 
 _GPU_CREATOR = re.compile(r'"IOUserClientCreator" = "pid (\d+), ([^"]*)"')
 _GPU_NS = re.compile(r'"accumulatedGPUTime"=(\d+)')
+GPU_IDLE_THRESHOLD_PCT = 5.0  # below this floor, a device/process ratio is measurement noise
 
 
 def gpu_time_by_pid() -> dict[int, dict]:
@@ -95,6 +97,198 @@ def gpu_share(before: dict, after: dict, seconds: float, commands: dict[int, str
             if names:
                 r["model"], r["model_names"] = ", ".join(names), names
     return sorted(rows, key=lambda r: -r["pct"])
+
+
+def _parse_macmon_sample(line: str) -> dict | None:
+    try:
+        payload = json.loads(line)
+    except (json.JSONDecodeError, TypeError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    usage = payload.get("gpu_usage")
+    timestamp = payload.get("timestamp")
+    if not isinstance(usage, list) or len(usage) < 2 or not isinstance(timestamp, str):
+        return None
+    try:
+        sample_time = datetime.fromisoformat(timestamp.replace("Z", "+00:00")).timestamp()
+        frequency_mhz, device_fraction = float(usage[0]), float(usage[1])
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if (not math.isfinite(sample_time) or not math.isfinite(frequency_mhz) or frequency_mhz < 0
+            or not math.isfinite(device_fraction) or not 0 <= device_fraction <= 1):
+        return None
+    return {"frequency_mhz": round(frequency_mhz, 1), "device_pct": round(device_fraction * 100, 1),
+            "timestamp": timestamp, "sample_time": sample_time}
+
+
+def _collect_macmon_window(seconds: float) -> tuple[list[dict], list[tuple[float, dict]]]:
+    counter_points = []
+
+    def sample_process_counters() -> None:
+        started = time.time()
+        counters = gpu_time_by_pid()
+        ended = time.time()
+        counter_points.append(((started + ended) / 2, counters))
+
+    sample_process_counters()
+    sample_count = max(2, math.ceil(seconds / 1.5))
+    try:
+        process = subprocess.Popen(["macmon", "pipe", "--samples", str(sample_count), "--interval", "1000"],
+                                   stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, bufsize=1)
+    except OSError:
+        return [], counter_points
+    deadline = time.monotonic() + max(30.0, seconds * 5)
+    timed_out = False
+    while process.poll() is None:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            timed_out = True
+            process.terminate()
+            try:
+                process.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+            break
+        try:
+            process.wait(timeout=min(0.5, remaining))
+        except subprocess.TimeoutExpired:
+            pass
+        sample_process_counters()
+    stdout, _ = process.communicate()
+    sample_process_counters()
+    if timed_out or process.returncode != 0:
+        return [], counter_points
+    samples = []
+    for line in stdout.splitlines():
+        sample = _parse_macmon_sample(line)
+        if sample is not None:
+            samples.append(sample)
+    return samples, counter_points
+
+
+def _gpu_counters_at(points: list[tuple[float, dict]], when: float) -> dict[int, dict] | None:
+    """Interpolate cumulative process counters at an IOReport sample boundary."""
+    for (left_time, left), (right_time, right) in zip(points, points[1:]):
+        if left_time <= when <= right_time and right_time > left_time:
+            fraction = (when - left_time) / (right_time - left_time)
+            counters = {}
+            for pid in left.keys() | right.keys():
+                before = left.get(pid, {})
+                after = right.get(pid, {})
+                before_ns = before.get("ns", 0)
+                after_ns = max(before_ns, after.get("ns", before_ns))
+                counters[pid] = {"name": after.get("name") or before.get("name") or "unknown",
+                                 "ns": round(before_ns + (after_ns - before_ns) * fraction)}
+            return counters
+    return None
+
+
+def gpu_coverage_summary(device_samples: list[float], process_pct: float | None) -> dict:
+    values = []
+    for value in device_samples:
+        if (isinstance(value, bool) or not isinstance(value, (int, float))
+                or not math.isfinite(value) or not 0 <= value <= 100):
+            values = []
+            break
+        values.append(float(value))
+    if (isinstance(process_pct, bool) or not isinstance(process_pct, (int, float))
+            or not math.isfinite(process_pct) or process_pct < 0):
+        return {"device_pct": None, "process_pct": None, "coverage": None, "unattributed_pct": None,
+                "status": "UNAVAILABLE", "source": "macmon IOReport"}
+    process_pct = float(process_pct)
+    if not values:
+        return {"device_pct": None, "process_pct": round(process_pct, 1), "coverage": None,
+                "unattributed_pct": None, "status": "UNAVAILABLE", "source": "macmon IOReport"}
+    device_pct = statistics.fmean(values)
+    if device_pct < GPU_IDLE_THRESHOLD_PCT and process_pct < GPU_IDLE_THRESHOLD_PCT:
+        status, coverage, unattributed_pct = "IDLE", None, 0.0
+    elif device_pct < GPU_IDLE_THRESHOLD_PCT:
+        status, coverage, unattributed_pct = "UNATTRIBUTED", None, None
+    else:
+        raw_coverage = 100 * process_pct / device_pct
+        coverage = round(min(100.0, raw_coverage), 1)
+        unattributed_pct = round(max(0.0, 100.0 - coverage), 1)
+        if raw_coverage > 100.0:
+            status = "UNALIGNED"
+        else:
+            status = "ATTRIBUTED" if coverage >= 90 else "UNATTRIBUTED"
+    return {"device_pct": round(device_pct, 1), "process_pct": round(float(process_pct), 1),
+            "coverage": coverage, "unattributed_pct": unattributed_pct, "status": status,
+            "source": "macmon IOReport"}
+
+
+def _device_window_mean(samples: list[dict]) -> float | None:
+    if len(samples) < 2:
+        return None
+    raw_time = samples[0].get("sample_time")
+    raw_pct = samples[0].get("device_pct")
+    if (isinstance(raw_time, bool) or not isinstance(raw_time, (int, float))
+            or isinstance(raw_pct, bool) or not isinstance(raw_pct, (int, float))):
+        return None
+    previous_time, previous_pct = float(raw_time), float(raw_pct)
+    if (not math.isfinite(previous_time) or not math.isfinite(previous_pct)
+            or not 0 <= previous_pct <= 100):
+        return None
+    first_time = previous_time
+    area = 0.0
+    for sample in samples[1:]:
+        raw_time, raw_pct = sample.get("sample_time"), sample.get("device_pct")
+        if (isinstance(raw_time, bool) or not isinstance(raw_time, (int, float))
+                or isinstance(raw_pct, bool) or not isinstance(raw_pct, (int, float))):
+            return None
+        sample_time, sample_pct = float(raw_time), float(raw_pct)
+        if (not math.isfinite(sample_time) or not math.isfinite(sample_pct)
+                or sample_time <= previous_time or not 0 <= sample_pct <= 100):
+            return None
+        area += (previous_pct + sample_pct) * 0.5 * (sample_time - previous_time)
+        previous_time, previous_pct = sample_time, sample_pct
+    return area / (previous_time - first_time)
+
+
+def gpu_window(seconds: float = 5.0) -> dict:
+    try:
+        seconds = float(seconds)
+    except (TypeError, ValueError, OverflowError):
+        seconds = 0
+    if not math.isfinite(seconds) or seconds <= 0:
+        samples, counter_points = [], []
+    else:
+        samples, counter_points = _collect_macmon_window(seconds)
+    raw_times = [sample.get("sample_time") for sample in samples]
+    sample_times: list[float] = []
+    for value in raw_times:
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+            sample_times = []
+            break
+        sample_times.append(float(value))
+    valid_window = (len(samples) >= 2 and len(sample_times) == len(samples)
+                    and all(right > left for left, right in zip(sample_times, sample_times[1:])))
+    if valid_window:
+        window_s = sample_times[-1] - sample_times[0]
+        before = _gpu_counters_at(counter_points, sample_times[0])
+        after = _gpu_counters_at(counter_points, sample_times[-1])
+    else:
+        window_s, before, after = 0.0, None, None
+    if window_s < seconds * 0.8:
+        before = after = None
+    if before is not None and after is not None and window_s > 0:
+        rows = gpu_share(before, after, window_s, min_pct=0.5)
+        delta_ns = sum(max(0, process["ns"] - before.get(pid, {}).get("ns", 0))
+                       for pid, process in after.items())
+        process_pct = 100 * delta_ns / (window_s * 1e9)
+        device_mean = _device_window_mean(samples)
+        device_samples = [device_mean] if device_mean is not None else []
+    else:
+        rows, process_pct, device_samples = [], None, []
+    report = gpu_coverage_summary(device_samples, process_pct)
+    report.update({"window_s": round(window_s, 3), "gpu_by_process": rows,
+                   "io_report_samples": len(samples),
+                   "process_counter_samples": len(counter_points),
+                   "io_report": [{"timestamp": sample.get("timestamp"),
+                                  "device_pct": sample["device_pct"]} for sample in samples]})
+    return report
 
 
 OLLAMA_WEIGHTS = "application/vnd.ollama.image.model"
@@ -613,14 +807,18 @@ class Sampler:
     `gpu_foreign_max_pct`, for any process other than the backend's own using more GPU than that in the interval
     (the device-wide % cannot see this: the model under test saturates it). The first sample of each contention
     episode goes to `on_contention` (live monitors see it).
+    `on_sample` runs on the sampler thread for each completed sample before it is stored; callback exceptions are recorded
+    on that sample as `sample_callback_error`.
     """
 
     def __init__(self, interval: float = 1.0, target: tuple[str, ...] | None = None,
-                 on_contention: Callable[[dict], None] | None = None, gpu_foreign_max_pct: float | None = None):
+                 on_contention: Callable[[dict], None] | None = None, gpu_foreign_max_pct: float | None = None,
+                 on_sample: Callable[[dict], None] | None = None):
         self.interval = interval
         self.target = target
         self.on_contention = on_contention
         self.gpu_foreign_max_pct = gpu_foreign_max_pct
+        self.on_sample = on_sample
         self.series: list[dict] = []
         self.contention: list[dict] = []
         self.load_spikes: list[dict] = []
@@ -667,6 +865,11 @@ class Sampler:
                     now = (prev[0], time.time())
                 in_episode = in_spike = False
             self._gpu_span[1] = now
+            if self.on_sample:
+                try:
+                    self.on_sample(s)
+                except Exception as exc:
+                    s["sample_callback_error"] = f"{type(exc).__name__}: {exc}"
             self.series.append(s)
             if self._stop.wait(self.interval):
                 break

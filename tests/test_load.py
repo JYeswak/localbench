@@ -207,6 +207,42 @@ class Verdict(unittest.TestCase):
                     self.assertEqual(apps, [CHROME])
 
 
+    def test_hidden_second_server_timeout_below_gpu_threshold_is_nonproof(self):
+        probes = {}
+        # The fake second server has an idle qwen3.8 resident; its status endpoint times out.
+        # Its process is absent from the low-GPU process sample, so only residency sampling detects uncertainty.
+
+        def endpoint(url, timeout):
+            if url.endswith("/api/ps"):
+                return BytesIO(json.dumps({"models": [{"name": TARGET[1]}]}).encode())
+            if url.startswith("http://127.0.0.1:11234/"):
+                raise urllib.error.URLError(TimeoutError("fake MLX residency timeout"))
+            raise urllib.error.URLError(ConnectionRefusedError("fake inactive server"))
+
+        with mock.patch.object(sysstats.urllib.request, "urlopen", side_effect=endpoint):
+            resident = sysstats.resident_models(probes)
+        self.assertEqual(resident["ollama"], [TARGET[1]])
+        self.assertIsNone(resident["mlx-serve"])
+        probe = probes["mlx-serve"]
+        self.assertEqual(probe["error_class"], "timeout")
+        self.assertLessEqual(probe["probe_start"], probe["probe_end"])
+
+        rows = []
+        foreign, runners, _apps = sysstats.classify(rows, resident, TARGET, 25.0)
+        sampler = sysstats.Sampler(target=TARGET, gpu_foreign_max_pct=25.0)
+        sampler.series = [{"resident": resident, "resident_probes": probes, "gpu_procs": rows,
+                           "gpu_device_pct": 5.0}]
+        during = sampler.summary()
+        summary = {"system": {"during": during}, "conformance": {},
+                   "verdicts": {"contended": bool(foreign or runners), "must_fail": [],
+                                "preflight_problems": [], "pins_changed": {}}}
+        self.assertEqual(during["resident_unknown_samples"], 1)
+        self.assertEqual(during["gpu_device_pct"]["mean"], 5.0)
+        self.assertFalse(summary["verdicts"]["contended"])
+        reasons = unsound(summary)
+        self.assertTrue(any("resident model state unknown" in reason for reason in reasons), reasons)
+        self.assertFalse(any(reason.startswith("CONTENDED:") for reason in reasons), reasons)
+
     def test_campaign_runs_cannot_be_used_as_performance_or_golden_evidence(self):
         summary = {"evaluation_campaign": {"profile": "omp-e2e.v1"}, "conformance": {},
                    "verdicts": {"contended": False, "must_fail": [], "preflight_problems": [], "pins_changed": {}}}

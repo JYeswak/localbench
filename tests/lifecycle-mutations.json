@@ -1,0 +1,20 @@
+[
+  {
+    "label": "termination handler skips registered process-group cleanup",
+    "file": "localbench/lifecycle.py",
+    "old": "        cleanup_children()\n",
+    "new": "        pass\n",
+    "tests": [
+      "tests.test_lifecycle.LifecycleCancellation.test_each_cancel_signal_terminates_the_registered_process_group"
+    ]
+  },
+  {
+    "label": "process-group cleanup signals only the leader",
+    "file": "localbench/lifecycle.py",
+    "old": "os.killpg(process.pid, signum)",
+    "new": "process.send_signal(signum)",
+    "tests": [
+      "tests.test_lifecycle.LifecycleCancellation.test_each_cancel_signal_terminates_the_registered_process_group"
+    ]
+  }
+]

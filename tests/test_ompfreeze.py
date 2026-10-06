@@ -149,6 +149,16 @@ class Freeze(FreezeCase):
             again = ompfreeze.freeze(plan)
         self.assertFalse(again["created"])
         self.assertEqual(again["made_at"], first["made_at"])
+        self.assertEqual(again["closure_sha256"], first["closure_sha256"])
+
+    def test_reuse_refuses_a_modified_dependency_and_names_the_path(self):
+        first = self.freeze()
+        target = self.frozen / first["snapshot_id"]
+        changed = target / "node_modules" / "dep-a" / "value.txt"
+        changed.chmod(changed.stat().st_mode | 0o200)
+        changed.write_text("corrupted\n")
+        with self.assertRaisesRegex(RuntimeError, "dep-a/value.txt"):
+            ompfreeze.freeze(ompfreeze.plan())
 
     def test_an_update_during_the_copy_is_refused_and_leaves_no_snapshot(self):
         plan = ompfreeze.plan()
@@ -292,6 +302,97 @@ class Cli(FreezeCase):
         self.assertEqual([c[2] for c in calls], ["1.0.0", "2.0.0", "2.0.0", "2.0.0", "2.0.0"])
         self.assertIn("e2e", receipt["pin_drift"])
         self.assertEqual(rc, 0)   # the drift voids the e2e rows; it is reported, not an exit status
+
+    def test_prove_omp_frozen_dry_run_plans_without_freezing(self):
+        from localbench import prove
+        spec = {"feature": "mnemopi-extraction", "kind": "memory", "stage": "proof",
+                "dataset": {"suite": "mem-suite", "items_sha256": "a" * 64},
+                "candidates": [{"route": "ollama:qwen3.6:35b-mlx"}],
+                "arms": {"ab_a": {}, "ab_b": {}}, "tiers": ["mem", "sess"],
+                "pairs": 12, "mem_rounds": 4, "repeats": 2}
+        with mock.patch.object(prove, "load_spec", return_value=spec), \
+                mock.patch.object(prove, "spec_commit", return_value="a" * 40), \
+                mock.patch.object(ompfreeze, "freeze", side_effect=AssertionError("dry-run froze OMP")):
+            rc, out, _err, _ = self._main(["prove", "fake-memory.json", "--omp-frozen", "--dry-run", "--json"])
+        self.assertEqual(rc, 0)
+        self.assertIn("launch mem/sess legs", out)
+        self.assertIn("25 interleaved A/B runs", out)
+
+    def test_prove_generation_dry_run_names_outputs_producer(self):
+        from localbench import prove
+        spec = {"feature": "skill-description-compression", "kind": "generation", "stage": "screen",
+                "dataset": {"suite": "skilldesc", "items_sha256": "b" * 64},
+                "candidates": [{"route": "ollama:qwen3.8:27b-mlx"}]}
+        with mock.patch.object(prove, "load_spec", return_value=spec), \
+                mock.patch.object(prove, "spec_commit", return_value="b" * 40), \
+                mock.patch.object(prove, "_generation_corpus", return_value={"items": [], "manifest": {}, "root": Path(".")}):
+            rc, out, _err, _ = self._main(["prove", "fake-generation.json", "--dry-run", "--json"])
+        self.assertEqual(rc, 0, (out, _err))
+        self.assertIn("outputs_fn (replay_generation_outputs)", out)
+
+    def test_prove_omp_frozen_runs_with_snapshot_in_environment(self):
+        from localbench import proofqueue, prove
+        observed, bead_writes = [], []
+        spec = {"feature": "mnemopi-extraction", "kind": "memory", "stage": "proof",
+                "dataset": {"suite": "mem-suite", "items_sha256": "a" * 64},
+                "candidates": [{"route": "ollama:qwen3.6:35b-mlx"}],
+                "arms": {"ab_a": {}, "ab_b": {}}, "tiers": ["mem", "sess"],
+                "pairs": 1, "mem_rounds": 1, "repeats": 1}
+
+        def run_spec(*args, **kwargs):
+            observed.append(os.environ.get("LOCALBENCH_OMP"))
+            kwargs["br"](["close", "kit-sample", "--reason", "proof"])
+            return {"candidates": []}
+
+        with mock.patch.object(prove, "load_spec", return_value=spec), \
+                mock.patch.object(prove, "spec_commit", return_value="a" * 40), \
+                mock.patch.object(prove, "prove_spec", side_effect=run_spec), \
+                mock.patch.object(proofqueue, "_br",
+                                  side_effect=lambda argv: bead_writes.append(argv) or (0, "", "")):
+            rc, _out, _err, _ = self._main(["prove", "fake-memory.json", "--omp-frozen"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(observed, [str(ompfreeze.entry_path(self.frozen / ompfreeze.plan().snapshot_id))])
+        self.assertEqual(bead_writes, [["close", "kit-sample", "--reason", "proof"]])
+        self.assertTrue(self.frozen.is_dir())
+
+    def test_prove_refuses_snapshot_drift_before_launch(self):
+        real_freeze = ompfreeze.freeze
+
+        def freeze_then_corrupt(plan):
+            manifest = real_freeze(plan)
+            path = self.frozen / plan.snapshot_id / "node_modules" / "dep-a" / "value.txt"
+            path.chmod(path.stat().st_mode | 0o200)
+            path.write_text("corrupted before prove\n")
+            return manifest
+
+        launched = []
+        args = type("Args", (), {"cmd": "prove", "omp_frozen": True})()
+        with mock.patch.object(ompfreeze, "freeze", side_effect=freeze_then_corrupt), \
+                tempfile.TemporaryDirectory() as receipts, mock.patch.object(cli, "RECEIPTS", Path(receipts)):
+            rc = cli._with_frozen_omp(lambda _args: launched.append(True) or 0, args, preserve_flag=True)
+        self.assertNotEqual(rc, 0)
+        self.assertEqual(launched, [])
+
+    def test_prove_marks_receipt_if_snapshot_changes_before_return(self):
+        args = type("Args", (), {"cmd": "prove", "omp_frozen": True})()
+        with tempfile.TemporaryDirectory() as receipts, mock.patch.object(cli, "RECEIPTS", Path(receipts)):
+            receipt = Path(receipts) / "prove__synthetic.json"
+
+            def run_proof(args):
+                receipt.write_text(json.dumps({"problems": []}))
+                args._frozen_proof_br(["close", "kit-sample", "--reason", "proof"])
+                path = self.frozen / ompfreeze.plan().snapshot_id / "node_modules" / "dep-a" / "value.txt"
+                path.chmod(path.stat().st_mode | 0o200)
+                path.write_text("corrupted during prove\n")
+                return 0
+
+            from localbench import proofqueue
+            with mock.patch.object(proofqueue, "_br") as bead_write:
+                rc = cli._with_frozen_omp(run_proof, args, preserve_flag=True)
+                proof_receipt = json.loads(receipt.read_text())
+            bead_write.assert_not_called()
+            self.assertEqual(rc, 1)
+            self.assertTrue(any("PINS CHANGED" in problem for problem in proof_receipt["problems"]))
 
     def test_run_omp_frozen_runs_its_leg_through_the_snapshot(self):
         execute, calls = _fake_leg()

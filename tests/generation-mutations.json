@@ -110,5 +110,61 @@
     "old": "        if not answerable(feature, body):\n            skipped += 1\n            continue",
     "new": "        pass",
     "tests": ["tests.test_generation.Answerable.test_assemble_skips_unanswerable_and_counts_them"]
+  },
+  {
+    "label": "replay url follows the body shape",
+    "file": "localbench/generation.py",
+    "old": "    endpoint = \"responses\" if isinstance(body.get(\"input\"), list) else \"chat/completions\"",
+    "new": "    endpoint = \"chat/completions\"",
+    "tests": ["tests.test_generation.GatewayRoute.test_replay_url_follows_body_shape_under_the_profile"]
+  },
+  {
+    "label": "replay profiles are plain names",
+    "file": "localbench/generation.py",
+    "old": "    if not isinstance(profile, str) or not profile or \"/\" in profile or profile in {\".\", \"..\"}:",
+    "new": "    if False:",
+    "tests": ["tests.test_generation.GatewayRoute.test_replay_url_follows_body_shape_under_the_profile"]
+  },
+  {
+    "label": "progress ready flag needs the full gate, not near it",
+    "file": "localbench/generation.py",
+    "old": "                     \"captured\": len(stamps),",
+    "new": "                     \"captured\": len(stamps),\n                     \"ready\": True,",
+    "tests": ["tests.test_generation.CorpusProgress.test_progress_counts_corpus_captured_and_dates"]
+  },
+  {
+    "label": "progress dates come from capture time, not file mtime",
+    "file": "localbench/generation.py",
+    "old": "            stamp = meta.get(\"t\") if isinstance(meta.get(\"t\"), (int, float)) else None",
+    "new": "            stamp = None",
+    "tests": ["tests.test_generation.CorpusProgress.test_progress_counts_corpus_captured_and_dates"]
+  },
+  {
+    "label": "generation MLX replay starts the owned server",
+    "file": "localbench/generation.py",
+    "old": "            server.start()",
+    "new": "            pass",
+    "tests": ["tests.test_generation.RunCandidate.test_mlx_serve_arm_starts_stops_and_replays_only_to_loopback"]
+  },
+  {
+    "label": "generation MLX replay cannot leave loopback",
+    "file": "localbench/generation.py",
+    "old": "                    url = server.base_url + \"/chat/completions\"",
+    "new": "                    url = \"http://example.com/chat/completions\"",
+    "tests": ["tests.test_generation.RunCandidate.test_mlx_serve_arm_starts_stops_and_replays_only_to_loopback"]
+  },
+  {
+    "label": "generation corpus ids cannot be rebuilt in place",
+    "file": "localbench/generation.py",
+    "old": "    try:\n        d.mkdir(mode=0o700)\n    except FileExistsError:\n        raise corpus.CorpusError(\n            f\"generation corpus directory {d} already exists; choose a new corpus id\") from None\n    corpus.refuse_repo_path(d.resolve())",
+    "new": "    corpus.secure_dir(d)",
+    "tests": ["tests.test_generation.Assemble.test_assembled_corpus_is_read_only_and_cannot_be_overwritten"]
+  },
+  {
+    "label": "generation dry-run validates the pinned corpus before planning",
+    "file": "localbench/__main__.py",
+    "old": "    if m.dry_run and spec[\"kind\"] == \"generation\":",
+    "new": "    if m.dry_run and False:",
+    "tests": ["tests.test_generation.ProofDryRun.test_generation_dry_run_refuses_a_stale_corpus_pin"]
   }
 ]

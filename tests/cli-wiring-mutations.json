@@ -221,8 +221,8 @@
   {
     "label": "--smol-model reaches Ctx",
     "file": "localbench/__main__.py",
-    "old": "e2e_case=e2e_case, smol_model=smol_model)",
-    "new": "e2e_case=e2e_case)",
+    "old": "e2e_case=e2e_case, smol_model=smol_model,",
+    "new": "e2e_case=e2e_case,",
     "tests": [
       "tests.test_cli.SmolModelRuns.test_smol_model_reaches_ctx_pins_sampler_and_is_warmed"
     ]
@@ -425,6 +425,15 @@
     "new": "",
     "tests": [
       "tests.test_cli.DecisionRunAllowEvict.test_allow_evict_is_passed_to_run_suite_only_when_given"
+    ]
+  },
+  {
+    "label": "watchdog-aborted run still emits the terminal done event",
+    "file": "localbench/__main__.py",
+    "old": "    if watchdog_state[\"reason\"] is not None:\n        done[\"watchdog_abort\"] = watchdog_state[\"reason\"]\n    emit(done)",
+    "new": "    if watchdog_state[\"reason\"] is not None:\n        done[\"watchdog_abort\"] = watchdog_state[\"reason\"]\n    if watchdog_state[\"reason\"] is None:\n        emit(done)",
+    "tests": [
+      "tests.test_cli.WatchdogRun.test_violation_aborts_before_tier_and_emits_terminal_done_with_reason"
     ]
   }
 ]

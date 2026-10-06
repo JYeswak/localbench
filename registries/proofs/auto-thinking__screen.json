@@ -1,4 +1,5 @@
 {
+  "analysis_sha": "760a973aa245a0fa1d51d86165f8494305c94741fdaf623ef7fdfc3b6453d3a4",
   "assertions": [
     {
       "id": "gate-accuracy",
@@ -22,10 +23,10 @@
     }
   ],
   "dataset": {
-    "items_sha256": "ae86eaa55e3515f56447bace22c1971ff096368b47f8a7f649bc2f1788571478",
-    "suite": "decision.choice/auto-thinking-level-jev174-20261001"
+    "items_sha256": "e5fa294b23c982c03fc5557ad40ace166a31ef89b17bdd2507424b06a13cb8ab",
+    "suite": "decision.choice/auto-thinking-level-jevlatest-cache-20261001"
   },
-  "description": "kit-auto-thinking-route-kmt screen: captured auto-thinking requests, 174 items. No paired assertion: the suite carries no hosted reference (labels only); agreement vs hosted comes at stage 2 with the hosted arm. Screen bar is the accuracy gate; latency p95 inside omp's 4 s cap is read from the receipt, not gated here.",
+  "description": "kit-auto-thinking-route-kmt screen: captured auto-thinking requests, 583 items. No paired assertion: the suite carries no hosted reference (labels only); agreement vs hosted comes at stage 2 with the hosted arm. Screen bar is the accuracy gate; latency p95 inside omp's 4 s cap is read from the receipt, not gated here.",
   "feature": "auto-thinking",
   "fresh_per_round": false,
   "kind": "decision",

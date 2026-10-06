@@ -17,7 +17,12 @@ from unittest import mock
 from localbench import __main__ as main_mod
 from localbench import smol
 from localbench.__main__ import DETAILS_NOT_BANKED, _overlay, _receipt_view
+
+# Status snapshots are host-scoped user state; suite status calls stay in scratch.
 from localbench.workloads import FIXTURES, MEM_CONFIG, TIERS
+
+# Status snapshots are host-scoped user state; suite status calls stay in scratch.
+main_mod.STATUS_SNAPSHOT = Path(tempfile.mkdtemp(prefix="status-snapshot-")) / "status-snapshot.json"
 
 ROOT = Path(__file__).resolve().parent.parent
 FTS = FIXTURES / "omp" / "child-config-mem-fts.yml"
@@ -46,23 +51,25 @@ class GoldenWriteRefusals(unittest.TestCase):
     """Refusals exit before open_backend: a nonexistent model name proves nothing was contacted."""
 
     def test_variant_overlay_cannot_write_a_golden(self):
-        p = cli("aa", "ollama:no-such-model", "--tiers", "mem", "--mem-config", str(FTS), "--write-golden")
+        p = cli("aa", "ollama:no-such-model", "--tiers", "mem", "--mem-config", str(FTS), "--write-golden",
+                "--force-load")
         self.assertEqual(p.returncode, 1)
         self.assertIn("refusing --write-golden", p.stderr)
 
     def test_server_flag_cannot_write_a_golden(self):
-        p = cli("aa", "mlx-serve:/nonexistent", "--server-arg=--mtp", "--write-golden")
+        p = cli("aa", "mlx-serve:/nonexistent", "--server-arg=--mtp", "--write-golden", "--force-load")
         self.assertEqual(p.returncode, 1)
         self.assertIn("refusing --write-golden", p.stderr)
 
     def test_a_non_default_round_count_cannot_write_a_golden(self):
-        p = cli("aa", "ollama:no-such-model", "--tiers", "mem", "--mem-rounds", "9", "--write-golden")
+        p = cli("aa", "ollama:no-such-model", "--tiers", "mem", "--mem-rounds", "9", "--write-golden",
+                "--force-load")
         self.assertEqual(p.returncode, 1)
         self.assertIn("refusing --write-golden", p.stderr)
         self.assertIn("--mem-rounds", p.stderr)
 
     def test_zero_rounds_is_a_usage_error_before_any_backend(self):
-        p = cli("aa", "ollama:no-such-model", "--mem-rounds", "0", "--write-golden")
+        p = cli("aa", "ollama:no-such-model", "--mem-rounds", "0", "--write-golden", "--force-load")
         self.assertEqual(p.returncode, 2)
         self.assertIn("at least 1", p.stderr)
         self.assertNotIn("refusing --write-golden", p.stderr)
@@ -438,6 +445,7 @@ class OllamaAutoUpdate(unittest.TestCase):
 
     def setUp(self):
         import sqlite3
+
         from localbench import audit, ollama_app
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
@@ -540,6 +548,81 @@ class OllamaAutoUpdate(unittest.TestCase):
         self.assertEqual((row["status"], row["fix"]), ("WARN", "localbench ollama-app auto-update status"))
 
 
+class StatusSnapshot(unittest.TestCase):
+    def test_suite_snapshot_target_is_not_user_home(self):
+        self.assertNotEqual(main_mod.STATUS_SNAPSHOT, Path.home() / ".localbench" / "status-snapshot.json")
+
+    def status_sandbox(self, sampled_at: float, host_id: str):
+        temp = tempfile.TemporaryDirectory()
+        root = Path(temp.name)
+        snapshot = root / "status-snapshot.json"
+        snapshot.write_text(json.dumps({"sampled_at": sampled_at, "data": {"host_id": host_id, "goldens": []}}))
+        patches = [
+            mock.patch.object(main_mod, "STATUS_SNAPSHOT", snapshot),
+            mock.patch.object(main_mod.sysstats, "host", return_value={"host_id": "current-host"}),
+            mock.patch.object(main_mod, "golden_states", return_value=[]),
+            mock.patch.object(main_mod, "omp_pins", return_value={"omp_version": "v", "omp_sha": "sha", "omp_child_config": None}),
+            mock.patch.object(main_mod.sysstats, "ollama_residents", return_value=[]),
+            mock.patch.object(main_mod.smol, "load_state", return_value=None),
+            mock.patch.object(main_mod.sysstats, "gpu_time_by_pid", return_value={}),
+            mock.patch.object(main_mod.sysstats, "gpu_share", return_value={}),
+            mock.patch.object(main_mod.sysstats, "omp_processes", return_value=[]),
+            mock.patch.object(main_mod.park, "stuck_sessions", return_value=[]),
+            mock.patch.object(main_mod.quiet, "paused", return_value=False),
+            mock.patch.object(main_mod.gateway, "status", return_value={"test": True}),
+            mock.patch.object(main_mod.time, "sleep"),
+            mock.patch.object(main_mod.park, "STATE", root / "park-state.json"),
+        ]
+        return temp, snapshot, patches
+
+    def test_fresh_same_host_snapshot_is_served_without_rewrite(self):
+        now = 10_000.0
+        temp, snapshot, patches = self.status_sandbox(now - 1, "current-host")
+        try:
+            before = snapshot.read_bytes()
+            with mock.patch.object(main_mod.time, "time", return_value=now):
+                with contextlib.ExitStack() as stack:
+                    for patcher in patches:
+                        stack.enter_context(patcher)
+                    result = main_mod.status_report()
+            self.assertEqual(result["status_snapshot"]["age_s"], 1.0)
+            self.assertEqual(snapshot.read_bytes(), before)
+        finally:
+            temp.cleanup()
+
+    def test_expired_snapshot_is_refreshed(self):
+        now = 10_000.0
+        temp, snapshot, patches = self.status_sandbox(now - main_mod.STATUS_SNAPSHOT_TTL - 1, "current-host")
+        try:
+            with mock.patch.object(main_mod.time, "time", return_value=now):
+                with contextlib.ExitStack() as stack:
+                    for patcher in patches:
+                        stack.enter_context(patcher)
+                    result = main_mod.status_report()
+            self.assertEqual(result["host_id"], "current-host")
+            self.assertEqual(result["status_snapshot"]["age_s"], 0.0)
+            self.assertFalse(result["status_snapshot"]["stale"])
+            saved = json.loads(snapshot.read_text())
+            self.assertEqual(saved["data"]["host_id"], "current-host")
+            self.assertEqual(saved["sampled_at"], now)
+        finally:
+            temp.cleanup()
+
+    def test_foreign_host_snapshot_is_ignored_and_replaced(self):
+        now = 10_000.0
+        temp, snapshot, patches = self.status_sandbox(now, "foreign-host")
+        try:
+            with mock.patch.object(main_mod.time, "time", return_value=now):
+                with contextlib.ExitStack() as stack:
+                    for patcher in patches:
+                        stack.enter_context(patcher)
+                    result = main_mod.status_report()
+            self.assertEqual(result["host_id"], "current-host")
+            self.assertEqual(json.loads(snapshot.read_text())["data"]["host_id"], "current-host")
+        finally:
+            temp.cleanup()
+
+
 class StaleGraderRescore(unittest.TestCase):
     def test_a_v1_spec_campaign_is_refused_and_its_scores_stay_unchanged(self):
         from localbench.evaluation import EvaluationCampaign, canonical_sha256, make_varied_spec
@@ -572,6 +655,38 @@ class PureJsonStdout(unittest.TestCase):
 
     def test_memory_json(self):
         json.loads(cli("memory", "--json").stdout)
+
+    def test_status_json_runs_with_closed_stdin(self):
+        host = {"host_id": "test-host"}
+        running = {"omp_version": "18.0", "omp_sha": "test-sha", "omp_child_config": "test-child"}
+        stdin = io.StringIO()
+        stdin.close()
+        output = io.StringIO()
+        park_state = mock.Mock()
+        park_state.exists.return_value = False
+        with mock.patch("sys.stdin", stdin), \
+                mock.patch.object(main_mod, "STATUS_SNAPSHOT", Path(SCRATCH_HOME) / ".localbench" / "status-snapshot.json"), \
+                mock.patch.object(main_mod.sysstats, "host", return_value=host), \
+                mock.patch.object(main_mod, "golden_states", return_value=[]), \
+                mock.patch.object(main_mod, "omp_pins", return_value=running), \
+                mock.patch.object(main_mod.sysstats, "ollama_residents", return_value=[]), \
+                mock.patch.object(main_mod.smol, "load_state", return_value=None), \
+                mock.patch.object(main_mod.sysstats, "gpu_time_by_pid", return_value=[]), \
+                mock.patch.object(main_mod.time, "sleep"), \
+                mock.patch.object(main_mod.sysstats, "ollama_auto_update", return_value=False), \
+                mock.patch.object(main_mod.quiet, "paused", return_value=[]), \
+                mock.patch.object(main_mod.park, "STATE", park_state), \
+                mock.patch.object(main_mod.park, "stuck_sessions", return_value=[]), \
+                mock.patch.object(main_mod.sysstats, "omp_processes", return_value=[]), \
+                mock.patch.object(main_mod.gateway, "status", return_value={}), \
+                mock.patch.object(main_mod.heavyslot, "holder", return_value=None), \
+                mock.patch.object(main_mod.sysstats, "gpu_share", return_value=[]), \
+                contextlib.redirect_stdout(output):
+            rc = main_mod.main(["status", "--json"])
+        self.assertEqual(rc, 0)
+        status = json.loads(output.getvalue())
+        self.assertEqual(status["host_id"], "test-host")
+        self.assertEqual(status["running_omp"], {"omp_version": "18.0", "omp_sha": "test-sha"})
 
     @unittest.skipUnless((ROOT / "runs" / "observe.db").exists(), "no runs/observe.db (localbench watch never ran)")
     def test_report_json(self):
@@ -617,7 +732,8 @@ class TrafficUnits(unittest.TestCase):
         output = io.StringIO()
         with mock.patch.object(main_mod.observe, "report", return_value=report), \
                 contextlib.redirect_stdout(output):
-            rc = main_mod.cmd_report(argparse.Namespace(since=3600, json=False, by_purpose=False, by_profile=False))
+            rc = main_mod.cmd_report(argparse.Namespace(since=3600, json=False, by_purpose=False, by_profile=False,
+                                                       requests=False, req_purpose=None, req_profile=None, limit=200))
         text = output.getvalue()
         self.assertEqual(rc, 0)
         self.assertIn("2 KB down", text)
@@ -1125,6 +1241,7 @@ class ReportByPurpose(unittest.TestCase):
     def report(self, *, as_json: bool = True, **flags):
         import sqlite3
         import time
+
         from localbench import gateway
         with tempfile.TemporaryDirectory() as tmp:
             db = Path(tmp) / "gw" / "gateway.sqlite3"
@@ -1137,7 +1254,9 @@ class ReportByPurpose(unittest.TestCase):
             con.commit()
             con.close()
             out = io.StringIO()
-            args = argparse.Namespace(since=86400.0, json=as_json, **{"by_purpose": False, "by_profile": False, **flags})
+            args = argparse.Namespace(since=86400.0, json=as_json, **{"by_purpose": False, "by_profile": False,
+                                                                     "requests": False, "req_purpose": None,
+                                                                     "req_profile": None, "limit": 200, **flags})
             with mock.patch.object(gateway, "database_path", return_value=db), contextlib.redirect_stdout(out):
                 rc = main_mod.cmd_report(args)
             self.assertEqual(rc, 0)
@@ -1242,6 +1361,117 @@ class SmolModelRuns(unittest.TestCase):
             main_mod.cmd_ab(argparse.Namespace(a="ollama:a", b="mlx-serve:/m", pairs=1, tiers="mem",
                                                smol_model=None, b_smol_model="qwen3.8:27b", side_regime=False))
         self.assertEqual(caught.exception.code, 2)
+
+
+
+class WatchdogRun(unittest.TestCase):
+    def test_violation_aborts_before_tier_and_emits_terminal_done_with_reason(self):
+        from types import SimpleNamespace
+
+        class Sampler:
+            def __init__(self, *_args, on_sample=None, **_kwargs):
+                self.on_sample = on_sample
+                self.series = []
+                self.contention = []
+
+            def __enter__(self):
+                sample = {"t": 123.0, "resident": {"ollama": []}, "gpu_procs": []}
+                self.series.append(sample)
+                self.on_sample(sample)
+                return self
+
+            def __exit__(self, *_exc):
+                return None
+
+            def summary(self):
+                return {"resident_unknown_samples": 0}
+
+        backend = SmolModelRuns.Backend()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            run_pins = {"backend": "ollama", "model": "nimble:latest", "omp_sha": "pinned",
+                        "omp_path": "/fixture/omp"}
+            quiet = mock.Mock(return_value=contextlib.nullcontext(SimpleNamespace(summary=lambda: {})))
+            tier = mock.Mock(return_value=[])
+            with mock.patch.object(main_mod, "ROOT", root), mock.patch.object(main_mod, "RUNS", root / "runs"), \
+                    mock.patch.object(main_mod.sysstats, "snapshot", return_value={"host": {}}), \
+                    mock.patch.object(main_mod, "preflight", return_value={"problems": []}), \
+                    mock.patch.object(main_mod, "run_pins", return_value=run_pins), \
+                    mock.patch.object(main_mod, "sha16", return_value="pinned"), \
+                    mock.patch.object(main_mod.golden, "pin_diff", return_value=[]), \
+                    mock.patch.object(main_mod.backends, "_warm"), \
+                    mock.patch.object(main_mod.sysstats, "Sampler", Sampler), \
+                    mock.patch.object(main_mod.sysstats, "PowerSampler", quiet), \
+                    mock.patch.object(main_mod.sysstats, "CpuSampler", quiet), \
+                    mock.patch.dict(main_mod.TIERS, {"conf": tier}), \
+                    mock.patch.object(main_mod.golden, "listed_discrepancies", return_value=[]), \
+                    mock.patch.object(main_mod, "_rev", return_value="rev"), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                summary = main_mod.execute(backend, "nimble:latest", tiers=["conf"], repeats=1, allow_busy=False,
+                                           purge=False, watchdog_enabled=True)
+
+            self.assertEqual(summary["verdicts"]["watchdog_abort"],
+                             "expected_model_not_resident:nimble:latest")
+            self.assertTrue(summary["watchdog"]["aborted"])
+            tier.assert_not_called()
+            progress = (root / summary["run_dir"] / "progress.jsonl").read_text()
+            events = [json.loads(line) for line in progress.splitlines()]
+            self.assertIn("watchdog_abort", [event["event"] for event in events])
+            done = [event for event in events if event["event"] == "done"]
+            self.assertEqual(len(done), 1)
+            self.assertEqual(events[-1]["event"], "done")
+            self.assertEqual(done[0]["watchdog_abort"], "expected_model_not_resident:nimble:latest")
+
+    def test_resume_skips_completed_case_and_leaves_aborted_case_uncheckpointed(self):
+        from types import SimpleNamespace
+
+        from localbench.evaluation import EvaluationCampaign
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            runs = root / "runs"
+            campaign_path = runs / "eval-resume"
+            runs.mkdir()
+            case_inputs = {"completed": "input-a", "pending": "input-b"}
+            pins = {"model_digest": "model-a", "omp_sha": "omp-a"}
+            fingerprint = {"context": 4096}
+            source_sha256 = {"client.py": "source-a"}
+            backend = SimpleNamespace(name="ollama", fingerprint=mock.Mock(return_value=fingerprint))
+            identity = {"profile": main_mod.E2E_PROFILE, "backend": "ollama", "model": "model-a",
+                        "pins": pins, "fingerprint": fingerprint, "server_args": [],
+                        "localbench_rev": "revision-a", "source_sha256": source_sha256}
+            campaign = EvaluationCampaign.create(campaign_path, root=root, identity=identity, cases=case_inputs,
+                                                 profile=main_mod.E2E_PROFILE)
+            completed_dir = runs / "completed-run"
+            completed_dir.mkdir()
+            trace = completed_dir / "summary.json"
+            trace.write_text("{}")
+            campaign.record_case("completed", input_sha256="input-a", status="PASS", run_dir=completed_dir,
+                                 trace_files=[trace])
+            args = argparse.Namespace(backend="ollama:model-a", server_arg=None, resume=str(campaign_path),
+                                      wait_idle=0, watchdog=True)
+            aborted = {"watchdog": {"aborted": True}}
+            stderr = io.StringIO()
+            with mock.patch.object(main_mod, "ROOT", root), mock.patch.object(main_mod, "RUNS", runs), \
+                    mock.patch.object(main_mod.park, "parked_now", return_value=True), \
+                    mock.patch.object(main_mod, "open_backend",
+                                      return_value=contextlib.nullcontext((backend, "model-a"))), \
+                    mock.patch.object(main_mod.sysstats, "snapshot", return_value={"host": {"host_id": "h"}}), \
+                    mock.patch.object(main_mod, "run_pins", return_value=pins), \
+                    mock.patch.object(main_mod, "_evaluation_case_inputs", return_value=case_inputs), \
+                    mock.patch.object(main_mod, "_localbench_source_hashes", return_value=source_sha256), \
+                    mock.patch.object(main_mod, "_rev", return_value="revision-a"), \
+                    mock.patch.object(main_mod, "execute", return_value=aborted) as execute, \
+                    contextlib.redirect_stderr(stderr):
+                result = main_mod.cmd_eval_run(args)
+
+            self.assertEqual(result, 1)
+            execute.assert_called_once()
+            self.assertEqual(execute.call_args.kwargs["e2e_case"], "pending")
+            resumed = EvaluationCampaign.open(campaign_path, root=root, expected_identity=identity)
+            self.assertIsNotNone(resumed.completed_case("completed", input_sha256="input-a"))
+            self.assertIsNone(resumed.completed_case("pending", input_sha256="input-b"))
+            self.assertIn("completed campaign cases remain checkpointed", stderr.getvalue())
 
 
 class CorpusCommand(unittest.TestCase):
@@ -1607,6 +1837,7 @@ class OmpCommand(unittest.TestCase):
 
     def test_watch_install_writes_the_watchpaths_plist_bootstraps_and_audits(self):
         import plistlib
+
         from localbench import ompupdate
         rc, _, _ = self.run_main("watch", "install")
         self.assertEqual(rc, 0)

@@ -1,0 +1,319 @@
+{
+  "base_review_failed_checks": [
+    {
+      "kind": "latency_power_15pct_win",
+      "limit": 0.8,
+      "lower95": 0.6663350327129758,
+      "pairs": 12,
+      "passed": false,
+      "target_pairs": 12
+    }
+  ],
+  "base_review_receipt": "docs/evidence/receipts/kit-v8t-cluster-review__20261005.json",
+  "base_review_receipt_sha256": "09c28051fc8e1ac9e676cfeaeda0b743a98979a976a78cc673f37fa22f2be212",
+  "base_review_status": "FAIL_REVIEW_REQUIRED",
+  "code_sha256": {
+    "script": "72ef043fe8d37614afb8512c21d94e40b120588d9d92942f64e9a2e463267e16",
+    "stats": "65e10062b4cfd2b84827390ed53e2fec9b24e5a39588be13fe4736dd2a762134"
+  },
+  "cpu_only": true,
+  "kind": "kit-v8t-latency-power-plan",
+  "latency_power_plan": {
+    "base_seed": 20261003,
+    "mde_at_12_pairs": {
+      "b_over_a_ratio": 0.8245612144470216,
+      "binary_search_iterations": 20,
+      "bracketed": true,
+      "latency_reduction_bracket_percent": [
+        17.543792724609364,
+        17.543878555297844
+      ],
+      "latency_reduction_percent": 17.543878555297844,
+      "next_smaller_effect_ratio": 0.8245620727539064,
+      "pairs": 12,
+      "power_at_mde": {
+        "events": 1636,
+        "interval95": [
+          0.8004855285111957,
+          0.8342952294179272
+        ],
+        "n": 2000,
+        "rate": 0.818,
+        "upper95_one_sided": 0.8317586951391394
+      },
+      "power_at_next_smaller_effect": {
+        "events": 1635,
+        "interval95": [
+          0.7999685143528416,
+          0.8338141606235628
+        ],
+        "n": 2000,
+        "rate": 0.8175,
+        "upper95_one_sided": 0.831274469487616
+      },
+      "ratio_bracket": [
+        0.8245612144470216,
+        0.8245620727539064
+      ],
+      "seed": 20263006,
+      "target_lower95": 0.8
+    },
+    "minimum_pairs": 16,
+    "minimum_pairs_power": {
+      "events": 1659,
+      "interval95": [
+        0.8123902711105082,
+        0.8453463947311461
+      ],
+      "n": 2000,
+      "rate": 0.8295,
+      "upper95_one_sided": 0.8428846089191765
+    },
+    "pair_scan": [
+      {
+        "pairs": 2,
+        "power_15pct_win": {
+          "events": 246,
+          "interval95": [
+            0.10932424977571716,
+            0.13812120387434756
+          ],
+          "n": 2000,
+          "rate": 0.123,
+          "upper95_one_sided": 0.13559181792457353
+        },
+        "seed": 20263003,
+        "source": "base_review_receipt"
+      },
+      {
+        "pairs": 3,
+        "power_15pct_win": {
+          "events": 400,
+          "interval95": [
+            0.18305203450854435,
+            0.2180981938602074
+          ],
+          "n": 2000,
+          "rate": 0.2,
+          "upper95_one_sided": 0.2151129454759875
+        },
+        "seed": 20264006,
+        "source": "recomputed_same_seed"
+      },
+      {
+        "pairs": 4,
+        "power_15pct_win": {
+          "events": 597,
+          "interval95": [
+            0.27884695860485476,
+            0.31892561144949005
+          ],
+          "n": 2000,
+          "rate": 0.2985,
+          "upper95_one_sided": 0.31559359387738695
+        },
+        "seed": 20263004,
+        "source": "base_review_receipt"
+      },
+      {
+        "pairs": 5,
+        "power_15pct_win": {
+          "events": 742,
+          "interval95": [
+            0.35009496132421736,
+            0.39239963687434576
+          ],
+          "n": 2000,
+          "rate": 0.371,
+          "upper95_one_sided": 0.3889305484417144
+        },
+        "seed": 20264008,
+        "source": "recomputed_same_seed"
+      },
+      {
+        "pairs": 6,
+        "power_15pct_win": {
+          "events": 812,
+          "interval95": [
+            0.38467775459641207,
+            0.42768265029246344
+          ],
+          "n": 2000,
+          "rate": 0.406,
+          "upper95_one_sided": 0.4241773415250188
+        },
+        "seed": 20264009,
+        "source": "recomputed_same_seed"
+      },
+      {
+        "pairs": 7,
+        "power_15pct_win": {
+          "events": 953,
+          "interval95": [
+            0.45467714809372733,
+            0.4984129531284914
+          ],
+          "n": 2000,
+          "rate": 0.4765,
+          "upper95_one_sided": 0.4948890618325039
+        },
+        "seed": 20264010,
+        "source": "recomputed_same_seed"
+      },
+      {
+        "pairs": 8,
+        "power_15pct_win": {
+          "events": 1014,
+          "interval95": [
+            0.4850966728328868,
+            0.5288764885051757
+          ],
+          "n": 2000,
+          "rate": 0.507,
+          "upper95_one_sided": 0.5253663412001875
+        },
+        "seed": 20263005,
+        "source": "base_review_receipt"
+      },
+      {
+        "pairs": 9,
+        "power_15pct_win": {
+          "events": 1190,
+          "interval95": [
+            0.5733238432860839,
+            0.6163119177304779
+          ],
+          "n": 2000,
+          "rate": 0.595,
+          "upper95_one_sided": 0.6129149485698973
+        },
+        "seed": 20264012,
+        "source": "recomputed_same_seed"
+      },
+      {
+        "pairs": 10,
+        "power_15pct_win": {
+          "events": 1247,
+          "interval95": [
+            0.6020481889453447,
+            0.6444783003761859
+          ],
+          "n": 2000,
+          "rate": 0.6235,
+          "upper95_one_sided": 0.641142115386932
+        },
+        "seed": 20264013,
+        "source": "recomputed_same_seed"
+      },
+      {
+        "pairs": 11,
+        "power_15pct_win": {
+          "events": 1336,
+          "interval95": [
+            0.6470561319884656,
+            0.6882997401250335
+          ],
+          "n": 2000,
+          "rate": 0.668,
+          "upper95_one_sided": 0.685083688757661
+        },
+        "seed": 20264014,
+        "source": "recomputed_same_seed"
+      },
+      {
+        "pairs": 12,
+        "power_15pct_win": {
+          "events": 1374,
+          "interval95": [
+            0.6663350327129758,
+            0.7069479916038357
+          ],
+          "n": 2000,
+          "rate": 0.687,
+          "upper95_one_sided": 0.7037931560245757
+        },
+        "seed": 20263006,
+        "source": "recomputed_same_seed"
+      },
+      {
+        "pairs": 13,
+        "power_15pct_win": {
+          "events": 1467,
+          "interval95": [
+            0.7136889900470432,
+            0.7524157488726116
+          ],
+          "n": 2000,
+          "rate": 0.7335,
+          "upper95_one_sided": 0.7494381399776088
+        },
+        "seed": 20264016,
+        "source": "recomputed_same_seed"
+      },
+      {
+        "pairs": 14,
+        "power_15pct_win": {
+          "events": 1522,
+          "interval95": [
+            0.7418202236895426,
+            0.7791790776296434
+          ],
+          "n": 2000,
+          "rate": 0.761,
+          "upper95_one_sided": 0.7763264566530482
+        },
+        "seed": 20264017,
+        "source": "recomputed_same_seed"
+      },
+      {
+        "pairs": 15,
+        "power_15pct_win": {
+          "events": 1616,
+          "interval95": [
+            0.7901540668625122,
+            0.824665032012236
+          ],
+          "n": 2000,
+          "rate": 0.808,
+          "upper95_one_sided": 0.8220667684391919
+        },
+        "seed": 20264018,
+        "source": "recomputed_same_seed"
+      },
+      {
+        "pairs": 16,
+        "power_15pct_win": {
+          "events": 1659,
+          "interval95": [
+            0.8123902711105082,
+            0.8453463947311461
+          ],
+          "n": 2000,
+          "rate": 0.8295,
+          "upper95_one_sided": 0.8428846089191765
+        },
+        "seed": 20264019,
+        "source": "recomputed_same_seed"
+      }
+    ],
+    "passed": true,
+    "seed_rule": "registered pair counts: base+2000+index; other counts: base+3000+pairs",
+    "simulations_per_cell": 2000,
+    "target_lower95": 0.8,
+    "true_b_over_a_ratio": 0.85
+  },
+  "python_version": "3.14.2",
+  "runtime_s": 1.6627472089603543,
+  "schema": 1,
+  "seed": 20261003,
+  "simulations_per_cell": 2000,
+  "simulator": {
+    "alpha": 0.05,
+    "log_sd": 0.173,
+    "power_bound": "lower endpoint of two-sided 95% Wilson interval across Monte Carlo replicates",
+    "test": "stats.drift_paired",
+    "trend_per_leg": 0.0
+  },
+  "source_tree": "db8e9748295497f1f815024870b940b3e1114d8a",
+  "status": "PASS"
+}

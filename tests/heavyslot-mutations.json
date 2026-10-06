@@ -1,0 +1,120 @@
+[
+  {
+    "label": "high load with idle CPU remains admissible",
+    "file": "localbench/heavyslot.py",
+    "old": "    cpu_busy = readings_[\"cpu_busy\"]\n    if cpu_busy is None:",
+    "new": "    cpu_busy = readings_[\"cpu_busy\"]\n    if readings_[\"load1\"] is not None and readings_[\"load1\"] >= CPU_BUSY_LIMIT_PCT:\n        problems.append(\"high load\")\n    if cpu_busy is None:",
+    "tests": [
+      "tests.test_heavyslot.Admission.test_high_load_with_idle_cpu_and_normal_memory_is_admitted"
+    ]
+  },
+  {
+    "label": "busy GPU refuses admission",
+    "file": "localbench/heavyslot.py",
+    "old": "        elif readings_[\"gpu_pct\"] >= GPU_LIMIT_PCT:",
+    "new": "        elif False:",
+    "tests": [
+      "tests.test_heavyslot.Admission.test_busy_gpu_refuses"
+    ]
+  },
+  {
+    "label": "unreadable GPU refuses closed",
+    "file": "localbench/heavyslot.py",
+    "old": "        if readings_[\"gpu_pct\"] is None:",
+    "new": "        if False:",
+    "tests": [
+      "tests.test_heavyslot.Admission.test_unreadable_gpu_refuses_closed"
+    ]
+  },
+  {
+    "label": "a live rival refuses naming its verb",
+    "file": "localbench/heavyslot.py",
+    "old": "        except BlockingIOError:\n            try:\n                owner = json.loads(owner_path(home).expanduser().read_text())",
+    "new": "        except BlockingIOError:\n            return None\n            try:\n                owner = json.loads(owner_path(home).expanduser().read_text())",
+    "tests": [
+      "tests.test_heavyslot.Acquire.test_live_rival_refuses_naming_the_holder"
+    ]
+  },
+  {
+    "label": "waiter remains queued until the holder releases",
+    "file": "localbench/heavyslot.py",
+    "old": "            if elapsed >= wait_s:",
+    "new": "            if elapsed >= 0.0:",
+    "tests": [
+      "tests.test_heavyslot.Acquire.test_wait_slot_queues_until_release"
+    ]
+  },
+  {
+    "label": "release closes the lock fd",
+    "file": "localbench/heavyslot.py",
+    "old": "            fcntl.flock(self._fd, fcntl.LOCK_UN)\n            os.close(self._fd)",
+    "new": "            fcntl.flock(self._fd, fcntl.LOCK_UN)",
+    "tests": [
+      "tests.test_heavyslot.Acquire.test_take_names_holder_and_release_frees",
+      "tests.test_heavyslot.Acquire.test_release_closes_the_lock_fd"
+    ]
+  },
+  {
+    "label": "eval run takes the heavy slot",
+    "file": "localbench/__main__.py",
+    "old": "@_held(\"eval run\")\ndef cmd_eval_run(args) -> int:",
+    "new": "def cmd_eval_run(args) -> int:",
+    "tests": [
+      "tests.test_heavyslot.Decorator.test_eval_run_refuses_on_a_held_slot"
+    ]
+  },
+  {
+    "label": "CPU-only holders skip the GPU gate",
+    "file": "localbench/heavyslot.py",
+    "old": "    if check_gpu:\n        if readings_[\"gpu_pct\"] is None:",
+    "new": "    if True:\n        if readings_[\"gpu_pct\"] is None:",
+    "tests": [
+      "tests.test_heavyslot.Admission.test_cpu_holder_skips_the_gpu_gate"
+    ]
+  },
+  {
+    "label": "CPU-only holders are not demoted to background priority",
+    "file": "localbench/heavyslot.py",
+    "old": "                readings_[\"background\"] = background_priority()",
+    "new": "                readings_[\"background\"] = True",
+    "tests": [
+      "tests.test_heavyslot.Admission.test_cpu_holder_with_high_load_and_idle_cpu_runs_at_background_priority"
+    ]
+  },
+  {
+    "label": "high CPU busy refuses inference admission",
+    "file": "localbench/heavyslot.py",
+    "old": "    elif cpu_busy >= CPU_BUSY_LIMIT_PCT:",
+    "new": "    elif False:",
+    "tests": [
+      "tests.test_heavyslot.Admission.test_95_percent_cpu_busy_refuses"
+    ]
+  },
+  {
+    "label": "GPU class priority can be lost",
+    "file": "localbench/heavyslot.py",
+    "old": "return (0 if t.get(\"needs_gpu\", True) else 1, queue_order,",
+    "new": "return (0, queue_order,",
+    "tests": [
+      "tests.test_heavyslot.Observability.test_gpu_ticket_precedes_five_earlier_cpu_tickets"
+    ]
+  },
+  {
+    "label": "FIFO within a class can be reversed",
+    "file": "localbench/heavyslot.py",
+    "old": "return (0 if t.get(\"needs_gpu\", True) else 1, queue_order,",
+    "new": "return (0 if t.get(\"needs_gpu\", True) else 1, -queue_order,",
+    "tests": [
+      "tests.test_heavyslot.Observability.test_gpu_class_precedence_preserves_fifo_within_each_class"
+    ]
+  },
+  {
+    "label": "new callers can bypass queued tickets",
+    "file": "localbench/heavyslot.py",
+    "old": "is_turn = (not queue if ticket is None",
+    "new": "is_turn = (True if ticket is None",
+    "tests": [
+      "tests.test_heavyslot.Observability.test_zero_wait_request_cannot_bypass_a_queued_ticket"
+    ]
+  }
+]

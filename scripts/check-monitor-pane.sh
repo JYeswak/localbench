@@ -5,7 +5,7 @@
 # Consumer: every lb-09 watcher, on its own pane, before it starts watching
 # (docs/MONITOR.md). Break-tests: docs/evidence/break-tests.md (lb-09).
 #
-# Usage: scripts/check-monitor-pane.sh <tmux-pane-id>      e.g. %12
+# Usage: scripts/check-monitor-pane.sh <tmux-pane-id>      e.g. %pane
 # Exit 0: the omp in that pane uses a non-local main model.
 # Exit 1: 'LOCAL MODEL: <selector>' — a local provider (ollama, mlx-serve,
 #         localbench, lm-studio, llama.cpp, vllm, or any provider whose
@@ -41,13 +41,13 @@ set -u
 PANE="${1:-}"
 case "$PANE" in
   %[0-9]*) ;;
-  *) echo "usage: $0 <tmux-pane-id like %12> (got '${PANE}')" >&2
+  *) echo "usage: $0 <tmux-pane-id like %pane> (got '${PANE}')" >&2
      echo "UNDETERMINED: not a tmux pane id" ; exit 2 ;;
 esac
 
 command -v tmux >/dev/null 2>&1 || { echo "UNDETERMINED: tmux not found"; exit 2; }
 
-# `tmux display -t %999` prints nothing and exits 0 (and inside tmux may fall
+# `tmux display -t %pane` prints nothing and exits 0 (and inside tmux may fall
 # back to the caller's own pane), so resolve the id from the full pane list.
 LINE=$(tmux list-panes -a -F '#{pane_id} #{pane_pid} #{pane_title}' 2>/dev/null \
   | awk -v p="$PANE" '$1==p {print; exit}')

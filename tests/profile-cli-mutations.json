@@ -1,0 +1,11 @@
+[
+  {
+    "label": "resume skips completed command records",
+    "file": "scripts/profile_cli.py",
+    "old": "        if result_path.exists():",
+    "new": "        if False:",
+    "tests": [
+      "tests.test_profile_cli.CliProfileTests.test_resume_skips_complete_command_and_ranks_exit_cohorts_separately"
+    ]
+  }
+]

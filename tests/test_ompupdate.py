@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 from urllib.request import Request, urlopen
 
 from localbench import mockomp, ompupdate
@@ -349,25 +350,39 @@ class OmpUpdate(unittest.TestCase):
         baseline = self.tmp / "baseline.json"
         previous = os.environ.get("LOCALBENCH_OMP")
         os.environ["LOCALBENCH_OMP"] = str(fake)
+        real_settle, ompupdate._settle_package = ompupdate._settle_package, lambda *a, **k: None
+        real_shas, ompupdate.feature_module_shas = (ompupdate.feature_module_shas,
+            lambda: {p.get("feature", n): "0" * 64 for n, p in ompupdate.CAPTURE_PROOFS.items()})
         try:
             first = ompupdate.refresh(baseline_path=baseline)
             second = ompupdate.refresh(baseline_path=baseline)
         finally:
+            ompupdate._settle_package = real_settle
+            ompupdate.feature_module_shas = real_shas
             if previous is None:
                 del os.environ["LOCALBENCH_OMP"]
             else:
                 os.environ["LOCALBENCH_OMP"] = previous
         self.assertTrue(baseline.is_file())
         self.assertEqual(first["omp_version"], "0.0.0-fake")
-        self.assertEqual(set(first["outcomes"]),
-                         {"auto-thinking", "find-judgments", "memory-extraction", "titles"})
+        self.assertEqual(set(first["outcomes"]), set(ompupdate.CAPTURE_PROOFS))
+        recorded = set(ompupdate.read_baseline(baseline)["requests"])
+        uncaptured = set(ompupdate.CAPTURE_PROOFS) - recorded
+        self.assertEqual(uncaptured, {"recall-embeddings", "unexpected-stop"})
         for name, outcome in first["outcomes"].items():
             self.assertEqual(outcome["status"], "NEW", name)
+            if name in uncaptured:
+                suite = ompupdate.CAPTURE_PROOFS[name]["proof_suite"]
+                self.assertEqual(outcome["queue"], ([suite] if suite != "-" else []) + ["through-omp"])
         for name, outcome in second["outcomes"].items():
-            self.assertEqual(outcome["status"], "CARRIED", name)
-            self.assertEqual(outcome["reason"], "carried forward (identical request)", name)
-        self.assertEqual(second["outcomes"]["auto-thinking"]["queue"], [])
-        self.assertEqual(second["outcomes"]["titles"]["queue"], [])
+            if name in uncaptured:
+                self.assertEqual(outcome["status"], "NEW", name)
+                suite = ompupdate.CAPTURE_PROOFS[name]["proof_suite"]
+                self.assertEqual(outcome["queue"], ([suite] if suite != "-" else []) + ["through-omp"])
+            else:
+                self.assertEqual(outcome["status"], "CARRIED", name)
+                self.assertEqual(outcome["reason"], "carried forward (identical request)", name)
+                self.assertEqual(outcome["queue"], [])
         self.assertEqual(first["outcomes"]["titles"]["queue"], ["through-omp"])
         self.assertEqual(first["outcomes"]["memory-extraction"]["feature"], "mnemopi-extraction")
 
@@ -393,10 +408,15 @@ class OmpUpdate(unittest.TestCase):
         previous, original = os.environ.get("LOCALBENCH_OMP"), ompupdate.run_capture
         os.environ["LOCALBENCH_OMP"] = sys.executable
         ompupdate.run_capture = flaky
+        real_settle, ompupdate._settle_package = ompupdate._settle_package, lambda *a, **k: None
+        real_shas, ompupdate.feature_module_shas = (ompupdate.feature_module_shas,
+            lambda: {p.get("feature", n): "0" * 64 for n, p in ompupdate.CAPTURE_PROOFS.items()})
         try:
             report = ompupdate.refresh(baseline_path=self.tmp / "baseline.json")
         finally:
             ompupdate.run_capture = original
+            ompupdate._settle_package = real_settle
+            ompupdate.feature_module_shas = real_shas
             if previous is None:
                 del os.environ["LOCALBENCH_OMP"]
             else:
@@ -412,21 +432,58 @@ class OmpUpdate(unittest.TestCase):
         previous, original = os.environ.get("LOCALBENCH_OMP"), ompupdate.run_capture
         os.environ["LOCALBENCH_OMP"] = sys.executable
         ompupdate.run_capture = always_slow
+        real_settle, ompupdate._settle_package = ompupdate._settle_package, lambda *a, **k: None
         try:
             with self.assertRaisesRegex(ompupdate.CaptureError, "attempt 1.*attempt 2"):
                 ompupdate.refresh(baseline_path=self.tmp / "baseline.json")
         finally:
             ompupdate.run_capture = original
+            ompupdate._settle_package = real_settle
             if previous is None:
                 del os.environ["LOCALBENCH_OMP"]
             else:
                 os.environ["LOCALBENCH_OMP"] = previous
 
-    def test_capture_proofs_cover_side_features_without_unmapped_main_cases(self):
-        names = set(ompupdate.CAPTURE_PROOFS)
-        self.assertEqual(names, {"auto-thinking", "find-judgments", "memory-extraction", "titles"})
-        self.assertNotIn("main-lean", names)
-        self.assertNotIn("main-full", names)
+    def test_refresh_marks_changed_embedding_module_stale_and_queues_mem(self):
+        proofs = ompupdate.capture_proofs()
+        capture_name = next((name for name, proof in proofs.items()
+                             if proof.get("feature") == "recall-embeddings"), None)
+        self.assertIsNotNone(capture_name, "recall-embeddings must be tracked by refresh")
+        if capture_name is None:
+            return
+        old_captures = {name: [b'{"shape":"stable"}'] for name in proofs}
+        old_shas = {proof["feature"]: "a" * 64 for proof in proofs.values()}
+        new_shas = {**old_shas, "recall-embeddings": "b" * 64}
+        baseline = self.tmp / "recall-baseline.json"
+        ompupdate.write_baseline(baseline, old_captures, old_shas, "18.4.8")
+        original_work = ompupdate.UPDATE_WORK_DIR
+        ompupdate.UPDATE_WORK_DIR = self.tmp / "refresh-work"
+        try:
+            with (mock.patch.object(ompupdate, "_settle_package"),
+                  mock.patch.object(ompupdate, "_omp_version", return_value="18.4.9"),
+                  mock.patch("localbench.workloads.omp_bin", return_value="/bin/true"),
+                  mock.patch("localbench.backends.sha16", return_value="c" * 16),
+                  mock.patch.object(ompupdate, "run_capture", return_value=old_captures),
+                  mock.patch.object(ompupdate, "feature_module_shas", return_value=new_shas)):
+                result = ompupdate.refresh(baseline_path=baseline)
+        finally:
+            ompupdate.UPDATE_WORK_DIR = original_work
+        outcome = result["outcomes"][capture_name]
+        self.assertEqual(outcome["status"], "STALE")
+        self.assertEqual(outcome["queue"], ["mem", "through-omp"])
+
+    def test_capture_proofs_cover_every_feature_with_a_registered_proof_spec(self):
+        rows = ompupdate.features.load()
+        proof_dir = ompupdate.features.REGISTRY.parent / "proofs"
+        required = {row["feature"] for row in rows if any(proof_dir.glob(f"{row['feature']}__*.json"))}
+        mapped = {proof.get("feature", name) for name, proof in ompupdate.CAPTURE_PROOFS.items()}
+        excluded = getattr(ompupdate, "CAPTURE_EXCLUSIONS", {})
+        self.assertTrue(all(isinstance(reason, str) and reason.strip() for reason in excluded.values()))
+        self.assertFalse(mapped & set(excluded), "a feature cannot be both captured and excluded")
+        self.assertEqual(required - mapped - set(excluded), set(), "proof-bearing features must be captured or excluded")
+        by_feature = {row["feature"]: row for row in rows}
+        for name, proof in ompupdate.CAPTURE_PROOFS.items():
+            self.assertEqual(proof["proof_suite"], by_feature[proof.get("feature", name)]["proof_suite"])
 
 
 if __name__ == "__main__":

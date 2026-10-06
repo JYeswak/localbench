@@ -17,6 +17,51 @@ change make it worse? It measures the path the user actually runs, records the m
 number, and gates regressions against frozen, reviewed goldens for this host only. Decisions come from
 same-item, same-invocation A/B receipts, not from vendor charts.
 
+## 0. Mission (approved by the owner, 2026-10-04)
+<!-- CHECK: MISSION -->
+localbench is how this Mac runs local models: every call attributed, every GPU job arbitrated, and no local route
+live unless it is proven better than today's route.
+
+1. **Attributed:** every local-model request names its caller and omp/proj-b feature. Check: unattributed GPU-seconds
+   < 5% in `localbench report --since 24h`.
+2. **Proven:** a live local route needs a current receipt: no quality loss beyond A/A noise plus one measured win
+   (p95 latency, availability, GPU cost or privacy). Check: `localbench features` lists no live route that is not
+   PROVEN or CARRIED.
+3. **Watched:** before go-live a route is shadowed on mirrored real calls; once live, ~1% of its real calls are
+   re-scored against hosted each week, and a live delta outside the A/A bound demotes it with automatic rollback.
+   Check: a weekly live-delta receipt per live route.
+4. **Current:** every omp or Ollama update re-verifies routes within a day (carried, or STALE with re-proof
+   queued); new model releases are screened weekly. Check: the refresh log and the weekly digest receipt.
+5. **Arbitrated:** all GPU work goes through one queue with approval; admission uses measured contention (CPU busy
+   plus memory pressure); every model on disk has a source, license, sha manifest and an owning bead or route, and
+   anything unowned is listed for pruning. Check: `localbench slot` shows every GPU job; 0 runs voided by avoidable
+   contention; `localbench models` shows 0 unowned or unhashed models.
+6. **Sound:** verdicts hold their stated error rates, clustering included; receipts reproduce from a clean export;
+   gates are hermetic and CI is green. Check: the E2 integrated validator (kit-mu71.26) and CI.
+7. **Valued:** `localbench value` shows each feature's measured benefit against hosted and its data class (code,
+   secrets, personal data) with whether the local route keeps that data on the machine; a feature with no win is
+   demoted (rule D4). Check: the scorecard receipt.
+
+Route types: a route is either a fixed per-feature route or a confidence-escalation route (answer locally when the
+local decision model is confident, send only low-confidence calls to hosted). Escalation is a designed route type,
+proven and measured like any other; it is not a fallback on failure.
+
+**Done for a feature:** PROVEN on current pins, shadowed, applied through a preset with omp readback and a
+one-command rollback, a through-omp acceptance run, independent review, and a row on the value scorecard.
+
+**Cadence.** Daily: main green; gateway healthy with 0 phantom requests; every GPU-second attributed; any load spike
+traced to its owner; omp and Ollama updates checked the same day; nothing closes without a landed sha and
+independent evidence. Weekly: the release digest screened (candidates kept or dropped by measurement); live-delta
+receipts for every live route; the value scorecard compared with last week's; the tracker re-graded with `br lint`
+clean; at least one UNPROVEN or STALE route driven to a verdict. Long-term: every omp/proj-b side feature has a verdict;
+the routes that stay local prove they beat hosted on current pins, are watched live, and are re-proven automatically
+across updates, while the Mac stays usable.
+
+**Not in the mission:** evaluating local models as the main coding agent; leaderboards or cross-host comparison;
+patching inference engines, weights or omp; machine-wide non-GPU load management and fleet tooling (omp-kit's; we
+feed it GPU/model data); a hosted fallback on failure (confidence escalation is a designed route, not a fallback);
+packaging for strangers.
+
 ## 1. Problem
 <!-- CHECK: PROBLEM -->
 Re-scoped by the owner on 2026-09-30; epic bead `kit-side-model-mission-hgy` (it supersedes `kit-mission-gate-ad7`).
@@ -697,3 +742,107 @@ provenance; the sole direct edge would be `kit-mission-gate-ad7`. An OMP-only
 version bump does not automatically stale unrelated goldens. An authorized
 existing session or user-restarted session must separately prove the live
 local route without fallback before any deployment claims VERIFIED.
+
+## 15. October amendment (2026-10-02; supersedes §§4/6/8/9/10 where they conflict)
+
+Decisions since §13/§14, with landing commits; prose, not a re-release. Where this section
+contradicts an earlier one, this section governs.
+
+- **Side regime (decision the owner 2026-10-02; commit 1f01ff8).** Memory-route proofs run with
+  the real smol model resident and shared: no park, no fence. Co-resident load is recorded
+  (sampler contention episodes, per-leg foreign models and GPU share) and never used to void;
+  quality gates are unchanged (MUST failures, quality losses beyond noise, loop/served/route/pin
+  voids still void or fail). Mixed-regime legs are a problem. This supersedes §8's rule that any
+  GPU consumer other than the backend voids a run: that rule still governs one-model (chat)
+  runs and has never applied to side-regime legs. Legs created before SIDE_REGIME_FROM keep
+  the one-model rule.
+- **Proof specs and the prove runner (commit b44c7ae).** A proof is a declarative spec in
+  `registries/proofs/*.json` (feature, kind, stage, candidates, dataset pin, assertions, wins):
+  the spec's git commit is the pre-registration (tracked + clean + last-touching sha, stamped
+  into every receipt; uncommitted or dirty specs are refused before anything runs).
+  `localbench prove` runs decision candidates through run_suite + paired, memory candidates
+  through interleaved legs + memory_verdict (one receipt per verdict direction), banks each
+  receipt, grades through features.grade on the live route, and comments on or closes the proof
+  bead (PROVEN closes citing the receipt; anything else comments). Screens REJECT or ADVANCE
+  to a stage-2 hosted-arm A/B; a screen never adopts. This extends §6 receipt formats (decision
+  run shape with paired tables, memory verdict shape with baseline inference, generation corpus
+  shape) and §10 exits (add: proof-program exits per spec stage; do not rewrite §10 yet).
+- **Statistical tests.** The A/A-relative-range band (golden.py) stays the decision rule until
+  kit-v8t lands; PowerPlan showed larger studies gain no power under it, but replacing it
+  early would orphan every banked band. Decision paired (exact McNemar doubled-tail + seeded
+  paired bootstrap) is available for screens vs recorded hosted answers. kit-v8t (Fisher-pooled
+  non-inferiority, neighbour-paired log-t latency, reject-only O'Brien-Fleming) is design-only
+  until its Type-I and clustering reviews close; no verdict code may cite it.
+  The CPU-only seeded cluster-review receipt
+  docs/evidence/receipts/kit-v8t-cluster-review__20261005.json (source_tree
+  5e66f3eac005f5a4624c44eb0069f4b6a8129325) reports 95% upper bounds below 5% for screen OBF
+  false-reject, equal-quality memory false-loss, and false-not-worse at true delta -0.11 for ICC 0, 0.1,
+  and 0.2; its known-good and planted-bad controls pass. The base receipt's 12-pair latency-power check
+  fails: the registered 15% latency reduction (B/A=0.85) estimates power 0.687 (95% Wilson interval
+  [0.6663, 0.7069]), with lower bound 0.6663 below 0.80.
+  The separate CPU-only power-plan receipt
+  docs/evidence/receipts/kit-v8t-latency-power-plan__20261005.json (seed 20261003, 2,000 simulations/cell,
+  log SD 0.173, four memory rounds, alpha 0.05) identifies 16 pairs as the first tested count with lower
+  95% Wilson power bound at least 0.80: estimated power 0.8295 [0.8124, 0.8453]. At 15 pairs, point
+  power is 0.808 but the lower bound is 0.7902. The registered effect remains 15%; the approximately
+  17.5% 12-pair MDE is sensitivity only, not a re-registered target. mem.recall.pre_main_s remains
+  unproven; no benefit may be claimed. These receipts do not close the independent Type-I/clustering
+  review.
+  Interim stopping in decision.run_suite remains disabled; do not use kit-v8t as proof evidence until
+  its independent review closes.
+- **Generation and decision receipts.** Generation corpora (real captured requests,
+  content-addressed, MIN_ITEMS volume gate) and deterministic shape checks exist; the
+  `generation` proof label is inert until the replay/judge runner lands (prove refuses live
+  generation runs). Builtin baselines name the feature and match only no-role routes; the
+  shared digest + BETTER + problems-empty contract is unchanged. Laya-MLX decision runs pin
+  the HF snapshot digest and the laya-mlx commit. Screens already banked (auto-thinking,
+  find, unexpected-stop, bash-gate, sst5) stand as REJECT/VOID evidence with their pins.
+- **Pacing (decision the owner 2026-10-02; AGENTS.md).** One heavy job at a time across
+  localbench (inference run or full suite/mutate gate); the orchestrator grants the slot;
+  start only under load 40 and GPU 80%; unload what was loaded; no ~-wide scans. The pause
+  stays until slots are granted. Single test modules, edits and reads need no slot.
+- **Omp freeze and gateway fence (commits 684f210, 453a795).** Long studies pin omp in a
+  read-only snapshot (`localbench omp freeze`; run|ab --omp-frozen) so a mid-study uca update
+  cannot void them; the suite drops inherited GIT_* variables. The gateway fences named
+  models with fast 503s for consumer-agreed windows (proj-b gate) and names the fence; fencing
+  never unloads anything.
+- **Already-local routes (commit 453a795).** A local route with no apply record may prove
+  against a registry-declared non-local preset of its family (alternatives()); a local model
+  is never an alternative, the digest check is unchanged, and a recorded pre-apply route stays
+  the only baseline. Memory verdicts score both directions on the same legs where applicable.
+- **What this does not change.** §5 claim inventory and §7 honesty machinery stand as written;
+  §9 release-gate clauses stand, with proof semantics now machine-checked by features.grade
+  as implemented (kit-omp-feature-map-b7s remains open for the remaining readback work);
+  §13/§14 stay the September record. A §16 closes the remaining S8/S9/S10 deltas when
+  kit-v8t lands and the proof program banks its first PROVEN receipt.
+
+### 15.1 Run queue for when the GPU pause lifts (2026-10-02; prose plan, one heavy job each)
+
+Order follows dependencies (suites and derived models first, proofs last); each item takes
+the heavy slot alone under the Pacing rule with load/GPU admission, and unloads what it
+loaded. Durations are sized from banked wall times and PowerPlan D, not promises.
+
+1. **unexpected-stop screens** (spec unexpected-stop__screen; nimble:latest + tev1-ctx4608,
+   540 items, repeats 1; ~15 min). Decides kit-icy/kit-r16/kit-dcf screens. Needs the
+   derived tev1-ctx4608 tag present; abort if missing rather than substituting.
+2. **auto-thinking screens** (spec auto-thinking__screen; nimble/tev1/tev1:0.8b, 583 items;
+   ~15 min). Decides kit-auto-thinking-route-kmt screens.
+3. **find screen** (spec find__screen; nimble-ctx21507, 6626 items; estimated 3–8 h, the
+   longest single job here). Decides kit-8fn/kit-7g7 screens. Needs the derived
+   nimble-ctx21507 tag; abort if a uca update moves omp mid-run (re-run frozen).
+4. **laya bash-gate screen** (spec laya__screen-bash-gate; aac6fef/laya-mlx, 396 items,
+   repeats 2; ~1 h, shim startup included). Decides kit-8rp screen 1/4.
+5. **skilldesc screen** (spec skill-description-compression__screen; qwen3.8 vs builtin,
+   357 items replay; under 1 h). Needs the replay-profile builder fix first, else the route
+   arm errors on every item and only the builtin baseline scores.
+6. **mnemopi-extraction proof** (spec mnemopi-extraction__proof; pairs 12, mem_rounds 4,
+   ~8 h, side regime, omp-frozen). Decides kit-x3g both directions.
+7. **recall-embeddings proof** (spec recall-embeddings__proof; pairs 12, mem_rounds 4,
+   ~8 h, side regime, omp-frozen). Decides kit-q5n.
+
+Every item aborts (banks nothing as proof) on: preflight refusal, CONTENDED legs, pins
+changed mid-run (omp/binary/model), MUST failures above the spec's allow_errors, sess
+turn timeouts beyond the stage-2 rule, LOOP-STOP, or load/GPU admission lost mid-run.
+Memory proofs additionally abort on any uca version move (re-run under --omp-frozen).
+A screen that REJECTs stops its line; only ADVANCE continues to the stage-2 hosted-arm
+A/B, which is scheduled separately, never appended here.

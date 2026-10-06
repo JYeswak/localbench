@@ -20,19 +20,38 @@ import urllib.parse
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
-from . import features
+from . import features, lifecycle
 
 OMP_PACKAGE_JSON = str(Path.home() / ".bun/install/global/node_modules/@oh-my-pi/pi-coding-agent/package.json")
 DEFAULT_LABEL = "dev.localbench.omp-update"
 DEFAULT_LOCALBENCH = str(Path.home() / ".local/bin/localbench")
 
 
-CAPTURE_PROOFS = {
-    "auto-thinking": {"feature": "auto-thinking", "proof_suite": "decision"},
-    "find-judgments": {"feature": "find-judgments", "proof_suite": "decision"},
-    "memory-extraction": {"feature": "mnemopi-extraction", "proof_suite": "mem"},
-    "titles": {"feature": "titles", "proof_suite": "-"},
+CAPTURE_FEATURES = {
+    "auto-thinking": "auto-thinking",
+    "find-judgments": "find-judgments",
+    "memory-extraction": "mnemopi-extraction",
+    "titles": "titles",
+    "recall-embeddings": "recall-embeddings",
+    "unexpected-stop": "unexpected-stop",
 }
+# These routes are intentionally excluded from request capture until a stable local fixture exists.
+CAPTURE_EXCLUSIONS = {
+    "skill-description-compression": "features.tsv has no proof suite; run_capture uses --no-skills",
+}
+
+
+def _capture_proofs_from_registry(rows: list[dict] | None = None) -> dict[str, dict]:
+    """Take feature identity and proof suites from features.tsv, not a second registry."""
+    by_feature = {row["feature"]: row for row in (features.load() if rows is None else rows)}
+    missing = sorted(set(CAPTURE_FEATURES.values()) - set(by_feature))
+    if missing:
+        raise ValueError(f"omp-update capture map references features absent from features.tsv: {', '.join(missing)}")
+    return {name: {"feature": feature, "proof_suite": by_feature[feature]["proof_suite"]}
+            for name, feature in CAPTURE_FEATURES.items()}
+
+
+CAPTURE_PROOFS = _capture_proofs_from_registry()
 BASELINE_PATH = Path.home() / ".localbench" / "corpora" / "omp-update-baseline.json"
 
 
@@ -211,7 +230,7 @@ class _IsolatedRpc:
 
     def __init__(self, argv: list[str], cwd: Path, stderr_path: Path, env: Mapping[str, str]):
         self._stderr = stderr_path.open("w", encoding="utf-8")
-        self.proc = subprocess.Popen(argv, cwd=cwd, env=dict(env), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        self.proc = lifecycle.spawn(argv, cwd=cwd, env=dict(env), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                      stderr=self._stderr, text=True, bufsize=1)
         self._lines: queue.Queue[str | None] = queue.Queue()
         try:
@@ -331,7 +350,7 @@ class _InteractiveTitle:
         self._master, slave = pty.openpty()
         self._master_open = True
         try:
-            self.proc = subprocess.Popen(argv, cwd=str(cwd), env=dict(env), stdin=slave, stdout=slave,
+            self.proc = lifecycle.spawn(argv, cwd=str(cwd), env=dict(env), stdin=slave, stdout=slave,
                                          stderr=self._stderr, close_fds=True, start_new_session=True)
         finally:
             os.close(slave)

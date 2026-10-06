@@ -23,16 +23,16 @@ http rows are named `METHOD service /path`.
 
 | kind | rows | checked against the code by tests/test_port_map.py |
 |---|---:|---|
-| py-stdlib | 47 | yes: every import has a row, every row is still imported, every row is a real stdlib module |
-| subprocess | 32 | yes: every launched executable (literals, `omp_bin()`, `_run`/`_first_line`/`_Rpc` helpers, the program behind `sudo -n`) |
-| http | 35 | yes: every URL and API path literal is covered, every row's path is still used |
-| env | 19 | yes: `os.environ`/`getenv` reads, the keys `omp_env()` filters, implicit HOME/PATH/TMPDIR; shell-only rows are checked against the scripts named in `used_in` |
+| py-stdlib | 53 | yes: every import has a row, every row is still imported, every row is a real stdlib module |
+| subprocess | 40 | yes: every launched executable (literals, `omp_bin()`, `_run`/`_first_line`/`_Rpc` helpers, the program behind `sudo -n`) |
+| http | 38 | yes: every URL and API path literal is covered, every row's path is still used |
+| env | 24 | yes: `os.environ`/`getenv` reads, the keys `omp_env()` filters, implicit HOME/PATH/TMPDIR; shell-only rows are checked against the scripts named in `used_in` |
 | sqlite | 5 | yes: every *.db file the code opens |
 | file | 43 | hand-curated (must exist and be mapped) |
 | text-format | 28 | hand-curated: the exact fields and lines parsed from other programs' output |
 | os | 16 | hand-curated |
 | tool | 14 | hand-curated (scripts, CI, dev loop) |
-| service | 17 | hand-curated, with the versions pinned in docs/evidence/incumbents.md |
+| service | 18 | hand-curated, with the versions pinned in docs/evidence/incumbents.md |
 
 The Python side is stdlib only, so every library dependency the port takes on is new. The crates it names: serde +
 serde_json, clap, ureq, httparse, rusqlite (bundled), sha2 + hex, regex, jiff, plist, uuid, url, which, walkdir, glob,

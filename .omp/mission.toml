@@ -1,0 +1,50 @@
+# Mission record (Mission Protocol v0, P1). Human text: docs/planning/packet.md §0 (commit dd55f43).
+identity = "localbench is how this Mac runs local models: every call attributed, every GPU job arbitrated, and no local route live unless it is proven better than today's route."
+stage = "1: first sound GPU proofs after the hardening epics (kit-mu71, kit-qkmi, kit-kcct)"
+approved_by = "the owner"
+approved_at = "2026-10-04"
+approval_quote = "yeah i like b ... yeah i like all of this"
+plan_doc = "docs/planning/packet.md#0-mission"
+
+[[pillar]]
+id = "attributed"
+clause = "Every local-model request names its caller and omp/proj-b feature."
+check = "MISSING: localbench report has no unattributed_gpu_share field (round4-48 finding 1); bead kit-p5wn.6 adds it, then: localbench report --since 24h --json | jq -e '.unattributed_gpu_share < 0.05'"
+
+[[pillar]]
+id = "proven"
+clause = "A live local route needs a current receipt: no quality loss beyond A/A noise plus one measured win."
+check = "localbench features --json | jq -e '(.features | length > 0) and ([.features[] | select(((.local_profiles // []) | length > 0) and ((.status == \"PROVEN\" or .status == \"CARRIED\") | not))] | length == 0)'  # 2026-10-04: exits 1, five live routes are not PROVEN (mnemopi-extraction BAD, recall-embeddings STALE, titles, skill-description-compression and commit-messages UNPROVEN)"
+
+[[pillar]]
+id = "watched"
+clause = "Shadow before go-live; ~1% of live calls re-scored weekly; out-of-bound delta demotes with rollback."
+check = "MISSING: kit-side-model-mission-hgy.1"
+
+[[pillar]]
+id = "current"
+clause = "Every omp/Ollama update re-verifies routes within a day; new releases screened weekly."
+check = "MISSING: a dry-run is a plan, not freshness (round4-48 finding 2); bead kit-p5wn.7 adds a freshness predicate: last successful refresh < 24 h and every route CURRENT/CARRIED or STALE with a queued re-proof"
+
+[[pillar]]
+id = "arbitrated"
+clause = "All GPU work goes through one approved queue; admission on measured contention; every model has source, license, sha and owner."
+check = "MISSING: exit codes are not outcomes (round4-48 finding 3); bead kit-p5wn.8 adds JSON predicates: every GPU job in the queue/history, 0 avoidable-contention voids, 0 unowned or unhashed models"
+
+[[pillar]]
+id = "sound"
+clause = "Verdicts hold stated error rates; receipts reproduce from a clean export; gates hermetic; CI green."
+check = "PARTIAL until kit-mu71.26: test -n \"$(ls ~/.localbench/suite-verdicts/$(git rev-parse HEAD^{tree})-* 2>/dev/null)\" (a cached local suite PASS for main's exact tree; GitHub Actions is disabled on this private repo by the owner's rule)"
+
+[[pillar]]
+id = "valued"
+clause = "localbench value shows each feature's measured benefit and data class; no-win features demoted (D4)."
+check = "MISSING: kit-p5wn.1 (localbench value)"
+
+done_rule = "PROVEN on current pins, shadowed, applied through a preset with omp readback and one-command rollback, through-omp acceptance run, independent review, a row on the value scorecard. Beads close only with a landed sha on origin/main plus independent evidence."
+not_in_mission = ["main-agent evaluation", "leaderboards or cross-host comparison", "patching engines, weights or omp", "machine-wide non-GPU load and fleet tooling (omp-kit)", "hosted fallback on failure", "packaging for strangers"]
+
+[cadence]
+daily = "main green; gateway healthy, 0 phantom requests; every GPU-second attributed; load spikes traced to owner; omp/Ollama updates checked same day; no close without landed sha + independent evidence"
+weekly = "release digest screened; live-delta receipts; value scorecard vs last week; tracker re-graded with br lint clean; one UNPROVEN/STALE route driven to a verdict"
+exit = "every omp/proj-b side feature has a verdict; retained local routes beat hosted on current pins, watched live, re-proven across updates"

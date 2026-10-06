@@ -6,6 +6,7 @@ import contextlib
 import hashlib
 import io
 import json
+import os
 import re
 import socket
 import sqlite3
@@ -122,6 +123,14 @@ class StoreAndExpiry(unittest.TestCase):
         self.store = gateway.GatewayStore(Path(self.temp.name) / "leases.sqlite")
         self.store.set_profiles({"default": "/omp-profile/default", "claude": "/omp-profile/claude"})
 
+    def test_start_request_records_gateway_pid_for_recovery(self):
+        request_id = self.store.start_request("default", "m", "instance-a", now=100.0)
+        with self.store._connect() as db:
+            row = db.execute("SELECT owner_pid FROM active_requests WHERE request_id=?",
+                             (request_id,)).fetchone()
+        self.assertIsNotNone(row)
+        self.assertEqual(row["owner_pid"], gateway.os.getpid())
+
     def test_concurrent_requests_hold_lease_until_last_completion_then_idle_window(self):
         first = self.store.start_request("default", "m", "instance-a", now=100.0)
         second = self.store.start_request("claude", "m", "instance-a", now=105.0)
@@ -141,6 +150,25 @@ class StoreAndExpiry(unittest.TestCase):
         self.store.set_manual_lease("m", expires_at=800.0, now=120.0)
         self.assertEqual(self.store.claim_due(now=500.0), [])
         self.assertEqual([row["model"] for row in self.store.claim_due(now=800.0)], ["m"])
+
+    def test_expired_lease_reports_expired_without_live_requests(self):
+        self.store.set_manual_lease("m", expires_at=800.0, now=120.0)
+        with self.store._connect() as db:
+            db.execute("UPDATE leases SET last_outcome='active' WHERE model=?", ("m",))
+        with mock.patch.object(gateway.time, "time", return_value=800.0):
+            lease = self.store.lease("m")
+        assert lease is not None
+        self.assertEqual(lease["active_requests"], 0)
+        self.assertEqual(lease["last_outcome"], "expired")
+
+    def test_expired_lease_remains_active_while_request_is_live(self):
+        self.store.set_manual_lease("m", expires_at=800.0, now=120.0)
+        self.store.start_request("default", "m", "instance-a", now=130.0)
+        with mock.patch.object(gateway.time, "time", return_value=800.0):
+            lease = self.store.lease("m")
+        assert lease is not None
+        self.assertEqual(lease["active_requests"], 1)
+        self.assertIsNone(lease["last_outcome"])
 
     def test_manual_lease_refuses_nonfinite_expiry_or_clock_before_any_row_is_written(self):
         for expires_at, now in ((float("nan"), 100.0), (float("inf"), 100.0),
@@ -194,6 +222,137 @@ class StoreAndExpiry(unittest.TestCase):
         assert lease is not None
         self.assertEqual(lease["last_outcome"], "interrupted_on_restart")
 
+    def test_stop_reconciles_fifteen_rows_owned_by_dead_gateway_pid(self):
+        home = Path(self.temp.name) / "home"
+        home.mkdir()
+        store = gateway.GatewayStore(gateway.database_path(home))
+        store.set_profiles({"default": "/omp-profile/default"})
+        for index in range(15):
+            store.start_request("default", "m", "old-instance", now=100.0 + index)
+        dead_pid = 2_000_000_000
+        with self.assertRaises(ProcessLookupError):
+            gateway.os.kill(dead_pid, 0)
+        with store._connect() as db:
+            columns = {row["name"] for row in db.execute("PRAGMA table_info(active_requests)")}
+            self.assertIn("owner_pid", columns)
+            db.execute("UPDATE active_requests SET owner_pid=?", (dead_pid,))
+
+        plist = gateway.plist_path(home)
+        plist.parent.mkdir(parents=True, exist_ok=True)
+        plist.write_text("fixture")
+        with mock.patch.object(gateway, "_gateway_established_connections", return_value=1, create=True), \
+                mock.patch.object(gateway, "stop_launch_agent", return_value=True) as stop_agent:
+            with self.assertRaises(gateway.GatewayError):
+                gateway.stop(home=home)
+        self.assertEqual(store.active_requests(), 0)
+        stop_agent.assert_not_called()
+        lease = store.lease("m")
+        assert lease is not None
+        self.assertEqual(lease["last_outcome"], "abandoned")
+        self.assertIn("owner gateway pid", lease["last_error"])
+        requests = store.requests_report(0.0, 1e20, limit=20)
+        self.assertEqual(len(requests), 15)
+        self.assertTrue(all(row["status"] == "abandoned" for row in requests))
+        self.assertTrue(all(row["abandon_reason"] == f"owner gateway pid {dead_pid} is gone"
+                            for row in requests))
+        self.assertTrue(all(row["busy_s"] is None for row in requests))
+        self.assertEqual(store.purpose_report(0.0, 1e20), [])
+
+
+    def test_legacy_active_rows_migrate_unknown_owner_and_reconcile_without_clients(self):
+        home = Path(self.temp.name) / "legacy-home"
+        path = gateway.database_path(home)
+        path.parent.mkdir(parents=True)
+        with contextlib.closing(gateway.sqlite3.connect(path)) as db, db:
+            db.execute("""CREATE TABLE active_requests (
+                request_id TEXT PRIMARY KEY, model TEXT NOT NULL, profile TEXT NOT NULL,
+                started_at REAL NOT NULL, instance_id TEXT NOT NULL
+            )""")
+            db.execute("INSERT INTO active_requests VALUES(?,?,?,?,?)",
+                       ("legacy-request", "m", "default", 100.0, "old-instance"))
+            db.execute("""CREATE TABLE requests (
+                request_id TEXT PRIMARY KEY, profile TEXT NOT NULL, purpose TEXT NOT NULL,
+                model TEXT NOT NULL, started_at REAL NOT NULL, first_byte_at REAL,
+                ended_at REAL NOT NULL, status TEXT NOT NULL, feature TEXT NOT NULL DEFAULT ''
+            )""")
+
+        store = gateway.GatewayStore(path)
+        with store._connect() as db:
+            columns = {row["name"] for row in db.execute("PRAGMA table_info(active_requests)")}
+            self.assertIn("owner_pid", columns)
+            self.assertEqual(db.execute("SELECT owner_pid FROM active_requests").fetchone()[0], 0)
+            request_columns = {row["name"] for row in db.execute("PRAGMA table_info(requests)")}
+            self.assertIn("abandon_reason", request_columns)
+            db.execute("INSERT INTO leases(model) VALUES(?)", ("m",))
+        self.assertEqual(store.reconcile_abandoned_requests(0, now=200.0), 1)
+        self.assertEqual(store.active_requests(), 0)
+        lease = store.lease("m")
+        assert lease is not None
+        self.assertEqual(lease["last_outcome"], "abandoned")
+        self.assertEqual(lease["last_error"], "no established gateway client connections")
+
+    def test_stop_reconciles_rows_when_no_established_clients_remain(self):
+        home = Path(self.temp.name) / "home-no-clients"
+        home.mkdir()
+        store = gateway.GatewayStore(gateway.database_path(home))
+        store.set_profiles({"default": "/omp-profile/default"})
+        for index in range(15):
+            store.start_request("default", "m", "current-instance", now=100.0 + index)
+        plist = gateway.plist_path(home)
+        plist.parent.mkdir(parents=True, exist_ok=True)
+        plist.write_text("fixture")
+
+        with mock.patch.object(gateway, "_gateway_established_connections", return_value=0), \
+                mock.patch.object(gateway, "stop_launch_agent", return_value=True) as stop_agent:
+            self.assertTrue(gateway.stop(home=home))
+
+        self.assertEqual(store.active_requests(), 0)
+        stop_agent.assert_called_once()
+        lease = store.lease("m")
+        assert lease is not None
+        self.assertEqual(lease["last_outcome"], "abandoned")
+        self.assertEqual(lease["last_error"], "no established gateway client connections")
+        requests = store.requests_report(0.0, 1e20, limit=20)
+        self.assertEqual(len(requests), 15)
+        self.assertTrue(all(row["abandon_reason"] == "no established gateway client connections"
+                            for row in requests))
+
+    def test_stop_preserves_live_request_when_gateway_client_remains(self):
+        home = Path(self.temp.name) / "live-home"
+        home.mkdir()
+        store = gateway.GatewayStore(gateway.database_path(home))
+        store.set_profiles({"default": "/omp-profile/default"})
+        store.start_request("default", "m", "current-instance", now=100.0)
+        plist = gateway.plist_path(home)
+        plist.parent.mkdir(parents=True, exist_ok=True)
+        plist.write_text("fixture")
+
+        with mock.patch.object(gateway, "_gateway_established_connections", return_value=1), \
+                mock.patch.object(gateway, "stop_launch_agent") as stop_agent:
+            with self.assertRaisesRegex(gateway.GatewayError, "established client connections"):
+                gateway.stop(home=home)
+
+        self.assertEqual(store.active_requests(), 1)
+        self.assertTrue(store.accepting())
+        self.assertEqual(store.requests_report(0.0, 1e20), [])
+        stop_agent.assert_not_called()
+
+    def test_stop_refuses_when_connection_probe_becomes_unknown(self):
+        home = Path(self.temp.name) / "unknown-home"
+        home.mkdir()
+        store = gateway.GatewayStore(gateway.database_path(home))
+        store.set_profiles({"default": "/omp-profile/default"})
+        plist = gateway.plist_path(home)
+        plist.parent.mkdir(parents=True, exist_ok=True)
+        plist.write_text("fixture")
+
+        with mock.patch.object(gateway, "_gateway_established_connections", return_value=None), \
+                mock.patch.object(gateway, "stop_launch_agent") as stop_agent:
+            with self.assertRaisesRegex(gateway.GatewayError, "connection state is unknown"):
+                gateway.stop(home=home)
+
+        self.assertTrue(store.accepting())
+        stop_agent.assert_not_called()
 
     def test_resident_reloaded_after_confirmed_gateway_unload_is_unowned(self):
         request_id = self.store.start_request("default", "m", "instance-a", now=100.0)
@@ -227,6 +386,78 @@ class StoreAndExpiry(unittest.TestCase):
                                    "requests": 1, "busy_s": 7.0}])
         self.assertEqual(self.store.purpose_report(0.0, 36_000.0), [])
         self.assertEqual(self.store.purpose_report(39_600.0, 43_200.0), [])
+
+
+class RequestRows(StoreAndExpiry):
+    def test_finished_request_lands_a_row_with_queue_wait(self):
+        rid = self.store.start_request("default", "m", "instance-a", now=100.0, purpose="decision:effort")
+        self.store.mark_first_byte(rid, now=102.0)
+        self.store.finish_request(rid, completed=True, outcome="completed", now=110.0)
+        self.assertEqual(self.store.requests_report(0.0, 200.0),
+                         [{"request_id": rid, "profile": "default", "purpose": "decision:effort", "model": "m",
+                           "started_at": 100.0, "first_byte_at": 102.0, "ended_at": 110.0, "status": "completed",
+                           "queue_wait_s": 2.0, "busy_s": 10.0}])
+
+    def test_missing_first_byte_reports_null_queue_wait(self):
+        rid = self.store.start_request("default", "m", "instance-a", now=100.0)
+        self.store.finish_request(rid, completed=False, outcome="client_or_upstream_disconnected", now=105.0)
+        (row,) = self.store.requests_report(0.0, 200.0)
+        self.assertEqual((row["first_byte_at"], row["queue_wait_s"], row["status"], row["purpose"]),
+                         (None, None, "client_or_upstream_disconnected", "unspecified"))
+
+    def test_refused_and_draining_statuses(self):
+        self.store.refuse_request("default", "m", "main", reason="model is fenced", now=50.0)
+        self.store.refuse_request("default", "m", "main", reason="gateway is draining", now=51.0)
+        rows = self.store.requests_report(0.0, 100.0)
+        self.assertEqual([(r["status"], r["first_byte_at"], r["busy_s"]) for r in rows],
+                         [("draining", None, 0.0), ("refused", None, 0.0)])
+
+    def test_rolling_retention_drops_rows_older_than_seven_days(self):
+        old = self.store.start_request("default", "m", "instance-a", now=100.0)
+        self.store.finish_request(old, completed=True, outcome="completed", now=110.0)
+        new = self.store.start_request("default", "m", "instance-a", now=8 * 24 * 3600.0)
+        self.store.finish_request(new, completed=True, outcome="completed", now=8 * 24 * 3600.0 + 5)
+        rows = self.store.requests_report(0.0, 9 * 24 * 3600.0)
+        self.assertEqual([r["request_id"] for r in rows], [new])
+
+    def test_row_cap_evicts_oldest_first(self):
+        ids = []
+        for t in (100.0, 101.0, 102.0):
+            rid = self.store.start_request("default", "m", "instance-a", now=t)
+            self.store.finish_request(rid, completed=True, outcome="completed", now=t + 1)
+            ids.append(rid)
+        with mock.patch.object(gateway, "REQUESTS_MAX_ROWS", 2):
+            rid = self.store.start_request("default", "m", "instance-a", now=200.0)
+            self.store.finish_request(rid, completed=True, outcome="completed", now=201.0)
+        rows = self.store.requests_report(0.0, 300.0)
+        self.assertEqual([r["request_id"] for r in rows], [rid, ids[2]])
+
+    def test_monthly_vacuum_marks_state_and_keeps_rows(self):
+        rid = self.store.start_request("default", "m", "instance-a", now=100.0)
+        with mock.patch.object(gateway, "VACUUM_INTERVAL_S", 0):
+            self.store.finish_request(rid, completed=True, outcome="completed", now=200.0)
+        with self.store._connect() as db:
+            vacuumed = db.execute("SELECT value FROM gateway_state WHERE key='requests_vacuum_at'").fetchone()
+        self.assertEqual(vacuumed[0], "200.0")
+        self.assertEqual(len(self.store.requests_report(0.0, 300.0)), 1)
+
+    def test_requests_report_preserves_feature_attribution(self):
+        rid = self.store.start_request("default", "m", "instance-a", now=100.0,
+                                      purpose="decision:effort", feature="titles")
+        self.store.finish_request(rid, completed=True, outcome="completed", now=101.0)
+        (row,) = self.store.requests_report(0.0, 200.0)
+        self.assertEqual(row["feature"], "titles")
+
+    def test_report_window_filters_purpose_and_limit(self):
+        first = self.store.start_request("default", "m", "instance-a", now=100.0, purpose="decision:effort")
+        self.store.finish_request(first, completed=True, outcome="completed", now=105.0)
+        second = self.store.start_request("claude", "m", "instance-a", now=110.0, purpose="main")
+        self.store.finish_request(second, completed=True, outcome="completed", now=112.0)
+        self.assertEqual([r["request_id"] for r in self.store.requests_report(0.0, 120.0)], [second, first])
+        self.assertEqual([r["request_id"] for r in self.store.requests_report(0.0, 120.0, purpose="main")],
+                         [second])
+        self.assertEqual([r["request_id"] for r in self.store.requests_report(0.0, 120.0, limit=1)], [second])
+        self.assertEqual(self.store.requests_report(200.0, 300.0), [])
 
 
 class ExpirySafety(StoreAndExpiry):
@@ -340,6 +571,36 @@ class ExternalActivitySafety(unittest.TestCase):
         self.assertIsNone(safe)
         assert reason is not None
         self.assertIn("telemetry is unavailable", reason)
+
+    def test_gateway_lsof_counts_server_side_established_sockets_only(self):
+        result = mock.Mock(
+            returncode=0,
+            stdout=("p100\ncgateway\nn127.0.0.1:11300->127.0.0.1:50001\n"
+                    "p101\ncclient\nn127.0.0.1:50001->127.0.0.1:11300\n"),
+            stderr="",
+        )
+        with mock.patch.object(gateway.shutil, "which", return_value="/usr/sbin/lsof"):
+            self.assertEqual(gateway._gateway_established_connections(
+                run=mock.Mock(return_value=result)), 1)
+
+    def test_gateway_lsof_probe_fails_closed_on_incomplete_visibility(self):
+        result = mock.Mock(returncode=0, stdout="", stderr="permission denied")
+        with mock.patch.object(gateway.shutil, "which", return_value="/usr/sbin/lsof"):
+            self.assertIsNone(gateway._gateway_established_connections(
+                run=mock.Mock(return_value=result)))
+
+
+    def test_stop_preflight_refuses_unknown_connection_state(self):
+        with mock.patch.object(gateway, "_gateway_established_connections", return_value=None):
+            self.assertEqual(gateway.stop_preflight(),
+                             "gateway client connection state is unknown; stop refused")
+
+
+    def test_stop_preflight_refuses_established_gateway_client(self):
+        with mock.patch.object(gateway, "_gateway_established_connections", return_value=1):
+            self.assertEqual(gateway.stop_preflight(),
+                             "gateway has established client connections; stop refused")
+
 
 class Duration(unittest.TestCase):
     def test_finite_duration_parser_bounds_values_and_rejects_unbounded_spellings(self):
@@ -456,6 +717,91 @@ class GatewayCli(unittest.TestCase):
             self.assertFalse((agent / "models.yml").exists())
             self.assertFalse(manager.manifest_path.exists())
 
+    def test_stop_dry_run_allows_stale_rows_when_lsof_proves_no_clients(self):
+        from localbench import __main__ as cli
+
+        with tempfile.TemporaryDirectory() as td:
+            home = Path(td)
+            store = gateway.GatewayStore(gateway.database_path(home))
+            store.set_profiles({"default": "/omp-profile/default"})
+            for index in range(15):
+                store.start_request("default", "m", "old-instance", now=100.0 + index)
+            mutation = cli.Mutation("gateway stop", [], dry_run=True, as_json=True, audited=False)
+            args = cli.argparse.Namespace(cmd="gateway", action="stop", host=gateway.HOST,
+                                          port=gateway.PORT, json=True, dry_run=True, explain=False,
+                                          mutation=mutation)
+            service = {"plist_installed": True, "plist_managed": True, "plist_error": None,
+                       "launchd_loaded": True, "health": True}
+            with mock.patch.object(gateway, "database_path", return_value=store.path), \
+                    mock.patch.object(gateway, "service_status", return_value=service), \
+                    mock.patch.object(gateway, "_gateway_established_connections", return_value=0), \
+                    mock.patch.object(gateway, "stop") as stop_call, \
+                    mock.patch("builtins.print") as output:
+                self.assertEqual(cli.cmd_gateway(args), 0)
+            plan = json.loads(output.call_args.args[0])
+            self.assertIsNone(plan["would_refuse"])
+            self.assertEqual(store.active_requests(), 15, "dry-run must not reconcile or mutate the store")
+            stop_call.assert_not_called()
+
+    def test_stop_actual_path_reconciles_dead_rows_before_refusing_live_clients(self):
+        from localbench import __main__ as cli
+
+        with tempfile.TemporaryDirectory() as td:
+            home = Path(td)
+            store = gateway.GatewayStore(gateway.database_path(home))
+            store.set_profiles({"default": "/omp-profile/default"})
+            store.start_request("default", "m", "old-instance", now=100.0)
+            dead_pid = 2_000_000_000
+            with self.assertRaises(ProcessLookupError):
+                gateway.os.kill(dead_pid, 0)
+            with store._connect() as db:
+                db.execute("UPDATE active_requests SET owner_pid=?", (dead_pid,))
+            plist = gateway.plist_path(home)
+            plist.parent.mkdir(parents=True, exist_ok=True)
+            plist.write_text("fixture")
+            service = {"plist_installed": True, "plist_managed": True, "plist_error": None,
+                       "launchd_loaded": True, "health": True}
+            mutation = cli.Mutation("gateway stop", [], dry_run=False, as_json=False, audited=False)
+            args = cli.argparse.Namespace(cmd="gateway", action="stop", host=gateway.HOST,
+                                          port=gateway.PORT, json=False, dry_run=False, explain=False,
+                                          mutation=mutation)
+            error = io.StringIO()
+            with mock.patch.object(gateway, "database_path", return_value=store.path), \
+                    mock.patch.object(gateway, "plist_path", return_value=plist), \
+                    mock.patch.object(gateway, "service_status", return_value=service), \
+                    mock.patch.object(gateway, "_gateway_established_connections", return_value=1), \
+                    mock.patch.object(gateway, "stop_launch_agent") as stop_agent, \
+                    contextlib.redirect_stderr(error):
+                self.assertEqual(cli.cmd_gateway(args), 1)
+
+            self.assertEqual(store.active_requests(), 0)
+            self.assertIn("abandoned", store.requests_report(0.0, 1e20)[0]["status"])
+            self.assertIn("owner gateway pid", store.requests_report(0.0, 1e20)[0]["abandon_reason"])
+            self.assertIn("established client connections", error.getvalue())
+            stop_agent.assert_not_called()
+
+    def test_request_report_text_shows_abandonment_reason_and_unknown_busy_time(self):
+        from localbench import __main__ as cli
+
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "leases.sqlite"
+            store = gateway.GatewayStore(path)
+            store.set_profiles({"default": "/omp-profile/default"})
+            now = gateway.time.time()
+            request_id = store.start_request("default", "m", "instance-a", now=now - 5.0)
+            store.finish_request(request_id, completed=False, outcome="abandoned", now=now,
+                                 abandon_reason="dead gateway pid")
+            args = cli.argparse.Namespace(since=3600.0, req_purpose=None, req_profile=None,
+                                          limit=20, json=False)
+            text = io.StringIO()
+            with mock.patch.object(gateway, "database_path", return_value=path), \
+                    contextlib.redirect_stdout(text):
+                self.assertEqual(cli._report_requests(args), 0)
+
+        self.assertIn("abandon_reason", text.getvalue())
+        self.assertIn("dead gateway pid", text.getvalue())
+        self.assertIn("abandoned", text.getvalue())
+
     def fence_cli(self, store_path: Path, action: str, *, models=(), fence_id=None, park_ids=frozenset()):
         from localbench import __main__ as cli
 
@@ -542,15 +888,25 @@ class GatewayCli(unittest.TestCase):
 
 
 class LaunchAgent(unittest.TestCase):
-    def test_launch_agent_is_user_scoped_loopback_only_and_does_not_use_shell(self):
+    def test_launch_agent_runs_from_a_verified_pinned_export(self):
         with tempfile.TemporaryDirectory() as td:
-            plist = gateway.launchd_plist(home=Path(td), python="/opt/localbench/bin/python")
-        self.assertEqual(plist["Label"], gateway.LABEL)
-        self.assertEqual(plist["ProgramArguments"][:3], ["/opt/localbench/bin/python", "-m", "localbench"])
-        self.assertIn("127.0.0.1", plist["ProgramArguments"])
-        self.assertTrue(plist["RunAtLoad"])
-        self.assertNotIn("sh", plist["ProgramArguments"])
-        self.assertTrue(plist["StandardOutPath"].startswith(str(Path(td) / ".localbench")))
+            home = Path(td)
+            plist = gateway.launchd_plist(home=home)
+            export = Path(plist["WorkingDirectory"])
+            interpreter = Path(plist["ProgramArguments"][0])
+            marker = json.loads((export / gateway.GATEWAY_EXPORT_MARKER).read_text())
+            self.assertEqual(plist["Label"], gateway.LABEL)
+            self.assertEqual(plist["ProgramArguments"][1:3], ["-m", "localbench"])
+            self.assertTrue(interpreter.is_file())
+            self.assertTrue(interpreter.absolute().is_relative_to(export.absolute()))
+            self.assertEqual(marker["gateway_sha"], gateway._file_sha(Path(gateway.__file__)))
+            self.assertEqual(marker["package_sha"], export.name)
+            self.assertIn("127.0.0.1", plist["ProgramArguments"])
+            self.assertTrue(plist["RunAtLoad"])
+            self.assertTrue(plist["KeepAlive"])
+            self.assertNotIn("sh", plist["ProgramArguments"])
+            self.assertEqual(plist["EnvironmentVariables"]["LOCALBENCH_GATEWAY_SHA"], marker["gateway_sha"])
+            self.assertTrue(plist["StandardOutPath"].startswith(str(home / ".localbench")))
 
 
 class StopStartRace(unittest.TestCase):
@@ -599,6 +955,25 @@ class StopStartRace(unittest.TestCase):
                                   return_value={"ok": True, "latency_s": 0.01, "reason": None}):
             with self.assertRaisesRegex(gateway.GatewayError, "still answers /healthz"):
                 gateway.stop_launch_agent(home=Path("/tmp/no-home"), run=run, unload_timeout=0.4)
+
+    def test_stop_checks_silence_when_launchd_is_already_unloaded(self):
+        run, calls = self._script([False, False])
+        with self._managed(), \
+                mock.patch.object(gateway, "_probe_health",
+                                  return_value={"ok": False, "latency_s": 0.01, "reason": None}) as probed:
+            self.assertTrue(gateway.stop_launch_agent(
+                home=Path("/tmp/no-home"), run=run, unload_timeout=0))
+        self.assertEqual(probed.call_count, 1)
+        self.assertFalse(any(c[:2] == ["launchctl", "bootout"] for c in calls))
+
+    def test_stop_timeout_when_unloaded_gateway_still_answers(self):
+        run, _ = self._script([False, False])
+        with self._managed(), \
+                mock.patch.object(gateway, "_probe_health",
+                                  return_value={"ok": True, "latency_s": 0.01, "reason": None}):
+            with self.assertRaisesRegex(gateway.GatewayError, "still answers /healthz"):
+                gateway.stop_launch_agent(
+                    home=Path("/tmp/no-home"), run=run, unload_timeout=0)
 
     def test_stop_then_start_actually_starts(self):
         run, calls = self._script([True, True, False])
@@ -813,13 +1188,77 @@ class HttpGateway(unittest.TestCase):
         self.assertEqual(lease["active_requests"], 0)
         self.assertIsNotNone(lease["idle_expires_at"])
 
-    def _post(self, path, payload):
+    def test_inflight_finishes_even_if_upstream_close_raises(self):
+        close_attempted = []
+
+        class CloseErrorResponse:
+            status = 200
+            headers = {"Content-Type": "application/json", "Content-Length": "2"}
+
+            def __init__(self):
+                self.body = io.BytesIO(b"ok")
+
+            def getcode(self):
+                return self.status
+
+            def read1(self, size):
+                return self.body.read(size)
+
+            def read(self, size=-1):
+                return self.body.read(size)
+
+            def close(self):
+                close_attempted.append(True)
+                raise OSError("upstream close failed")
+
+        response = CloseErrorResponse()
+        with mock.patch.object(self.gateway_server, "handle_error"), \
+                mock.patch.object(gateway, "urlopen", return_value=response):
+            status, body = self._post("/omp-profile/claude/responses", {"model": "m"})
+            self.assertEqual((status, body), (200, b"ok"))
+            deadline = time.monotonic() + 3
+            while self.store.active_requests("m"):
+                self.assertLess(time.monotonic(), deadline, "upstream close error skipped in-flight decrement")
+                time.sleep(0.01)
+        self.assertEqual(close_attempted, [True])
+
+    def test_upstream_error_and_timeout_release_inflight(self):
+        failures = (("upstream error", OSError("upstream failed")),
+                    ("timeout", TimeoutError("upstream timed out")))
+        for label, failure in failures:
+            with self.subTest(terminal=label):
+                with mock.patch.object(gateway, "urlopen", side_effect=failure):
+                    with self.assertRaises(HTTPError) as response:
+                        self._post("/omp-profile/claude/responses", {"model": "m"})
+                self.assertEqual(response.exception.code, 502)
+                response.exception.close()
+                deadline = time.monotonic() + 3
+                while self.store.active_requests("m"):
+                    self.assertLess(time.monotonic(), deadline, f"{label} leaked an in-flight request")
+                    time.sleep(0.01)
+                self.assertEqual(self.store.active_requests("m"), 0)
+
+    def _post(self, path, payload, headers=None):
         root = f"http://127.0.0.1:{self.gateway_server.server_port}"
         body = json.dumps(payload).encode()
-        request = Request(root + path, data=body, headers={"Content-Type": "application/json"},
-                          method="POST")
+        request = Request(root + path, data=body,
+                          headers={"Content-Type": "application/json", **(headers or {})}, method="POST")
         with urlopen(request, timeout=5) as response:
             return response.status, response.read()
+
+    def test_feature_header_lands_on_request_report(self):
+        _StreamingUpstream.release_systemone.set()
+        payload = {"model": "m", "questions": [{"name": "effort"}]}
+        status, body = self._post("/omp-profile/claude/v1/systemone", payload,
+                                  {"X-Localbench-Feature": "titles"})
+        self.assertEqual((status, body), (200, _StreamingUpstream.SYSTEMONE_RESPONSE))
+        deadline = time.monotonic() + 3
+        while self.store.active_requests("m"):
+            if time.monotonic() >= deadline:
+                self.fail("gateway request did not finish")
+            time.sleep(0.01)
+        rows = self.store.requests_report(0.0, time.time() + 1)
+        self.assertEqual(rows[0]["feature"], "titles")
 
     def test_systemone_returns_upstream_bytes_and_counts_lease_inflight_and_purpose(self):
         payload = {"model": "m", "questions": [{"name": "effort"}, {"name": "find"}]}
@@ -942,6 +1381,186 @@ class HttpGateway(unittest.TestCase):
             self.assertEqual(_StreamingUpstream.systemone_calls, [])
         finally:
             self.store.release_park_fence("manual-window")
+
+
+class _ClefUpstream(BaseHTTPRequestHandler):
+    """Stands in for proj-b's serve.py on :8010: any POST path is one decision call, GET is its identity."""
+    calls: list = []
+    arrived = threading.Semaphore(0)
+    release = threading.Event()
+    status = 200
+    REPLY = b'{"decisions":[{"name":"gate","answer":"allow"}]}'
+
+    def log_message(self, format, *args):
+        return
+
+    def _reply(self, code, body):
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):
+        type(self).calls.append(("GET", self.path, b""))
+        self._reply(200, b'{"models":[{"id":"clef-flash"}]}')
+
+    def do_POST(self):
+        raw = self.rfile.read(int(self.headers["Content-Length"]))
+        type(self).calls.append(("POST", self.path, raw))
+        type(self).arrived.release()
+        type(self).release.wait(10)
+        code = type(self).status
+        self._reply(code, type(self).REPLY if code == 200 else b'{"error":"RuntimeError","detail":"mps oom"}')
+
+
+class ClefFlashGateway(unittest.TestCase):
+    """kit-jtq2: the gateway fronts proj-b's Clef-Flash server. Calls are attributed to profile proj-b and feature
+    proj-b-<route>, yield to park fences, are capped at two in flight, and never take a residency lease."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.store = gateway.GatewayStore(Path(self.temp.name) / "leases.sqlite")
+        self.store.set_profiles({"claude": "/omp-profile/claude"})
+        _ClefUpstream.calls = []
+        _ClefUpstream.arrived = threading.Semaphore(0)
+        _ClefUpstream.release = threading.Event()
+        _ClefUpstream.status = 200
+        self.clef = ThreadingHTTPServer(("127.0.0.1", 0), _ClefUpstream)
+        self.server = self._gateway(f"http://127.0.0.1:{self.clef.server_port}")
+        threading.Thread(target=self.clef.serve_forever, daemon=True).start()
+        self.addCleanup(self._close)
+
+    def _gateway(self, clef_root):
+        # The Ollama upstream is unreachable on purpose: a clef call that went to Ollama fails with 502.
+        server = gateway.create_server(
+            ("127.0.0.1", 0), self.store, gateway.GatewayPolicy(self.store, object(), lambda _model: (True, None)),
+            upstream_root="http://127.0.0.1:1", instance_id="clef-test", clef_root=clef_root)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        return server
+
+    def _close(self):
+        _ClefUpstream.release.set()
+        self.clef.shutdown()
+        self.clef.server_close()
+
+    def _call(self, path, body=b'{"questions":{"gate":{"text":"rm -rf build"}}}', server=None, method="POST"):
+        server = server or self.server
+        request = Request(f"http://127.0.0.1:{server.server_port}{path}", data=body if method == "POST" else None,
+                          headers={"Content-Type": "application/json"}, method=method)
+        with urlopen(request, timeout=5) as response:
+            return response.status, response.read(), response.headers
+
+    def _refused(self, path, server=None):
+        with self.assertRaises(HTTPError) as caught:
+            self._call(path, server=server)
+        with caught.exception as response:
+            return response.code, json.loads(response.read()), response.headers
+
+    def _settled(self):
+        """The reply reaches the client before the handler's finally frees its slot and writes the row."""
+        deadline = time.monotonic() + 3
+        while self.store.active_requests("clef-flash"):
+            self.assertLess(time.monotonic(), deadline, "clef-flash request never finished")
+            time.sleep(0.01)
+
+    def test_route_names_follow_the_contract(self):
+        ok = gateway.route_request("POST", "/proj-b/clef-flash/" + "a" * 64, ())
+        self.assertEqual((ok.kind, ok.profile, ok.upstream, ok.upstream_path, ok.feature),
+                         ("inference", "proj-b", "clef", "/v1/systemone", "proj-b-" + "a" * 64))
+        identity = gateway.route_request("GET", "/proj-b/clef-flash/", ())
+        self.assertEqual((identity.kind, identity.upstream, identity.upstream_path), ("discovery", "clef", "/"))
+        for method, path, status in (("POST", "/proj-b/clef-flash/" + "a" * 65, 400),
+                                     ("POST", "/proj-b/clef-flash/X2-gate", 400),
+                                     ("POST", "/proj-b/clef-flash/x2_gate", 400),
+                                     ("POST", "/proj-b/clef-flash/x2/gate", 400),
+                                     ("POST", "/proj-b/clef-flash/", 400),
+                                     ("POST", "/proj-b/clef-flash/v1/systemone", 400),
+                                     ("POST", "/proj-b/clef-flash/find-rank/v1/systemone/", 400),
+                                     ("POST", "/proj-b/clef-flash/find-rank/v1/chat/completions", 400),
+                                     ("GET", "/proj-b/clef-flash/x2-gate", 404),
+                                     ("PUT", "/proj-b/clef-flash/x2-gate", 405)):
+            with self.subTest(method=method, path=path), self.assertRaises(gateway.RouteError) as caught:
+                gateway.route_request(method, path, ())
+            self.assertEqual(caught.exception.status, status)
+
+    def test_a_decision_call_reaches_serve_py_unchanged_and_is_attributed_to_jev(self):
+        _ClefUpstream.release.set()
+        body = b'{"questions":{"gate":{"text":"rm -rf build"}},"model":"anything"}'
+        status, reply, headers = self._call("/proj-b/clef-flash/x2-gate", body)
+        self.assertEqual((status, reply), (200, _ClefUpstream.REPLY))
+        self.assertEqual(_ClefUpstream.calls, [("POST", "/v1/systemone", body)])
+        self._settled()
+        rows = self.store.requests_report(0, time.time() + 1, profile="proj-b")
+        self.assertEqual([(r["request_id"], r["model"], r["feature"], r["status"]) for r in rows],
+                         [(headers["X-Localbench-Request-Id"], "clef-flash", "proj-b-x2-gate", "completed")])
+        self.assertIsNone(self.store.lease("clef-flash"))   # never leased, so expiry never unloads it
+        self.assertEqual(self.store.active_requests(), 0)
+
+    def test_omp_typesafe_base_url_form_is_the_same_call(self):
+        # omp's typesafe provider appends /v1/systemone to its baseUrl http://127.0.0.1:11300/proj-b/clef-flash/<route>.
+        _ClefUpstream.release.set()
+        body = b'{"questions":{"find":{"text":"rank these"}}}'
+        status, reply, headers = self._call("/proj-b/clef-flash/find-rank/v1/systemone", body)
+        self.assertEqual((status, reply), (200, _ClefUpstream.REPLY))
+        self.assertEqual(_ClefUpstream.calls, [("POST", "/v1/systemone", body)])
+        self._settled()
+        rows = self.store.requests_report(0, time.time() + 1, profile="proj-b")
+        self.assertEqual([(r["request_id"], r["feature"]) for r in rows],
+                         [(headers["X-Localbench-Request-Id"], "proj-b-find-rank")])
+
+    def test_a_route_outside_the_contract_never_reaches_serve_py(self):
+        code, _payload, _ = self._refused("/proj-b/clef-flash/X2-gate")
+        self.assertEqual(code, 400)
+        self.assertEqual(_ClefUpstream.calls, [])
+
+    def test_a_third_call_in_flight_is_busy_with_retry_after_and_the_slots_come_back(self):
+        results = []
+        workers = [threading.Thread(target=lambda: results.append(self._call("/proj-b/clef-flash/x2-gate")[0]))
+                   for _ in range(2)]
+        for worker in workers:
+            worker.start()
+        for _ in range(2):
+            self.assertTrue(_ClefUpstream.arrived.acquire(timeout=5))
+        code, payload, headers = self._refused("/proj-b/clef-flash/x2-gate")
+        self.assertEqual((code, payload["code"], headers["Retry-After"]), (503, "busy", "2"))
+        self.assertEqual(len(_ClefUpstream.calls), 2)
+        _ClefUpstream.release.set()
+        for worker in workers:
+            worker.join(5)
+        self.assertEqual(results, [200, 200])
+        self._settled()
+        for _ in range(3):   # both slots were returned: sequential calls keep being admitted
+            self.assertEqual(self._call("/proj-b/clef-flash/x2-gate")[0], 200)
+            self._settled()
+
+    def test_any_park_fence_holds_clef_until_it_is_released(self):
+        _ClefUpstream.release.set()
+        self.assertIsNone(self.store.acquire_park_fence(["qwen3.8:27b-mlx"], "run-window"))
+        code, payload, headers = self._refused("/proj-b/clef-flash/x2-gate")
+        self.assertEqual((code, payload["code"], headers["Retry-After"]), (503, "fenced", "60"))
+        self.assertEqual(_ClefUpstream.calls, [])
+        self.store.release_park_fence("run-window")
+        self.assertEqual(self._call("/proj-b/clef-flash/x2-gate")[0], 200)
+
+    def test_serve_py_failing_or_down_is_a_502(self):
+        _ClefUpstream.release.set()
+        _ClefUpstream.status = 500
+        code, payload, headers = self._refused("/proj-b/clef-flash/x2-gate")
+        self.assertEqual((code, payload["error"]), (502, "RuntimeError"))
+        self.assertTrue(headers["X-Localbench-Request-Id"])
+        down = self._gateway("http://127.0.0.1:1")
+        code, payload, _ = self._refused("/proj-b/clef-flash/x2-gate", server=down)
+        self.assertEqual((code, payload["code"]), (502, "upstream"))
+
+    def test_identity_get_is_proxied_without_a_request_row(self):
+        status, reply, _ = self._call("/proj-b/clef-flash/", method="GET")
+        self.assertEqual((status, json.loads(reply)), (200, {"models": [{"id": "clef-flash"}]}))
+        self.assertEqual(_ClefUpstream.calls, [("GET", "/", b"")])
+        self.assertEqual(self.store.requests_report(0, time.time() + 1, profile="proj-b"), [])
 
 
 class HealthzIndependence(unittest.TestCase):
@@ -1167,7 +1786,6 @@ class CaptureOptIn(unittest.TestCase):
         gateway.corpus.capture_on(["decision"], max_items=10, minutes=60,
                                    root=self.root, now=time.time())
         payload = {"model": "m", "questions": [{"name": "effort"}]}
-        sent = json.dumps(payload).encode()
         for _ in range(2):
             status, body = self._post("/omp-profile/claude/v1/systemone", payload)
             self.assertEqual(status, 200)
@@ -1301,3 +1919,30 @@ class CaptureOptIn(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AuxiliaryConcurrency(unittest.TestCase):
+    def test_default_cap_is_disabled(self):
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop(gateway.AUX_CONCURRENCY_ENV, None)
+            self.assertEqual(gateway._aux_concurrency(), 0)
+
+    def test_enabled_cap_refuses_until_slot_released(self):
+        server = object.__new__(gateway.GatewayHTTPServer)
+        server._aux_slots = threading.BoundedSemaphore(1)
+        self.assertTrue(server.acquire_aux())
+        self.assertFalse(server.acquire_aux())
+        server.release_aux()
+        self.assertTrue(server.acquire_aux())
+        server.release_aux()
+
+    def test_invalid_cap_is_rejected(self):
+        with mock.patch.dict(os.environ, {gateway.AUX_CONCURRENCY_ENV: "nope"}):
+            with self.assertRaises(gateway.GatewayError):
+                gateway._aux_concurrency()
+
+    def test_known_side_purposes_are_auxiliary_but_decision_and_main_are_not(self):
+        for purpose in ("aux", "judge", "memory-extract", "memory-consolidate"):
+            self.assertTrue(gateway.auxiliary_purpose(purpose))
+        self.assertFalse(gateway.auxiliary_purpose("decision:foo"))
+        self.assertFalse(gateway.auxiliary_purpose("main"))
